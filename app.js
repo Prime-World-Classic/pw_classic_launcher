@@ -1,4 +1,4 @@
-APP_VERSION = '1.4.10';
+APP_VERSION = '1.4.12';
 
 PW_VERSION = '1.4';
 
@@ -3396,6 +3396,18 @@ class MM {
 		
 	}
 	
+	static soundEvent(){
+		
+		let audio = new Audio();
+		
+		audio.preload = 'auto';
+		
+		audio.src = 'found.mp3';
+		
+		audio.play();
+		
+	}
+	
 	static play(){
 		
 		return MM.button;
@@ -3570,6 +3582,8 @@ class MM {
 	}
 	*/
 	static async ready(data){
+		
+		MM.soundEvent();
 		
 		MM.id = data.id;
 		
@@ -3812,6 +3826,8 @@ class MM {
 		}
 		
 		if(App.storage.data.id == data.target){
+			
+			MM.soundEvent();
 			
 			MM.selectHeroButton.style.opacity = 1;
 			
