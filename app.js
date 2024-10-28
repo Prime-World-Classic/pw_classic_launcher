@@ -1,4 +1,4 @@
-APP_VERSION = '1.4.11';
+APP_VERSION = '1.4.10';
 
 PW_VERSION = '1.4';
 
