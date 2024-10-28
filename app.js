@@ -3032,7 +3032,7 @@ class App {
 		
 		App.storage = new Store('u');
 		
-		await App.storage.init({token:'',login:''});
+		await App.storage.init({id:0,token:'',login:''});
 		
 		await Protect.init();
 		
