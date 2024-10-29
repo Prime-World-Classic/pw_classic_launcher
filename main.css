@@ -1067,9 +1067,9 @@ cursor:pointer;
 	
 	margin:1vw 0;
 	text-align:center;
-	font:1.5vw / 1 Verdana;
-	color:rgba(255,255,255,0.5);
-	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
+	font: bold 1.5vw / 1 Verdana;
+	color: #111;
+	text-shadow: #fff 0 0 5px;
 	
 }
 
