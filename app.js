@@ -937,7 +937,7 @@ class View {
 					
 				}
 				
-				img.style.backgroundImage = (item.hero) ? `url(hero/${item.hero}/1.png)` : `url(hero/empty.png)`;
+				img.style.backgroundImage = (item.hero) ? `url(hero/${item.hero}/1.png)` : `url(hero/empty-ru.avif)`;
 				
 			}
 			else{
@@ -1006,7 +1006,7 @@ class View {
 							
 							MM.activeSelectHero = item.id;
 							
-							player.children[1].style.backgroundImage = (item.id) ? `url(hero/${item.id}/1.png)` : `url(hero/empty.png)`;
+							player.children[1].style.backgroundImage = (item.id) ? `url(hero/${item.id}/1.png)` : `url(hero/empty-ru.avif)`;
 							
 							Splash.hide();
 							
@@ -1019,7 +1019,7 @@ class View {
 						}
 						else{
 							
-							hero.dataset.url = `hero/empty.png`;
+							hero.dataset.url = `hero/empty-ru.avif`;
 							
 						}
 						
@@ -2983,7 +2983,7 @@ class Events {
 		
 		if(find){
 			
-			find.children[1].style.backgroundImage = (data.hero) ? `url(hero/${data.hero}/1.png)` : `url(hero/empty.png)`;
+			find.children[1].style.backgroundImage = (data.hero) ? `url(hero/${data.hero}/1.png)` : `url(hero/empty-ru.avif)`;
 			
 		}
 		
@@ -3644,7 +3644,7 @@ class MM {
 			}
 			else{
 				
-				hero.src = `hero/empty.png`;
+				hero.src = `hero/empty-ru.avif`;
 				
 			}
 			
