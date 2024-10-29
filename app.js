@@ -1553,13 +1553,7 @@ class Build{
 		
 		for(let build of builds){
 			
-			let item = DOM({style:'build-list-item'},`${build.name}`);
-			
-			if(build.target){
-				
-				item.style.background = 'rgba(153,255,51,0.7)';
-				
-			}
+			let item = DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']}, `${build.name}`);
 			
 			item.onclick = () => {
 				
@@ -1573,7 +1567,7 @@ class Build{
 		
 		if(builds.length < 6){
 			
-			let create = DOM({style:'build-list-item',event:['click', () => {
+			let create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
 				
 				let template = document.createDocumentFragment();
 				
@@ -1605,13 +1599,13 @@ class Build{
 			
 		}
 		
-		Build.listView.append(DOM({style:'build-list-random',event:['click', async () => {
+		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-1'], event:['click', async () => {
 			
 			await App.api.request('build','random',{id:Build.id});
 			
 			View.show('build',Build.heroId);
 			
-		}]},'[Случайный]'));
+		}]},'Случайный билд'));
 		Build.listView.append(DOM({style:'build-list-close',event:['click',() => View.show('main')]},'[X]'));
 		
 		
@@ -1764,7 +1758,7 @@ class Build{
 				}
 				else{
 					
-					item.style.background = 'rgba(153,255,51,0.7)';
+					item.classList
 					
 					if(key == 'hp'){
 						
@@ -4962,7 +4956,11 @@ function DOM(properties){
 					
 					case 'style':
 					
-					parent.classList.add(properties.style);
+					if (typeof properties.style === 'string') {
+						parent.classList.add(properties.style);
+					} else {
+						parent.classList.add(...properties.style);
+					}
 					
 					break;
 					
