@@ -1,6 +1,6 @@
-APP_VERSION = '1.4.12';
+APP_VERSION = '1.5.0';
 
-PW_VERSION = '1.4';
+PW_VERSION = '1.5';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
@@ -3024,7 +3024,7 @@ class App {
 		// ws://192.168.9.167:7373
 		await Store.init();
 		
-		App.storage = new Store('u');
+		App.storage = new Store('u1');
 		
 		await App.storage.init({id:0,token:'',login:''});
 		
@@ -3119,7 +3119,7 @@ class App {
 			
 		}
 
-		await App.storage.set({token:request.token,login:login.value});
+		await App.storage.set({id:request.id,token:request.token,login:login.value});
 		
 		View.show('main');
 		
@@ -3344,7 +3344,7 @@ class Protect {
 		
 		if(Protect.storage.data.v != PW_VERSION){
 			
-			await Protect.storage.set({s:false});
+			await Protect.storage.set({c:'',s:false});
 			
 			return false;
 			
