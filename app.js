@@ -2320,7 +2320,7 @@ class Build{
 				}
 				
 			}]});
-			
+
 			if(item >= 0){
 				
 				element.dataset.active = 0;
@@ -2389,7 +2389,12 @@ class Build{
 			index++;
 			
 		}
-		
+
+		const p = document.createElement('p');
+		p.id = 'help';
+		p.innerText = 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
+		document.getElementById('STAT').after(p);
+
 	}
 	
 	static setSortInventory(key,value){
