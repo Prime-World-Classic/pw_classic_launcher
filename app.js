@@ -2038,7 +2038,7 @@ class Build{
 				}
 				else{
 					
-					item.style.background = 'rgba(153,255,51,0.7)';
+					item.style.background = 'rgb(57, 166, 166)';
 					
 					Build.setSortInventory('level',item.dataset.id);
 					
