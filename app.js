@@ -2328,8 +2328,8 @@ class Build{
 			}
 			else{
 				
-				element.style.background = 'rgba(153,255,51,0.7)';
-				
+				element.classList.add('smartcast');
+
 				element.dataset.active = 1;
 				
 			}
