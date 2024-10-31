@@ -2176,7 +2176,6 @@ class Build{
 		return talent;
 		
 		preload.add(talent);
-		
 	}
 	
 	static inventory(){
