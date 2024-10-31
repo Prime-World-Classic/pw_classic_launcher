@@ -3508,8 +3508,8 @@ class MM {
 				
 				if(request.type == 'reconnect'){
 					
-					let reconnect = DOM({tag:'a',href:`pwclassic://${App.storage.data.token}/reconnect/${PW_VERSION}/${request.id}/1/1`});
-					
+					let reconnect = DOM({tag:'a',href:`pwclassic://${App.storage.data.token}/reconnect/${PW_VERSION}/${request.id}/${request.hero}/${request.team}`});
+		
 					reconnect.click();
 					
 					return;
