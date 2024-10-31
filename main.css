@@ -1216,6 +1216,14 @@ cursor:pointer;
 	
 }
 
+#help {
+	position: absolute;
+	bottom: 26px;
+	left: 17vw;
+	z-index: 1;
+	color: #fff;
+}
+
 /*
 от  - до
 1200 - и больше
