@@ -2887,7 +2887,7 @@ class Events {
 		
 		console.log('stat',data);
 		
-		let find = document.getElementById('STAT');
+		const find = document.getElementById('STAT');
 		
 		if(find){
 			
