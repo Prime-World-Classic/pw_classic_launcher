@@ -422,7 +422,18 @@ background-color:rgba(15,15,15,0.7);
 	cursor:pointer;
 	
 }
-
+.build-active-bar-item .build-talent-item:after {
+	content: '';
+	display: block;
+	position: relative;
+	width: 17px;
+	height: 17px;
+	border-radius: 50%;
+	background: gray;
+	left: 86px;
+	bottom: -89px;
+	border: 2px solid #000;
+}
 
 .build-rarity{
 	margin:0 10px;
@@ -1396,6 +1407,10 @@ cursor:pointer;
 	background-clip: padding-box, border-box;
 	animation: borderRotate var(--d) linear infinite forwards;
 }
+.smartcast .build-talent-item:after {
+	background: #8f9;
+}
+
 
 @keyframes borderRotate {
 	100% {
