@@ -1,4 +1,4 @@
-APP_VERSION = '1.5.0';
+APP_VERSION = '1.5.1';
 
 PW_VERSION = '1.5';
 
@@ -2951,7 +2951,7 @@ class Events {
 		
 		let b1 = DOM({style:'splash-content-button',event:['click', async () => {
 			
-			await App.api.request('mm','joinParty',{code:data.code});
+			await App.api.request('mm','joinParty',{code:data.code,version:PW_VERSION});
 			
 			Splash.hide();
 			
@@ -3502,7 +3502,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero});
+				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero,version:PW_VERSION});
 				
 				MM.id = request.id;
 				
