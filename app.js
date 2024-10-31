@@ -2157,7 +2157,7 @@ class Build{
 	
 	static templateViewTalent(data){
 		
-		let talent = document.createElement('div');
+		const talent = document.createElement('div');
 		
 		talent.classList.add('build-talent-item');
 		
