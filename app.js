@@ -2891,7 +2891,7 @@ class Events {
 		
 		if(find){
 			
-			find.innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Группы: ${data.party}`
+			find.innerText = `Онлайн: ${data.online}, ММ (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
 			
 		}
 		
