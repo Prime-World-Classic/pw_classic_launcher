@@ -2883,20 +2883,6 @@ class Events {
 		
 	}
 	
-	static stat(data){
-		
-		console.log('stat',data);
-		
-		const find = document.getElementById('STAT');
-		
-		if(find){
-			
-			find.innerText = `Онлайн: ${data.online}, ММ (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
-			
-		}
-		
-	}
-	
 	static MMReady(data){
 		
 		MM.ready(data);
@@ -3008,14 +2994,21 @@ class Events {
 		MM.searchActive(data.status);
 		
 	}
-	
+
+	static stat(data) {
+		
+		console.log('stat',data);
+		
+		document.getElementById('STAT')
+			.innerText = `Онлайн: ${data.online}, ММ (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
+		
+	}
+
 }
 
 class App {
 	
 	static async init(){
-		
-		document.body.append(DOM({id:'STAT'}));
 		
 		Splash.init();
 		
@@ -3048,7 +3041,8 @@ class App {
 		}
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
-		
+		//
+		document.body.append(DOM({id:'STAT'}));
 	}
 	
 	static async authorization(login,password){
