@@ -2292,14 +2292,14 @@ class Build{
 				
 				if(element.dataset.active == 1){
 					
-					element.style.background = 'rgba(255,255,255,0.2)';
+					element.classList.remove('smartcast');
 					
 					element.dataset.active = 0;
 					
 				}
 				else{
 					
-					element.style.background = 'rgba(153,255,51,0.7)';
+					element.classList.add('smartcast');
 					
 					element.dataset.active = 1;
 					
