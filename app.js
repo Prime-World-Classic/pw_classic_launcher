@@ -2288,7 +2288,7 @@ class Build{
 		
 		for(let item of data){
 			
-			let element = DOM({data:{index:index},style:'build-active-bar-item',event:['click', async () => {
+			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['click', async () => {
 				
 				if(element.dataset.active == 1){
 					
