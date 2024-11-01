@@ -1182,7 +1182,11 @@ class View {
 			
 			for(const item of result){
 				
-				const hero = DOM({style:'hero-item'},DOM({tag:'span'},item.name));
+				const hero = DOM(
+					{style:'hero-item'},
+					DOM({tag:'span'}, item.name),
+					// DOM({tag:'img', src: 'ransk/_05_20.png'}, item.name)
+				);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
 				
