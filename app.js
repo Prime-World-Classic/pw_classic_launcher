@@ -1182,7 +1182,7 @@ class View {
 			
 			for(let item of result){
 				
-				let hero = DOM({style:'hero-item'},DOM({tag:'span'},item.name));
+				const hero = DOM({style:'hero-item'},DOM({tag:'span'},item.name));
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
 				
