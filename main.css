@@ -686,6 +686,14 @@ text-align:center;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
 	
 }
+.hero-item img {
+	margin: 120px 0 0 100px;
+	width: 40px;
+	background: #377;
+	padding: 8px;
+	border: 1px solid orange;
+	border-radius: 50%;
+}
 
 .adm{
 	
