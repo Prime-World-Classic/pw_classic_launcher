@@ -1095,6 +1095,19 @@ class View {
 		DOM({style:'main-body-full'},party)
 		);
 		
+		MM.lobby({id:1,users:{
+		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
+		10:{nickname:'Nesh',hero:3,ready:1,select:false,team:1},
+		2:{nickname:'Коао',hero:22,ready:1,select:false,team:1},
+		3:{nickname:'Asfodel',hero:37,ready:1,select:false,team:1},
+		4:{nickname:'XIIIAngel',hero:12,ready:1,select:false,team:1},
+		5:{nickname:'Lantarm',hero:8,ready:1,select:false,team:2},
+		6:{nickname:'Stagven_YouTube',hero:2,ready:1,select:false,team:2},
+		7:{nickname:'Farfania',hero:9,ready:1,select:false,team:2},
+		8:{nickname:'Rekongstor',hero:25,ready:1,select:false,team:2},
+		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
+		},target:1,map:[1,2,3,4,5,6,7,8,9,10]});
+		
 		return body;
 		
 	}
@@ -3047,6 +3060,7 @@ class App {
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		//
 		document.body.append(DOM({id:'STAT'}));
+		
 	}
 	
 	static async authorization(login,password){
@@ -3697,15 +3711,15 @@ class MM {
 			
 		});
 		
-		if(App.storage.data.id != data.target){
+		//if(App.storage.data.id != data.target){
 			
 			MM.selectHeroButton.style.opacity = 0;
 			
-		}
+		//}
 		
 		Timer.start(() => {
 			
-			MM.close();
+			//MM.close();
 			
 		},'',30);
 		
