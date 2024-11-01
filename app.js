@@ -1180,7 +1180,7 @@ class View {
 			
 			MM.hero = result;
 			
-			for(let item of result){
+			for(const item of result){
 				
 				const hero = DOM({style:'hero-item'},DOM({tag:'span'},item.name));
 				
