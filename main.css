@@ -1096,8 +1096,7 @@ cursor:pointer;
 }
 
 .party{
-
-
+	width: 100vw;
 	display:flex;
 	flex-flow:column nowrap;
 	justify-content:center;
@@ -1106,9 +1105,10 @@ cursor:pointer;
 }
 
 .party-middle{
+	width: 100vw;
 	display:flex;
 	flex-flow:row nowrap;
-	justify-content:center;
+	justify-content: space-around;
 	align-items:center;
 }
 
@@ -1163,7 +1163,7 @@ cursor:pointer;
 }
 
 .party-middle-item-middle{
-	
+	margin: auto;
 	width:10vw;
 	height:10vw;
 	background-color:rgba(255,255,255,0.1);
@@ -1185,6 +1185,7 @@ cursor:pointer;
 	top: -120px;
 }
 .party-middle-item .rank {
+	width: 2vw;
 	position: relative;
 	top: -100px;
 	left: 70px;
