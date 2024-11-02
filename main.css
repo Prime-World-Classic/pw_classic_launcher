@@ -428,7 +428,7 @@ background-color:rgba(15,15,15,0.7);
 .build-talent:before {
 	content: 'Библиотека';
 	position: absolute;
-	top: 230px;
+	top: 210px;
 	color: #fff;
 }
 
