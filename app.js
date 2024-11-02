@@ -1182,10 +1182,10 @@ class View {
 			
 			for(const item of result){
 				
-				const hero = DOM(
-					{style:'hero-item'},
-					DOM({tag:'span'}, item.name),
-					// DOM({tag:'img', src: 'ransk/_05_20.png'}, item.name)
+				const hero = DOM({style:'hero-item'},
+					DOM({tag:'span', style: 'name'}, item.name),
+					// DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
+					// DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
 				);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
@@ -1911,9 +1911,22 @@ class Build{
 			
 		}
 		
-		Build.heroImg = DOM({tag:'img',src:`hero/${data.id}/1.png`});
-		
-		Build.heroView.append(Build.heroImg,stats);
+		// Build.heroName = DOM({tag: 'p', style: 'name'});
+		// Build.heroName.innerText = 'TODO name';
+
+		Build.heroImg = DOM({tag:'img', src:`hero/${data.id}/1.png`, style: 'avatar'});
+
+		// Build.lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
+		Build.rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
+
+	
+		Build.heroView.append(
+			// Build.heroName,
+			Build.heroImg,
+			// Build.lvl,
+			// Build.rank,
+			stats
+		);
 		
 	}
 	
