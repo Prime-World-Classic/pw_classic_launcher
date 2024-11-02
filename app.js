@@ -857,7 +857,12 @@ class View {
 		play.classList.add('button-play');
 		
 		let middle = DOM({style:'party-middle'});
+
+		// const chatInput = DOM({tag: 'input', placeholder: 'Enter your message here', style: 'chat-input'});
+		// const chatMessages = DOM({style: 'chat-input'});
+		// const chat = DOM({style: 'chat'}, chatMessages, chatInput);
 		
+		// let party = DOM({style:'party'},middle, chat);
 		let party = DOM({style:'party'},middle);
 		
 		let players = new Array();
