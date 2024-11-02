@@ -1625,17 +1625,17 @@ class Build{
 			
 		}
 		
-		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-1'], event:['click', async () => {
+		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
 			
 			await App.api.request('build','random',{id:Build.id});
 			
 			View.show('build',Build.heroId);
 			
 		}]},'Случайный билд'));
+		
+		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'skins', 'btn-hover', 'color-3'], title: 'Скоро, скоро, пока эта кнопка не работает', event:['click', async () => {}]}, 'Скины'));
+		
 		Build.listView.append(DOM({style:'build-list-close',event:['click',() => View.show('main')]},'[X]'));
-		
-		
-		
 	}
 	
 	static hero(data){
