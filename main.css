@@ -1104,6 +1104,18 @@ cursor:pointer;
 	
 }
 
+.party .chat {
+	width: 70vw;
+	position: absolute;
+	bottom: 30px;
+	left: 10px;
+}
+.party .chat input {
+	width: 70vw;
+	background: #000;
+	color: #bbb;
+}
+
 .party-middle{
 	width: 100vw;
 	display:flex;
