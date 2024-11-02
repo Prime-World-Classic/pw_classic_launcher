@@ -898,6 +898,9 @@ class View {
 			
 			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
 
+			// const lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100); // TODO from hardcode to server data
+			// const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+
 			if(item.id){
 				
 				if(item.ready){
@@ -950,6 +953,7 @@ class View {
 			
 			let nickname = DOM(`${item.nickname ? item.nickname : 'Добавить'}`);
 			
+			// let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status, lvl, rank); // TODO use this for lvl and rank
 			let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status);
 			
 			player.dataset.id = item.id;
