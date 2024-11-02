@@ -1180,6 +1180,16 @@ cursor:pointer;
 	
 }
 
+.party-middle-item .lvl {
+	position: relative;
+	top: -120px;
+}
+.party-middle-item .rank {
+	position: relative;
+	top: -100px;
+	left: 70px;
+}
+
 .party-hero {
 	
 	display:flex;
