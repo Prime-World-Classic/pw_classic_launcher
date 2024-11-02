@@ -1465,3 +1465,9 @@ cursor:pointer;
 		--angle: 450deg;
 	}
 }
+
+@media (width < 1800px) {
+	.party-middle-item .rank {
+		left: 50px;
+	}
+}
