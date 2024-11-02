@@ -227,12 +227,25 @@ background-color:rgba(15,15,15,0.7);
 	
 }
 
-.build-hero img{
+.build-hero .name {
+	position: absolute;
+	top: 170px;
+	color: #fff;
+	font-family: Arial;
+}
+
+.build-hero .avatar{
 	margin-top: -74px;
 	width:200px;
 	
 }
-
+.build-hero .lvl {
+	top: 390px;
+	left: 100px;
+}
+.build-hero .rank {
+	margin: -90px 0 0 150px;
+}
 
 
 .build-hero-stats{
@@ -669,15 +682,12 @@ text-align:center;
 	background-repeat:no-repeat;
 }
 
-.hero-item div,.hero-item span{
-	
-	
+.hero-item div,.hero-item .name {
 	position:absolute;
 	
 }
 
-.hero-item span{
-	
+.hero-item .name {
 	top:-20px;
 	width: 169px;
 	text-align:center;
@@ -686,13 +696,33 @@ text-align:center;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
 	
 }
-.hero-item img {
-	margin: 120px 0 0 100px;
+.rank-common {
 	width: 40px;
-	background: #377;
+	background: #244;
 	padding: 8px;
 	border: 1px solid orange;
 	border-radius: 50%;
+}
+.hero-item .rank {
+	margin: 140px 0 0 100px;
+}
+.lvl-common {
+	position: absolute;
+	background: #244;
+	min-width: 23px;
+	height: 8px;
+	padding: 8px;
+	border: 1px solid darkorange;
+	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
+	font-size: 21px;
+	color: #fdd;
+	font-family: Arial;
+	line-height: .4;
+	text-align: center;
+
+}
+.hero-item .lvl {
+	top: 130px;
 }
 
 .adm{
