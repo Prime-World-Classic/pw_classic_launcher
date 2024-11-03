@@ -877,16 +877,10 @@ class View {
 		
 		for(let key in data.users){
 			
-			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready});
+			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready,rating:data.users[key].rating});
 			
 		}
-		/*
-		if(!players.length){
-			
-			players.push({id:App.storage.data.id,hero:MM.storage.data.hero,nickname:App.storage.data.login,ready:0});
-			
-		}
-		*/
+		
 		if(players.length < 5){
 			
 			while(players.length < 5){
@@ -903,8 +897,8 @@ class View {
 			
 			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
 
-			// const lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100); // TODO from hardcode to server data
-			// const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+			const lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']},item.rating); // TODO from hardcode to server data
+			const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
 
 			if(item.id){
 				
@@ -954,12 +948,16 @@ class View {
 				
 				status.style.opacity = 0;
 				
+				lvl.style.opacity = 0;
+				
+				rank.style.opacity = 0;
+				
 			}
 			
 			let nickname = DOM(`${item.nickname ? item.nickname : 'Добавить'}`);
 			
-			// let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status, lvl, rank); // TODO use this for lvl and rank
-			let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status);
+			let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status, lvl, rank); // TODO use this for lvl and rank
+			// let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status);
 			
 			player.dataset.id = item.id;
 			
@@ -1011,7 +1009,16 @@ class View {
 						
 						hero.addEventListener('click', async () => {
 							
-							await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
+							try{
+								
+								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
+								
+							}
+							catch(error){
+								
+								return App.error(error);
+								
+							}
 							
 							MM.activeSelectHero = item.id;
 							
@@ -1193,8 +1200,8 @@ class View {
 				
 				const hero = DOM({style:'hero-item'},
 					DOM({tag:'span', style: 'name'}, item.name),
-					// DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
-					// DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
+					DOM({tag:'span', style: ['lvl-common', 'lvl']},item.rating), // TODO from hardcode to server data
+					DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
 				);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
