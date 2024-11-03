@@ -1586,7 +1586,7 @@ class Build{
 		
 		for(let build of builds){
 			
-			let item = DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']}, `${build.name}`);
+			const item = DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']}, `${build.name}`);
 			
 			item.onclick = () => {
 				
