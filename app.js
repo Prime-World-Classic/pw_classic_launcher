@@ -1586,15 +1586,27 @@ class Build{
 		
 		for(let build of builds){
 			
-			const item = DOM({tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']}, `${build.name}`);
-			
+			const item = DOM(
+				{tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']},
+				`${build.name}`,
+			);
+
+			const btnRemove = DOM({tag: 'button', style: 'remove', title: 'Удалить билд', event: [
+					'click', _ => {
+						alert('Спасибо что вы с нами, TODO пока удаление не имплементировано');
+					}
+				]}, 'X'
+			);
+
+			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item, btnRemove);
+
 			item.onclick = () => {
 				
 				View.show('build',Build.heroId,build.id);
 				
 			}
 			
-			Build.listView.append(item);
+			Build.listView.append(div);
 			
 		}
 		
