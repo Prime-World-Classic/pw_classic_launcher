@@ -819,7 +819,8 @@ text-align:center;
 
 
 .build-active-bar{
-	
+	position: relative;
+	left: 58px;
 	display:flex;
 	flex-flow:row nowrap;
 	
