@@ -847,7 +847,7 @@ text-align:center;
 	align-items:center;
 	width:100vw;
 	height:100vh;
-	backdrop-filter:blur(15px);
+	backdrop-filter:blur(1vmax);
 	z-index:9999;
 	
 }
@@ -968,8 +968,6 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	height:100vh;
 	display:flex;
 	flex-flow:column nowrap;
-	justify-content:center;
-	align-items:center;
 	
 }
 
@@ -977,10 +975,11 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 	display:flex;
 	flex-flow:row nowrap;
-	width:98vw;
-	justify-content:space-between;
+	width:100vw;
+	height:30vh;
+	justify-content:space-around;
 	align-items:center;
-	padding:3vh 1vw;
+	/*padding:3vh 1vw;*/
 	
 }
 
@@ -988,12 +987,13 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 	display:flex;
 	flex-flow:row nowrap;
-	justify-content:center;
+	justify-content:space-between;
 	align-items:center;
 	background:rgba(255,255,255,0.1);
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-	width:98vw;
-	padding:3vh 1vw;
+	width:100vw;
+	height:70vh;
+	/*padding:3vh 1vw;*/
 	
 	
 }
@@ -1003,15 +1003,14 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	display:flex;
 	flex-flow:column nowrap;
 	justify-content:center;
-	width:20vw;
-	height:100%;
-	
+	width:33.33vw;
+	height:70vh;
 	
 }
 
 .mm-lobby-middle-chat-body{
 	
-	height:40vh;
+	height:60vh;
 	overflow-y:scroll;
 	background:rgba(255,255,255,0.1);
 	border-radius:3px 3px 0 0;
@@ -1044,10 +1043,10 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 
 .mm-lobby-middle-chat-button{
 	
-	height:10%;
+	height:10vh;
 	width:94%;
 	padding:0 3%;
-	font: 1vw / 1 Verdana;
+	font: 1.5vw / 1 Verdana;
 	background:rgba(255,255,255,0.1);
 	border-radius:0 0 3px 3px;
 	color: rgba(255, 255, 255, 0.7);
@@ -1055,13 +1054,24 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 }
 
+.mm-lobby-middle-build{
+	
+	width:33.33vw;
+	height:70vh;
+
+	
+}
+
 .mm-lobby-middle-hero{
 	
 	display:flex;
 	flex-flow:row wrap;
-	justify-content:end;
+	justify-content:center;
 	align-items:center;
-	width:80vw;
+	width:31.33vw;
+	height:64vh;
+	padding:3vh 1vw;
+	overflow-y:scroll;
 	
 }
 
@@ -1082,13 +1092,14 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	flex-flow:row nowrap;
 	justify-content:center;
 	align-items:center;
+	width:40vw;
 	
 	
 }
 
 .mm-lobby-header-team img{
 	
-	width:9vw;
+	width:8vw;
 	
 }
 
