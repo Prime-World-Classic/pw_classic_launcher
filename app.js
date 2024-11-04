@@ -897,7 +897,7 @@ class View {
 			
 			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
 
-			const lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']},item.rating); // TODO from hardcode to server data
+			const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, item.rating);
 			const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
 
 			if(item.id){
