@@ -1200,7 +1200,7 @@ class View {
 				
 				const hero = DOM({style:'hero-item'},
 					DOM({tag:'span', style: 'name'}, item.name),
-					DOM({tag:'span', style: ['lvl-common', 'lvl']},item.rating), // TODO from hardcode to server data
+					DOM({tag:'div', style: ['lvl-common', 'lvl']},item.rating), // TODO from hardcode to server data
 					DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
 				);
 				
