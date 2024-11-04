@@ -3658,6 +3658,17 @@ class MM {
 		
 	}
 	
+	static async lobbyBuildView(){
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	
 	static async lobby(data){
 		console.log('MM.LOBBY DATA',data);
 		if(!MM.hero){
@@ -3675,6 +3686,14 @@ class MM {
 		MM.lobbyUsers = data.users;
 		
 		MM.targetHeroId = data.users[App.storage.data.id].hero;
+		
+		MM.lobbyBuild = DOM({style:'mm-lobby-middle-build'},`123`);
+		
+		if(MM.targetHeroId){
+			
+			MM.lobbyBuildView(MM.targetHeroId);
+			
+		}
 		
 		let leftTeam = DOM({style:'mm-lobby-header-team'});
 		
@@ -3718,6 +3737,8 @@ class MM {
 				
 				name.innerText = 'Инкогнито';
 				
+				name.style.opacity = 0;
+				
 			}
 			
 		}
@@ -3735,6 +3756,8 @@ class MM {
 			hero.onclick = () => {
 				
 				MM.targetHeroId = item.id;
+				
+				MM.lobbyBuildView(MM.targetHeroId);
 				
 				App.api.request('mm','eventChangeHero',{id:MM.id,heroId:item.id});
 				
@@ -3754,11 +3777,11 @@ class MM {
 			
 		});
 		
-		//if(App.storage.data.id != data.target){
+		if(App.storage.data.id != data.target){
 			
 			MM.selectHeroButton.style.opacity = 0;
 			
-		//}
+		}
 		
 		Timer.start(() => {
 			
@@ -3800,7 +3823,7 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),MM.lobbyBuild,MM.lobbyHeroes));
 		
 		MM.show(body);
 		
