@@ -1346,7 +1346,7 @@ class View {
 	
 	static async build(heroId,targetId = 0){
 		
-		let body = DOM({style:'main-vertical'});
+		const body = DOM({style:'main-vertical'});
 		
 		await Build.init(heroId,targetId);
 		
