@@ -709,7 +709,7 @@ text-align:center;
 	margin: 70px 0.3vw;
 }
 
-.hero-item,.hero-item div{
+.hero-item {
 	width:166px;
 	min-width:166px;
 	height:166px;
@@ -719,12 +719,8 @@ text-align:center;
 	background-repeat:no-repeat;
 }
 
-.hero-item div,.hero-item .name {
-	position:absolute;
-	
-}
-
 .hero-item .name {
+	position:absolute;
 	top:-20px;
 	width: 169px;
 	text-align:center;
@@ -733,20 +729,22 @@ text-align:center;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
 	
 }
+
 .rank-common {
-	width: 40px;
+	position: relative;
 	background: #244;
 	padding: 8px;
 	border: 1px solid orange;
 	border-radius: 50%;
 }
 .hero-item .rank {
-	margin: 140px 0 0 100px;
+	top: 100px;
+	left: 110px;
 }
 .lvl-common {
-	position: absolute;
+	position: relative;
 	background: #244;
-	min-width: 23px;
+	width: 46px;
 	height: 8px;
 	padding: 8px;
 	border: 1px solid darkorange;
@@ -759,7 +757,8 @@ text-align:center;
 
 }
 .hero-item .lvl {
-	top: 130px;
+	left: -15px;
+	top: 135px;
 }
 
 .adm{
@@ -1238,14 +1237,11 @@ cursor:pointer;
 }
 
 .party-middle-item .lvl {
-	position: relative;
-	top: -120px;
+	top: -5vw;
 }
 .party-middle-item .rank {
-	width: 2vw;
-	position: relative;
-	top: -100px;
-	left: 70px;
+	top: -7vw;
+	left: 8vw;
 }
 
 .party-hero {
@@ -1545,20 +1541,15 @@ cursor:pointer;
 
 @media (width < 1800px) {
 	.party-middle-item .rank {
-		left: 50px;
+		/* left: 50px; */
 	}
 }
 
 
-@media (width > 1940px) {
-	.party-middle-item .lvl {
-		top: -6vw;
-		left: 1vw;
-	}
-
+@media (width > 2000px) {
 	.party-middle-item .rank {
-		top: -5vw;
-		left: 4vw;
+		top: -6vw;
+		/* left: 4vw; */
 	}
 }
 
