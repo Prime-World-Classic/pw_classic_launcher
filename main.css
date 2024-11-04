@@ -323,12 +323,26 @@ background-color:rgba(15,15,15,0.7);
 	
 }
 
+.help {
+	top: -10px;
+	left: 10px;
+	color: #ccc;
+	font-family: Arial;
+	width: 70vw;
+	display: flex;
+	align-self: baseline;
+	margin-left: 10px;
+}
+.help p {
+	margin-top: 5px;
+}
+
 .build-field-top {
 	height: 180px;
 }
 
 .build-field-bottom {
-	margin: 14px 0 0 -118px;
+	margin: 14px 0 34px -118px;
 }
 .build-field-bottom:after {
 	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
@@ -341,7 +355,7 @@ button.new-build {
 button.skins,
 button.random-build
 {
-	margin-top: -40px;
+	margin-top: -100px;
 }
 
 button.skins {
@@ -360,7 +374,7 @@ button.skins {
 
 .build-list-random,.build-list-item, .build-list-close{
 	
-	margin:0 15px;
+	margin: -100px -15px 0 15px;
 	padding: 0.8vh 0.5vw;
 	cursor: pointer;
 	
