@@ -1553,12 +1553,12 @@ class Build{
 		const buttonTalents = document.createElement('button');
 		buttonTalents.innerText = 'Таланты';
 		buttonTalents.title = 'TODO work in progress';
-		buttonTalents.classList.add('talents', 'btn-hover', 'color-4');
+		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
 
 		const buttonSets = document.createElement('button');
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO work in progress';
-		buttonSets.classList.add('sets', 'btn-hover', 'color-4');
+		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
 
 		const buttonsTalentsAndSets = document.createElement('div');
 		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
