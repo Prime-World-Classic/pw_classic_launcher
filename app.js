@@ -1555,6 +1555,11 @@ class Build{
 		buttonTalents.title = 'TODO work in progress';
 		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
 
+		const separator = document.createElement('div');
+		separator.innerText = '|';
+		separator.classList.add('separator');
+
+
 		const buttonSets = document.createElement('button');
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO work in progress';
@@ -1562,7 +1567,7 @@ class Build{
 
 		const buttonsTalentsAndSets = document.createElement('div');
 		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
-		buttonsTalentsAndSets.append(buttonTalents, buttonSets);
+		buttonsTalentsAndSets.append(buttonTalents, separator, buttonSets);
 
 		const buildTalets = document.createElement('div');
 		buildTalets.classList.add('build-talents');
