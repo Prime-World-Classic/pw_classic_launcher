@@ -1468,7 +1468,7 @@ cursor:pointer;
 }
 
 .btn-hover.color-2 {
-    background-image: linear-gradient(to right, rgb(57, 166, 166), rgb(115, 225, 219), #82d9a8, rgb(131, 216, 249));
+    background-image: linear-gradient(to right, rgb(57, 166, 166), rgb(85, 175, 200), #82d9a8, rgb(131, 216, 249));
     box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
 }
 
