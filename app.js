@@ -2546,7 +2546,7 @@ class Build{
 	
 	static sortInventory(){
 		
-		for(let item of Build.inventoryView.children){
+		for(let item of Build.inventoryView.querySelectorAll('.build-talent-item')){
 			
 			let data = Build.talents[item.dataset.id], flag = true;
 			
