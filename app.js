@@ -1531,7 +1531,7 @@ class Build{
 		Build.listView.classList.add('build-list');
 	
 		Build.helpView = document.createElement('p');
-		Build.helpView.innerText = 'Тут вы можете собрать разнообразные билды из представленных талантов собранные в сеты (группа талантов дающая особый эффект). Если вы новичок, можно воспользоваться казульным билдом при нажатии "Случайный билд". При нажатии кнопки "Скины" вы можете определить образ героя для боёв.'
+		Build.helpView.innerHTML = `Тут вы можете собрать разнообразные билды из представленных талантов собранные в <span title='группа талантов дающая особый эффект' style='text-decoration:underline dotted'>сеты</span>. Если вы новичок, можно воспользоваться казульным билдом при нажатии "Случайный билд". При нажатии кнопки "Скины" вы можете определить образ героя для боёв.`;
 		
 		Build.heroView = document.createElement('div');
 		
@@ -1546,11 +1546,33 @@ class Build{
 		Build.fieldView.classList.add('build-field');
 		
 		Build.fieldConflict = new Object();
-		
+	
+		// ================================================
+
+
+		const buttonTalents = document.createElement('button');
+		buttonTalents.innerText = 'Таланты';
+		buttonTalents.title = 'TODO work in progress';
+		buttonTalents.classList.add('talents', 'btn-hover', 'color-4');
+
+		const buttonSets = document.createElement('button');
+		buttonSets.innerText = 'Сеты';
+		buttonSets.title = 'TODO work in progress';
+		buttonSets.classList.add('sets', 'btn-hover', 'color-4');
+
+		const buttonsTalentsAndSets = document.createElement('div');
+		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
+		buttonsTalentsAndSets.append(buttonTalents, buttonSets);
+
+		const buildTalets = document.createElement('div');
+		buildTalets.classList.add('build-talents');
+
 		Build.inventoryView = document.createElement('div');
-		
 		Build.inventoryView.classList.add('build-talent');
-		
+		Build.inventoryView.append(buttonsTalentsAndSets, buildTalets);
+
+		// ================================================
+
 		Build.rarityView = document.createElement('div');
 		
 		Build.rarityView.classList.add('build-rarity');
@@ -2255,7 +2277,7 @@ class Build{
 	
 	static inventory(){
 		
-		let preload = new PreloadImages(Build.inventoryView);
+		let preload = new PreloadImages(Build.inventoryView.querySelector('.build-talents'));
 		
 		App.api.silent((data) => {
 			
