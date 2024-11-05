@@ -1586,6 +1586,7 @@ class Build{
 	}
 	
 	static list(builds){
+		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
 		
 		for(let build of builds){
 			
@@ -1598,7 +1599,7 @@ class Build{
 					'click', _ => {
 						alert('Спасибо что вы с нами, TODO пока удаление не имплементировано');
 					}
-				]}, 'X'
+				]}, 'x'
 			);
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item, btnRemove);
@@ -1609,10 +1610,13 @@ class Build{
 				
 			}
 			
-			Build.listView.append(div);
-			
+			buildButtonsWrapper.append(div);
 		}
-		
+
+		Build.listView.append(buildButtonsWrapper);
+
+		const newRandomSkinsButtons = DOM({style: 'new-random-skins-buttons--wrapper'});
+
 		if(builds.length < 6){
 			
 			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
@@ -1643,11 +1647,11 @@ class Build{
 				
 			}]},`Новый билд`);
 			
-			Build.listView.append(create);
+			newRandomSkinsButtons.append(create);
 			
 		}
 		
-		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
+		newRandomSkinsButtons.append(DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
 			
 			await App.api.request('build','random',{id:Build.id});
 			
@@ -1655,8 +1659,18 @@ class Build{
 			
 		}]},'Случайный билд'));
 		
-		Build.listView.append(DOM({tag: 'button', style: ['build-list-item', 'skins', 'btn-hover', 'color-3'], title: 'Скоро, скоро, пока эта кнопка не работает', event:['click', async () => {}]}, 'Скины'));
-		
+		newRandomSkinsButtons.append(
+			DOM({
+				tag: 'button',
+				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
+				title: 'Скоро, скоро, пока эта кнопка не работает',
+				event:['click', async () => {}]
+			},
+			'Скины')
+		);
+
+		Build.listView.append(newRandomSkinsButtons)
+
 		Build.listView.append(DOM({style:'build-list-close',event:['click',() => View.show('main')]},'[X]'));
 	}
 	
