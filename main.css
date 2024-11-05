@@ -479,7 +479,13 @@ button.skins {
 }
 .buttons-talents-and-sets {
 	display: flex;
-	justify-content: space-around;
+	justify-content: center;
+}
+.buttons-talents-and-sets .separator {
+	color: #fff;
+	font-size: 50px;
+	cursor: default;
+	opacity: .7;
 }
 
 .build-talent-item{
