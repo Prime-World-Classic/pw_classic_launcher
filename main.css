@@ -279,7 +279,7 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-item div:first-child{
 	color: #fff;
 	letter-spacing: 2px;
-	font-family: "Noto Sans", sans-serif;
+	font-family: "PT Sans", sans-serif;
 	font-optical-sizing: auto;
 	font-weight: 400;
 	font-style: normal;
@@ -287,7 +287,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero-stats-item div:last-child{
-	font-family: "Noto Sans", sans-serif;
+	font-family: "PT Sans", sans-serif;
 	color: #ffe9c1;
 	
 }
@@ -338,6 +338,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-field-top {
+	width: 97vw;
 	height: 180px;
 }
 
@@ -350,13 +351,20 @@ background-color:rgba(15,15,15,0.7);
 	margin-left: 4vw;
 }
 
+.new-random-skins-buttons--wrapper {
+	margin-top: -40px;
+}
+
 button.new-build {
 	margin: -40px 20px 0 100px !important;
 }
-button.skins,
+button.new-build,
 button.random-build
+button.skins,
 {
 	margin-top: -100px;
+	font-weight: bold;
+	font-size: 20px;
 }
 
 button.skins {
@@ -364,13 +372,16 @@ button.skins {
 }
 
 .build-list{
-	
 	display:flex;
-	flex-flow:row nowrap;
+	justify-content: space-between;
 	font: 1.3rem / 1 Tahoma;
 	text-shadow: 0 0 5px rgba(25, 25, 25, 0.9);
 	color:rgba(255,255,255,0.8);
 	
+}
+
+.build-buttons--wrapper {
+	flex-grow: 9;
 }
 
 .build-list-random,.build-list-item, .build-list-close{
@@ -382,6 +393,7 @@ button.skins {
 }
 
 .build-list-item{
+	font-family: "PT Sans", sans-serif;
     border-radius: 15px;
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	
@@ -389,13 +401,20 @@ button.skins {
 }
 
 .button-build--wrapper button.remove {
-	background: #000;
-	color: #fff;
+	font-size: large;
+	background: #39b;
+	color: #eee;
 	border: 0;
+	border-radius: 50%;
 	position: relative;
-	top: 20px;
-	left: -30px;
+	top: -21px;
+	left: -43px;
+	height: 17px;
+	line-height: 6px;
 	cursor: pointer;
+}
+.button-build--wrapper button.remove:hover {
+	background: darkred;
 }
 
 .build-play{
@@ -458,12 +477,6 @@ button.skins {
 	
 	margin:5px;
 	
-}
-.build-talent:before {
-	content: 'Библиотека';
-	position: absolute;
-	top: 210px;
-	color: #fff;
 }
 
 .build-talent-item{
@@ -1439,7 +1452,6 @@ cursor:pointer;
 .btn-hover {
     width: 200px;
     font-size: 18px;
-    font-weight: 600;
     color: #fff;
     cursor: pointer;
     margin: 20px;
@@ -1540,17 +1552,9 @@ cursor:pointer;
 	}
 }
 
-@media (width < 1800px) {
-	.party-middle-item .rank {
-		/* left: 50px; */
-	}
-}
-
-
 @media (width > 2000px) {
 	.party-middle-item .rank {
 		top: -6vw;
-		/* left: 4vw; */
 	}
 }
 
