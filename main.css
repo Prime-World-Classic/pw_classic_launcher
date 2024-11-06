@@ -317,13 +317,13 @@ background-color:rgba(15,15,15,0.7);
 .help {
 	color: #ccc;
 	font-family: Arial;
-	width: 55vw;
+	width: 50vw;
 	display: flex;
 	align-self: baseline;
 	margin-left: 10px;
 }
 .help p {
-	margin-top: 5px;
+	margin-top: 10px;
 }
 
 .build-field-top {
