@@ -442,6 +442,9 @@ button.skins {
 	display:flex;
 	flex-flow:row nowrap;
 }
+.build-field-row.highlight {
+	background: #4789;
+}
 
 .build-field-item{
 	
