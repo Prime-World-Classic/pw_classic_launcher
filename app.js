@@ -2137,8 +2137,7 @@ class Build{
 					
 					item.dataset.active = 0;
 					
-				}
-				else{
+				} else {
 					
 					item.style.background = 'rgb(57, 166, 166)';
 					
