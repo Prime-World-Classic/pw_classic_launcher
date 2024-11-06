@@ -1982,20 +1982,19 @@ class Build{
 			
 		}
 		
-		// Build.heroName = DOM({tag: 'p', style: 'name'});
-		// Build.heroName.innerText = 'TODO name';
+		Build.heroName = DOM({tag: 'p', style: 'name'});
+		Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
 
 		Build.heroImg = DOM({tag:'img', src:`hero/${data.id}/1.png`, style: 'avatar'});
 
-		// Build.lvl = DOM({tag:'span', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
+		Build.lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
 		Build.rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
+
+		const wrapper = DOM({tag: 'div'}, Build.heroImg, Build.lvl, Build.heroName, Build.rank);
 
 	
 		Build.heroView.append(
-			// Build.heroName,
-			Build.heroImg,
-			// Build.lvl,
-			// Build.rank,
+			wrapper,
 			stats
 		);
 		

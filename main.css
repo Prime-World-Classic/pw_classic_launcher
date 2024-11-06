@@ -165,7 +165,6 @@ background-color:rgba(15,15,15,0.7);
 .main-header, .main-body,.main-body-full,.main-footer,.build{
 	display:flex;
 	flex-flow:row;
-	margin:0 3vw;
 	
 }
 
@@ -204,16 +203,6 @@ background-color:rgba(15,15,15,0.7);
 	
 }
 
-.build{
-
-	display:flex;
-	flex-flow:row nowrap;
-	justify-content:center;
-	align-items:center;
-	
-	
-}
-
 .build-hero{
 
 	width:300px;
@@ -222,35 +211,37 @@ background-color:rgba(15,15,15,0.7);
 	min-height:660px;
 	display:flex;
 	flex-flow:column nowrap;
-	justify-content:space-between;
 	align-items:center;
 	
 }
 
 .build-hero .name {
-	position: absolute;
-	top: 170px;
+	position: relative;
+	top: -30px;
+	text-align: center;
+
 	color: #fff;
 	font-family: Arial;
+
 }
 
 .build-hero .avatar{
-	margin-top: -74px;
 	width:200px;
 	
 }
 .build-hero .lvl {
-	top: 390px;
-	left: 100px;
+	top: -30px;
 }
 .build-hero .rank {
-	margin: -90px 0 0 150px;
+	top: -140px;
+	left: 140px;
 }
 
 
 .build-hero-stats{
 	display:flex;
-	width: 300px;
+	align-self: start;
+	width: 270px;
 	flex-flow:column nowrap;
 	font: 1.2rem / 1 Tahoma;
 	
