@@ -2109,10 +2109,8 @@ class Build{
 	
 	static level(){
 		
-		const level = ['VI','V','IV','III','II','I']
-
 		let i = 6;
-		for(const number of level){
+		for(const number of ['VI','V','IV','III','II','I']){
 			
 			const item = document.createElement('div');
 			
