@@ -2145,6 +2145,8 @@ class Build{
 					item.dataset.active = 1;
 					
 				}
+
+				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.toggle('highlight');
 				
 			});
 			
