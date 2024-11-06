@@ -2112,7 +2112,7 @@ class Build{
 		const level = ['VI','V','IV','III','II','I']
 
 		let i = 6;
-		for(let number of level){
+		for(const number of level){
 			
 			let item = document.createElement('div');
 			
