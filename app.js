@@ -1549,7 +1549,6 @@ class Build{
 	
 		// ================================================
 
-
 		const buttonTalents = document.createElement('button');
 		buttonTalents.innerText = 'Таланты';
 		buttonTalents.title = 'TODO work in progress';
