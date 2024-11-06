@@ -2114,7 +2114,7 @@ class Build{
 		let i = 6;
 		for(const number of level){
 			
-			let item = document.createElement('div');
+			const item = document.createElement('div');
 			
 			item.innerText = number
 			
