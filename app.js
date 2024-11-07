@@ -2126,8 +2126,6 @@ class Build{
 				
 				if(item.dataset.active == 1){
 					
-					item.style.background = 'rgba(255,255,255,0.2)';
-					
 					Build.removeSortInventory('level',item.dataset.id);
 					
 					Build.sortInventory();
@@ -2135,8 +2133,6 @@ class Build{
 					item.dataset.active = 0;
 					
 				} else {
-					
-					item.style.background = 'rgb(57, 166, 166)';
 					
 					Build.setSortInventory('level',item.dataset.id);
 					
@@ -2146,8 +2142,17 @@ class Build{
 					
 				}
 
+				item.classList.toggle('highlight');
+
 				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.toggle('highlight');
 				
+			});
+
+			item.addEventListener('contextmenu', e => {
+				e.preventDefault();
+				document.querySelectorAll('.build-level div.highlight').forEach(n => n.click());
+				item.classList.add('highlight');
+				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.add('highlight');
 			});
 			
 			Build.levelView.append(item);
