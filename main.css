@@ -363,8 +363,6 @@ button.skins {
 }
 
 .build-list{
-	display:flex;
-	justify-content: space-between;
 	font: 1.3rem / 1 Tahoma;
 	text-shadow: 0 0 5px rgba(25, 25, 25, 0.9);
 	color:rgba(255,255,255,0.8);
@@ -372,7 +370,10 @@ button.skins {
 }
 
 .build-buttons--wrapper {
-	flex-grow: 9;
+	display: flex;
+	width: 35vw;
+	margin-left: 20vw;
+	overflow-y: scroll;
 }
 
 .build-list-close {
@@ -396,7 +397,7 @@ button.skins {
 	border: 0;
 	border-radius: 50%;
 	position: relative;
-	top: -21px;
+	top: -86px;
 	left: -43px;
 	height: 17px;
 	line-height: 6px;
