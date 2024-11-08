@@ -1632,13 +1632,21 @@ class Build{
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item, btnRemove);
 
 			item.onclick = () => {
-				
+				setTimeout(_ => {
+					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
+					document.querySelectorAll('.button-build--wrapper')[_i].classList.add('highlight');
+				}, 300);
 				View.show('build',Build.heroId,build.id);
-				
 			}
-			
+
 			buildButtonsWrapper.append(div);
+
 		}
+		setTimeout(_ => {
+			if (!document.querySelector('.button-build--wrapper.highlight')) {
+				document.querySelector('.button-build--wrapper').classList.add('highlight');
+			}
+		}, 300);
 
 		Build.listView.append(buildButtonsWrapper);
 
