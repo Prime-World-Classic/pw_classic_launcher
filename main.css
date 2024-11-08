@@ -1097,7 +1097,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 }
 
-.mm-lobby-middle-hero div{
+.mm-lobby-middle-hero > div{
 	
 	width:5vw;
 	height:5vw;
@@ -1106,6 +1106,17 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	background-size:100%;
 	cursor:pointer;
 	
+}
+.mm-lobby-middle-hero .lvl {
+	font-size: 16px;
+	width: 30px;
+	height: 3px;
+	padding-left: 3px;
+	border: 0;
+}
+.mm-lobby-middle-hero .rank {
+	padding: 2px;
+	border: 0;
 }
 
 .mm-lobby-header-team{
