@@ -1114,6 +1114,7 @@ class View {
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,select:false,team:1},
+		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,select:false,team:1},
 		2:{nickname:'Коао',hero:22,ready:1,select:false,team:1},
 		3:{nickname:'Asfodel',hero:37,ready:1,select:false,team:1},
 		4:{nickname:'XIIIAngel',hero:12,ready:1,select:false,team:1},
@@ -1122,7 +1123,7 @@ class View {
 		7:{nickname:'Farfania',hero:9,ready:1,select:false,team:2},
 		8:{nickname:'Rekongstor',hero:25,ready:1,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
-		},target:1,map:[1,2,3,4,5,6,7,8,9,10]});
+		},target:1,map:[1,2,3,4,5,6,7,8,9,10,1858]});
 		
 		return body;
 		
