@@ -3780,7 +3780,7 @@ class MM {
 		
 		let preload = new PreloadImages(MM.lobbyHeroes);
 		
-		for(let item of MM.hero){
+		for(const item of MM.hero){
 			
 			let hero = DOM({id:`HERO${item.id}`,data:{active:0}});
 			
