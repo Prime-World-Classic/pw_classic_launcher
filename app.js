@@ -3781,9 +3781,12 @@ class MM {
 		let preload = new PreloadImages(MM.lobbyHeroes);
 		
 		for(const item of MM.hero){
+		
 			
-			const hero = DOM({id:`HERO${item.id}`,data:{active:0}});
-			
+			const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100); // TODO hardcode 1100 to the data from server
+			const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+			const hero = DOM({id:`HERO${item.id}`,data:{active:0}}, lvl, rank);
+
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
 			hero.onclick = () => {
