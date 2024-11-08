@@ -3782,7 +3782,7 @@ class MM {
 		
 		for(const item of MM.hero){
 			
-			let hero = DOM({id:`HERO${item.id}`,data:{active:0}});
+			const hero = DOM({id:`HERO${item.id}`,data:{active:0}});
 			
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
