@@ -3753,39 +3753,27 @@ class MM {
 			if(data.users[key].hero){
 				
 				hero.src = `hero/${data.users[key].hero}/1.png`;
-				
-			}
-			else{
-				
-				hero.src = `hero/empty-ru.avif`;
-				
-			}
+	
+				const name = DOM({tag:'div', style: 'name'},`${data.users[key].nickname}`);
 			
-			let name = DOM({tag:'div'},`${data.users[key].nickname}`);
-			
-			player.append(hero,name);
-			
-			if(key == data.target){
-				
-				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
-				
-			}
-			
-			if(data.users[App.storage.data.id].team == data.users[key].team){
-				
+				const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100); // TODO hardcode 1100 to the data from server
+				const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+
+				player.append(hero, lvl, name, rank);
 				leftTeam.append(player);
-				
-			}
-			else{
-				
-				rightTeam.append(player);
-				
-				name.innerText = 'Инкогнито';
-				
-				name.style.opacity = 0;
-				
+			} else {
+				hero.src = `hero/empty-ru.avif`;
+				player.append(hero);
 			}
 			
+			if(key == data.target) {
+				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
+			}
+			
+			if(data.users[App.storage.data.id].team !== data.users[key].team) {
+				rightTeam.append(player);
+			}
+
 		}
 		
 		MM.lobbyHeroes = DOM({style:'mm-lobby-middle-hero'});
