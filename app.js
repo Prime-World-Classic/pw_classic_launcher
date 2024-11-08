@@ -2318,7 +2318,7 @@ class Build{
 		
 		a.classList.add('build-rarity-other');
 		
-		a.innerText = 'A';
+		a.innerText = 'K';
 		
 		a.dataset.active = 0;
 		
