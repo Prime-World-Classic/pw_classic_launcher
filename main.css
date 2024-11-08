@@ -998,6 +998,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	flex-flow:row nowrap;
 	width:100vw;
 	height:30vh;
+	margin-left: 40px;
 	justify-content:space-around;
 	align-items:center;
 	/*padding:3vh 1vw;*/
@@ -1118,27 +1119,26 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 }
 
-.mm-lobby-header-team img{
+.mm-lobby-header-team img[src^=hero]{
 	
 	width:8vw;
 	
 }
 
-.mm-lobby-header-team-player{
-	
-	display:flex;
-	flex-flow:column nowrap;
-	
-}
-
-.mm-lobby-header-team-player div:last-child{
-	
+.mm-lobby-header-team-player .name {
 	margin-top:1vh;
 	font: 1vw / 1 Verdana;
     color: rgba(255, 255, 255, 0.5);
     text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 	text-align:center;
 	
+}
+.mm-lobby-header-team-player .lvl {
+	top: -1vw;
+}
+.mm-lobby-header-team-player .rank {
+	top: -4vw;
+	left: 5vw;
 }
 
 .lobby-info{
