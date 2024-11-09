@@ -1,6 +1,6 @@
-APP_VERSION = '1.5.1';
+APP_VERSION = '1.6.0';
 
-PW_VERSION = '1.5';
+PW_VERSION = '1.6';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
@@ -1110,21 +1110,20 @@ class View {
 		),
 		DOM({style:'main-body-full'},party)
 		);
-		
+		/*
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,select:false,team:1},
 		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,select:false,team:1},
 		2:{nickname:'Коао',hero:22,ready:1,select:false,team:1},
-		3:{nickname:'Asfodel',hero:37,ready:1,select:false,team:1},
 		4:{nickname:'XIIIAngel',hero:12,ready:1,select:false,team:1},
 		5:{nickname:'Lantarm',hero:8,ready:1,select:false,team:2},
 		6:{nickname:'Stagven_YouTube',hero:2,ready:1,select:false,team:2},
 		7:{nickname:'Farfania',hero:9,ready:1,select:false,team:2},
 		8:{nickname:'Rekongstor',hero:25,ready:1,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
-		},target:1,map:[1,2,3,4,5,6,7,8,9,10,1858]});
-		
+		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+		*/
 		return body;
 		
 	}
@@ -3038,7 +3037,7 @@ class Events {
 		
 	}
 	
-	static MMFinish(data){
+	static MMEnd(data){
 		
 		MM.finish(data);
 		
@@ -3112,8 +3111,25 @@ class Events {
 		
 		console.log('stat',data);
 		
-		document.getElementById('STAT')
-			.innerText = `Онлайн: ${data.online}, ММ (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
+		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
+		
+	}
+	
+	static MMKick(data){
+		
+		setTimeout(() => {
+			
+			MM.searchActive(false);
+			
+		},1000);
+		
+		let body = document.createDocumentFragment();
+		
+		let button = DOM({style:'splash-content-button',event:['click', async () => Splash.hide()]},'Больше так не буду');
+		
+		body.append(DOM(`${data.party ? 'Один из участников пати был АФК, поэтому вы исключены из подбора матча' : 'Вы были исключены из матчмейкинга за АФК!'}`),button)
+		
+		Splash.show(body);
 		
 	}
 
@@ -3616,7 +3632,7 @@ class MM {
 				
 				if(request.type == 'reconnect'){
 					
-					let reconnect = DOM({tag:'a',href:`pwclassic://${App.storage.data.token}/reconnect/${PW_VERSION}/${request.id}/${request.hero}/${request.team}`});
+					let reconnect = DOM({tag:'a',href:`pwclassic://reconnect/${request.key}/${PW_VERSION}`});
 		
 					reconnect.click();
 					
@@ -3635,8 +3651,6 @@ class MM {
 			
 		}
 		
-		// setTimeout(() => MM.ready(),5000);
-		
 	}
 	
 	static async cancel(){
@@ -3646,44 +3660,10 @@ class MM {
 		MM.id = '';
 		
 	}
-	/*
-	static timer(callback,name,seconds){
-		
-		seconds++;
-		
-		let sb = DOM(`${name} 00:${seconds}`);
-		
-		let body = DOM({style:'mm-timer'},sb);
-		
-		body.animate({opacity:[1,0.5,1]},{duration:1000,iterations:Infinity,easing:'ease-out'});
-		
-		let start = () => {
-			
-			seconds--;
-			
-			sb.innerText = `${name} 00:${(seconds < 10 ? '0': '')}${seconds}`;
-			
-			if(!seconds){
-				
-				clearInterval(MM.intervalId);
-				
-				MM.intervalId = false;
-				
-				callback();
-				
-			}
-			
-		}
-		
-		MM.intervalId = setInterval(() => start(),1000);
-		
-		start();
-		
-		return body;
-		
-	}
-	*/
+	
 	static async ready(data){
+		
+		MM.searchActive(false);
 		
 		MM.soundEvent();
 		
@@ -3695,7 +3675,9 @@ class MM {
 			
 			MM.close();
 			
-		},'Бой найден',30);
+			MM.searchActive(true);
+			
+		},'Бой найден',data.start,data.finish);
 		
 		let button = DOM({style:'mm-ready-button',event:['click', async () => {
 			
@@ -3962,7 +3944,7 @@ class MM {
 		
 		MM.close();
 		
-		let play = DOM({tag:'a',href:`pwclassic://${App.storage.data.token}/runGame/${PW_VERSION}/${data.id}/${data.users[App.storage.data.id].hero}/${Number(data.users[App.storage.data.id].team) - 1}`});
+		let play = DOM({tag:'a',href:`pwclassic://runGame/${data.key}/${PW_VERSION}`});
 		
 		play.click();
 		
@@ -4048,53 +4030,69 @@ class Timer {
 	
 	static intervalId = false;
 	
-	static seconds = 0;
-	
 	static init(){
 		
-		Timer.sb = DOM(`${name} 00:${Timer.seconds}`);
+		Timer.sb = DOM(`${name} 00:00`);
 		
 		Timer.body = DOM({style:'mm-timer'},Timer.sb);
 		
 	}
 	
-	static start(callback,name,seconds){
+	static start(callback,name,start,finish){
 		
 		Timer.callback = callback;
 		
 		Timer.message = name;
 		
-		Timer.seconds = (seconds + 1);
+		Timer.timeStart = start;
 		
-		if(Timer.intervalId){
+		Timer.timeFinish = finish;
+		
+		if(Timer.end()){
 			
-			clearInterval(Timer.intervalId);
-			
-			Timer.intervalId = false;
+			return;
 			
 		}
 		
-		Timer.intervalId = setInterval(() => Timer.second(),1000);
+		Timer.intervalId = setInterval(() => Timer.update(),250);
 		
-		Timer.second();
+		Timer.update();
 		
 	}
 	
-	static second(){
+	static update(){
 		
-		Timer.seconds--;
-		
-		Timer.sb.innerText = `${Timer.message} 00:${(Timer.seconds < 10 ? '0': '')}${Timer.seconds}`;
-		
-		if(!Timer.seconds){
+		if(Timer.end()){
 			
-			clearInterval(Timer.intervalId);
+			return;
 			
-			Timer.intervalId = false;
+		}
+		
+		let seconds = Math.abs( Date.now() - (Timer.timeStart + Timer.timeFinish) ) / 1000;
+		
+		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds}`;
+		
+	}
+	
+	static end(){
+		
+		if( (Date.now() - (Timer.timeStart + Timer.timeFinish) ) >= 0){
+			
+			if(Timer.intervalId){
+				
+				clearInterval(Timer.intervalId);
+				
+				Timer.intervalId = false;
+				
+			}
 			
 			Timer.callback();
 			
+			return true;
+			
 		}
+		
+		return false;
 		
 	}
 	
