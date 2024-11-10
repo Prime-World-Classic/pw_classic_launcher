@@ -895,11 +895,17 @@ class View {
 			
 			let img = DOM({style:'party-middle-item-middle'});
 			
+			let rankIcon = DOM({style:'rank-icon'});
+			
+			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
+			
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
+			
+			img.append(rank);
+			
 			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
-
-			const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, item.rating);
-			const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
-
+			
+			
 			if(item.id){
 				
 				if(item.ready){
@@ -948,15 +954,15 @@ class View {
 				
 				status.style.opacity = 0;
 				
-				lvl.style.opacity = 0;
+				// lvl.style.opacity = 0;
 				
-				rank.style.opacity = 0;
+				//rank.style.opacity = 0;
 				
 			}
 			
-			let nickname = DOM(`${item.nickname ? item.nickname : 'Добавить'}`);
+			let nickname = DOM({style:'party-middle-item-nickname'},`${item.nickname ? item.nickname : 'Добавить'}`);
 			
-			let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status, lvl, rank); // TODO use this for lvl and rank
+			let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status); // TODO use this for lvl and rank
 			// let player = DOM({id:`PP${item.id}`,style:'party-middle-item'},nickname,img,status);
 			
 			player.dataset.id = item.id;
@@ -1197,12 +1203,14 @@ class View {
 			MM.hero = result;
 			
 			for(const item of result){
+				//item.rating = App.getRandomInt(1100,3000);
+				let rankIcon = DOM({style:'rank-icon'});
 				
-				const hero = DOM({style:'hero-item'},
-					DOM({tag:'span', style: 'name'}, item.name),
-					DOM({tag:'div', style: ['lvl-common', 'lvl']},item.rating), // TODO from hardcode to server data
-					DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
-				);
+				rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
+				
+				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
+				
+				const hero = DOM({style:'hero-item'},DOM({tag:'span', style: 'name'},item.name),rank);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
 				
@@ -1230,8 +1238,6 @@ class View {
 		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('adm')]}),
 		play,
 		DOM({style:'main-header-item',event:['click',() => View.show('main')]},App.storage.data.login),
-		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
-		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
 		),
 		DOM({style:'main-body-full'},hero)
@@ -1465,6 +1471,75 @@ class View {
 		body.append(adm);
 		
 		return body;
+		
+	}
+	
+}
+
+class Rank {
+	
+	static icon(rating){
+		
+		if(rating <= 1199){
+			
+			return 1;
+			
+		}
+		else if(rating <= 1299){
+			
+			return 2;
+			
+		}
+		else if(rating <= 1399){
+			
+			return 3;
+			
+		}
+		else if(rating <= 1499){
+			
+			return 4;
+			
+		}
+		else if(rating <= 1599){
+			
+			return 5;
+			
+		}
+		else if(rating <= 1699){
+			
+			return 6;
+			
+		}
+		else if(rating <= 1799){
+			
+			return 7;
+			
+		}
+		else if(rating <= 1899){
+			
+			return 8;
+			
+		}
+		else if(rating <= 1999){
+			
+			return 9;
+			
+		}
+		else if(rating <= 2199){
+			
+			return 10;
+			
+		}
+		else if(rating <= 2499){
+			
+			return 11;
+			
+		}
+		else{
+			
+			return 12;
+			
+		}
 		
 	}
 	

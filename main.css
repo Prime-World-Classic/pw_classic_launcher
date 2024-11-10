@@ -229,13 +229,6 @@ background-color:rgba(15,15,15,0.7);
 	width:200px;
 	
 }
-.build-hero .lvl {
-	top: -30px;
-}
-.build-hero .rank {
-	top: -140px;
-	left: 140px;
-}
 
 
 .build-hero-stats{
@@ -745,7 +738,7 @@ text-align:center;
 }
 
 .hero-item{
-	margin: 70px 0.3vw;
+	margin: 3vh 0.3vw;
 }
 
 .hero-item {
@@ -769,35 +762,43 @@ text-align:center;
 	
 }
 
-.rank-common {
-	position: relative;
-	background: #244;
-	padding: 8px;
-	border: 1px solid orange;
-	border-radius: 50%;
+
+.rank{
+	
+	width:100%;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:space-between;
+	align-items:center;
+	position:absolute;
+	bottom:0;
+	
 }
-.hero-item .rank {
-	top: 100px;
-	left: 110px;
+
+.rank-icon {
+	
+	width:2vw;
+	height:2vw;
+	background:#244;
+	border:1px solid orange;
+	border-radius:50%;
+	background-size:80%;
+	background-position:center;
+	background-repeat:no-repeat;
+	
 }
-.lvl-common {
-	position: relative;
+
+.rank-lvl {
+	
+	height:1.1vw;
 	background: #244;
-	width: 46px;
-	height: 8px;
-	padding: 8px;
 	border: 1px solid darkorange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
-	font-size: 21px;
 	color: #fdd;
-	font-family: Arial;
-	line-height: .4;
+	font: 1.1vw / 1 Arial;
 	text-align: center;
+	padding:0.1vw 0.5vw;
 
-}
-.hero-item .lvl {
-	left: -15px;
-	top: 135px;
 }
 
 .adm{
@@ -1138,7 +1139,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	padding-left: 3px;
 	border: 0;
 }
-.mm-lobby-middle-hero .rank {
+.mm-lobby-middle-hero {
 	padding: 2px;
 	border: 0;
 }
@@ -1171,9 +1172,8 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 .mm-lobby-header-team-player .lvl {
 	top: -1vw;
 }
-.mm-lobby-header-team-player .rank {
-	top: -4vw;
-	left: 5vw;
+.mm-lobby-header-team-player{
+
 }
 
 .lobby-info{
@@ -1231,7 +1231,7 @@ cursor:pointer;
 	
 }
 
-.party-middle-item div:first-child{
+.party-middle-item-nickname {
 	
 	margin:1vw 0;
 	text-align:center;
@@ -1275,7 +1275,7 @@ cursor:pointer;
 }
 
 .party-middle-item-middle{
-	margin: auto;
+
 	width:10vw;
 	height:10vw;
 	background-color:rgba(255,255,255,0.1);
@@ -1289,15 +1289,12 @@ cursor:pointer;
 	line-height:9.5vw;
 	text-align:center;
 	color:rgba(255,255,255,0.2);
+	position:relative;
 	
 }
 
 .party-middle-item .lvl {
 	top: -5vw;
-}
-.party-middle-item .rank {
-	top: -7vw;
-	left: 8vw;
 }
 
 .party-hero {
@@ -1607,8 +1604,6 @@ cursor:pointer;
 }
 
 @media (width > 2000px) {
-	.party-middle-item .rank {
-		top: -6vw;
-	}
+
 }
 
