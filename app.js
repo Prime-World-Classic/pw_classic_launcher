@@ -2490,14 +2490,16 @@ class Build{
 					element.classList.remove('smartcast');
 					
 					element.dataset.active = 0;
-					
+
+					element.title = 'Смарткаст выключён';
 				}
 				else{
 					
 					element.classList.add('smartcast');
 					
 					element.dataset.active = 1;
-					
+
+					element.title = 'Смарткаст включён';
 				}
 				
 				if(element.firstChild){
