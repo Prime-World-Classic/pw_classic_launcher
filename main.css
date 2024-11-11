@@ -772,7 +772,13 @@ text-align:center;
 	align-items:center;
 	position:absolute;
 	bottom:0;
-	
+}
+
+.build-hero .rank {
+	width: unset;
+	position: relative;;
+	bottom: 160px;
+	left: 120px;
 }
 
 .rank-icon {
@@ -788,8 +794,9 @@ text-align:center;
 	
 }
 
-.rank-lvl {
-	
+.rank-lvl,
+.lvl
+{
 	height:1.1vw;
 	background: #244;
 	border: 1px solid darkorange;
@@ -799,6 +806,11 @@ text-align:center;
 	text-align: center;
 	padding:0.1vw 0.5vw;
 
+}
+.build-hero .lvl {
+	width: 44px;
+	position: relative;
+	top: -30px;
 }
 
 .adm{

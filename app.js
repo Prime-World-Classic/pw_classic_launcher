@@ -2071,7 +2071,7 @@ class Build{
 		Build.heroImg = DOM({tag:'img', src:`hero/${data.id}/1.png`, style: 'avatar'});
 
 		Build.lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
-		Build.rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
+		Build.rank = DOM({tag:'img', src: 'ransk/1.png', style: ['rank-common', 'rank']}) // TODO from hardcode to server data
 
 		const wrapper = DOM({tag: 'div'}, Build.heroImg, Build.lvl, Build.heroName, Build.rank);
 
@@ -3821,8 +3821,8 @@ class MM {
 	
 				const name = DOM({tag:'div', style: 'name'},`${data.users[key].nickname}`);
 			
-				const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100); // TODO hardcode 1100 to the data from server
-				const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+				const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
+				const rank = DOM({tag:'img', src: 'ransk/1.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
 
 				player.append(hero, lvl, name, rank);
 				leftTeam.append(player);
@@ -3848,8 +3848,8 @@ class MM {
 		for(const item of MM.hero){
 		
 			
-			const lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100); // TODO hardcode 1100 to the data from server
-			const rank = DOM({tag:'img', src: 'ransk/_05_20.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
+			const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
+			const rank = DOM({tag:'img', src: 'ransk/1.png', style: ['rank-common', 'rank']}); // TODO from hardcode to server data
 			const hero = DOM({id:`HERO${item.id}`,data:{active:0}}, lvl, rank);
 
 			hero.dataset.url = `hero/${item.id}/1.png`;
