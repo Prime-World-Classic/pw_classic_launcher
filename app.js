@@ -2386,9 +2386,15 @@ class Build{
 	
 	static rarity(){
 		
-		let element = [{id:'4',color:'170,20,44'},{id:'3',color:'237,129,5'},{id:'2',color:'205,0,205'},{id:'1',color:'17,105,237'}];
+		const element = [
+			{id:'4', name: 'Красное', color:'170,20,44'},
+			{id:'3', name: 'Оранжевое', color:'237,129,5'},
+			{id:'2', name: 'Фиолетовое', color:'205,0,205'},
+			{id:'1', name: 'Синее', color:'17,105,237'}
+		];
 		
 		let a = document.createElement('div');
+		a.title = 'Классовые навыки героя';
 		
 		a.classList.add('build-rarity-other');
 		
@@ -2449,7 +2455,7 @@ class Build{
 				else{
 					
 					button.style.border = 'solid 7px rgb(153,255,51)';
-					
+
 					Build.setSortInventory('rarity',item.id);
 					
 					Build.sortInventory();
@@ -2461,6 +2467,8 @@ class Build{
 			}
 			
 			button.style.background = `rgba(${item.color},0.6)`;
+
+			button.title = `${item.name} качество талантов`;
 			
 			Build.rarityView.append(button);
 			
