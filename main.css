@@ -791,7 +791,9 @@ text-align:center;
 	left: 120px;
 }
 
-.rank-icon {
+.rank-icon,
+.rank
+{
 	
 	width:2vw;
 	height:2vw;
@@ -802,6 +804,10 @@ text-align:center;
 	background-position:center;
 	background-repeat:no-repeat;
 	
+}
+.build-hero .rank {
+	top: -140px;
+	left: 130px;
 }
 
 .rank-lvl,
