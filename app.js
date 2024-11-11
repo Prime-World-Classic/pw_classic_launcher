@@ -1780,7 +1780,7 @@ class Build{
 
 		Build.listView.append(newRandomSkinsButtons)
 
-		Build.listView.append(DOM({style:'build-list-close',event:['click',() => View.show('main')]},'[X]'));
+		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('main')]},'[X]'));
 	}
 	
 	static hero(data){
