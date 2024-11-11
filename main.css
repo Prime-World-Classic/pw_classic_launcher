@@ -550,6 +550,16 @@ button.skins {
 	color:rgba(255,255,255,0.8);
 	
 }
+.build-rarity .reset {
+	color: #fff;
+	font-size: 40px;
+}
+.build-rarity .reset:hover {
+	font-size: 45px;
+}
+.build-rarity .reset:active {
+	color: red;
+}
 
 .build-description{
 	
