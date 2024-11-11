@@ -2474,7 +2474,11 @@ class Build{
 			
 		}
 		
-		
+		const reset = document.createElement('div');
+		reset.innerText = '⭮ ';
+		reset.classList.add('reset');
+		reset.title = `Сброс талантов из билда в "Таланты"`;
+		Build.rarityView.append(reset);
 	}
 	
 	static activeBar(data){
