@@ -795,8 +795,8 @@ text-align:center;
 .build-hero .rank
 {
 	
-	width:2vw;
-	height:2vw;
+	width: 1.5vw;
+	height: 1.5vw;
 	background:#244;
 	border:1px solid orange;
 	border-radius:50%;
@@ -813,12 +813,13 @@ text-align:center;
 .rank-lvl,
 .lvl
 {
-	height:1.1vw;
+	height: .8vw;
+	width: 1.6vw;
 	background: #244;
 	border: 1px solid darkorange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	color: #fdd;
-	font: 1.1vw / 1 Arial;
+	font: .8vw / 1 Arial;
 	text-align: center;
 	padding:0.1vw 0.5vw;
 
