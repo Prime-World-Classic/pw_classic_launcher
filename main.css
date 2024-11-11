@@ -380,7 +380,7 @@ button.skins {
 	overflow-y: hidden;
 }
 .button-build--wrapper:not(.highlight) .build-list-item {
-	background-image: linear-gradient(to top, #062a25, #103a51) !important;
+	background-image: linear-gradient(to top, #153, #163) !important;
 }
 .build-list-close {
 	position: absolute;
