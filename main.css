@@ -370,7 +370,6 @@ button.skins {
 	overflow-y: hidden;
 }
 .build-buttons--wrapper .build-list-item {
-	border: 1px solid darkorange !important;
 	border-top-left-radius: 13px !important;
 	border-top-right-radius: 13px !important;
 	border-bottom-left-radius: 0 !important;
@@ -381,6 +380,9 @@ button.skins {
 }
 .button-build--wrapper:not(.highlight) .build-list-item {
 	background-image: linear-gradient(to top, #153, #163) !important;
+}
+.button-build--wrapper.highlight .build-list-item {
+	border: 1px solid darkorange !important;
 }
 .build-list-close {
 	position: absolute;
