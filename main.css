@@ -312,10 +312,10 @@ background-color:rgba(15,15,15,0.7);
 
 .help {
 	position: absolute;
-	top: 10px;
+	top: 0;
 	color: #ccc;
 	font-family: Arial;
-	width: 50vw;
+	width: 60vw;
 	display: flex;
 	align-self: baseline;
 	margin-left: 10px;
