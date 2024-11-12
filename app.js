@@ -1689,6 +1689,40 @@ class Build{
 	static list(builds){
 		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
 		
+		if(builds.length < 6){
+			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
+					
+				let template = document.createDocumentFragment();
+				
+				let name = DOM({tag:'input',placeholder:'Наименование билда'});
+				
+				let button = DOM({style:'splash-content-button',event:['click', async () => {
+					
+					if(!name.value){
+						
+						Splash.hide();
+						
+					}
+					
+					await App.api.request('build','create',{heroId:Build.heroId,name:name.value});
+					
+					Splash.hide();
+					
+					View.show('build',Build.heroId);
+					
+				}]},'Создать билд');
+				
+				template.append(name,button);
+				
+				Splash.show(template);
+				
+			}]},'+');
+
+			buildButtonsWrapper.append(create);
+
+		}
+
+
 		for(let build of builds){
 			
 			const item = DOM(
@@ -1726,39 +1760,10 @@ class Build{
 
 		const newRandomSkinsButtons = DOM({style: 'new-random-skins-buttons--wrapper'});
 
-		if(builds.length < 6){
 			
-			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
-				
-				let template = document.createDocumentFragment();
-				
-				let name = DOM({tag:'input',placeholder:'Наименование билда'});
-				
-				let button = DOM({style:'splash-content-button',event:['click', async () => {
-					
-					if(!name.value){
-						
-						Splash.hide();
-						
-					}
-					
-					await App.api.request('build','create',{heroId:Build.heroId,name:name.value});
-					
-					Splash.hide();
-					
-					View.show('build',Build.heroId);
-					
-				}]},'Создать билд');
-				
-				template.append(name,button);
-				
-				Splash.show(template);
-				
-			}]},'+');
+
 			
-			newRandomSkinsButtons.append(create);
 			
-		}
 		
 		newRandomSkinsButtons.append(DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
 			
