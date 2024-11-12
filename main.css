@@ -308,6 +308,8 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .help {
+	position: absolute;
+	top: 20px;
 	color: #ccc;
 	font-family: Arial;
 	width: 50vw;
