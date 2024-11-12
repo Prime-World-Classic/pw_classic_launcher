@@ -588,6 +588,8 @@ button.skins {
 	
 }
 .build-rarity .reset {
+	margin-top: 30px;
+	margin-left: 7px;
 	color: #fff;
 	font-size: 40px;
 }
