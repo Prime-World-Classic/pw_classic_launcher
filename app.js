@@ -1934,7 +1934,7 @@ class Build{
 				}
 				else{
 					
-					item.classList
+					item.style.background = '#5899';
 					
 					if(key == 'hp'){
 						
