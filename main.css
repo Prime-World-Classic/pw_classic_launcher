@@ -204,7 +204,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero{
-
+	margin-top: -90px;
 	width:300px;
 	min-width:300px;
 	height:660px;
@@ -368,8 +368,8 @@ button.skins {
 .build-buttons--wrapper {
 	margin-top: 120px;
 	display: flex;
-	width: 35vw;
-	margin-left: 20vw;
+	width: 40vw;
+	margin-left: 17vw;
 	overflow-y: hidden;
 }
 .build-buttons--wrapper .build-list-item {
@@ -484,7 +484,7 @@ button.skins {
 }
 
 .build-talent{
-	margin-top: -130px;
+	margin-top: -79px;
 	min-width:660px;
 	width:660px;
 	height: 750px;
@@ -1634,7 +1634,19 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 23vw;
+		margin-left: 21vw;
+	}
+}
+
+@media (width > 2400px) {
+	.build-buttons--wrapper {
+		margin-left: 27vw;
+	}
+}
+
+@media (width > 3200px) {
+	.build-buttons--wrapper {
+		margin-left: 33vw;
 	}
 }
 
