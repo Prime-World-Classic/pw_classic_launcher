@@ -369,6 +369,10 @@ button.random-build {
 }
 
 button.skins {
+	position: absolute;
+	margin-top: -60px;
+	margin-left: 220px;
+}
 	animation: glowing 4000ms infinite;
 }
 
