@@ -1754,7 +1754,7 @@ class Build{
 				
 				Splash.show(template);
 				
-			}]},`Новый билд`);
+			}]},'+');
 			
 			newRandomSkinsButtons.append(create);
 			
@@ -1766,7 +1766,7 @@ class Build{
 			
 			View.show('build',Build.heroId);
 			
-		}]},'Случайный билд'));
+		}]}));
 		
 		newRandomSkinsButtons.append(
 			DOM({

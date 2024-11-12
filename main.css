@@ -346,9 +346,7 @@ background-color:rgba(15,15,15,0.7);
 	right: 75px;
 }
 
-button.new-build {
-	margin: -40px 20px 0 100px !important;
-}
+
 button.new-build,
 button.random-build
 button.skins,
@@ -356,6 +354,27 @@ button.skins,
 	margin-top: -100px;
 	font-weight: bold;
 	font-size: 20px;
+}
+button.new-build {
+	color: #eee;
+	font-size: 70px;
+	line-height: 0;
+	width: 55px;
+}
+button.random-build {
+	background: transparent;
+	border: 0;
+	background-image: url(dice.svg) !important;
+	background-color: #279aac;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-size: 45px;
+	background-position: 9px;
+	width: 63px;
+	height: 63px;
+	box-shadow: none !important;
+	cursor: pointer;
+	opacity: .8;
 }
 
 button.skins {
