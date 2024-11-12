@@ -492,11 +492,14 @@ button.skins {
 	min-width:660px;
 	width:660px;
 	height: 750px;
-	overflow-y:scroll;
+	overflow: hidden;
 }
 .build-talents {
 	display: flex;
 	flex-flow: row wrap;
+
+	height: 700px;
+	overflow: auto;
 }
 .build-talent-item {
 	
