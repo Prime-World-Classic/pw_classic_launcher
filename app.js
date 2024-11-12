@@ -2394,11 +2394,11 @@ class Build{
 		];
 		
 		let a = document.createElement('div');
-		a.title = 'Классовые навыки героя';
+		a.title = 'Активные таланты';
 		
 		a.classList.add('build-rarity-other');
 		
-		a.innerText = 'K';
+		a.innerText = 'А';
 		
 		a.dataset.active = 0;
 		
