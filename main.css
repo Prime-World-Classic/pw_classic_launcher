@@ -1664,8 +1664,8 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 28vw;
-		width: 27vw;
+		margin-left: 23vw;
+		width: 33vw;
 	}
 }
 
@@ -1681,9 +1681,9 @@ cursor:pointer;
 	}
 }
 
-@media (width > 2400px) {
+@media (width > 2300px) {
 	.build-buttons--wrapper {
-		margin-left: 31vw;
+		margin-left: 29vw;
 		width: 25vw;
 	}
 }
