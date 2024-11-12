@@ -1622,7 +1622,7 @@ class Build{
 
 		const buttonTalents = document.createElement('button');
 		buttonTalents.innerText = 'Таланты';
-		buttonTalents.title = 'TODO еще не готово - команда PR Classic работает над этим';
+		buttonTalents.title = 'TODO еще не готово - команда PW Classic работает над этим';
 		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
 
 		const separator = document.createElement('div');
@@ -1632,7 +1632,7 @@ class Build{
 
 		const buttonSets = document.createElement('button');
 		buttonSets.innerText = 'Сеты';
-		buttonSets.title = 'TODO еще не готово - команда PR Classic работает над этим';
+		buttonSets.title = 'TODO еще не готово - команда PW Classic работает над этим';
 		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
 
 		const buttonsTalentsAndSets = document.createElement('div');
