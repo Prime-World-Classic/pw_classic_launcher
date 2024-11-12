@@ -378,8 +378,16 @@ button.skins {
 	border-bottom-right-radius: 0 !important;
 	margin: 0;
 	width: 217px;
-	overflow-y: hidden;
+	overflow: hidden;
 }
+.build-buttons--wrapper::-webkit-scrollbar {
+	background-color: #eee;
+	height: 7px;
+}
+.build-buttons--wrapper::-webkit-scrollbar-thumb {
+	background-color: #030;
+}
+
 .button-build--wrapper:not(.highlight) .build-list-item {
 	background-image: linear-gradient(to top, #153, #163) !important;
 }
