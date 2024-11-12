@@ -1639,12 +1639,23 @@ class Build{
 		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
 		buttonsTalentsAndSets.append(buttonTalents, separator, buttonSets);
 
-		const buildTalets = document.createElement('div');
-		buildTalets.classList.add('build-talents');
+		const buildTalents = document.createElement('div');
+		buildTalents.classList.add('build-talents');
 
 		Build.inventoryView = document.createElement('div');
 		Build.inventoryView.classList.add('build-talent');
-		Build.inventoryView.append(buttonsTalentsAndSets, buildTalets);
+
+		const newSkin = DOM({
+				tag: 'button',
+				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
+				title: 'Скоро, скоро, пока эта кнопка не работает',
+				event:['click', async () => {}]
+			},
+			'Скины'
+		)
+
+		Build.inventoryView.append(newSkin, buttonsTalentsAndSets, buildTalents);
+
 
 		// ================================================
 
@@ -1683,8 +1694,9 @@ class Build{
 	}
 	
 	static list(builds){
-		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
-		
+
+		const newRandomSkinsButtons = DOM({tag: 'div', style: 'new-random-skins-buttons--wrapper'});
+
 		if(builds.length < 6){
 			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
 					
@@ -1714,10 +1726,20 @@ class Build{
 				
 			}]},'+');
 
-			buildButtonsWrapper.append(create);
-
+			newRandomSkinsButtons.append(create);
 		}
 
+		const random = DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
+			
+			await App.api.request('build','random',{id:Build.id});
+			
+			View.show('build',Build.heroId);
+			
+		}]});
+		newRandomSkinsButtons.append(random);
+
+		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
+		buildButtonsWrapper.append(newRandomSkinsButtons)
 
 		for(let build of builds){
 			
@@ -1753,33 +1775,6 @@ class Build{
 		}, 300);
 
 		Build.listView.append(buildButtonsWrapper);
-
-		const newRandomSkinsButtons = DOM({style: 'new-random-skins-buttons--wrapper'});
-
-			
-
-			
-			
-		
-		newRandomSkinsButtons.append(DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
-			
-			await App.api.request('build','random',{id:Build.id});
-			
-			View.show('build',Build.heroId);
-			
-		}]}));
-		
-		newRandomSkinsButtons.append(
-			DOM({
-				tag: 'button',
-				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
-				title: 'Скоро, скоро, пока эта кнопка не работает',
-				event:['click', async () => {}]
-			},
-			'Скины')
-		);
-
-		Build.listView.append(newRandomSkinsButtons)
 
 		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('main')]},'[X]'));
 	}

@@ -204,7 +204,6 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero{
-	margin-top: -90px;
 	width:300px;
 	min-width:300px;
 	height:660px;
@@ -327,8 +326,9 @@ background-color:rgba(15,15,15,0.7);
 
 .new-random-skins-buttons--wrapper {
 	position: absolute;
-	top: 0;
-	right: 75px;
+	margin-left: -190px;
+	margin-top: -20px;
+	display: flex;
 }
 
 
@@ -343,8 +343,14 @@ button.skins,
 button.new-build {
 	color: #eee;
 	font-size: 70px;
+	background: #279aac !important;
 	line-height: 0;
-	width: 55px;
+	width: 62px;
+	height: 62px;
+	margin-right: 5px;
+}
+button.new-build:hover {
+	transform: rotate(20deg);
 }
 button.random-build {
 	background: transparent;
@@ -372,15 +378,18 @@ button.skins {
 	color:rgba(255,255,255,0.8);
 	
 }
+.build-list .wrapper {
+	display: flex;
+}
 
 .build-buttons--wrapper {
-	margin-top: 120px;
+	margin-top: 118px;
 	display: flex;
 	width: 35vw;
-	margin-left: 17vw;
+	margin-left: 24vw;
 	overflow-y: hidden;
 }
-.build-buttons--wrapper .build-list-item {
+.build-buttons--wrapper .build-list-item:not(.new-build, .random-build) {
 	border-top-left-radius: 13px !important;
 	border-top-right-radius: 13px !important;
 	border-bottom-left-radius: 0 !important;
@@ -1645,13 +1654,14 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 22vw;
+		margin-left: 28vw;
+		width: 27vw;
 	}
 }
 
 @media (width > 2100px) {
 	.build-buttons--wrapper {
-		width: 36vw;
+		width: 31vw;
 	}
 }
 
@@ -1663,14 +1673,15 @@ cursor:pointer;
 
 @media (width > 2400px) {
 	.build-buttons--wrapper {
-		margin-left: 27vw;
+		margin-left: 31vw;
+		width: 25vw;
 	}
 }
 
 @media (width > 3200px) {
 	.build-buttons--wrapper {
+		margin-left: 34vw;
 		width: 20vw;
-		margin-left: 33vw;
 	}
 }
 
