@@ -376,7 +376,7 @@ button.skins {
 .build-buttons--wrapper {
 	margin-top: 120px;
 	display: flex;
-	width: 40vw;
+	width: 35vw;
 	margin-left: 17vw;
 	overflow-y: hidden;
 }
@@ -1645,7 +1645,7 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 21vw;
+		margin-left: 22vw;
 	}
 }
 
