@@ -1724,7 +1724,7 @@ class Build{
 				
 				Splash.show(template);
 				
-			}]},'+');
+			}]});
 
 			newRandomSkinsButtons.append(create);
 		}
