@@ -343,7 +343,12 @@ button.skins,
 button.new-build {
 	color: #eee;
 	font-size: 70px;
-	background: #279aac !important;
+	background-image: url(plus.svg) !important;
+	background-color: #279aac !important;
+	background-size: 77px;
+	background-position-x: -8px;
+	background-position-y: -7px;
+	background-repeat: no-repeat;
 	line-height: 0;
 	width: 62px;
 	height: 62px;
