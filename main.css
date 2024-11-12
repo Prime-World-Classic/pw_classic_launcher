@@ -1297,12 +1297,10 @@ cursor:pointer;
 }
 
 .party-middle-item-nickname {
-	
 	margin:1vw 0;
 	text-align:center;
 	font: bold 1.5vw / 1 Verdana;
-	color: #111;
-	text-shadow: #fff 0 0 5px;
+	color: #ccc;
 	
 }
 
