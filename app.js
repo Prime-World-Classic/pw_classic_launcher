@@ -2881,7 +2881,7 @@ class Build{
 					
 					element.style.display = 'block';
 					
-					if(elemBelow && (elemBelow.parentNode.className == 'build-talent') && (element.dataset.state != 1) ){
+					if(elemBelow && (elemBelow.parentNode.className == 'build-talents') && (element.dataset.state != 1) ){
 						
 						let oldParentNode = element.parentNode;
 						
