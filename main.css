@@ -319,6 +319,7 @@ background-color:rgba(15,15,15,0.7);
 	display: flex;
 	align-self: baseline;
 	margin-left: 10px;
+	z-index: -1;
 }
 .help p {
 	margin-top: 10px;
