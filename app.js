@@ -1696,7 +1696,7 @@ class Build{
 				`${build.name}`,
 			);
 
-			const btnRemove = DOM({tag: 'button', style: 'remove', title: 'Удалить билд', event: [
+			const btnRemove = DOM({tag: 'button', style: 'remove', title: 'Очистить билд', event: [
 					'click', _ => {
 						alert('Спасибо что вы с нами, TODO пока удаление не имплементировано');
 					}
