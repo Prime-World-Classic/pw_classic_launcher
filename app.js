@@ -1,4 +1,4 @@
-APP_VERSION = '1.6.1';
+APP_VERSION = '1.6.2';
 
 PW_VERSION = '1.6';
 
@@ -3721,7 +3721,7 @@ class MM {
 				
 				if(request.type == 'reconnect'){
 					
-					let reconnect = DOM({tag:'a',href:`pwclassic://reconnect/${request.key}/${PW_VERSION}`});
+					let reconnect = DOM({tag:'a',href:`pwclassic://reconnect/${request.id}/${PW_VERSION}`});
 		
 					reconnect.click();
 					
