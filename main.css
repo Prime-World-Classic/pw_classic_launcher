@@ -310,21 +310,6 @@ background-color:rgba(15,15,15,0.7);
 	
 }
 
-.help {
-	position: absolute;
-	top: 0;
-	color: #ccc;
-	font-family: Arial;
-	width: 60vw;
-	display: flex;
-	align-self: baseline;
-	margin-left: 10px;
-	z-index: -1;
-}
-.help p {
-	margin-top: 10px;
-}
-
 .build-field-top {
 	width: 97vw;
 	height: 180px;

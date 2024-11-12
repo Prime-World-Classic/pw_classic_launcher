@@ -1358,7 +1358,6 @@ class View {
 		
 		// build-field-top ->    play,DOM({event:['click',() => View.show('main')]},'Закрыть окно билда [X]')
 		body.append(
-		DOM({style:'help'}, Build.helpView),
 		DOM({style:'build-field-top'},Build.listView),
 		DOM({style:'build'},Build.heroView,Build.levelView,Build.fieldView,Build.inventoryView,Build.rarityView),
 		DOM({style:'build-field-bottom'},Build.activeBarView)
@@ -1605,9 +1604,6 @@ class Build{
 		Build.listView = document.createElement('div');
 		Build.listView.classList.add('build-list');
 	
-		Build.helpView = document.createElement('p');
-		Build.helpView.innerHTML = `Тут вы можете собрать разнообразные билды из представленных талантов собранные в <span title='группа талантов дающая особый эффект' style='text-decoration:underline dotted'>сеты</span>. Если вы новичок, можно воспользоваться казульным билдом при нажатии "Случайный билд". При нажатии кнопки "Скины" вы можете определить образ героя для боёв.`;
-		
 		Build.heroView = document.createElement('div');
 		
 		Build.heroView.classList.add('build-hero');
