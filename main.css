@@ -214,6 +214,9 @@ background-color:rgba(15,15,15,0.7);
 	align-items:center;
 	
 }
+.build-hero > div:first-child {
+	height: 300px;
+}
 
 .build-hero .name {
 	position: relative;
