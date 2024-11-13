@@ -1,4 +1,4 @@
-APP_VERSION = '1.6.2';
+APP_VERSION = '1.6.3';
 
 PW_VERSION = '1.6';
 
@@ -1524,12 +1524,12 @@ class Rank {
 			return 9;
 			
 		}
-		else if(rating <= 2199){
+		else if(rating <= 2099){
 			
 			return 10;
 			
 		}
-		else if(rating <= 2499){
+		else if(rating <= 2199){
 			
 			return 11;
 			
@@ -2068,14 +2068,20 @@ class Build{
 		Build.heroName = DOM({tag: 'p', style: 'name'});
 		Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
 
-		Build.heroImg = DOM({tag:'img', src:`hero/${data.id}/1.png`, style: 'avatar'});
-
-		Build.lvl = DOM({tag:'div', style: ['lvl-common', 'lvl']}, 1100), // TODO from hardcode to server data
-		Build.rank = DOM({tag:'img', src: 'ransk/1.png', style: 'rank'}) // TODO from hardcode to server data
-
-		const wrapper = DOM({tag: 'div'}, Build.heroImg, Build.lvl, Build.heroName, Build.rank);
-
-	
+		Build.heroImg = DOM({style:'avatar'});
+		
+		Build.heroImg.style.backgroundImage = `url(hero/${data.id}/1.png)`;
+		
+		let rankIcon = DOM({style:'rank-icon'});
+		
+		rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
+		
+		let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.rating),rankIcon);
+		
+		Build.heroImg.append(rank);
+		
+		const wrapper = DOM({tag: 'div'},Build.heroImg,Build.heroName);
+		
 		Build.heroView.append(
 			wrapper,
 			stats
@@ -2478,6 +2484,13 @@ class Build{
 		reset.innerText = '⭮ ';
 		reset.classList.add('reset');
 		reset.title = `Сброс талантов из билда в "Таланты"`;
+		reset.addEventListener('click', async () => {
+			
+			await App.api.request('build','clear',{id:Build.id});
+			
+			View.show('build',Build.heroId);
+			
+		});
 		Build.rarityView.append(reset);
 	}
 	
@@ -3191,6 +3204,10 @@ class Events {
 		if(find){
 			
 			find.children[1].style.backgroundImage = (data.hero) ? `url(hero/${data.hero}/1.png)` : `url(hero/empty-ru.avif)`;
+			
+			find.children[1].firstChild.children[0].innerText = data.rating;
+			
+			find.children[1].firstChild.children[1].style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
 			
 		}
 		
