@@ -376,7 +376,11 @@ button.skins {
 	margin-top: -60px;
 	margin-left: 220px;
 }
-	animation: glowing 4000ms infinite;
+
+button.skins,
+button.talents,
+button.sets {
+	font-weight: bold;
 }
 
 .build-list{
