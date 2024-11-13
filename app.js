@@ -2856,7 +2856,7 @@ class Build{
 										
 										element.dataset.state = 1;
 										
-										Build.inventoryView.querySelector('build-talents').prepend(element);
+										Build.inventoryView.querySelector('.build-talents').prepend(element);
 										
 										Build.setStat(data,false);
 										
