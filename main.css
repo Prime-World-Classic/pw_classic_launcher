@@ -1026,6 +1026,13 @@ background:rgba(255,255,255,0.5);
 
 }
 
+.splash-content .close {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	cursor: pointer;
+}
+
 .mm-timer{
 	
 	display:flex;
