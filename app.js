@@ -1624,6 +1624,7 @@ class Build{
 		buttonTalents.innerText = 'Таланты';
 		buttonTalents.title = 'TODO еще не готово - команда PW Classic работает над этим';
 		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
+		buttonTalents.title = 'Библиотека талантов';
 
 		const separator = document.createElement('div');
 		separator.innerText = '|';
