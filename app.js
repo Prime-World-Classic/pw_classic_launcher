@@ -1764,7 +1764,7 @@ class Build{
 			item.onclick = () => {
 				setTimeout(_ => {
 					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
-					document.querySelectorAll('.button-build--wrapper')[_i].classList.add('highlight');
+					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('highlight');
 				}, 300);
 				View.show('build',Build.heroId,build.id);
 			}
