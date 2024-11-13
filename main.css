@@ -541,6 +541,9 @@ button.sets {
 	margin:5px;
 	
 }
+.build-active-bar-item .build-talent-item {
+	margin: 0;
+}
 .buttons-talents-and-sets {
 	display: flex;
 	justify-content: center;
