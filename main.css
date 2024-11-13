@@ -1027,9 +1027,9 @@ background:rgba(255,255,255,0.5);
 }
 
 .splash-content .close {
-	position: absolute;
-	top: 20px;
-	right: 20px;
+	position: relative;
+	top: -290px;
+	right: -520px;
 	cursor: pointer;
 }
 
