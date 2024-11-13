@@ -407,7 +407,8 @@ button.sets {
 	border-bottom-left-radius: 0 !important;
 	border-bottom-right-radius: 0 !important;
 	margin: 0;
-	width: 217px;
+	padding: 0 10px 0 10px;
+	width: auto;
 	overflow: hidden;
 }
 .build-buttons--wrapper::-webkit-scrollbar {
