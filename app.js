@@ -1700,7 +1700,7 @@ class Build{
 		if(builds.length < 6){
 			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 				Splash.hide();
-			}]}, 'x');
+			}]}, '[x]');
 			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
 					
 				let template = document.createDocumentFragment();
