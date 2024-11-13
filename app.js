@@ -2998,6 +2998,20 @@ class Build{
 			return false;
 			
 		};
+
+		element.oncontextmenu = e => {
+			e.preventDefault();
+			const data = Build.talents[element.dataset.id];
+			const nodeEmpty = Array.from(document.getElementById(`bfr${data.level}`).children).find(ch => {
+				if (ch.children.length === 0) {
+					return ch;
+				}
+			});
+			const positionElement = nodeEmpty.getBoundingClientRect();
+			element.style.left = `${positionElement.x + 20}px`;
+			element.style.top = `${positionElement.y + 20}px`;
+			element.onmouseup({clientX: positionElement.x + 20, clientY: positionElement.y + 20});
+		}
 		
 	}
 	
