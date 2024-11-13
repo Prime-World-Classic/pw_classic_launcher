@@ -1720,6 +1720,13 @@ cursor:pointer;
 	}
 }
 
+@media (width > 3600px) {
+	.build-buttons--wrapper {
+		margin-left: 37vw;
+		width: 20vw;
+	}
+}
+
 @media (width > 2000px) {
 
 }
