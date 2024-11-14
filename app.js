@@ -863,11 +863,59 @@ class View {
 		// const chat = DOM({style: 'chat'}, chatMessages, chatInput);
 		
 		// let party = DOM({style:'party'},middle, chat);
+		
+		let top = DOM({style:'top'});
+		
+		App.api.silent((result) => {
+			
+			let number = 1;
+			
+			for(let player of result){
+				
+				let rank = DOM({style:'top-item-hero-rank'});
+				
+				rank.style.backgroundImage = `url(ransk/${Rank.icon(player.rating)}.png)`;
+				
+				let hero = DOM({style:'top-item-hero'},rank);
+				
+				hero.style.backgroundImage = `url(hero/${player.hero}/1.png)`;
+				
+				let item = DOM({style:'top-item'},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+				
+				if(number == 1){
+					
+					item.style.background = 'rgba(255,50,0,0.9)';
+					
+				}
+				else if(number == 2){
+					
+					item.style.background = 'rgba(255,100,0,0.9)';
+					
+				}
+				else if(number == 3){
+					
+					item.style.background = 'rgba(150,50,255,0.9)';
+					
+				}
+				else if(number == 4){
+					
+					item.style.background = 'rgba(50,100,200,0.9)';
+					
+				}
+				
+				top.append(item);
+				
+				number++;
+				
+			}
+			
+		},'mm','top')
+		
 		let party = DOM({style:'party'},middle);
 		
 		let players = new Array();
 		
-		data = (data) ? data : await App.api.request('mmtest','loadParty');
+		data = (data) ? data : await App.api.request('mm','loadParty');
 		
 		MM.partyId = data.id;
 		
@@ -935,7 +983,7 @@ class View {
 							
 						}
 						
-						await App.api.request('mmtest','readyParty',{id:MM.partyId});
+						await App.api.request('mm','readyParty',{id:MM.partyId});
 						
 						status.onclick = false;
 						
@@ -971,7 +1019,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mmtest','leaderKickParty',{id:player.dataset.id});
+					await App.api.request('mm','leaderKickParty',{id:player.dataset.id});
 					
 				}]},'[X]'));
 				
@@ -981,7 +1029,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
+					await App.api.request('mm','leaveParty',{id:MM.partyId});
 					
 					View.show('main');
 					
@@ -1017,7 +1065,7 @@ class View {
 							
 							try{
 								
-								await App.api.request('mmtest','heroParty',{id:MM.partyId,hero:item.id});
+								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
 								
 							}
 							catch(error){
@@ -1067,7 +1115,7 @@ class View {
 					
 					input.addEventListener('input', async () => {
 						
-						let request = await App.api.request('mmtest','findUser',{name:input.value});
+						let request = await App.api.request('mm','findUser',{name:input.value});
 						
 						if(body.firstChild){
 							
@@ -1083,7 +1131,7 @@ class View {
 							
 							body.append(DOM({event:['click', async () => {
 								
-								await App.api.request('mmtest','inviteParty',{id:item.id});
+								await App.api.request('mm','inviteParty',{id:item.id});
 								
 								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
 								
@@ -1114,7 +1162,7 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
 		),
-		DOM({style:'main-body-full'},party)
+		DOM({style:'main-body-column'},top,party)
 		);
 		/*
 		MM.lobby({id:1,users:{
@@ -3177,7 +3225,7 @@ class Events {
 		
 		let b1 = DOM({style:'splash-content-button',event:['click', async () => {
 			
-			await App.api.request('mmtest','joinParty',{code:data.code,version:PW_VERSION});
+			await App.api.request('mm','joinParty',{code:data.code,version:PW_VERSION});
 			
 			Splash.hide();
 			
@@ -3565,7 +3613,7 @@ class Protect {
 			
 			if(Protect.storage.data.c){
 				
-				let request = await App.api.request('mmtest','check',{id:Protect.storage.data.c});
+				let request = await App.api.request('mm','check',{id:Protect.storage.data.c});
 				
 				if(request){
 					
@@ -3586,7 +3634,7 @@ class Protect {
 				
 				await Protect.storage.set({c:c});
 				
-				await App.api.request('mmtest','check',{id:c});
+				await App.api.request('mm','check',{id:c});
 				
 			}
 			
@@ -3742,7 +3790,7 @@ class MM {
 			
 			try{
 				
-				MM.id = await App.api.request('mmtest','cancel');
+				MM.id = await App.api.request('mm','cancel');
 				
 			}
 			catch(error){
@@ -3758,7 +3806,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request('mmtest','start',{hero:MM.activeSelectHero,version:PW_VERSION});
+				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero,version:PW_VERSION});
 				
 				MM.id = request.id;
 				
@@ -3787,7 +3835,7 @@ class MM {
 	
 	static async cancel(){
 		
-		await App.api.request('mmtest','start');
+		await App.api.request('mm','start');
 		
 		MM.id = '';
 		
@@ -3813,7 +3861,7 @@ class MM {
 		
 		let button = DOM({style:'mm-ready-button',event:['click', async () => {
 			
-			await App.api.request('mmtest','ready',{id:MM.id});
+			await App.api.request('mm','ready',{id:MM.id});
 			
 			button.style.opacity = 0;
 			
@@ -3917,7 +3965,7 @@ class MM {
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
-				App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
+				App.api.request('mm','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 			}
 			
@@ -3931,7 +3979,7 @@ class MM {
 		
 		MM.selectHeroButton.addEventListener('click', async () => {
 			
-			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
+			await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
 			
 		});
 		
@@ -3973,7 +4021,7 @@ class MM {
 					
 				}
 				
-				await App.api.request('mmtest','chat',{id:MM.id,message:chatInput.value});
+				await App.api.request('mm','chat',{id:MM.id,message:chatInput.value});
 				
 				chatInput.value = '';
 				
