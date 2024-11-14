@@ -168,6 +168,13 @@ background-color:rgba(15,15,15,0.7);
 	
 }
 
+.main-body-column{
+	
+	display:flex;
+	flex-flow:column nowrap;
+	
+}
+
 .main-header{
 	align-items:center;
 	text-align:center;
@@ -656,7 +663,7 @@ button.sets {
 	
 }
 
-.main-body-full{
+.main-body-full,.main-body-column{
 	
 	justify-content:center;
 	height:80vh;
@@ -1270,6 +1277,7 @@ cursor:pointer;
 
 .party{
 	width: 100vw;
+	height: 40vh;
 	display:flex;
 	flex-flow:column nowrap;
 	justify-content:center;
@@ -1385,6 +1393,88 @@ cursor:pointer;
 	border-radius:50%;
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	
+}
+
+.top{
+	
+	width:100vw;
+	height: 40vh;
+	display:flex;
+	flex-flow:row wrap;
+	justify-content:center;
+	align-items:center;
+	font:1.3vw / 1 Arial;
+	color:rgba(255, 255, 255, 0.5);
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+	
+}
+
+.top:before{
+	
+	content:'Зал славы Prime World Classic!';
+	width:100vw;
+	text-align:center;
+	font:italic 1.5vw / 1 Verdana;
+	
+}
+
+.top-item{
+	
+	width:23vw;
+	margin:0 1vw;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:center;
+	align-items:center;
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+	border-radius:5vw;
+}
+
+.top-item-hero{
+	
+	width:5vw;
+	min-width:5vw;
+	height:5vw;
+	background-size:105%;
+	background-position:center;
+	background-repeat:no-repeat;
+	position:relative;
+	
+}
+
+.top-item-hero-rank{
+	
+	width:1.5vw;
+	height:1.5vw;
+	background:#244;
+	border:1px solid orange;
+	border-radius:50%;
+	background-size:80%;
+	background-size:cover;
+	background-position:center;
+	background-repeat:no-repeat;
+	position:absolute;
+	right:0;
+	bottom:0;
+	
+}
+
+.top-item-player{
+	
+	margin-right:auto;
+	padding:0 1vw;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	
+}
+
+.top-item-player div:last-child{
+	
+	font-weight:600;
+	color:rgba(255, 255, 255, 0.8);
+	margin-top:0.5vh;
+	font-size:1.5vw;
 }
 
 .search{
