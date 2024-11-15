@@ -1,4 +1,4 @@
-APP_VERSION = '1.6.3';
+APP_VERSION = '1.6.4';
 
 PW_VERSION = '1.6';
 
@@ -3049,6 +3049,8 @@ class Build{
 				fieldRow.style.background = 'none';
 				
 				element.style.position = 'static';
+				
+				element.style.zIndex = 'auto';
 				
 			}
 			
