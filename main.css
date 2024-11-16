@@ -1372,7 +1372,7 @@ cursor:pointer;
 	
 }
 
-.party-hero {
+.party-hero, .skin-change {
 	
 	display:flex;
 	flex-flow:row wrap;
@@ -1384,6 +1384,19 @@ cursor:pointer;
 	
 	width:6vw;
 	height:6vw;
+	
+	
+}
+
+.skin-change div {
+	
+	width:12vw;
+	height:12vw;
+	
+}
+
+.party-hero div, .skin-change div {
+	
 	margin:0.2vw;
 	background-position:center;
 	background-repeat:repeat-y;

@@ -1,4 +1,4 @@
-APP_VERSION = '1.6.4';
+APP_VERSION = '1.6.7';
 
 PW_VERSION = '1.6';
 
@@ -878,7 +878,7 @@ class View {
 				
 				let hero = DOM({style:'top-item-hero'},rank);
 				
-				hero.style.backgroundImage = `url(hero/${player.hero}/1.png)`;
+				hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
 				
 				let item = DOM({style:'top-item'},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 				
@@ -1076,15 +1076,13 @@ class View {
 							
 							MM.activeSelectHero = item.id;
 							
-							player.children[1].style.backgroundImage = (item.id) ? `url(hero/${item.id}/1.png)` : `url(hero/empty-ru.avif)`;
-							
 							Splash.hide();
 							
 						});
 						
 						if(item.id){
 							
-							hero.dataset.url = `hero/${item.id}/1.png`;
+							hero.dataset.url = `hero/${item.id}/${item.skin ? item.skin : 1}.png`;
 							
 						}
 						else{
@@ -1268,7 +1266,7 @@ class View {
 				
 				hero.dataset.total = item.total;
 				
-				hero.dataset.url = `hero/${item.id}/1.png`;
+				hero.dataset.url = `hero/${item.id}/${item.skin ? item.skin : 1}.png`;
 				
 				preload.add(hero);
 				
@@ -1698,7 +1696,7 @@ class Build{
 				tag: 'button',
 				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
 				title: 'Скоро, скоро, пока эта кнопка не работает',
-				event:['click', async () => {}]
+				event:['click', async () => Build.skinChange()]
 			},
 			'Скины'
 		)
@@ -1717,7 +1715,9 @@ class Build{
 		Build.activeBarView.classList.add('build-active-bar');
 		
 		let request = await App.api.request('build','data',{heroId:heroId,target:targetId});
-		console.log('request',request);
+		
+		Build.dataRequest = request;
+		
 		Build.id = request.id;
 		
 		Build.heroId = heroId;
@@ -1739,6 +1739,38 @@ class Build{
 		Build.activeBar(request.active);
 		
 		Build.ruleSortInventory = new Object();
+		
+	}
+	
+	static skinChange(){
+		
+		let bodyHero = DOM({style:'skin-change'});
+		
+		let preload = new PreloadImages(bodyHero);
+		
+		for(let i = 0; i < Build.dataRequest.hero.skin.total; i++){
+			
+			let hero = DOM();
+			
+			hero.dataset.url = `hero/${Build.heroId}/${(i + 1)}.png`;
+			
+			hero.dataset.skin = (i + 1);
+			
+			hero.addEventListener('click', async () => {
+				
+				await App.api.request('build','skinChange',{hero:Build.heroId,skin:hero.dataset.skin});
+				
+				Build.heroImg.style.backgroundImage = `url(hero/${Build.heroId}/${hero.dataset.skin}.png)`;
+				
+				Splash.hide();
+				
+			});
+			
+			preload.add(hero);
+			
+		}
+		
+		Splash.show(bodyHero,false);
 		
 	}
 	
@@ -2118,7 +2150,7 @@ class Build{
 
 		Build.heroImg = DOM({style:'avatar'});
 		
-		Build.heroImg.style.backgroundImage = `url(hero/${data.id}/1.png)`;
+		Build.heroImg.style.backgroundImage = `url(hero/${data.id}/${Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1}.png)`;
 		
 		let rankIcon = DOM({style:'rank-icon'});
 		
@@ -3253,7 +3285,7 @@ class Events {
 		
 		if(find){
 			
-			find.children[1].style.backgroundImage = (data.hero) ? `url(hero/${data.hero}/1.png)` : `url(hero/empty-ru.avif)`;
+			find.children[1].style.backgroundImage = (data.hero) ? `url(hero/${data.hero}/${data.skin ? data.skin : 1}.png)` : `url(hero/empty-ru.avif)`;
 			
 			find.children[1].firstChild.children[0].innerText = data.rating;
 			
