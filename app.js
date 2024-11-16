@@ -1,6 +1,6 @@
-APP_VERSION = '1.6.7';
+APP_VERSION = '1.7.1';
 
-PW_VERSION = '1.6';
+PW_VERSION = '1.7';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
@@ -915,7 +915,7 @@ class View {
 		
 		let players = new Array();
 		
-		data = (data) ? data : await App.api.request('mm','loadParty');
+		data = (data) ? data : await App.api.request('mmtest','loadParty');
 		
 		MM.partyId = data.id;
 		
@@ -925,7 +925,7 @@ class View {
 		
 		for(let key in data.users){
 			
-			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready,rating:data.users[key].rating});
+			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready,rating:data.users[key].rating,skin:data.users[key].skin});
 			
 		}
 		
@@ -952,7 +952,6 @@ class View {
 			img.append(rank);
 			
 			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
-			
 			
 			if(item.id){
 				
@@ -983,7 +982,7 @@ class View {
 							
 						}
 						
-						await App.api.request('mm','readyParty',{id:MM.partyId});
+						await App.api.request('mmtest','readyParty',{id:MM.partyId});
 						
 						status.onclick = false;
 						
@@ -993,7 +992,7 @@ class View {
 					
 				}
 				
-				img.style.backgroundImage = (item.hero) ? `url(hero/${item.hero}/1.png)` : `url(hero/empty-ru.avif)`;
+				img.style.backgroundImage = (item.hero) ? `url(hero/${item.hero}/${item.skin ? item.skin : 1}.png)` : `url(hero/empty-ru.avif)`;
 				
 			}
 			else{
@@ -1019,7 +1018,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mm','leaderKickParty',{id:player.dataset.id});
+					await App.api.request('mmtest','leaderKickParty',{id:player.dataset.id});
 					
 				}]},'[X]'));
 				
@@ -1029,7 +1028,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mm','leaveParty',{id:MM.partyId});
+					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
 					
 					View.show('main');
 					
@@ -1065,7 +1064,7 @@ class View {
 							
 							try{
 								
-								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
+								await App.api.request('mmtest','heroParty',{id:MM.partyId,hero:item.id});
 								
 							}
 							catch(error){
@@ -1113,7 +1112,7 @@ class View {
 					
 					input.addEventListener('input', async () => {
 						
-						let request = await App.api.request('mm','findUser',{name:input.value});
+						let request = await App.api.request('mmtest','findUser',{name:input.value});
 						
 						if(body.firstChild){
 							
@@ -1129,7 +1128,7 @@ class View {
 							
 							body.append(DOM({event:['click', async () => {
 								
-								await App.api.request('mm','inviteParty',{id:item.id});
+								await App.api.request('mmtest','inviteParty',{id:item.id});
 								
 								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
 								
@@ -1695,7 +1694,7 @@ class Build{
 		const newSkin = DOM({
 				tag: 'button',
 				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
-				title: 'Скоро, скоро, пока эта кнопка не работает',
+				title: 'Образы на героя',
 				event:['click', async () => Build.skinChange()]
 			},
 			'Скины'
@@ -3259,7 +3258,7 @@ class Events {
 		
 		let b1 = DOM({style:'splash-content-button',event:['click', async () => {
 			
-			await App.api.request('mm','joinParty',{code:data.code,version:PW_VERSION});
+			await App.api.request('mmtest','joinParty',{code:data.code,version:PW_VERSION});
 			
 			Splash.hide();
 			
@@ -3647,7 +3646,7 @@ class Protect {
 			
 			if(Protect.storage.data.c){
 				
-				let request = await App.api.request('mm','check',{id:Protect.storage.data.c});
+				let request = await App.api.request('mmtest','check',{id:Protect.storage.data.c});
 				
 				if(request){
 					
@@ -3668,7 +3667,7 @@ class Protect {
 				
 				await Protect.storage.set({c:c});
 				
-				await App.api.request('mm','check',{id:c});
+				await App.api.request('mmtest','check',{id:c});
 				
 			}
 			
@@ -3824,7 +3823,7 @@ class MM {
 			
 			try{
 				
-				MM.id = await App.api.request('mm','cancel');
+				MM.id = await App.api.request('mmtest','cancel');
 				
 			}
 			catch(error){
@@ -3840,7 +3839,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero,version:PW_VERSION});
+				let request = await App.api.request('mmtest','start',{hero:MM.activeSelectHero,version:PW_VERSION});
 				
 				MM.id = request.id;
 				
@@ -3869,7 +3868,7 @@ class MM {
 	
 	static async cancel(){
 		
-		await App.api.request('mm','start');
+		await App.api.request('mmtest','start');
 		
 		MM.id = '';
 		
@@ -3895,7 +3894,23 @@ class MM {
 		
 		let button = DOM({style:'mm-ready-button',event:['click', async () => {
 			
-			await App.api.request('mm','ready',{id:MM.id});
+			try{
+				
+				await App.api.request('mmtest','ready',{id:MM.id});
+				
+			}
+			catch(error){
+				
+				Timer.stop();
+				
+				MM.close();
+				
+				MM.searchActive(false);
+				
+				return;
+				
+			}
+			
 			
 			button.style.opacity = 0;
 			
@@ -3999,7 +4014,7 @@ class MM {
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
-				App.api.request('mm','eventChangeHero',{id:MM.id,heroId:item.id});
+				App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 			}
 			
@@ -4013,7 +4028,7 @@ class MM {
 		
 		MM.selectHeroButton.addEventListener('click', async () => {
 			
-			await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
+			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
 			
 		});
 		
@@ -4055,7 +4070,7 @@ class MM {
 					
 				}
 				
-				await App.api.request('mm','chat',{id:MM.id,message:chatInput.value});
+				await App.api.request('mmtest','chat',{id:MM.id,message:chatInput.value});
 				
 				chatInput.value = '';
 				
