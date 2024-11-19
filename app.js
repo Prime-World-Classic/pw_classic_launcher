@@ -1781,7 +1781,7 @@ class Build{
 			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 				Splash.hide();
 			}]}, '[x]');
-			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'] ,event:['click', () => {
+			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'], title: 'Создать новую вкладку билда',  event:['click', () => {
 					
 				let template = document.createDocumentFragment();
 				
