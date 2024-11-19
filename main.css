@@ -1844,10 +1844,22 @@ cursor:pointer;
 		left: 610px;
 	}
 }
+@media (height >= 1273px) {
+	.build-rarity .reset {
+		top: 73vh;
+		left: 729px;
+	}
+}
 @media (height > 1338px) {
 	.build-rarity .reset {
 		top: 73vh;
 		left: 754px;
+	}
+}
+@media (height >= 1425px) {
+	.build-rarity .reset {
+		top: 71vh;
+		left: 854px;
 	}
 }
 @media (height >= 1500px) {
