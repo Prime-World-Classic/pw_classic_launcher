@@ -397,7 +397,7 @@ button.skins,
 button.talents,
 button.sets {
 	font-weight: bold;
-	font-size: 22px;
+	font-size: 26px;
 }
 
 .build-list{
@@ -598,16 +598,25 @@ button.sets {
 	
 }
 .build-rarity .reset {
-	margin-top: 30px;
-	margin-left: 7px;
-	color: #fff;
-	font-size: 40px;
+	position: absolute;
+	width: 332px;
+	height: 30px;
+	line-height: 26px;
+	left: 500px;
+	top: 80vh;
+	color: #eee;
+	font-size: 22px;
+	user-select: none;
+	border: none !important;
+	padding-left: 20px;
 }
 .build-rarity .reset:hover {
-	font-size: 45px;
+	color: #fdd;
+	border: 1px solid #fdd !important;
+	border-radius: 15px;
 }
 .build-rarity .reset:active {
-	color: red;
+	color: #f99;
 }
 
 .build-description{
@@ -1806,7 +1815,44 @@ cursor:pointer;
 	}
 }
 
-@media (width > 2000px) {
-
+@media (height < 1000px) {
+	.build-rarity .reset {
+		top: 81vh;
+	}
 }
-
+@media (height > 1068px) {
+	.build-rarity .reset {
+		top: 75vh;
+		left: 627px;
+	}
+}
+@media (height >= 1100px) {
+	.build-rarity .reset {
+		top: 78vh;
+		left: 577px;
+	}
+}
+@media (height >= 1140px) {
+	.build-rarity .reset {
+		top: 76vh;
+		left: 610px;
+	}
+}
+@media (height >= 1200px) {
+	.build-rarity .reset {
+		top: 75vh;
+		left: 610px;
+	}
+}
+@media (height > 1338px) {
+	.build-rarity .reset {
+		top: 73vh;
+		left: 754px;
+	}
+}
+@media (height >= 1500px) {
+	.build-rarity .reset {
+		top: 70vh;
+		left: 850px;
+	}
+}
