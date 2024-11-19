@@ -2430,6 +2430,8 @@ class Build{
 		Build.talents[data.id] = data;
 		
 		talent.dataset.id = data.id;
+
+		talent.dataset.active = data.active;
 		
 		talent.dataset.state = data.state;
 		
