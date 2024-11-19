@@ -570,7 +570,8 @@ button.sets {
 }
 
 .build-talent-item[data-active='1'] {
-	border: 1px solid red;
+	border: 1px solid #599;
+	border-radius: 10px;
 }
 
 .build-rarity{
