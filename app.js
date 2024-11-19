@@ -1812,7 +1812,7 @@ class Build{
 			newRandomSkinsButtons.append(create);
 		}
 
-		const random = DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], event:['click', async () => {
+		const random = DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], title: 'Сгенерировать случайный билд', event:['click', async () => {
 			
 			await App.api.request('build','random',{id:Build.id});
 			
