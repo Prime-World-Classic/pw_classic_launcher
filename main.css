@@ -599,10 +599,10 @@ button.sets {
 }
 .build-rarity .reset {
 	position: absolute;
-	width: 332px;
+	width: 374px;
 	height: 30px;
 	line-height: 26px;
-	left: 500px;
+	left: 600px;
 	top: 80vh;
 	color: #eee;
 	font-size: 22px;
@@ -1854,5 +1854,11 @@ cursor:pointer;
 	.build-rarity .reset {
 		top: 70vh;
 		left: 850px;
+	}
+}
+@media (height > 1600px) {
+	.build-rarity .reset {
+		top: 69vh;
+		left: 1060px;
 	}
 }
