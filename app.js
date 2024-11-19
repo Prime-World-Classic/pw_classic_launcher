@@ -2553,9 +2553,8 @@ class Build{
 		}
 		
 		const reset = document.createElement('div');
-		reset.innerText = '⭮ ';
+		reset.innerText = `Сбросить таланты в этом билдe`;
 		reset.classList.add('reset');
-		reset.title = `Сброс талантов из билда в "Таланты"`;
 		reset.addEventListener('click', async () => {
 			
 			await App.api.request('build','clear',{id:Build.id});
