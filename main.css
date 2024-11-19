@@ -334,7 +334,7 @@ background-color:rgba(15,15,15,0.7);
 }
 .build-field-bottom:after {
 	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
-	color: #fff;
+	color: #eee;
 	display: flex;
 	justify-content: end;
 }
