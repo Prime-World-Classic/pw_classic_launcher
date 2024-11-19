@@ -569,6 +569,10 @@ button.sets {
 	border: 2px solid #000;
 }
 
+.build-talent-item[data-active='1'] {
+	border: 1px solid red;
+}
+
 .build-rarity{
 	margin:0 10px;
 	min-width:48px;
