@@ -1831,14 +1831,7 @@ class Build{
 				`${build.name}`,
 			);
 
-			const btnRemove = DOM({tag: 'button', style: 'remove', title: 'Очистить билд', event: [
-					'click', _ => {
-						alert('Спасибо что вы с нами, TODO пока удаление не имплементировано');
-					}
-				]}, 'x'
-			);
-
-			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item, btnRemove);
+			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
 
 			item.onclick = () => {
 				setTimeout(_ => {
