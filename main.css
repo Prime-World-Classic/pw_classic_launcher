@@ -460,23 +460,6 @@ button.sets {
 	border-bottom-width: 0 !important;
 }
 
-.button-build--wrapper button.remove {
-	font-size: large;
-	background: transparent;
-	color: #eee;
-	border: 0;
-	border-radius: 50%;
-	position: relative;
-	top: -65px;
-	left: 198px;
-	height: 17px;
-	line-height: 6px;
-	cursor: pointer;
-}
-.button-build--wrapper button.remove:hover {
-	background: darkred;
-}
-
 .build-play{
 	
 	background:rgba(255,50,0,0.9);
