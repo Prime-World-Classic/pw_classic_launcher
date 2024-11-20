@@ -2845,15 +2845,16 @@ class Build{
 			
 			element.style.position = 'absolute';
 			
-			element.style.left = event.pageX - shiftX + 'px';
-			
-			element.style.top = event.pageY - shiftY + 'px';
+			element.style.left = event.pageX - shiftX - 5 + 'px';
+			// Without "-5" onmouseup will not trigger - because mouse will be not on the node - if mousedown on top-left,
+			// "mouseup event is released while the pointer is located inside" - from https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
+			element.style.top = event.pageY - shiftY - 5 + 'px';
 			
 			document.onmousemove = (e) => {
 				
-				element.style.left = e.pageX - shiftX + 'px';
+				element.style.left = e.pageX - shiftX - 5 + 'px';
 				
-				element.style.top = e.pageY - shiftY + 'px';
+				element.style.top = e.pageY - shiftY - 5 + 'px';
 				
 			}
 			
