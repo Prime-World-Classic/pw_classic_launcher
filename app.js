@@ -1852,7 +1852,7 @@ class Build{
 
 		Build.listView.append(buildButtonsWrapper);
 
-		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('main')]},'[X]'));
+		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('builds')]},'[X]'));
 	}
 	
 	static hero(data){
