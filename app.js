@@ -2366,67 +2366,45 @@ class Build{
 			0: 90.2
 		}
 
+		const talentRefineByRarity = {
+			4: 5.0,
+			3: 7.0,
+			2: 9.0,
+			1: 12.0
+		}
+
 		let talentPower = 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
 		Build.heroPower += fold ? talentPower : -talentPower;
 
 		let add = new Object();
+
+		function registerStat(stat, key) {
+			let statValue = talent.stats[key];
+			if ('statsRefine' in talent && 'rarity' in talent) {
+				statValue += (talentRefineByRarity[talent.rarity] - 1.0) * talent.statsRefine[key];
+			}
+			add[stat] = talent.stats[key];
+		}
+			
+		function statByMax(param1, param2, key) {
+			
+			let p1 = Build.totalStat(param1);
+			
+			let p2 = Build.totalStat(param2);
+			
+			registerStat(p1 > p2 ? param1 : param2, key);
+		}
 		
 		for(let key in talent.stats){
 			
-			
 			if(key == 'sr'){
-				
-				let p1 = Build.calculationStats['sila'];
-				
-				let p2 = Build.calculationStats['razum'];
-				
-				if(p1 > p2){
-					
-					add['sila'] =  talent.stats[key];
-					
-				}
-				else{
-					
-					add['razum'] =  talent.stats[key];
-					
-				}
-				
+				statByMax('sila', 'razum', key)
 			}
 			else if(key == 'ph'){
-				
-				let p1 = Build.calculationStats['provorstvo'];
-				
-				let p2 = Build.calculationStats['hitrost'];
-				
-				if(p1 > p2){
-					
-					add['provorstvo'] =  talent.stats[key];
-					
-				}
-				else{
-					
-					add['hitrost'] =  talent.stats[key];
-					
-				}
-				
+				statByMax('provorstvo', 'hitrost', key)
 			}
 			else if(key == 'sv'){
-				
-				let p1 = Build.calculationStats['stoikost'];
-				
-				let p2 = Build.calculationStats['volia'];
-				
-				if(p1 > p2){
-					
-					add['stoikost'] =  talent.stats[key];
-					
-				}
-				else{
-					
-					add['volia'] =  talent.stats[key];
-					
-				}
-				
+				statByMax('stoikost', 'volia', key)
 			}
 			else if(key == 'srsv'){
 				let stats = ['sila', 'razum', 'stoikost', 'volia'];
@@ -2434,17 +2412,18 @@ class Build{
 				let maxValue = Build.totalStat(maxStat);
 
 				for(let s = 1; s < stats.length; s++) {
-					if (Build.calculationStats[stats[s]] > maxValue) {
+					if (Build.totalStat(stats[s]) > maxValue) {
 						maxStat = stats[s];
 						maxValue = Build.totalStat(maxStat)
 					}
 				}
-				add[maxStat] = talent.stats[key];
+
+				registerStat(maxStat, key);
 				
 			}
 			else{
-				
-				add[key] = talent.stats[key];
+
+				registerStat(key, key);
 				
 			}
 			
