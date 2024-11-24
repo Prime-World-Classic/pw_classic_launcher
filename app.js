@@ -1722,6 +1722,20 @@ class Build{
 		Build.heroId = heroId;
 		
 		Build.dataStats = new Object();
+		Build.calculationStats = new Object();
+		Build.initialStats = new Object();
+		Build.heroPower = 0.0;
+		Build.heroStatsFromPower = {
+			hp: 0.0,
+			mp: 0.0,
+			sila: 0.0,
+			razum: 0.0,
+			provorstvo: 0.0,
+			hitrost: 0.0,
+			stoikost: 0.0,
+			volia: 0.0
+		}
+		Build.installedTalents = new Array(36).fill(null);
 		
 		Build.list(request.build);
 		
@@ -1854,8 +1868,43 @@ class Build{
 
 		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('builds')]},'[X]'));
 	}
+
+	static totalStat(stat){
+
+		let initialStat = Build.initialStats[stat];
+		let talentsStat = Build.calculationStats[stat];
+		let powerStat = 0.0;
+		if (stat in Build.heroStatsFromPower) {
+			powerStat += Build.heroStatsFromPower[stat];
+		}
+		return initialStat + talentsStat + powerStat;
+	}
 	
 	static hero(data){
+
+		Build.heroStatMods = data.statModifiers;
+		Build.heroPowerModifier = data.overallModifier;
+
+		if (!Build.heroStatMods) {
+			Build.heroStatMods = {
+				hp: 33.0,
+				mp: 8.5,
+				sila: 0.5,
+				razum: 0.7,
+				provorstvo: 0.6,
+				hitrost: 0.3,
+				stoikost: 0.55,
+				volia: 0.75
+			} 
+		}
+		if (!Build.heroPowerModifier) {
+			Build.heroPowerModifier = 0.98;
+		}
+
+		for(let stat in data.stats){
+			Build.initialStats[stat] = parseFloat(data.stats[stat]);
+			Build.calculationStats[stat] = 0.0;
+		}
 		
 		let stats = DOM({style:'build-hero-stats'});
 		
@@ -2160,24 +2209,62 @@ class Build{
 		);
 		
 	}
-	
-	static setStat(talent,fold = true,animation = true){
-		
-		if( !('stats' in talent) ){
+
+	static updateHeroStats(){
+		Build.heroPower = 0.0;
+		for(let key in Build.calculationStats)  {
+			Build.calculationStats[key] = 0.0;
+		}
+
+		for(let i = 35; i >= 0; i--) {
+			let talent = Build.installedTalents[i];
+			if (talent) {
+				Build.setStat(talent, true, false);
+			}
+		}
+
+		Build.calcStatsFromPower();
+
+		for(let key2 in Build.dataStats){
 			
-			return;
+			Build.dataStats[key2].lastChild.innerText = Math.round(Build.totalStat(key2));
 			
 		}
+	}
+
+	static calcStatsFromPower(){
+		for(let stat in Build.heroStatsFromPower){
+			let Lvl = Build.heroStatMods[stat];
+			let q = Build.heroPowerModifier;
+			let m = Build.heroPower;
+			Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0)
+		}
+	}
+	
+	static setStat(talent,fold = true,animation = true){
+
+		// Calculate overall power bonus
+		const talentPowerByRarity = {
+			4: 53.04, //69.0,
+			3: 47.04, //68.2,
+			2: 43.2, //69.1,
+			1: 36.0, //64.8,
+			0: 45.1  //90.2
+		}
+
+		let talentPower = 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
+		Build.heroPower += fold ? talentPower : -talentPower;
+
+		let add = new Object();
 		
 		for(let key in talent.stats){
 			
-			let add = new Object();
 			
 			if(key == 'sr'){
 				
-				let p1 = parseFloat(Build.dataStats['sila'].lastChild.innerText);
+				let p1 = Build.calculationStats['sila'];
 				
-				let p2 = parseFloat(Build.dataStats['razum'].lastChild.innerText);
+				let p2 = Build.calculationStats['razum'];
 				
 				if(p1 > p2){
 					
@@ -2193,9 +2280,9 @@ class Build{
 			}
 			else if(key == 'ph'){
 				
-				let p1 = parseFloat(Build.dataStats['provorstvo'].lastChild.innerText);
+				let p1 = Build.calculationStats['provorstvo'];
 				
-				let p2 = parseFloat(Build.dataStats['hitrost'].lastChild.innerText);
+				let p2 = Build.calculationStats['hitrost'];
 				
 				if(p1 > p2){
 					
@@ -2211,9 +2298,9 @@ class Build{
 			}
 			else if(key == 'sv'){
 				
-				let p1 = parseFloat(Build.dataStats['stoikost'].lastChild.innerText);
+				let p1 = Build.calculationStats['stoikost'];
 				
-				let p2 = parseFloat(Build.dataStats['volia'].lastChild.innerText);
+				let p2 = Build.calculationStats['volia'];
 				
 				if(p1 > p2){
 					
@@ -2227,40 +2314,47 @@ class Build{
 				}
 				
 			}
+			else if(key == 'srsv'){
+				let stats = ['sila', 'razum', 'stoikost', 'volia'];
+				let maxStat = stats[0];
+				let maxValue = Build.totalStat(maxStat);
+
+				for(let s = 1; s < stats.length; s++) {
+					if (Build.calculationStats[stats[s]] > maxValue) {
+						maxStat = stats[s];
+						maxValue = Build.totalStat(maxStat)
+					}
+				}
+				add[maxStat] = talent.stats[key];
+				
+			}
 			else{
 				
 				add[key] = talent.stats[key];
 				
 			}
 			
-			for(let key2 in add){
+		}
+			
+		// Apply animation and change stats in Build.calculationStats
+		for(let key2 in add){
+			
+			if( !(key2 in Build.dataStats) ){
 				
-				if( !(key2 in Build.dataStats) ){
-					
-					continue;
-					
-				}
+				continue;
 				
-				let number = parseFloat(Build.dataStats[key2].lastChild.innerText);
+			}
+			
+			if (key2 in Build.calculationStats) {
+				let statChange = parseFloat(add[key2]);
+				Build.calculationStats[key2] += fold ? statChange : -statChange;
+			}
+			
+			if(animation){
 				
-				if(fold){
-					
-					Build.dataStats[key2].lastChild.innerText = Math.round(number + parseFloat(add[key2]));
-					
-				}
-				else{
-					
-					Build.dataStats[key2].lastChild.innerText = Math.round(number - add[key2]);
-					
-				}
+				Build.dataStats[key2].animate({transform:['scale(1)','scale(1.5)','scale(1)']},{duration:250,fill:'both',easing:'ease-out'});
 				
-				if(animation){
-					
-					Build.dataStats[key2].animate({transform:['scale(1)','scale(1.5)','scale(1)']},{duration:250,fill:'both',easing:'ease-out'});
-					
-					Build.heroImg.animate({transform:['scale(1)','scale(1.5)','scale(1)']},{duration:250,fill:'both',easing:'ease-out'});
-					
-				}
+				Build.heroImg.animate({transform:['scale(1)','scale(1.5)','scale(1)']},{duration:250,fill:'both',easing:'ease-out'});
 				
 			}
 			
@@ -2354,8 +2448,6 @@ class Build{
 					
 					data[index].state = 2;
 					
-					Build.setStat(data[index],true,false);
-					
 					preload.add(Build.templateViewTalent(data[index]),item);
 					
 				}
@@ -2405,6 +2497,8 @@ class Build{
 					item.style.borderRadius = '18px';
 					
 				}
+
+				Build.installedTalents[index] = data[index];
 				
 				x++;
 				
@@ -2418,6 +2512,8 @@ class Build{
 			
 			y++;
 		}
+
+		Build.updateHeroStats();
 		
 	}
 	
@@ -2893,12 +2989,14 @@ class Build{
 								element.dataset.state = 2;
 								
 								elemBelow.append(element);
-								
-								Build.setStat(data,true);
+
+								Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
 								
 								try{
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
+							
+									Build.setStat(data,true);
 									
 								}catch(e){
 									
@@ -2906,7 +3004,7 @@ class Build{
 									
 									Build.inventoryView.querySelector('build-talents').prepend(element);
 									
-									Build.setStat(data,false);
+									Build.installedTalents[parseInt(elemBelow.dataset.position)] = null;
 									
 								}
 								
@@ -2933,11 +3031,13 @@ class Build{
 									
 									elemBelow.append(element);
 									
-									Build.setStat(data,true);
+									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
 									
 									try{
 										
 										await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
+							
+										Build.setStat(data,true);
 										
 									}catch(e){
 										
@@ -2945,7 +3045,7 @@ class Build{
 										
 										Build.inventoryView.querySelector('.build-talents').prepend(element);
 										
-										Build.setStat(data,false);
+										Build.installedTalents[parseInt(elemBelow.dataset.position)] = null;
 										
 									}
 									
@@ -2976,11 +3076,14 @@ class Build{
 						
 						elemBelow.parentNode.prepend(element);
 						
-						Build.setStat(data,false);
 						
 						try{
 							
 							await App.api.request('build','setZero',{buildId:Build.id,index:oldParentNode.dataset.position});
+
+							Build.installedTalents[parseInt(oldParentNode.dataset.position)] = null;
+							
+							Build.setStat(data,true);
 							
 							if(data.id < 0){
 								
@@ -2994,8 +3097,6 @@ class Build{
 							element.dataset.state = 2;
 							
 							oldParentNode.append(element);
-							
-							Build.setStat(data,true);
 							
 						}
 						
@@ -3071,6 +3172,9 @@ class Build{
 					}
 					
 				}
+				
+
+				Build.updateHeroStats();
 				
 				fieldRow.style.background = 'none';
 				
