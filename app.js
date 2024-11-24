@@ -2245,11 +2245,11 @@ class Build{
 
 		// Calculate overall power bonus
 		const talentPowerByRarity = {
-			4: 53.04, //69.0,
-			3: 47.04, //68.2,
-			2: 43.2, //69.1,
-			1: 36.0, //64.8,
-			0: 45.1  //90.2
+			4: 68.952,
+			3: 68.208,
+			2: 69.12,
+			1: 64.875,
+			0: 90.2
 		}
 
 		let talentPower = 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
