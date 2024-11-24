@@ -1997,24 +1997,9 @@ class Build{
 		Build.heroStatMods = Build.dataRequest.hero.statModifiers;
 		
 		Build.heroPowerModifier = Build.dataRequest.hero.overallModifier;
+
+		Build.heroPowerFromInstalledTalents = 0.0;
 		
-		/*
-		if (!Build.heroStatMods) {
-			Build.heroStatMods = {
-				hp: 33.0,
-				mp: 8.5,
-				sila: 0.5,
-				razum: 0.7,
-				provorstvo: 0.6,
-				hitrost: 0.3,
-				stoikost: 0.55,
-				volia: 0.75
-			} 
-		}
-		if (!Build.heroPowerModifier) {
-			Build.heroPowerModifier = 0.98;
-		}
-		*/
 		for(let stat in data.stats){
 			Build.initialStats[stat] = parseFloat(data.stats[stat]);
 			Build.calculationStats[stat] = 0.0;
@@ -2333,11 +2318,10 @@ class Build{
 		for(let i = 35; i >= 0; i--) {
 			let talent = Build.installedTalents[i];
 			if (talent) {
+				Build.calcStatsFromPower(i);
 				Build.setStat(talent, true, false);
 			}
 		}
-
-		Build.calcStatsFromPower();
 
 		for(let key2 in Build.dataStats){
 			
@@ -2346,12 +2330,31 @@ class Build{
 		}
 	}
 
-	static calcStatsFromPower(){
+	static calcStatsFromPower(maxTalentId){
+		const talentPowerByLine = {
+			5: 0.055,
+			4: 0.038,
+			3: 0.027,
+			2: 0.022,
+			1: 0.015,
+			0: 0.0097
+		}
+
+		Build.heroPowerFromInstalledTalents = 0.0;
+
+		for(let i = 35; i >= 0 && i >= maxTalentId; i--) {
+			let talent = Build.installedTalents[i];
+			if (talent) {
+				let line = Math.floor((35 - i) / 6);
+				Build.heroPowerFromInstalledTalents += talentPowerByLine[line];
+			}
+		}
+
 		for(let stat in Build.heroStatsFromPower){
 			let Lvl = Build.heroStatMods[stat];
 			let q = Build.heroPowerModifier;
-			let m = Build.heroPower;
-			Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0)
+			let m = Build.heroPower * Build.heroPowerFromInstalledTalents;
+			Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0);
 		}
 	}
 	
@@ -2379,52 +2382,45 @@ class Build{
 		let add = new Object();
 
 		function registerStat(stat, key) {
-			let statValue = talent.stats[key];
+			let statValue = parseFloat(talent.stats[key]);
 			if ('statsRefine' in talent && 'rarity' in talent) {
-				statValue += (talentRefineByRarity[talent.rarity] - 1.0) * talent.statsRefine[key];
+				let refineBonus = talentRefineByRarity[talent.rarity] - 1.0;
+				let refineMul = parseFloat(talent.statsRefine[key]);
+				statValue += refineBonus * refineMul;
 			}
-			add[stat] = talent.stats[key];
+			add[stat] = statValue;
 		}
-			
-		function statByMax(param1, param2, key) {
-			
-			let p1 = Build.totalStat(param1);
-			
-			let p2 = Build.totalStat(param2);
-			
-			registerStat(p1 > p2 ? param1 : param2, key);
+
+		function statByMax(stats, key) {
+			let maxStat = stats[0];
+			let maxValue = Build.totalStat(maxStat);
+
+			for(let s = 1; s < stats.length; s++) {
+				if (Build.totalStat(stats[s]) > maxValue) {
+					maxStat = stats[s];
+					maxValue = Build.totalStat(maxStat)
+				}
+			}
+
+			registerStat(maxStat, key);
 		}
 		
 		for(let key in talent.stats){
 			
 			if(key == 'sr'){
-				statByMax('sila', 'razum', key)
+				statByMax(['sila', 'razum'], key)
 			}
 			else if(key == 'ph'){
-				statByMax('provorstvo', 'hitrost', key)
+				statByMax(['provorstvo', 'hitrost'], key)
 			}
 			else if(key == 'sv'){
-				statByMax('stoikost', 'volia', key)
+				statByMax(['stoikost', 'volia'], key)
 			}
 			else if(key == 'srsv'){
-				let stats = ['sila', 'razum', 'stoikost', 'volia'];
-				let maxStat = stats[0];
-				let maxValue = Build.totalStat(maxStat);
-
-				for(let s = 1; s < stats.length; s++) {
-					if (Build.totalStat(stats[s]) > maxValue) {
-						maxStat = stats[s];
-						maxValue = Build.totalStat(maxStat)
-					}
-				}
-
-				registerStat(maxStat, key);
-				
+				statByMax(['sila', 'razum', 'stoikost', 'volia'], key)
 			}
 			else{
-
 				registerStat(key, key);
-				
 			}
 			
 		}
