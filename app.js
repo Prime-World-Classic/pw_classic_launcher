@@ -1740,6 +1740,13 @@ class Build{
 		vs: 'Воля/Стойкость'
 	};
 	
+	static talentRefineByRarity = {
+		4: 5.0,
+		3: 7.0,
+		2: 9.0,
+		1: 12.0
+	}
+	
 	static async init(heroId,targetId){
 		
 		Build.talents = new Object();
@@ -2369,13 +2376,6 @@ class Build{
 			0: 90.2
 		}
 
-		const talentRefineByRarity = {
-			4: 5.0,
-			3: 7.0,
-			2: 9.0,
-			1: 12.0
-		}
-
 		let talentPower = 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
 		Build.heroPower += fold ? talentPower : -talentPower;
 
@@ -2384,7 +2384,7 @@ class Build{
 		function registerStat(stat, key) {
 			let statValue = parseFloat(talent.stats[key]);
 			if ('statsRefine' in talent && 'rarity' in talent) {
-				let refineBonus = talentRefineByRarity[talent.rarity] - 1.0;
+				let refineBonus = Build.talentRefineByRarity[talent.rarity] - 1.0;
 				let refineMul = parseFloat(talent.statsRefine[key]);
 				statValue += refineBonus * refineMul;
 			}
@@ -2494,6 +2494,16 @@ class Build{
 
 			item.addEventListener('contextmenu', e => {
 				e.preventDefault();
+				/*
+				for(const level of ["1", "2", "3", "4", "5", "6"]) {
+					Build.removeSortInventory('level',level);
+				}
+				Build.setSortInventory('level',item.dataset.id);
+					
+				Build.sortInventory();
+					
+				item.dataset.active = 0;
+				*/
 				document.querySelectorAll('.build-level div.highlight').forEach(n => n.click());
 				item.classList.add('highlight');
 				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.add('highlight');
@@ -3318,7 +3328,15 @@ class Build{
 					
 					for(let key in data.stats){
 						
-						stats += `+${data.stats[key]} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
+						let statValue = parseFloat(data.stats[key]);
+						
+						if ('statsRefine' in data && 'rarity' in data) {
+							let refineBonus = Build.talentRefineByRarity[data.rarity] - 1.0;
+							let refineMul = parseFloat(data.statsRefine[key]);
+							statValue += refineBonus * refineMul;
+						}
+
+						stats += `+${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
 						
 					}
 					
