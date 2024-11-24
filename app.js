@@ -1,4 +1,4 @@
-APP_VERSION = '1.8.0';
+APP_VERSION = '1.9.0';
 
 PW_VERSION = '1.8';
 
@@ -846,15 +846,29 @@ class View {
 		
 	}
 	
-	static async main(data){
-		
-		let body = DOM({style:'main'});
+	static header(){
 		
 		let play = MM.play();
 		
 		play.classList.add('main-header-item');
 		
 		play.classList.add('button-play');
+		
+		return DOM({style:'main-header'},
+		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('main')]}),
+		play,
+		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
+		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
+		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Зал славы'),
+		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'3 в ряд'),
+		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
+		);
+		
+	}
+	
+	static async main(data){
+		
+		let body = DOM({style:'main'});
 		
 		let middle = DOM({style:'party-middle'});
 
@@ -884,9 +898,13 @@ class View {
 				
 				if(number == 1){
 					
-					item.style.background = 'rgba(255,50,0,0.9)';
+					//item.style.background = 'rgba(255,50,0,0.9)';
+					
+					item.classList.add('animation1');
 					
 				}
+				
+				/*
 				else if(number == 2){
 					
 					item.style.background = 'rgba(255,100,0,0.9)';
@@ -902,14 +920,14 @@ class View {
 					item.style.background = 'rgba(50,100,200,0.9)';
 					
 				}
-				
+				*/
 				top.append(item);
 				
 				number++;
 				
 			}
 			
-		},'mm','top')
+		},'mm','top');
 		
 		let party = DOM({style:'party'},middle);
 		
@@ -1152,15 +1170,7 @@ class View {
 			
 		}
 		
-		body.append(DOM({style:'main-header'},
-		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('adm')]}),
-		play,
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},App.storage.data.login),
-		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
-		),
-		DOM({style:'main-body-column'},top,party)
-		);
+		body.append(View.header(),DOM({style:'main-body-column'},top,party));
 		/*
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
@@ -1175,6 +1185,121 @@ class View {
 		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
 		*/
+		return body;
+		
+	}
+	
+	static async history(){
+		
+		let body = DOM({style:'main'}), history = DOM({style:'history'});
+		
+		let result = await App.api.request('mm','history');
+		
+		for(let item of result){
+			
+			let hero = DOM();
+			
+			hero.style.backgroundImage = `url(hero/${item.hero}/${item.skin ? item.skin : 1}.png)`;
+			
+			let game = DOM({style:'history-item'},hero,DOM({tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({tag:'div'},(item.team == item.win) ? +item.rating : -item.rating),DOM({tag:'div'},new Date(item.added).toLocaleString()));
+			
+			if(item.team == item.win){
+				
+				game.style.background = 'rgba(51,255,51,0.5)';
+				
+			}
+			
+			history.append(game);
+			
+		}
+		
+		body.append(View.header(),history);
+		
+		return body;
+		
+	}
+	
+	static async top(hero = 0){
+		
+		let body = DOM({style:'main'});
+		
+		let result = await App.api.request('mm','top',{limit:100,hero:hero});
+		
+		if(!result){
+			
+			throw 'Рейтинг отсутствует';
+			
+		}
+		
+		let top = DOM({style:'top-scroll'},DOM({style:'top-filter',title:'Выберите героя, чтобы отсортировать игроков зала славы',event:['click', async () => {
+			
+			let request = await App.api.request('build','heroAll');
+			
+			request.push({id:0});
+			
+			let bodyHero = DOM({style:'party-hero'});
+			
+			let preload = new PreloadImages(bodyHero);
+			
+			for(let item of request){
+				
+				let hero = DOM();
+				
+				if(item.id){
+					
+					hero.dataset.url = `hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+					
+				}
+				else{
+					
+					hero.dataset.url = `hero/empty-ru.avif`;
+					
+				}
+				
+				hero.addEventListener('click', async () => {
+					
+					View.show('top',item.id);
+					
+					Splash.hide();
+					
+				});
+				
+				preload.add(hero);
+				
+			}
+			
+			Splash.show(bodyHero,false);
+			
+		}]},DOM({tag:'div'}),DOM({tag:'div'})));
+		
+		top.firstChild.classList.add('animation1');
+		
+		top.firstChild.firstChild.style.backgroundImage = `url(hero/${result[0].hero}/${result[0].skin ? result[0].skin : 1}.png)`;
+		
+		top.firstChild.lastChild.innerText = `#1. ${result[0].nickname}`;
+		
+		let number = 1;
+		
+		for(let player of result){
+			
+			let rank = DOM({style:'top-item-hero-rank'});
+			
+			rank.style.backgroundImage = `url(ransk/${Rank.icon(player.rating)}.png)`;
+			
+			let hero = DOM({style:'top-item-hero'},rank);
+			
+			hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
+			
+			let item = DOM({style:'top-item'},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+			
+			top.append(item);
+			
+			number++;
+			
+		}
+		
+		body.append(View.header(),top);
+		
 		return body;
 		
 	}
@@ -1273,20 +1398,7 @@ class View {
 			
 		},'build','heroAll');
 		
-		let play = MM.play();
-		
-		play.classList.add('main-header-item');
-		
-		play.classList.add('button-play');
-		
-		body.append(DOM({style:'main-header'},
-		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('adm')]}),
-		play,
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},App.storage.data.login),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
-		),
-		DOM({style:'main-body-full'},hero)
-		);
+		body.append(View.header(),DOM({style:'main-body-full'},hero));
 		
 		return body;
 		
@@ -1882,9 +1994,11 @@ class Build{
 	
 	static hero(data){
 
-		Build.heroStatMods = data.statModifiers;
-		Build.heroPowerModifier = data.overallModifier;
-
+		Build.heroStatMods = Build.dataRequest.hero.statModifiers;
+		
+		Build.heroPowerModifier = Build.dataRequest.hero.overallModifier;
+		
+		/*
 		if (!Build.heroStatMods) {
 			Build.heroStatMods = {
 				hp: 33.0,
@@ -1900,7 +2014,7 @@ class Build{
 		if (!Build.heroPowerModifier) {
 			Build.heroPowerModifier = 0.98;
 		}
-
+		*/
 		for(let stat in data.stats){
 			Build.initialStats[stat] = parseFloat(data.stats[stat]);
 			Build.calculationStats[stat] = 0.0;
