@@ -1553,6 +1553,34 @@ cursor:pointer;
 	font-size:1.5vw;
 }
 
+.build-body {
+	
+	display:flex;
+	flex-flow:column nowrap;
+	width:100%;
+	height:100%;
+	
+}
+
+.build-body-row {
+	
+	display:flex;
+	flex-flow:row nowrap;
+	height:16.66%;
+	
+}
+
+.build-body-row div {
+	
+	width:16.66%;
+	min-width:16.66%;
+	height:auto;
+	background-size:100%;
+	background-position:center;
+	background-repeat:no-repeat;
+	
+}
+
 .search{
 	
 	display:flex;
