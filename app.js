@@ -894,7 +894,7 @@ class View {
 				
 				hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
 				
-				let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+				let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero,player.nickname)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 				
 				if(number == 1){
 					
@@ -1289,7 +1289,7 @@ class View {
 			
 			hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
 			
-			let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+			let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero,player.nickname)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 			
 			top.append(item);
 			
@@ -1746,40 +1746,45 @@ class Build{
 		1: 12.0
 	}
 	
-	static async view(user,hero){
+	static async view(user,hero,nickname = ''){
 		
-		let request = await App.api.request('build','get',{user:user,hero:hero});
-		/*
-		let request = [
-		412,693,689,595,748,576,
-		-699,692,688,594,747,426,
-		-80,690,686,592,379,623,
-		-82,-83,577,533,741,430,
-		-79,-78,-84,534,743,432,
-		-6,-77,-81,578,403,513
-		];
-		*/
 		let container = DOM();
 		
-		container.style.width = '50vw';
+		container.style.width = '35vw';
 		
-		container.style.height = '50vw';
+		container.style.height = '35vw';
 		
-		container.append(Build.viewModel(request));
+		container.append(await Build.viewModel(user,hero));
 		
-		Splash.show(container,false);
+		let state = false, get = DOM({event:['click', async () => {
+			
+			if(!state){
+				
+				get.innerText = 'Перезаписать текущий билд?';
+				
+				state = true;
+				
+				return;
+				
+			}
+			
+			// await App.api.request('build','',{user:user,hero:hero});
+			
+		}]},`Забрать билд?`);
 		
-		setTimeout(() => {Splash.hide();},15000);
+		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`))),false);
 		
 	}
 	
-	static viewModel(data,animate = true){
+	static async viewModel(user,hero,animate = true){
 		
-		let body = DOM({style:'build-body'}), i = 1, row = DOM({style:'build-body-row'}), elements = new Array();
+		let request = await App.api.request('build','get',{user:user,hero:hero});
+		
+		let body = DOM({style:'build-body'}), i = 1, row = DOM({style:'build-body-row'}), elements1 = new Array(), elements2 = new Array();
 		
 		body.append(row);
 		
-		for(let item of data){
+		for(let item of request){
 			
 			let talent = DOM();
 			
@@ -1789,7 +1794,18 @@ class Build{
 					
 					talent.style.opacity = 0;
 					
-					elements.push(talent);
+					talent.style.zIndex = 9999;
+					
+					if(item > 0){
+						
+						elements2.push(talent);
+						
+					}
+					else{
+						
+						elements1.push(talent);
+						
+					}
 					
 				}
 				
@@ -1826,15 +1842,41 @@ class Build{
 			
 		}
 		
-		elements = Game.shuffle(elements);
+		elements1 = Game.shuffle(elements1);
 		
-		let delay = 0;
+		elements2 = Game.shuffle(elements2);
 		
-		for(let element of elements){
+		let delay = 0, number = 1;
+		
+		for(let element of elements1){
 			
-			delay += 250;
+			delay += 350;
 			
-			element.animate({opacity:[0,1],transform:['scale(3)','scale(0.9)']},{delay:delay,duration:750,fill:'both',easing:'ease-out'});
+			let animate = element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+			
+			if(number == elements1.length){
+				
+				animate.onfinish = () => {
+					
+					setTimeout(() => {
+						
+						delay = 0;
+						
+						for(let element of elements2){
+							
+							delay += 50;
+							
+							element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+							
+						}
+						
+					},500);
+					
+				}
+				
+			}
+			
+			number++;
 			
 		}
 		
