@@ -894,7 +894,7 @@ class View {
 				
 				hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
 				
-				let item = DOM({style:'top-item'},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+				let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 				
 				if(number == 1){
 					
@@ -903,7 +903,6 @@ class View {
 					item.classList.add('animation1');
 					
 				}
-				
 				/*
 				else if(number == 2){
 					
@@ -1290,7 +1289,7 @@ class View {
 			
 			hero.style.backgroundImage = `url(hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
 			
-			let item = DOM({style:'top-item'},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
+			let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 			
 			top.append(item);
 			
@@ -1745,6 +1744,102 @@ class Build{
 		3: 7.0,
 		2: 9.0,
 		1: 12.0
+	}
+	
+	static async view(user,hero){
+		
+		let request = await App.api.request('build','get',{user:user,hero:hero});
+		/*
+		let request = [
+		412,693,689,595,748,576,
+		-699,692,688,594,747,426,
+		-80,690,686,592,379,623,
+		-82,-83,577,533,741,430,
+		-79,-78,-84,534,743,432,
+		-6,-77,-81,578,403,513
+		];
+		*/
+		let container = DOM();
+		
+		container.style.width = '50vw';
+		
+		container.style.height = '50vw';
+		
+		container.append(Build.viewModel(request));
+		
+		Splash.show(container,false);
+		
+		setTimeout(() => {Splash.hide();},15000);
+		
+	}
+	
+	static viewModel(data,animate = true){
+		
+		let body = DOM({style:'build-body'}), i = 1, row = DOM({style:'build-body-row'}), elements = new Array();
+		
+		body.append(row);
+		
+		for(let item of data){
+			
+			let talent = DOM();
+			
+			if(item != 0){
+				
+				if(animate){
+					
+					talent.style.opacity = 0;
+					
+					elements.push(talent);
+					
+				}
+				
+				talent.style.backgroundImage = (item > 0) ? `url(talents/${item}.png)` : `url(htalents/${Math.abs(item)}.png)`;
+				
+			}
+			
+			if(i > 6){
+				
+				i = 2;
+				
+				row = DOM({style:'build-body-row'});
+				
+				row.append(talent);
+				
+				body.append(row);
+				
+				continue;
+				
+			}
+			else{
+				
+				row.append(talent);
+				
+			}
+			
+			i++;
+			
+		}
+		
+		if(!animate){
+			
+			return body;
+			
+		}
+		
+		elements = Game.shuffle(elements);
+		
+		let delay = 0;
+		
+		for(let element of elements){
+			
+			delay += 250;
+			
+			element.animate({opacity:[0,1],transform:['scale(3)','scale(0.9)']},{delay:delay,duration:750,fill:'both',easing:'ease-out'});
+			
+		}
+		
+		return body;
+		
 	}
 	
 	static async init(heroId,targetId){
