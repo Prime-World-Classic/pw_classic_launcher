@@ -974,7 +974,7 @@ text-align:center;
 	width:100vw;
 	height:100vh;
 	backdrop-filter:blur(1vmax);
-	z-index:9999;
+	z-index:9000;
 	
 }
 
@@ -1479,9 +1479,9 @@ cursor:pointer;
 
 .top-filter div:first-child{
 	
-	width:10vw;
-	min-width:10vw;
-	height:10vw;
+	width:8vw;
+	min-width:8vw;
+	height:8vw;
 	background-size:105%;
 	background-position:center;
 	background-repeat:no-repeat;
@@ -1553,6 +1553,21 @@ cursor:pointer;
 	font-size:1.5vw;
 }
 
+.build-top{
+	
+	font: 3vw / 1 Verdana;
+	
+}
+
+.build-top, .build-bottom {
+	
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+	text-align:center;
+	padding:1vw 0;
+	
+}
+
 .build-body {
 	
 	display:flex;
@@ -1575,9 +1590,18 @@ cursor:pointer;
 	width:16.66%;
 	min-width:16.66%;
 	height:auto;
-	background-size:100%;
+	background-size:90%;
 	background-position:center;
 	background-repeat:no-repeat;
+	
+}
+
+.build-bottom {
+	
+	font: 2vw / 1 Verdana;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:space-between;
 	
 }
 
@@ -1678,9 +1702,9 @@ cursor:pointer;
 
 .history-item div:first-child{
 	
-	width: 7vw;
-    min-width: 7vw;
-    height: 7vw;
+	width: 3vw;
+    min-width: 3vw;
+    height: 3vw;
     background-size: 105%;
     background-position: center;
     background-repeat: no-repeat;
