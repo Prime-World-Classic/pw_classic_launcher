@@ -3289,9 +3289,18 @@ class Build{
 						isActiveBarTarget = false;
 					}
 					else if (element.dataset.state == 1 && data.level > 0) {
-						isFieldTarget = true;
-						isInventoryTarget = false;
-						isActiveBarTarget = false;
+						let hasEmptySpace = false;
+						for (let t = (data.level - 1) * 6; t < data.level * 6; t++) {
+							if (!Build.installedTalents[35-t]) {
+								hasEmptySpace = true;
+								break;
+							}
+						}
+						if (hasEmptySpace) {
+							isFieldTarget = true;
+							isInventoryTarget = false;
+							isActiveBarTarget = false;
+						}
 					}
 				}
 				
