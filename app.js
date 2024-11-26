@@ -3388,11 +3388,13 @@ class Build{
 
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
+										Build.setStat(data, false);
+									} else {
+										Build.setStat(data, true);
 									}
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
 							
-									Build.setStat(data,true);
 									
 								}catch(e){
 									
