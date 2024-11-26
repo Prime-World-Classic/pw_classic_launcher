@@ -1,6 +1,6 @@
-APP_VERSION = '1.9.0';
+APP_VERSION = '1.9.0 (TEST)';
 
-PW_VERSION = '1.8';
+PW_VERSION = '1.9';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
@@ -2165,9 +2165,9 @@ class Build{
 			
 		};
 		
-		if( !(statsProfile in data) ){
+		if( !('profile' in Build.dataRequest) ){
 			
-			data.statsProfile = [0,0,0,0,0,0,0,0,0];
+			Build.dataRequest.profile = [0,0,0,0,0,0,0,0,0];
 			
 		}
 		
@@ -2458,7 +2458,13 @@ class Build{
 			
 			daw.dataset.index = i;
 			
-			daw.dataset.status = data.statsProfile[i];
+			daw.dataset.status = Build.dataRequest.profile[i];
+			
+			if(daw.dataset.status == 1){
+				
+				daw.style.background = 'rgb(153,255,51)';
+				
+			}
 			
 			stats.append(DOM({style:'build-hero-stats-line'},daw,item));
 			
@@ -4230,21 +4236,21 @@ class MM {
 	
 	static async ready(data){
 		
-		MM.searchActive(false);
-		
-		MM.soundEvent();
-		
 		MM.id = data.id;
 		
 		let body = DOM({style:'mm-ready'},Timer.body,DOM({id:`MMReady`,style:'mm-ready-count'},`0/10`));
 		
-		Timer.start(() => {
+		await Timer.start(data.id,'Бой найден',() => {
 			
 			MM.close();
 			
 			MM.searchActive(true);
 			
-		},'Бой найден',data.start,data.finish);
+		});
+		
+		MM.searchActive(false);
+		
+		MM.soundEvent();
 		
 		let button = DOM({style:'mm-ready-button',event:['click', async () => {
 			
@@ -4621,15 +4627,13 @@ class Timer {
 		
 	}
 	
-	static start(callback,name,start,finish){
+	static async start(id,name,callback){
 		
 		Timer.callback = callback;
 		
 		Timer.message = name;
-		
-		Timer.timeStart = start;
-		
-		Timer.timeFinish = finish;
+
+		Timer.timeFinish = await App.api.request('mmtest','getTimer',{id:id,time:Date.now()});
 		
 		if(Timer.end()){
 			
@@ -4651,15 +4655,15 @@ class Timer {
 			
 		}
 		
-		let seconds = Math.abs( Date.now() - (Timer.timeStart + Timer.timeFinish) ) / 1000;
+		let seconds = Math.abs(Date.now() - Timer.timeFinish) / 1000;
 		
-		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds}`;
+		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds.toFixed(2)}`;
 		
 	}
 	
 	static end(){
 		
-		if( (Date.now() - (Timer.timeStart + Timer.timeFinish) ) >= 0){
+		if( (Date.now() - Timer.timeFinish) >= 0){
 			
 			if(Timer.intervalId){
 				
