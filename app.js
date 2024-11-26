@@ -1992,6 +1992,7 @@ class Build{
 			volia: 0.0
 		}
 		Build.installedTalents = new Array(36).fill(null);
+		Build.profileStats = new Object();
 		
 		Build.list(request.build);
 		
@@ -2443,6 +2444,9 @@ class Build{
 					
 					daw.style.background = 'rgba(255,255,255,0.1)';
 					
+					Build.profileStats[key] = 0;
+
+					Build.updateHeroStats();
 				}
 				else{
 					
@@ -2451,7 +2455,10 @@ class Build{
 					daw.dataset.status = 1;
 					
 					daw.style.background = 'rgb(153,255,51)';
-					
+
+					Build.profileStats[key] = 1;
+
+					Build.updateHeroStats();
 				}
 				
 			}]});
@@ -2459,6 +2466,8 @@ class Build{
 			daw.dataset.index = i;
 			
 			daw.dataset.status = Build.dataRequest.profile[i];
+			
+			Build.profileStats[key] = parseInt(daw.dataset.status);
 			
 			if(daw.dataset.status == 1){
 				
@@ -2572,13 +2581,20 @@ class Build{
 		}
 
 		function statByMax(stats, key) {
+			const fakeStat = 999;
 			let maxStat = stats[0];
 			let maxValue = Build.totalStat(maxStat);
+			if (maxStat in Build.profileStats) {
+				maxValue += Build.profileStats[maxStat] * fakeStat;
+			} 
 
 			for(let s = 1; s < stats.length; s++) {
 				if (Build.totalStat(stats[s]) > maxValue) {
 					maxStat = stats[s];
-					maxValue = Build.totalStat(maxStat)
+					maxValue = Build.totalStat(maxStat);
+					if (maxStat in Build.profileStats) {
+						maxValue += Build.profileStats[maxStat] * fakeStat;
+					} 
 				}
 			}
 
