@@ -2589,7 +2589,11 @@ class Build{
 			} 
 
 			for(let s = 1; s < stats.length; s++) {
-				if (Build.totalStat(stats[s]) > maxValue) {
+				let possibleMaxStat = Build.totalStat(stats[s]);
+				if (stats[s] in Build.profileStats) {
+					possibleMaxStat += Build.profileStats[stats[s]] * fakeStat;
+				} 
+				if (possibleMaxStat > maxValue) {
 					maxStat = stats[s];
 					maxValue = Build.totalStat(maxStat);
 					if (maxStat in Build.profileStats) {
