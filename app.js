@@ -2798,6 +2798,10 @@ class Build{
 				}
 
 				Build.installedTalents[index] = data[index];
+
+				if ('conflict' in data[index]) {
+					Build.fieldConflict[Math.abs(data[index].id)] = true;
+				}
 				
 				x++;
 				
@@ -3318,6 +3322,14 @@ class Build{
 					element.style.display = 'none';
 
 					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+
+					let swapParentNode = element.parentNode;
+					let performSwap = false;
+
+					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-field-item') {
+						elemBelow = elemBelow.parentElement;
+						performSwap = true;
+					}
 					
 					if (isClick && data.level > 0) {
 						let talentsInRow = document.getElementsByClassName('build-field-row')[6 - data.level].children;
@@ -3334,16 +3346,49 @@ class Build{
 					if(elemBelow && (elemBelow.className == 'build-field-item') ){
 						
 						if( (data.level) && (elemBelow.parentNode.dataset.level == data.level) ){
-							
-							if(data.id > 0){
+
+							let conflictState = false;
 								
+							if ('conflict' in data) {
+								for(let item of data.conflict){
+									
+									if(item in Build.fieldConflict){
+										
+										conflictState = true;
+										
+									}
+									
+								}
+							}
+							
+							if(!conflictState){
+								
+								if ('conflict' in data) {
+									Build.fieldConflict[Math.abs(data.id)] = true;
+								}
+
 								element.dataset.state = 2;
 								
-								elemBelow.append(element);
-
-								Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+								if (performSwap) {
+									let swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
+									let swappedTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
+									Build.installedTalents[parseInt(elemBelow.dataset.position)] = swappingTal;
+									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = swappedTal;
+									
+									swapParentNode.append(elemBelow.firstChild);
+									elemBelow.append(element);
+								} else {
+									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+									elemBelow.append(element);
+								}
 								
 								try{
+									if (performSwap) {
+										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
+
+										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
+										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
+									}
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
 							
@@ -3358,53 +3403,8 @@ class Build{
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = null;
 									
 								}
-								
+
 							}
-							else{
-								
-								let conflictState = false;
-								
-								for(let item of data.conflict){
-									
-									if(item in Build.fieldConflict){
-										
-										conflictState = true;
-										
-									}
-									
-								}
-								
-								if(!conflictState){
-									
-									Build.fieldConflict[Math.abs(data.id)] = true;
-									
-									element.dataset.state = 2;
-									
-									elemBelow.append(element);
-									
-									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
-									
-									try{
-										
-										await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
-							
-										Build.setStat(data,true);
-										
-									}catch(e){
-										
-										element.dataset.state = 1;
-										
-										Build.inventoryView.querySelector('.build-talents').prepend(element);
-										
-										Build.installedTalents[parseInt(elemBelow.dataset.position)] = null;
-										
-									}
-									
-								}
-								
-							}
-							
-							
 							
 						}
 						
