@@ -3221,6 +3221,8 @@ class Build{
 	static move(element){
 		
 		element.onmousedown = (event) => {
+
+			let moveStart = Date.now();
 			
 			Build.descriptionView.style.display = 'none';
 			
@@ -3254,6 +3256,9 @@ class Build{
 			}
 			
 			element.onmouseup = async (event) => {
+
+				let moveEnd = Date.now();
+				let isClick = moveEnd - moveStart < 100;
 				
 				document.onmousemove = null;
 				
@@ -3270,12 +3275,41 @@ class Build{
 				let left = parseInt(element.style.left) + (target.width / 2);
 				
 				let top = parseInt(element.style.top) + (target.height / 2);
+
+				let isFieldTarget = (left > field.x) && (left < (field.x + field.width) ) && (top > field.y) && (top < (field.y + field.height) );
+
+				let isInventoryTarget = (left > inventory.x) && (left < (inventory.x + inventory.width) ) && (top > inventory.y) && (top < (inventory.y + inventory.height) );
+
+				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) );
+
+				if (isClick) {
+					if (element.dataset.state == 2) {
+						isFieldTarget = false;
+						isInventoryTarget = true;
+						isActiveBarTarget = false;
+					}
+					else if (element.dataset.state == 1 && data.level > 0) {
+						isFieldTarget = true;
+						isInventoryTarget = false;
+						isActiveBarTarget = false;
+					}
+				}
 				
-				if( (left > field.x) && (left < (field.x + field.width) ) && (top > field.y) && (top < (field.y + field.height) ) ){
+				if( isFieldTarget ){
 					
 					element.style.display = 'none';
-					
+
 					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					
+					if (isClick && data.level > 0) {
+						let talentsInRow = document.getElementsByClassName('build-field-row')[6 - data.level].children;
+						for (let tal in talentsInRow) {
+							if (talentsInRow[tal].children.length == 0) {
+								elemBelow = talentsInRow[tal];
+								break;
+							}
+						}
+					}
 					
 					element.style.display = 'block';
 					
@@ -3359,11 +3393,15 @@ class Build{
 					}
 					
 				}
-				else if( (left > inventory.x) && (left < (inventory.x + inventory.width) ) && (top > inventory.y) && (top < (inventory.y + inventory.height) ) ){
+				else if( isInventoryTarget ){
 					
 					element.style.display = 'none';
 					
 					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					
+					if (isClick) {
+						elemBelow = document.getElementsByClassName('build-talents')[0].firstChild;
+					}
 					
 					element.style.display = 'block';
 					
@@ -3402,7 +3440,7 @@ class Build{
 					}
 					
 				}
-				else if( (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) ) ){
+				else if( isActiveBarTarget ){
 					
 					element.style.display = 'none';
 					
