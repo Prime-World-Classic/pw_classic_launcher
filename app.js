@@ -2836,6 +2836,10 @@ class Build{
 		
 		Build.description(talent);
 		
+		if (data.level == 0) {
+			talent.style.display = 'none';
+		}
+		
 		return talent;
 		
 		preload.add(talent);
@@ -3135,6 +3139,11 @@ class Build{
 		for(let item of Build.inventoryView.querySelectorAll('.build-talent-item')){
 			
 			let data = Build.talents[item.dataset.id], flag = true;
+
+			if (data.level == 0) {
+				item.style.display = 'none';
+				continue;
+			}
 			
 			for(let key in Build.ruleSortInventory){
 				
