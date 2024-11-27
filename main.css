@@ -641,18 +641,20 @@ button.sets {
 }
 .build-rarity .reset {
 	position: absolute;
-	width: 374px;
+	width: auto;
 	height: 30px;
-	line-height: 26px;
-	left: 600px;
-	top: 80vh;
+	left: 30px;
+	bottom: 20px;
 	color: #bbb;
 	font-size: 18px;
 	user-select: none;
-	border: none !important;
-	padding-left: 20px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 5px;
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 }
 .build-rarity .reset:hover {
+	background: #a224;
 	color: #fdd;
 	font-size: 19px;
 }
@@ -1994,65 +1996,5 @@ cursor:pointer;
 	.build-buttons--wrapper {
 		margin-left: 37vw;
 		width: 20vw;
-	}
-}
-
-@media (height < 1000px) {
-	.build-rarity .reset {
-		top: 81vh;
-	}
-}
-@media (height > 1068px) {
-	.build-rarity .reset {
-		top: 78vh;
-		left: 627px;
-	}
-}
-@media (height >= 1100px) {
-	.build-rarity .reset {
-		top: 78vh;
-		left: 577px;
-	}
-}
-@media (height >= 1140px) {
-	.build-rarity .reset {
-		top: 76vh;
-		left: 800px;
-	}
-}
-@media (height >= 1200px) {
-	.build-rarity .reset {
-		top: 75vh;
-		left: 940px;
-	}
-}
-@media (height >= 1273px) {
-	.build-rarity .reset {
-		top: 73vh;
-		left: 737px;
-	}
-}
-@media (height > 1338px) {
-	.build-rarity .reset {
-		top: 73vh;
-		left: 754px;
-	}
-}
-@media (height >= 1425px) {
-	.build-rarity .reset {
-		top: 71vh;
-		left: 854px;
-	}
-}
-@media (height >= 1500px) {
-	.build-rarity .reset {
-		top: 70vh;
-		left: 850px;
-	}
-}
-@media (height > 1600px) {
-	.build-rarity .reset {
-		top: 69vh;
-		left: 1060px;
 	}
 }
