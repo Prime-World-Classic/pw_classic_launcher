@@ -654,8 +654,7 @@ button.sets {
 }
 .build-rarity .reset:hover {
 	color: #fdd;
-	border: 1px solid #fdd !important;
-	border-radius: 15px;
+	font-size: 19px;
 }
 .build-rarity .reset:active {
 	color: #f99;
