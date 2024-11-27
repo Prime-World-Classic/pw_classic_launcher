@@ -590,7 +590,7 @@ button.sets {
 	cursor:pointer;
 	
 }
-.build-active-bar-item .build-talent-item:after {
+.build-active-bar-item:not(:empty):after {
 	content: '';
 	display: block;
 	position: relative;
@@ -598,13 +598,14 @@ button.sets {
 	height: 17px;
 	border-radius: 50%;
 	background: gray;
-	left: 86px;
-	bottom: -89px;
+	left: 83px;
+	bottom: 9px;
 	border: 2px solid #000;
 }
 
 .build-talent-item[data-active='1'] {
 	border: 3px solid #ccc;
+	box-sizing: border-box; /* Do not occupy space */
 	border-radius: 10px;
 	--s: 23px;
 	mask: conic-gradient(at var(--s) var(--s),#0000 75%,#000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box
@@ -980,7 +981,7 @@ text-align:center;
 	border: 7px solid transparent;
 	border-radius:18px;
 	margin:0 5px;
-	padding:5px;
+	padding: 2px 4px 10px 4px;
 	box-shadow:0 0 50px rgba(25,25,25,0.8);
 	
 }
@@ -1932,8 +1933,8 @@ cursor:pointer;
 	background-clip: padding-box, border-box;
 	animation: borderRotate var(--d) linear infinite forwards;
 }
-.smartcast .build-talent-item:after {
-	background: #8f9;
+.smartcast:after {
+	background: #8f9 !important;
 }
 
 
