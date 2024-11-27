@@ -2666,7 +2666,7 @@ class Build{
 			
 			item.id = `bl${i}`
 			
-			item.addEventListener('click',() => {
+			item.addEventListener('click', e => {
 				
 				if(item.dataset.active == 1){
 					
@@ -2686,7 +2686,7 @@ class Build{
 					
 				}
 
-				item.classList.toggle('highlight');
+				e.target.classList.toggle('highlight');
 
 				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.toggle('highlight');
 				
