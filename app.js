@@ -2434,7 +2434,7 @@ class Build{
 			
 			Build.dataStats[key] = item;
 			
-			let daw = DOM({style:'build-hero-stats-daw', title: 'Сделать параметр (стат) приоритетным', event:['click', async () => {
+			let daw = DOM({style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
 				
 				if(daw.dataset.status != 0){
 					
