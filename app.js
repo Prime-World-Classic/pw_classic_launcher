@@ -2963,15 +2963,15 @@ class Build{
 			
 		}
 		
-		const reset = document.createElement('div');
-		reset.innerText = `Сбросить таланты в этом билдe`;
+		const reset = document.createElement('img');
+		reset.title = 'Сбросить таланты в этом билде';
+		reset.src = 'trash.svg';
 		reset.classList.add('reset');
 		reset.addEventListener('click', async () => {
-			
-			await App.api.request('build','clear',{id:Build.id});
-			
-			View.show('build',Build.heroId);
-			
+			if (confirm('Сбросить таланты в этом билде?')) {
+				await App.api.request('build','clear',{id:Build.id});
+				View.show('build',Build.heroId);
+			}
 		});
 		Build.rarityView.append(reset);
 	}
