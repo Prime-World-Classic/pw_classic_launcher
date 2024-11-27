@@ -640,18 +640,17 @@ button.sets {
 	
 }
 .build-rarity .reset {
-	position: absolute;
-	width: auto;
 	height: 30px;
-	left: 30px;
+	left: 40vw;
 	bottom: 20px;
 	color: #bbb;
 	font-size: 18px;
 	user-select: none;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 5px;
+	padding: 10px;
+	border-radius: 50%;
+	margin-top: 40px;
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+	cursor: pointer;
 }
 .build-rarity .reset:hover {
 	background: #a224;
