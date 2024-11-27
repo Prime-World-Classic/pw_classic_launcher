@@ -658,7 +658,7 @@ button.sets {
 	font-size: 19px;
 }
 .build-rarity .reset:active {
-	color: #f99;
+	background: #c225;
 }
 
 .build-description{
