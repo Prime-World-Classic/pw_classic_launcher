@@ -603,7 +603,7 @@ button.sets {
 	border: 2px solid #000;
 }
 
-.build-talent-item[data-active='1'] {
+.build .build-talent-item[data-active='1'] {
 	border: 3px solid #ccc;
 	box-sizing: border-box; /* Do not occupy space */
 	border-radius: 10px;
