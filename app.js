@@ -2694,16 +2694,22 @@ class Build{
 
 			item.addEventListener('contextmenu', e => {
 				e.preventDefault();
-				/*
+				
 				for(const level of ["1", "2", "3", "4", "5", "6"]) {
 					Build.removeSortInventory('level',level);
+				}
+				for (let l = 0; l < 6; l++) {
+					item.parentElement.childNodes[l].dataset.active = 0;
+
+					item.parentElement.childNodes[l].classList.remove('highlight');
+					document.querySelector(`[data-level="${item.parentElement.childNodes[l].dataset['id']}"`).classList.remove('highlight');
 				}
 				Build.setSortInventory('level',item.dataset.id);
 					
 				Build.sortInventory();
 					
-				item.dataset.active = 0;
-				*/
+				item.dataset.active = 1;
+				
 				document.querySelectorAll('.build-level div.highlight').forEach(n => n.click());
 				item.classList.add('highlight');
 				document.querySelector(`[data-level="${item.dataset['id']}"`).classList.add('highlight');
@@ -2799,7 +2805,7 @@ class Build{
 
 				Build.installedTalents[index] = data[index];
 
-				if ('conflict' in data[index]) {
+				if (data[index] && 'conflict' in data[index]) {
 					Build.fieldConflict[Math.abs(data[index].id)] = true;
 				}
 				
@@ -3332,9 +3338,9 @@ class Build{
 					}
 					
 					if (isClick && data.level > 0) {
-						let talentsInRow = document.getElementsByClassName('build-field-row')[6 - data.level].children;
+						let talentsInRow = document.getElementsByClassName('build-field-row')[6 - data.level].childNodes;
 						for (let tal in talentsInRow) {
-							if (talentsInRow[tal].children.length == 0) {
+							if (talentsInRow[tal].childNodes.length == 0) {
 								elemBelow = talentsInRow[tal];
 								break;
 							}
