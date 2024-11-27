@@ -3538,9 +3538,9 @@ class Build{
 				
 
 				Build.updateHeroStats();
-				
-				fieldRow.style.background = 'none';
-				
+			
+				fieldRow.style.background = '';
+
 				element.style.position = 'static';
 				
 				element.style.zIndex = 'auto';
