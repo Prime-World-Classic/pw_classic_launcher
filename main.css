@@ -2022,7 +2022,7 @@ cursor:pointer;
 }
 @media (height >= 1200px) {
 	.build-rarity .reset {
-		top: 74.5vh;
+		top: 75vh;
 		left: 950px;
 	}
 }
