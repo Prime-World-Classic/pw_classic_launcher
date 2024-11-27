@@ -2018,13 +2018,13 @@ cursor:pointer;
 @media (height >= 1140px) {
 	.build-rarity .reset {
 		top: 76vh;
-		left: 610px;
+		left: 800px;
 	}
 }
 @media (height >= 1200px) {
 	.build-rarity .reset {
-		top: 75vh;
-		left: 610px;
+		top: 74.5vh;
+		left: 950px;
 	}
 }
 @media (height >= 1273px) {
