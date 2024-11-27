@@ -550,7 +550,7 @@ button.sets {
 }
 
 .build-talent{
-	margin-top: -79px;
+	margin-top: -87px;
 	min-width:660px;
 	width:660px;
 	height: 750px;
@@ -560,7 +560,7 @@ button.sets {
 	display: flex;
 	flex-flow: row wrap;
 
-	height: 700px;
+	height: 660px;
 	overflow: auto;
 }
 .build-talent-item {
