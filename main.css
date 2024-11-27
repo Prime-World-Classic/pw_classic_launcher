@@ -375,8 +375,8 @@ background-color:rgba(15,15,15,0.7);
 
 .new-random-skins-buttons--wrapper {
 	position: absolute;
-	margin-left: -190px;
-	margin-top: -20px;
+	margin-left: -20px;
+	margin-top: -110px;
 	display: flex;
 }
 
