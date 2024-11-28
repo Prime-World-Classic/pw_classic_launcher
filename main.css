@@ -228,6 +228,8 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero{
+	margin-top: -150px;
+	margin-right: 30px;
 	width:300px;
 	min-width:300px;
 	height:660px;
@@ -283,6 +285,10 @@ background-color:rgba(15,15,15,0.7);
 	margin-bottom:5px;
 	
 }
+.build-hero-stats-line:nth-child(-n+3) img {
+	opacity: 0;
+	cursor: default;
+}
 
 .build-hero-stats-item{
 	
@@ -300,12 +306,11 @@ background-color:rgba(15,15,15,0.7);
 
 .build-hero-stats-daw {
 	
-	width:1.5vw;
-	height:1.5vw;
+	width:1.6vw;
+	height:1.6vw;
+	padding: 3px;
 	border-radius:50%;
 	margin-right:5px;
-	box-shadow:0 0 25px rgba(0,0,0,0.3);
-	background:rgba(255,255,255,0.1);
 	cursor:pointer;
 	
 }
@@ -369,7 +374,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-field-bottom {
-	margin: 44px 0 34px 90px;
+	margin: 44px 0 34px 135px;
 }
 .build-field-bottom:after {
 	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
@@ -380,8 +385,8 @@ background-color:rgba(15,15,15,0.7);
 
 .new-random-skins-buttons--wrapper {
 	position: absolute;
-	margin-left: -190px;
-	margin-top: -20px;
+	margin-left: -20px;
+	margin-top: -110px;
 	display: flex;
 }
 
@@ -553,7 +558,7 @@ button.sets {
 }
 
 .build-talent{
-	margin-top: -79px;
+	margin-top: -87px;
 	min-width:660px;
 	width:660px;
 	height: 750px;
@@ -563,7 +568,7 @@ button.sets {
 	display: flex;
 	flex-flow: row wrap;
 
-	height: 700px;
+	height: 660px;
 	overflow: auto;
 }
 .build-talent-item {
@@ -608,12 +613,14 @@ button.sets {
 	border: 2px solid #000;
 }
 
-.build .build-talent-item[data-active='1'] {
-	border: 3px solid #ccc;
-	box-sizing: border-box; /* Do not occupy space */
-	border-radius: 10px;
-	--s: 23px;
-	mask: conic-gradient(at var(--s) var(--s),#0000 75%,#000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box
+.build .build-talent-item[data-active='1']:after {
+	content: '';
+	background-image: url('activeBorder.png');
+	display: block;
+	width: 128px;
+	height: 120px;
+	background-repeat: no-repeat;
+	margin-left: -5px;
 }
 
 .build-rarity{
@@ -645,25 +652,25 @@ button.sets {
 	
 }
 .build-rarity .reset {
-	position: absolute;
-	width: 374px;
 	height: 30px;
-	line-height: 26px;
-	left: 600px;
-	top: 80vh;
-	color: #ddd;
+	left: 40vw;
+	bottom: 20px;
+	color: #bbb;
 	font-size: 18px;
 	user-select: none;
-	border: none !important;
-	padding-left: 20px;
+	padding: 10px;
+	border-radius: 50%;
+	margin-top: 40px;
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+	cursor: pointer;
 }
 .build-rarity .reset:hover {
+	background: #a224;
 	color: #fdd;
-	border: 1px solid #fdd !important;
-	border-radius: 15px;
+	font-size: 19px;
 }
 .build-rarity .reset:active {
-	color: #f99;
+	background: #c225;
 }
 
 .build-description{
@@ -1977,7 +1984,7 @@ cursor:pointer;
 
 @media (width > 2300px) {
 	.build-buttons--wrapper {
-		margin-left: 29vw;
+		margin-left: 30vw;
 		width: 25vw;
 	}
 }

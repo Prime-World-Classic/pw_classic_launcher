@@ -2434,15 +2434,14 @@ class Build{
 			
 			Build.dataStats[key] = item;
 			
-			let daw = DOM({style:'build-hero-stats-daw',event:['click', async () => {
+			let daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
 				
 				if(daw.dataset.status != 0){
 					
 					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
 					
 					daw.dataset.status = 0;
-					
-					daw.style.background = 'rgba(255,255,255,0.1)';
+					daw.src = 'circle.png';
 					
 					Build.profileStats[key] = 0;
 
@@ -2453,14 +2452,12 @@ class Build{
 					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
 					
 					daw.dataset.status = 1;
+					daw.src = 'checkbox.png';
 					
-					daw.style.background = 'rgb(153,255,51)';
-
 					Build.profileStats[key] = 1;
 
 					Build.updateHeroStats();
 				}
-				
 			}]});
 			
 			daw.dataset.index = i;
@@ -2470,9 +2467,9 @@ class Build{
 			Build.profileStats[key] = parseInt(daw.dataset.status);
 			
 			if(daw.dataset.status == 1){
-				
-				daw.style.background = 'rgb(153,255,51)';
-				
+				daw.src = 'checkbox.png';
+			} else {
+				daw.src = 'circle.png';
 			}
 			
 			stats.append(DOM({style:'build-hero-stats-line'},daw,item));
@@ -2963,15 +2960,15 @@ class Build{
 			
 		}
 		
-		const reset = document.createElement('div');
-		reset.innerText = `Сбросить таланты в этом билдe`;
+		const reset = document.createElement('img');
+		reset.title = 'Сбросить таланты в этом билде';
+		reset.src = 'trash.svg';
 		reset.classList.add('reset');
 		reset.addEventListener('click', async () => {
-			
-			await App.api.request('build','clear',{id:Build.id});
-			
-			View.show('build',Build.heroId);
-			
+			if (confirm('Сбросить таланты в этом билде?')) {
+				await App.api.request('build','clear',{id:Build.id});
+				View.show('build',Build.heroId);
+			}
 		});
 		Build.rarityView.append(reset);
 	}
