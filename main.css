@@ -605,12 +605,13 @@ button.sets {
 	border: 2px solid #000;
 }
 
-.build .build-talent-item[data-active='1'] {
-	border: 3px solid #ccc;
-	box-sizing: border-box; /* Do not occupy space */
-	border-radius: 10px;
-	--s: 23px;
-	mask: conic-gradient(at var(--s) var(--s),#0000 75%,#000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box
+.build .build-talent-item[data-active='1']:after {
+	content: '';
+	background-image: url('activeBorder.png');
+	display: block;
+	width: 128px;
+	height: 120px;
+	background-repeat: no-repeat;
 }
 
 .build-rarity{
