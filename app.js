@@ -754,6 +754,14 @@ class View {
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
 	
+	static setCss(name = 'style.css'){
+		
+		let css = DOM({tag:'link',rel:'stylesheet',href:name});
+		
+		document.head.appendChild(css);
+		
+	}
+	
 	static async show(method,value,value2){
 		
 		if( !(method in View) ){
@@ -843,6 +851,22 @@ class View {
 		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'logo_classic.png'}))
 		
 		),DOM({style:'author'},`Версия ${APP_VERSION} by ifst.`));
+		
+	}
+	
+	static castle(){
+		
+		// View.setCss('castle.css');
+		
+		let canvas = DOM({tag:'canvas',style:'body-canvas'});
+		
+		// App.storage.data.fraction; тут будет инфа о стороне 1 или 2 
+		
+		canvas.style.width = '100vw';
+		
+		canvas.style.height = '100vh';
+		
+		return canvas;
 		
 	}
 	
@@ -3812,7 +3836,16 @@ class App {
 			
 			await App.api.init();
 			
-			View.show('main');
+			if(window.location.hash == '#castle'){
+				
+				View.show('castle');
+				
+			}
+			else{
+				
+				View.show('main');
+				
+			}
 			
 		}
 		else{
@@ -3824,7 +3857,7 @@ class App {
 		}
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
-		//
+		
 		document.body.append(DOM({id:'STAT'}));
 		
 	}
