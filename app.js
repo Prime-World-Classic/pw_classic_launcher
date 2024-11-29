@@ -878,15 +878,54 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		return DOM({style:'main-header'},
-		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('main')]}),
-		play,
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'logo.png',event:['click',() => View.show('main')]}),play);
+		
+		if(App.isAdmin()){
+			
+			let adm = DOM({style:'main-header-item',event:['click',() => {
+				
+				let body = document.createDocumentFragment();
+				
+				body.append(DOM({style:'splash-content-button',event:['click',() => {
+					
+					View.show('talents');
+					
+					Splash.hide();
+					
+				}]},'Таланты (обычные)'),DOM({style:'splash-content-button',event:['click',() => {
+					
+					//View.show('talents');
+					
+					Splash.hide();
+					
+				}]},'Таланты (классовые)'),DOM({style:'splash-content-button',event:['click',() => {
+					
+					View.show('users');
+					
+					Splash.hide();
+					
+				}]},'Пользователи'),DOM({style:'splash-content-button',event:['click',() => Splash.hide()]},'[X]'));
+				
+				Splash.show(body);
+				
+			}]},'Админ');
+			
+			adm.classList.add('animation1');
+			
+			menu.append(adm);
+			
+		}
+		
+		menu.append(
+		DOM({style:'main-header-item',event:['click',() => View.show('main')]},'Лобби'),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
-		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Зал славы'),
-		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'3 в ряд'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
+		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
+		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
+		DOM({style:'main-header-item',event:['click',() => App.exit()]},'[X]')
 		);
+		
+		return menu;
 		
 	}
 	
@@ -1547,9 +1586,9 @@ class View {
 		
 	}
 	
-	static async adm(){
+	static async talents(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'});
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
 		
 		let result = await App.api.request('build','adm');
 		
@@ -1583,15 +1622,15 @@ class View {
 			
 		}
 		
-		body.append(DOM({event:['click',() => View.show('userAdm')]},'Аккаунты пользователей'),adm);
+		body.append(adm);
 		
 		return body;
 		
 	}
 	
-	static async userAdm(){
+	static async users(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'});
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
 		
 		let result = await App.api.request('user','all');
 		
@@ -1774,9 +1813,9 @@ class Build{
 		
 		let container = DOM();
 		
-		container.style.width = '35vw';
+		container.style.width = '30vw';
 		
-		container.style.height = '35vw';
+		container.style.height = '30vw';
 		
 		container.append(await Build.viewModel(user,hero));
 		
@@ -4142,6 +4181,12 @@ class App {
 			document.body.append(body);
 			
 		},delay);
+		
+	}
+	
+	static isAdmin(){
+		
+		return [1,2,24,134,2220].includes(Number(App.storage.data.id));
 		
 	}
 	
