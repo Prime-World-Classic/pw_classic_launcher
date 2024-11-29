@@ -482,7 +482,7 @@ button.sets {
 }
 
 .button-build--wrapper:not(.highlight) .build-list-item {
-	background-image: linear-gradient(to top, #153, #163) !important;
+	background-image: linear-gradient(to top, #244, #163) !important;
 }
 .button-build--wrapper.highlight .build-list-item {
 	border: 1px solid darkorange !important;
