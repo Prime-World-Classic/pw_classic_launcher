@@ -3413,8 +3413,9 @@ class Build{
 
 								element.dataset.state = 2;
 								
+								let swappingTal = null;
 								if (performSwap) {
-									let swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
+									swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 									let swappedTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = swappingTal;
 									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = swappedTal;
@@ -3422,6 +3423,9 @@ class Build{
 									swapParentNode.append(elemBelow.firstChild);
 									elemBelow.append(element);
 								} else {
+									if (performSwapFromLibrary) {
+										swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
+									}
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
 									if (performSwapFromLibrary) {
 										swapParentNode.prepend(elemBelow.firstChild);
@@ -3445,6 +3449,9 @@ class Build{
 										Build.setStat(data, true, false);
 									} else {
 										if (performSwapFromLibrary) {
+											if (swappingTal.active) {
+												await removeFromActive(elemBelow.dataset.position);
+											}
 											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
 										}
 										Build.setStat(data, true);
