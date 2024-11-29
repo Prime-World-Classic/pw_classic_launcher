@@ -3347,6 +3347,17 @@ class Build{
 						}
 					}
 				}
+
+				let removeFromActive = async (position) => {
+					for (let i = 0; i < Build.activeBarItems.length; i++) {
+						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
+						if (talPos == position) {
+							Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
+							Build.activeBarItems[i] = 0;
+							await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
+						}
+					}
+				}
 				
 				if( isFieldTarget ){
 					
@@ -3414,24 +3425,14 @@ class Build{
 								}
 								
 								try{
-									let removeFromActive = async (position) => {
-										for (let i = 0; i < Build.activeBarItems.length; i++) {
-											const talPos = Math.abs(Build.activeBarItems[i]) - 1;
-											if (talPos == position) {
-												Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
-												Build.activeBarItems[i] = 0;
-												await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
-											}
-										}
+									if (data.active && swapParentNode.dataset.position) {
+										await removeFromActive(swapParentNode.dataset.position);
 									}
 									if (performSwap) {
 										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 										
 										if (swappedTalent.active) {
 											await removeFromActive(elemBelow.dataset.position);
-										}
-										if (data.active) {
-											await removeFromActive(swapParentNode.dataset.position);
 										}
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
@@ -3484,6 +3485,9 @@ class Build{
 						
 						
 						try{
+							if (data.active && oldParentNode.dataset.position) {
+								await removeFromActive(oldParentNode.dataset.position);
+							}
 							
 							await App.api.request('build','setZero',{buildId:Build.id,index:oldParentNode.dataset.position});
 
