@@ -1956,7 +1956,7 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 23vw;
+		margin-left: 23.5vw;
 		width: 34vw;
 	}
 }
@@ -1991,6 +1991,14 @@ cursor:pointer;
 	.build-buttons--wrapper {
 		margin-left: 28vw;
 		width: 28vw;
+	}
+}
+
+/* Zoom 75% */
+@media (width >= 2560px) {
+	.build-buttons--wrapper {
+		margin-left: 30vw;
+		width: 25vw;
 	}
 }
 
