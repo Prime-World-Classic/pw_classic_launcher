@@ -459,8 +459,8 @@ button.sets {
 .build-buttons--wrapper {
 	margin-top: 118px;
 	display: flex;
-	width: 35vw;
-	margin-left: 24vw;
+	margin-left: 21vw;
+	width: 37vw;
 	overflow-y: hidden;
 }
 .build-buttons--wrapper .build-list-item:not(.new-build, .random-build) {
@@ -1957,7 +1957,7 @@ cursor:pointer;
 @media (width > 1900px) {
 	.build-buttons--wrapper {
 		margin-left: 23vw;
-		width: 33vw;
+		width: 34vw;
 	}
 }
 
@@ -1975,8 +1975,8 @@ cursor:pointer;
 
 @media (width > 2100px) {
 	.build-buttons--wrapper {
-		margin-left: 25vw;
-		width: 32vw;
+		margin-left: 26vw;
+		width: 31vw;
 	}
 }
 
@@ -1987,23 +1987,40 @@ cursor:pointer;
 	}
 }
 
-@media (width > 2800px) {
+@media (width >= 2400px) {
 	.build-buttons--wrapper {
-		margin-left: 32vw;
-		width: 25vw;
+		margin-left: 28vw;
+		width: 28vw;
 	}
 }
 
-@media (width > 3200px) {
+/* Zoom 70% */
+@media (width >= 2752px) {
 	.build-buttons--wrapper {
-		margin-left: 34vw;
-		width: 20vw;
+		margin-left: 30.7vw;
+		width: 24vw;
 	}
 }
 
-@media (width > 3600px) {
+@media (width >= 2880px) {
 	.build-buttons--wrapper {
-		margin-left: 37vw;
-		width: 20vw;
+		margin-left: 31.5vw;
+		width: 23vw;
+	}
+}
+
+/* Zoom 60% */
+@media (width >= 3200px) {
+	.build-buttons--wrapper {
+		margin-left: 33vw;
+		width: 21vw;
+	}
+}
+
+/* Zoom 50% (4k) */
+@media (width >= 3840px) {
+	.build-buttons--wrapper {
+		margin-left: 36vw;
+		width: 17vw;
 	}
 }
