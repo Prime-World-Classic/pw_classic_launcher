@@ -2029,7 +2029,7 @@ class Build{
 		Build.inventory();
 		
 		Build.rarity();
-		
+
 		Build.activeBar(request.active);
 		
 		Build.ruleSortInventory = new Object();
@@ -2998,6 +2998,9 @@ class Build{
 	}
 	
 	static activeBar(data){
+		
+		Build.activeBarItems = data;
+
 		console.log('activeBar',data)
 		let index = 0;
 		
@@ -3078,6 +3081,7 @@ class Build{
 					try{
 						
 						App.api.request('build','setZeroActive',{buildId:Build.id,index:element.dataset.index});
+						Build.activeBarItems[element.dataset.index] = 0;
 						
 						clone.remove();
 						
@@ -3410,17 +3414,35 @@ class Build{
 								}
 								
 								try{
+									let removeFromActive = async (position) => {
+										for (let i = 0; i < Build.activeBarItems.length; i++) {
+											const talPos = Math.abs(Build.activeBarItems[i]) - 1;
+											if (talPos == position) {
+												Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
+												Build.activeBarItems[i] = 0;
+												await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
+											}
+										}
+									}
 									if (performSwap) {
 										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
-
+										
+										if (swappedTalent.active) {
+											await removeFromActive(elemBelow.dataset.position);
+										}
+										if (data.active) {
+											await removeFromActive(swapParentNode.dataset.position);
+										}
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
-										Build.setStat(data, false);
+										
+										Build.setStat(data, true, false);
 									} else {
 										Build.setStat(data, true);
 									}
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
+
 							
 									
 								}catch(e){
@@ -3512,6 +3534,7 @@ class Build{
 						try{
 							
 							await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+							Build.activeBarItems[index] = position;
 							
 							let clone = element.cloneNode(true);
 							
@@ -3522,6 +3545,7 @@ class Build{
 								try{
 									
 									App.api.request('build','setZeroActive',{buildId:Build.id,index:index});
+									Build.activeBarItems[index] = null;
 									
 									clone.remove();
 									
