@@ -225,7 +225,7 @@ background-color:rgba(15,15,15,0.7);
 .build-hero{
 	margin-top: -150px;
 	margin-right: 30px;
-	width:300px;
+	width: 320px;
 	min-width:300px;
 	height:660px;
 	min-height:660px;
@@ -265,7 +265,7 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats{
 	display:flex;
 	align-self: start;
-	width: 270px;
+	width: 300px;
 	flex-flow:column nowrap;
 	font: 1.2rem / 1 Tahoma;
 	
