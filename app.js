@@ -3367,10 +3367,12 @@ class Build{
 
 					let swapParentNode = element.parentNode;
 					let performSwap = false;
+					let performSwapFromLibrary = false;
 
 					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-field-item') {
 						elemBelow = elemBelow.parentElement;
-						performSwap = true;
+						performSwap = swapParentNode.dataset.position ? true : false;
+						performSwapFromLibrary = !performSwap;
 					}
 					
 					if (isClick && data.level > 0) {
@@ -3421,6 +3423,9 @@ class Build{
 									elemBelow.append(element);
 								} else {
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+									if (performSwapFromLibrary) {
+										swapParentNode.prepend(elemBelow.firstChild);
+									}
 									elemBelow.append(element);
 								}
 								
@@ -3439,6 +3444,9 @@ class Build{
 										
 										Build.setStat(data, true, false);
 									} else {
+										if (performSwapFromLibrary) {
+											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
+										}
 										Build.setStat(data, true);
 									}
 									
