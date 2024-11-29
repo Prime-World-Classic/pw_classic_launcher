@@ -3404,6 +3404,11 @@ class Build{
 
 					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
 
+					if (elemBelow.childNodes[0] && elemBelow.childNodes[0].className == 'build-talent-item') {
+						// Select 'build-talent-item' if selected its parent
+						elemBelow = elemBelow.childNodes[0];
+					}
+
 					let swapParentNode = element.parentNode;
 					let performSwap = false;
 					let performSwapFromLibrary = false;
