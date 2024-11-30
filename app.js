@@ -894,7 +894,7 @@ class View {
 					
 				}]},'Таланты (обычные)'),DOM({style:'splash-content-button',event:['click',() => {
 					
-					//View.show('talents');
+					View.show('talents2');
 					
 					Splash.hide();
 					
@@ -911,6 +911,8 @@ class View {
 			}]},'Админ');
 			
 			adm.classList.add('animation1');
+			
+			adm.style.color = 'rgba(255,255,255,1)';
 			
 			menu.append(adm);
 			
@@ -1590,7 +1592,7 @@ class View {
 		
 		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
 		
-		let result = await App.api.request('build','adm');
+		let result = await App.api.request('build','talentAll');
 		
 		for(let item of result){
 			
@@ -1612,7 +1614,49 @@ class View {
 					
 					object[key] = value;
 					
-					await App.api.request('build','admEdit',{id:item.id,object:object});
+					await App.api.request('build','talentEdit',{id:item.id,object:object});
+					
+				},{value:item[key]}));
+				
+			}
+			
+			adm.append(div);
+			
+		}
+		
+		body.append(adm);
+		
+		return body;
+		
+	}
+	
+	static async talents2(){
+		
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		
+		let result = await App.api.request('build','talentHeroAll');
+		
+		for(let item of result){
+			
+			let div = DOM({tag:'div'});
+			
+			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`htalents/${item.id}.png`}));
+			
+			for(let key in item){
+				
+				if(key == 'id'){
+					
+					continue;
+					
+				}
+				
+				div.append(DOM({tag:'div'},key),App.input( async (value) => {
+					
+					let object = new Object();
+					
+					object[key] = value;
+					
+					await App.api.request('build','talentHeroEdit',{id:item.id,object:object});
 					
 				},{value:item[key]}));
 				
@@ -1817,8 +1861,6 @@ class Build{
 		
 		container.style.height = '30vw';
 		
-		container.append(await Build.viewModel(user,hero));
-		
 		let state = false, get = DOM({event:['click', async () => {
 			
 			if(!state){
@@ -1831,15 +1873,29 @@ class Build{
 				
 			}
 			
-			// await App.api.request('build','',{user:user,hero:hero});
+			await App.api.request('build','steal',{user:user,hero:hero});
 			
-		}]},`Забрать билд?`);
+			View.show('build',hero);
+			
+			Splash.hide();
+			
+		}]},`Украсть билд?`);
 		
-		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`))),false);
+		let bottom = DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`));
+		
+		bottom.style.opacity = 0;
+		
+		container.append(await Build.viewModel(user,hero,() => {
+			
+			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
+			
+		}));
+		
+		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,bottom),false);
 		
 	}
 	
-	static async viewModel(user,hero,animate = true){
+	static async viewModel(user,hero,callback,animate = true){
 		
 		let request = await App.api.request('build','get',{user:user,hero:hero});
 		
@@ -1923,13 +1979,31 @@ class Build{
 					
 					setTimeout(() => {
 						
+						let number = 1;
+						
 						delay = 0;
 						
 						for(let element of elements2){
 							
 							delay += 50;
 							
-							element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+							let animate = element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+							
+							if(number == elements2.length){
+								
+								animate.onfinish = () => {
+									
+									if(callback){
+										
+										callback();
+										
+									}
+									
+								}
+								
+							}
+							
+							number++;
 							
 						}
 						
@@ -2542,9 +2616,42 @@ class Build{
 		}
 		
 		Build.heroName = DOM({tag: 'p', style: 'name'});
-		Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
+		
+		if(MM.hero){
+			
+			Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
+			
+		}
 
 		Build.heroImg = DOM({style:'avatar'});
+		
+		if(App.isAdmin()){
+			
+			Build.heroImg.onclick = async () => {
+				
+				let body = document.createDocumentFragment(), request = await App.api.request('build','heroData',{id:data.id});
+				
+				for(let key in request){
+					
+					body.append(App.input((value) => {
+						
+						let object = new Object();
+						
+						object[key] = value;
+						
+						App.api.request('build','heroEdit',{id:data.id,object:object});
+						
+					},{value:request[key]}));
+					
+				}
+				
+				body.append(DOM({style:'splash-content-button',event:['click',() => Splash.hide()]},'Закрыть'));
+				
+				Splash.show(body);
+				
+			}
+			
+		}
 		
 		Build.heroImg.style.backgroundImage = `url(hero/${data.id}/${Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1}.png)`;
 		
@@ -3908,7 +4015,7 @@ class App {
 		
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
-		// ws://192.168.9.167:7373
+		
 		await Store.init();
 		
 		App.storage = new Store('u1');
