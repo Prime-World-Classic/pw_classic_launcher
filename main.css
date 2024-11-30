@@ -1633,10 +1633,16 @@ cursor:pointer;
 
 .build-bottom {
 	
-	font: 2vw / 1 Verdana;
+	font: 1.5vw / 1 Verdana;
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
+	
+}
+
+.build-bottom div{
+	
+	cursor:pointer;
 	
 }
 
