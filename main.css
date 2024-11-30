@@ -1148,8 +1148,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	display:flex;
 	flex-flow:row nowrap;
 	width:100vw;
-	height:30vh;
-	margin-left: 40px;
+	height:25vh;
 	justify-content:space-around;
 	align-items:center;
 	/*padding:3vh 1vw;*/
@@ -1166,6 +1165,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	width:100vw;
 	height:70vh;
+	margin-bottom:5vh;
 	/*padding:3vh 1vw;*/
 	
 	
@@ -1219,7 +1219,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	height:10vh;
 	width:94%;
 	padding:0 3%;
-	font: 1.5vw / 1 Verdana;
+	font: 1.3vw / 1 Verdana;
 	background:rgba(255,255,255,0.1);
 	border-radius:0 0 3px 3px;
 	color: rgba(255, 255, 255, 0.7);
@@ -1229,9 +1229,12 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 
 .mm-lobby-middle-build{
 	
+	display:flex;
+	flex-flow:column nowrap;
+	justify-content:center;
+	align-items:center;
 	width:33.33vw;
 	height:70vh;
-
 	
 }
 
@@ -1239,35 +1242,22 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 	display:flex;
 	flex-flow:row wrap;
-	justify-content:center;
 	align-items:center;
-	width:31.33vw;
-	height:64vh;
-	padding:3vh 1vw;
+	width:33.33vw;
+	height:70vh;
 	overflow-y:scroll;
 	
 }
 
 .mm-lobby-middle-hero > div{
-	
-	width:5vw;
-	height:5vw;
+
+	width:6.66vw;
+	height:6.66vw;
 	background-position:center;
 	background-repeat:repeat-y;
 	background-size:100%;
 	cursor:pointer;
 	
-}
-.mm-lobby-middle-hero .lvl {
-	font-size: 16px;
-	width: 30px;
-	height: 3px;
-	padding-left: 3px;
-	border: 0;
-}
-.mm-lobby-middle-hero {
-	padding: 2px;
-	border: 0;
 }
 
 .mm-lobby-header-team{
@@ -1281,25 +1271,36 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 }
 
-.mm-lobby-header-team img[src^=hero]{
+.mm-lobby-header-team-player{
 	
 	width:8vw;
+	margin:0 0.5vw;
 	
 }
 
-.mm-lobby-header-team-player .name {
+.mm-lobby-header-team-player-hero{
+	
+	width:8vw;
+	height:8vw;
+	border-radius:50%;
+	background-size:110%;
+	background-position:center;
+	background-repeat:no-repeat;
+	position:relative;
+	
+}
+
+.mm-lobby-header-team-player-name{
+	
 	margin-top:1vh;
 	font: 1vw / 1 Verdana;
     color: rgba(255, 255, 255, 0.5);
     text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 	text-align:center;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 	
-}
-.mm-lobby-header-team-player .lvl {
-	top: -1vw;
-}
-.mm-lobby-header-team-player{
-
 }
 
 .lobby-info{
