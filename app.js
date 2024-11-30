@@ -1237,16 +1237,16 @@ class View {
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
 		/*
 		MM.lobby({id:1,users:{
-		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
-		10:{nickname:'Nesh',hero:3,ready:1,select:false,team:1},
-		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,select:false,team:1},
-		2:{nickname:'Коао',hero:22,ready:1,select:false,team:1},
-		4:{nickname:'XIIIAngel',hero:12,ready:1,select:false,team:1},
-		5:{nickname:'Lantarm',hero:8,ready:1,select:false,team:2},
-		6:{nickname:'Stagven_YouTube',hero:2,ready:1,select:false,team:2},
-		7:{nickname:'Farfania',hero:9,ready:1,select:false,team:2},
-		8:{nickname:'Rekongstor',hero:25,ready:1,select:false,team:2},
-		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
+		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
+		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
+		2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
+		4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
+		5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+		6:{nickname:'Stagven_YouTube',hero:2,ready:1,rating:1100,select:false,team:2},
+		7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
+		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
+		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
 		*/
 		return body;
@@ -4397,8 +4397,6 @@ class MM {
 		
 		Timer.init();
 		
-		//setTimeout(() => MM.ready(),5000);
-		
 	}
 	
 	static soundEvent(){
@@ -4596,14 +4594,23 @@ class MM {
 		
 	}
 	
-	static async lobbyBuildView(){
+	static async lobbyBuildView(heroId){
 		
+		while(MM.lobbyBuild.firstChild){
+			
+			MM.lobbyBuild.firstChild.remove();
+			
+		}
 		
+		let container = DOM();
 		
+		container.style.width = '30vw';
 		
+		container.style.height = '30vw';
 		
+		container.append(await Build.viewModel(App.storage.data.id,heroId,false,false));
 		
-		
+		MM.lobbyBuild.append(container);
 		
 	}
 	
@@ -4621,11 +4628,13 @@ class MM {
 			
 		}
 		
+		MM.searchActive(false);
+		
 		MM.lobbyUsers = data.users;
 		
 		MM.targetHeroId = data.users[App.storage.data.id].hero;
 		
-		MM.lobbyBuild = DOM({style:'mm-lobby-middle-build'},`123`);
+		MM.lobbyBuild = DOM({style:'mm-lobby-middle-build'});
 		
 		if(MM.targetHeroId){
 			
@@ -4641,30 +4650,45 @@ class MM {
 			
 			let player = DOM({id:`PLAYER${key}`,style:'mm-lobby-header-team-player'});
 			
-			let hero = DOM({tag:'img'});
+			let hero = DOM({style:'mm-lobby-header-team-player-hero'});
+			
+			let name = DOM({style:'mm-lobby-header-team-player-name'},`${data.users[key].nickname}`);
 			
 			if(data.users[key].hero){
 				
-				hero.src = `hero/${data.users[key].hero}/1.png`;
-	
-				const name = DOM({tag:'div', style: 'name'},`${data.users[key].nickname}`);
-			
-				const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
-				const rank = DOM({tag:'img', src: 'ransk/1.png', style: 'rank'}); // TODO from hardcode to server data
-
-				player.append(hero, lvl, name, rank);
+				hero.style.backgroundImage = `url(hero/${data.users[key].hero}/1.png)`;
+				
+				let rankIcon = DOM({style:'rank-icon'});
+				
+				rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(data.users[key].rating)}.png)`;
+				
+				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.users[key].rating),rankIcon);
+				
+				hero.append(rank);
+				
+				player.append(hero,name);
+				
 				leftTeam.append(player);
-			} else {
-				hero.src = `hero/empty-ru.avif`;
-				player.append(hero);
+				
+			}
+			else{
+				
+				hero.style.backgroundImage = `url(hero/empty.png)`;
+				
+				player.append(hero,name);
+				
 			}
 			
 			if(key == data.target) {
-				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
+				
+				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				
 			}
 			
-			if(data.users[App.storage.data.id].team !== data.users[key].team) {
+			if(data.users[App.storage.data.id].team !== data.users[key].team){
+				
 				rightTeam.append(player);
+				
 			}
 
 		}
@@ -4673,12 +4697,9 @@ class MM {
 		
 		let preload = new PreloadImages(MM.lobbyHeroes);
 		
-		for(const item of MM.hero){
-		
+		for(let item of MM.hero){
 			
-			const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
-			const rank = DOM({tag:'img', src: 'ransk/1.png', style: 'rank'}); // TODO from hardcode to server data
-			const hero = DOM({id:`HERO${item.id}`,data:{active:0}}, lvl, rank);
+			let hero = DOM({id:`HERO${item.id}`,data:{active:0}});
 
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
@@ -4688,10 +4709,18 @@ class MM {
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
-				App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
+				//App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 			}
+			/*
+			let rankIcon = DOM({style:'rank-icon'});
 			
+			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
+			
+			let rank = DOM({style:'rank'},rankIcon);
+			
+			hero.append(rank);
+			*/
 			preload.add(hero);
 			
 		}
@@ -4711,19 +4740,17 @@ class MM {
 			MM.selectHeroButton.style.opacity = 0;
 			
 		}
-		
-		Timer.start(() => {
+		/*
+		await Timer.start(data.id,'Бой найден',() => {
 			
-			//MM.close();
+			MM.close();
 			
-		},'',30);
-		
-		Timer.body.style.fontSize = '3.5vh';
-		
-		Timer.body.style.fontWeight = 600;
+			MM.searchActive(true);
+			
+		});
 		
 		info.append(Timer.body,MM.selectHeroButton);
-		
+		*/
 		MM.chatBody = DOM({style:'mm-lobby-middle-chat-body'});
 		
 		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и <Enter>'})
@@ -4768,7 +4795,9 @@ class MM {
 			
 			if(findHero){
 				
-				findHero.style.backgroundColor = 'rgba(51, 255, 51, 0.8)';
+				findHero.style.filter = 'grayscale(100%)';
+				
+				findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 				
 				findHero.dataset.active = 1;
 				
