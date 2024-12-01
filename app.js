@@ -1235,7 +1235,7 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		/*
+		
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
@@ -1248,7 +1248,7 @@ class View {
 		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
-		*/
+		
 		return body;
 		
 	}
@@ -1855,6 +1855,8 @@ class Build{
 	
 	static async view(user,hero,nickname = ''){
 		
+		let request = await App.api.request('build','get',{user:user,hero:hero});
+		
 		let container = DOM();
 		
 		container.style.width = '30vw';
@@ -1885,7 +1887,7 @@ class Build{
 		
 		bottom.style.opacity = 0;
 		
-		container.append(await Build.viewModel(user,hero,() => {
+		container.append(Build.viewModel(request,() => {
 			
 			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
 			
@@ -1895,15 +1897,13 @@ class Build{
 		
 	}
 	
-	static async viewModel(user,hero,callback,animate = true){
-		
-		let request = await App.api.request('build','get',{user:user,hero:hero});
+	static viewModel(data,callback,animate = true){
 		
 		let body = DOM({style:'build-body'}), i = 1, row = DOM({style:'build-body-row'}), elements1 = new Array(), elements2 = new Array();
 		
 		body.append(row);
 		
-		for(let item of request){
+		for(let item of data){
 			
 			let talent = DOM();
 			
@@ -4014,7 +4014,7 @@ class App {
 		Splash.init();
 		
 		// ws://192.168.31.194:3737
-		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
+		App.api = new Api('ws://192.168.31.194:3737',Events); // wss://playpw.fun:443/api/v1/
 		
 		await Store.init();
 		
@@ -4596,26 +4596,50 @@ class MM {
 	
 	static async lobbyBuildView(heroId){
 		
-		while(MM.lobbyBuild.firstChild){
+		let builds = await App.api.request('build','my',{hero:heroId});
+		
+		while(MM.lobbyBuildTab.firstChild){
 			
-			MM.lobbyBuild.firstChild.remove();
+			MM.lobbyBuildTab.firstChild.remove();
 			
 		}
 		
-		let container = DOM();
-		
-		container.style.width = '30vw';
-		
-		container.style.height = '30vw';
-		
-		container.append(await Build.viewModel(App.storage.data.id,heroId,false,false));
-		
-		MM.lobbyBuild.append(container);
+		for(let build of builds){
+			
+			let tab = DOM({event:['click',() => {
+				
+				if(MM.lobbyBuildField.firstChild){
+					
+					MM.lobbyBuildField.firstChild.remove();
+					
+				}
+				
+				MM.lobbyBuildField.append(Build.viewModel(build.body,false,false));
+				
+			}]},build.name);
+			
+			if(build.target){
+				
+				tab.style.background = 'rgba(255,255,255,0.4)';
+				
+				if(MM.lobbyBuildField.firstChild){
+					
+					MM.lobbyBuildField.firstChild.remove();
+					
+				}
+				
+				MM.lobbyBuildField.append(Build.viewModel(build.body,false,false));
+				
+			}
+			
+			MM.lobbyBuildTab.append(tab);
+			
+		}
 		
 	}
 	
 	static async lobby(data){
-		console.log('MM.LOBBY DATA',data);
+		
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
@@ -4634,7 +4658,17 @@ class MM {
 		
 		MM.targetHeroId = data.users[App.storage.data.id].hero;
 		
-		MM.lobbyBuild = DOM({style:'mm-lobby-middle-build'});
+		let lobbyBuild = DOM({style:'mm-lobby-middle-build'});
+		
+		MM.lobbyBuildField = DOM();
+		
+		MM.lobbyBuildField.style.width = '28vw';
+		
+		MM.lobbyBuildField.style.height = '28vw';
+		
+		MM.lobbyBuildTab = DOM({style:'lobby-build-tab'});
+		
+		lobbyBuild.append(DOM({style:'mm-lobby-ready-button'}),MM.lobbyBuildField,MM.lobbyBuildTab);
 		
 		if(MM.targetHeroId){
 			
@@ -4681,11 +4715,13 @@ class MM {
 			
 			if(key == data.target) {
 				
-				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				//MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
 				
 			}
 			
 			if(data.users[App.storage.data.id].team !== data.users[key].team){
+				
+				name.style.opacity = 0;
 				
 				rightTeam.append(player);
 				
@@ -4712,7 +4748,7 @@ class MM {
 				//App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 			}
-			/*
+			
 			let rankIcon = DOM({style:'rank-icon'});
 			
 			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
@@ -4720,7 +4756,7 @@ class MM {
 			let rank = DOM({style:'rank'},rankIcon);
 			
 			hero.append(rank);
-			*/
+			
 			preload.add(hero);
 			
 		}
@@ -4779,7 +4815,7 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),MM.lobbyBuild,MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
 		MM.show(body);
 		
