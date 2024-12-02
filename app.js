@@ -1235,7 +1235,7 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		
+		/*
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
@@ -1248,7 +1248,7 @@ class View {
 		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
-		
+		*/
 		return body;
 		
 	}
@@ -4014,7 +4014,7 @@ class App {
 		Splash.init();
 		
 		// ws://192.168.31.194:3737
-		App.api = new Api('ws://192.168.31.194:3737',Events); // wss://playpw.fun:443/api/v1/
+		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
 		
 		await Store.init();
 		
