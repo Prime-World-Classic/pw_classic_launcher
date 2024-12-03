@@ -623,6 +623,9 @@ button.sets {
 
 	height: 660px;
 	overflow: auto;
+
+	background: #3332;
+	border-radius: 2%;
 }
 .build-talent-item {
 	
