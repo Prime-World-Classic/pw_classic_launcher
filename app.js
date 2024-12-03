@@ -2308,7 +2308,8 @@ class Build{
 			provorstvo:'Проворство',
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
-			volia:'Воля'
+			volia:'Воля',
+			damage: 'Урон'
 			
 		};
 		
@@ -2580,7 +2581,7 @@ class Build{
 			
 			Build.dataStats[key] = item;
 			
-			let daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
+			const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
 				
 				if(daw.dataset.status != 0){
 					
