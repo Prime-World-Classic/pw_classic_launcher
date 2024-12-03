@@ -2323,7 +2323,7 @@ class Build{
 		
 		for(let key in template){
 			
-			let item = DOM({style:'build-hero-stats-item',event:['click',() => {
+			const item = DOM({style:'build-hero-stats-item',event:['click',() => {
 				
 				if(item.dataset.active == 1){
 					
