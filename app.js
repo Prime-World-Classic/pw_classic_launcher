@@ -2142,7 +2142,14 @@ class Build{
 		Build.specialStats = new Object();
 		
 		Build.list(request.build);
-		
+
+		// TODO replace to real values
+		request.hero.stats['damage'] = 0;
+		request.hero.stats['critProb'] = 0;
+		request.hero.stats['attackSpeed'] = 0;
+		request.hero.stats['punching'] = 0;
+		request.hero.stats['protectionBody'] = 0;
+		request.hero.stats['protectionSpirit'] = 0;
 		Build.hero(request.hero);
 		
 		Build.level();
@@ -2313,8 +2320,12 @@ class Build{
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
 			volia:'Воля',
-			damage: 'Урон'
-			
+			damage: 'Урон',
+			critProb: 'Шанс крита',
+			attackSpeed: 'Скорость атаки',
+			punching: 'Пробивание',
+			protectionBody: 'Защита тела',
+			protectionSpirit: 'Защита духа',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
@@ -2324,10 +2335,13 @@ class Build{
 		}
 		
 		let i = 0;
+
+		const cond = key =>
+			['damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key);
 		
 		for(const key in template){
 			
-			const item = DOM({style:'build-hero-stats-item',event:['click',() => {
+			const item = DOM({style:'build-hero-stats-item',event:['click', !cond(key) ? () => {
 				
 				if(item.dataset.active == 1){
 					
@@ -2468,52 +2482,61 @@ class Build{
 					
 				}
 				
-			}]},DOM({tag:'div'},template[key]),DOM({tag:'div'},data.stats[key]));
+			} : null]},
+				DOM({tag:'div'}, template[key]),
+				DOM({tag:'div'}, data.stats[key] || 0)
+			);
 			
 			item.dataset.active = 0;
-			
-			Build.dataStats[key] = item;
-			
-			const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
-				
-				if(daw.dataset.status != 0){
-					
-					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
-					
-					daw.dataset.status = 0;
-					daw.src = 'circle.png';
-					
-					Build.profileStats[key] = 0;
-
-					Build.updateHeroStats();
-				}
-				else{
-					
-					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
-					
-					daw.dataset.status = 1;
-					daw.src = 'checkbox.png';
-					
-					Build.profileStats[key] = 1;
-
-					Build.updateHeroStats();
-				}
-			}]});
-			
-			daw.dataset.index = i;
-			
-			daw.dataset.status = Build.dataRequest.profile[i];
-			
-			Build.profileStats[key] = parseInt(daw.dataset.status);
-			
-			if(daw.dataset.status == 1){
-				daw.src = 'checkbox.png';
-			} else {
-				daw.src = 'circle.png';
+			if (cond(key)) {
+				item.classList.add('passive');
 			}
 			
-			stats.append(DOM({style:'build-hero-stats-line'},daw,item));
-			
+			Build.dataStats[key] = item;
+		
+			if (!['hp', 'mp', 'speed', 'damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key)) {
+				const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
+					
+					if(daw.dataset.status != 0){
+						
+						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
+						
+						daw.dataset.status = 0;
+						daw.src = 'circle.png';
+						
+						Build.profileStats[key] = 0;
+
+						Build.updateHeroStats();
+					}
+					else{
+						
+						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
+						
+						daw.dataset.status = 1;
+						daw.src = 'checkbox.png';
+						
+						Build.profileStats[key] = 1;
+
+						Build.updateHeroStats();
+					}
+				}]});
+				
+				daw.dataset.index = i;
+				
+				daw.dataset.status = Build.dataRequest.profile[i];
+				
+				Build.profileStats[key] = parseInt(daw.dataset.status);
+				
+				if(daw.dataset.status == 1){
+					daw.src = 'checkbox.png';
+				} else {
+					daw.src = 'circle.png';
+				}
+				
+				stats.append(DOM({style:'build-hero-stats-line'}, daw, item));
+			} else {
+				stats.append(DOM({style:'build-hero-stats-line'}, item));
+			}
 			i++;
 			
 		}

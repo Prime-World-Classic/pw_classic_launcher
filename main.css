@@ -335,10 +335,6 @@ background-color:rgba(15,15,15,0.7);
 	margin-bottom:5px;
 	
 }
-.build-hero-stats-line:nth-child(-n+3) img {
-	opacity: 0;
-	cursor: default;
-}
 
 .build-hero-stats-item{
 	
@@ -352,6 +348,13 @@ background-color:rgba(15,15,15,0.7);
 	box-shadow:0 0 25px rgba(0,0,0,0.3);
 	flex-grow:1;
 	
+}
+.build-hero-stats-item.passive {
+	box-shadow: none;
+}
+.build-hero-stats-item.passive:hover {
+	background: none;
+	cursor: default;
 }
 
 .build-hero-stats-daw {
