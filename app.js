@@ -2321,7 +2321,7 @@ class Build{
 		
 		let i = 0;
 		
-		for(let key in template){
+		for(const key in template){
 			
 			const item = DOM({style:'build-hero-stats-item',event:['click',() => {
 				
