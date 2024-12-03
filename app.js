@@ -2720,6 +2720,35 @@ class Build{
 			Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0);
 		}
 	}
+
+	static getMaxStat(stats){
+		const fakeStat = 999;
+		let maxStat = stats[0];
+		let maxValue = Build.totalStat(maxStat);
+		if (maxStat in Build.profileStats) {
+			maxValue += Build.profileStats[maxStat] * fakeStat;
+		} 
+
+		for(let s = 1; s < stats.length; s++) {
+			let possibleMaxStat = Build.totalStat(stats[s]);
+			if (stats[s] in Build.profileStats) {
+				possibleMaxStat += Build.profileStats[stats[s]] * fakeStat;
+			} 
+			if (possibleMaxStat > maxValue) {
+				maxStat = stats[s];
+				maxValue = Build.totalStat(maxStat);
+				if (maxStat in Build.profileStats) {
+					maxValue += Build.profileStats[maxStat] * fakeStat;
+				} 
+			}
+		}
+
+		return maxStat;
+	}
+
+	static getTalentRefineByRarity(rarity){
+		return rarity ? Build.talentRefineByRarity[rarity] - 1.0 : 4.0;
+	}
 	
 	static setStat(talent,fold = true,animation = true){
 
@@ -2740,51 +2769,26 @@ class Build{
 		function registerStat(stat, key) {
 			let statValue = parseFloat(talent.stats[key]);
 			if ('statsRefine' in talent && 'rarity' in talent) {
-				let refineBonus = Build.talentRefineByRarity[talent.rarity] - 1.0;
+				let refineBonus = Build.getTalentRefineByRarity(talent.rarity);
 				let refineMul = parseFloat(talent.statsRefine[key]);
 				statValue += refineBonus * refineMul;
 			}
 			add[stat] = statValue;
 		}
-
-		function statByMax(stats, key) {
-			const fakeStat = 999;
-			let maxStat = stats[0];
-			let maxValue = Build.totalStat(maxStat);
-			if (maxStat in Build.profileStats) {
-				maxValue += Build.profileStats[maxStat] * fakeStat;
-			} 
-
-			for(let s = 1; s < stats.length; s++) {
-				let possibleMaxStat = Build.totalStat(stats[s]);
-				if (stats[s] in Build.profileStats) {
-					possibleMaxStat += Build.profileStats[stats[s]] * fakeStat;
-				} 
-				if (possibleMaxStat > maxValue) {
-					maxStat = stats[s];
-					maxValue = Build.totalStat(maxStat);
-					if (maxStat in Build.profileStats) {
-						maxValue += Build.profileStats[maxStat] * fakeStat;
-					} 
-				}
-			}
-
-			registerStat(maxStat, key);
-		}
 		
 		for(let key in talent.stats){
 			
 			if(key == 'sr'){
-				statByMax(['sila', 'razum'], key)
+				registerStat(Build.getMaxStat(['sila', 'razum']), key)
 			}
 			else if(key == 'ph'){
-				statByMax(['provorstvo', 'hitrost'], key)
+				registerStat(Build.getMaxStat(['provorstvo', 'hitrost']), key)
 			}
 			else if(key == 'sv'){
-				statByMax(['stoikost', 'volia'], key)
+				registerStat(Build.getMaxStat(['stoikost', 'volia']), key)
 			}
 			else if(key == 'srsv'){
-				statByMax(['sila', 'razum', 'stoikost', 'volia'], key)
+				registerStat(Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']), key)
 			}
 			else{
 				registerStat(key, key);
@@ -2998,6 +3002,9 @@ class Build{
 		const talent = document.createElement('div');
 		
 		talent.classList.add('build-talent-item');
+
+		// fake params
+		data.params = "all,8,74,num,ra1zum";
 		
 		Build.talents[data.id] = data;
 		
@@ -3810,7 +3817,7 @@ class Build{
 						let statValue = parseFloat(data.stats[key]);
 						
 						if ('statsRefine' in data && 'rarity' in data) {
-							let refineBonus = Build.talentRefineByRarity[data.rarity] - 1.0;
+							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
 							let refineMul = parseFloat(data.statsRefine[key]);
 							statValue += refineBonus * refineMul;
 						}
@@ -3820,9 +3827,75 @@ class Build{
 					}
 					
 				}
-				
 				Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${data.name}</b><div>${data.description}</div><span>${stats}</span>`;
 				
+				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
+				let paramIterator = 0;
+				for (let specialTag of innerChilds) {
+					switch (specialTag.nodeName) {
+						case 'FIZ':
+						case 'MAG':
+						case 'NUM':
+							if (specialTag.innerHTML != '%s') {
+								break;
+							}
+							let params = data.params.split(';');
+							if (paramIterator >= params.length) {
+								break;
+							}
+							let param = params[paramIterator];
+							let paramValues = param.split(',');
+
+							let statAffection, minValue, maxValue;
+
+							if (paramValues.length == 5) {
+								//let applyTo = paramValues[0];
+								minValue = parseFloat(paramValues[1]);
+								maxValue = parseFloat(paramValues[2]);
+								//let applicator = paramValues[3];
+								statAffection = paramValues[4];
+							} 
+							else if (paramValues.length == 3) {
+								minValue = parseFloat(paramValues[0]);
+								maxValue = parseFloat(paramValues[1]);
+								statAffection = paramValues[2];
+							}
+
+							let resolvedStatAffection;
+							switch (statAffection) {
+								case 'sr_max':
+									resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+									break;
+								case 'sv_max':		
+									resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+									break;		
+								case 'ph_max':		
+									resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+									break;
+								default:
+									resolvedStatAffection = statAffection;
+									break;		
+							}
+
+							function lerp( a, b, alpha ) {
+								return a + alpha * ( b - a );
+							}
+
+							if (resolvedStatAffection in Build.dataStats) {
+								let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+								specialTag.innerHTML = Math.round(lerp(minValue, maxValue, (resolvedTotalStat - 50.0) / 250.0));
+							} else {
+								let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+								specialTag.innerHTML = Math.round(minValue + maxValue * refineBonus);
+							}
+							
+							paramIterator++;
+
+							break;
+						default:
+							break;
+					}
+				}
 			}
 			
 			let positionDescription = Build.descriptionView.getBoundingClientRect();
