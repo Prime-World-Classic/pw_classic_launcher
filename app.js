@@ -2330,247 +2330,136 @@ class Build{
 					item.style.background = 'rgba(0,0,0,0)';
 					
 					if(key == 'hp'){
-						
 						Build.removeSortInventory('stats','hp');
-						
 						Build.removeSortInventory('stats','krajahp');
-						
 						Build.removeSortInventory('stats','krajahprz');
-						
 						Build.removeSortInventory('stats','regenhpvz');
-						
 						Build.removeSortInventory('stats','krajahpvz');
-						
 						Build.removeSortInventory('stats','regenhp');
-						
-						
 					}
 					else if(key == 'mp'){
-						
 						Build.removeSortInventory('stats','mp');
-						
 						Build.removeSortInventory('stats','regenmp');
-						
 						Build.removeSortInventory('stats','krajamp');
-						
 						Build.removeSortInventory('stats','regenmpvz');
-						
 					}
 					else if(key == 'speed'){
-						
 						Build.removeSortInventory('stats','speedtal');
-						
 						Build.removeSortInventory('stats','speedtalrz');
-						
 					}
 					else if(key == 'sila'){
-						
 						Build.removeSortInventory('stats','sila');
-						
 						Build.removeSortInventory('stats','sr');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','silarz');
-						
 						Build.removeSortInventory('stats','silavz');
-						
 					}
 					else if(key == 'razum'){
-						
 						Build.removeSortInventory('stats','razum');
-						
 						Build.removeSortInventory('stats','sr');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','razumrz');
-						
 						Build.removeSortInventory('stats','razumvz');
-						
 					}
 					else if(key == 'provorstvo'){
-						
 						Build.removeSortInventory('stats','provorstvo');
-						
 						Build.removeSortInventory('stats','ph');
-						
 						Build.removeSortInventory('stats','provorstvorz');
-						
 						Build.removeSortInventory('stats','provorstvovz');
 						
 					}
 					else if(key == 'hitrost'){
-						
 						Build.removeSortInventory('stats','hitrost');
-						
 						Build.removeSortInventory('stats','ph');
-						
 						Build.removeSortInventory('stats','hitrostrz');
-						
 						Build.removeSortInventory('stats','hitrostvz');
 						
 					}
 					else if(key == 'stoikost'){
-						
 						Build.removeSortInventory('stats','stoikost');
-						
 						Build.removeSortInventory('stats','sv');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','stoikostrz');
-						
 						Build.removeSortInventory('stats','svvz');
-						
 						Build.removeSortInventory('stats','vs');
-						
 					}
 					else if(key == 'volia'){
-						
 						Build.removeSortInventory('stats','volia');
-						
 						Build.removeSortInventory('stats','sv');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','voliarz');
-						
 						Build.removeSortInventory('stats','svvz');
-						
 						Build.removeSortInventory('stats','vs');
-						
 					}
-					
 					Build.sortInventory();
-					
 					item.dataset.active = 0;
-					
-				}
-				else{
-					
+				} else {
 					item.style.background = '#5899';
-					
 					if(key == 'hp'){
-						
 						Build.setSortInventory('stats','hp');
-						
 						Build.setSortInventory('stats','krajahp');
-						
 						Build.setSortInventory('stats','krajahprz');
-						
 						Build.setSortInventory('stats','regenhpvz');
-						
 						Build.setSortInventory('stats','krajahpvz');
-						
 						Build.setSortInventory('stats','regenhp');
-						
 					}
 					else if(key == 'mp'){
-						
 						Build.setSortInventory('stats','mp');
-						
 						Build.setSortInventory('stats','regenmp');
-						
 						Build.setSortInventory('stats','krajamp');
-						
 						Build.setSortInventory('stats','regenmpvz');
-						
 					}
 					else if(key == 'speed'){
-						
 						Build.setSortInventory('stats','speedtal');
-						
 						Build.setSortInventory('stats','speedtalrz');
-						
 					}
 					else if(key == 'sila'){
-						
 						Build.setSortInventory('stats','sila');
-						
 						Build.setSortInventory('stats','sr');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','silarz');
-						
 						Build.setSortInventory('stats','silavz');
-						
 					}
 					else if(key == 'razum'){
-						
 						Build.setSortInventory('stats','razum');
-						
 						Build.setSortInventory('stats','sr');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','razumrz');
-						
 						Build.setSortInventory('stats','razumvz');
-						
 					}
 					else if(key == 'provorstvo'){
-						
 						Build.setSortInventory('stats','provorstvo');
-						
 						Build.setSortInventory('stats','ph');
-						
 						Build.setSortInventory('stats','provorstvorz');
-						
 						Build.setSortInventory('stats','provorstvovz');
-						
 					}
 					else if(key == 'hitrost'){
-						
 						Build.setSortInventory('stats','hitrost');
-						
 						Build.setSortInventory('stats','ph');
-						
 						Build.setSortInventory('stats','hitrostrz');
-						
 						Build.setSortInventory('stats','hitrostvz');
-						
 					}
 					else if(key == 'stoikost'){
-						
 						Build.setSortInventory('stats','stoikost');
-						
 						Build.setSortInventory('stats','sv');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','stoikostrz');
-						
 						Build.setSortInventory('stats','svvz');
-						
 						Build.setSortInventory('stats','vs');
-						
 					}
 					else if(key == 'volia'){
-						
 						Build.setSortInventory('stats','volia');
-						
 						Build.setSortInventory('stats','sv');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','voliarz');
-						
 						Build.setSortInventory('stats','svvz');
-						
 						Build.setSortInventory('stats','vs');
-						
-					}
-					else{
-						
+					} else {
 						Build.setSortInventory('stats',key);
-						
 					}
 					// Build.setSortInventory('stats','hp');
 					
 					Build.sortInventory();
-					
 					item.dataset.active = 1;
 					
 				}
