@@ -1236,6 +1236,8 @@ class View {
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
 		/*
+		setTimeout(() => {
+			
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
@@ -1248,7 +1250,10 @@ class View {
 		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+		
+		},5000);
 		*/
+		
 		return body;
 		
 	}
@@ -4514,6 +4519,8 @@ class MM {
 	
 	static close(){
 		
+		Sound.stop('tambur');
+		
 		MM.view.style.display = 'none';
 		
 	}
@@ -4866,14 +4873,13 @@ class MM {
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
 			hero.onclick = async () => {
-				
+				Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
+				return;
 				MM.targetHeroId = item.id;
 				
 				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 				MM.lobbyBuildView(MM.targetHeroId);
-				
-				// Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
 				
 			}
 			
@@ -4937,6 +4943,8 @@ class MM {
 		});
 		
 		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
+		
+		Sound.play('tambur.mp3',{id:'tambur',volume:0.50,loop:true});
 		
 		MM.show(body);
 		
@@ -5129,15 +5137,51 @@ class MM {
 
 class Sound {
 	
-	static play(source){
+	static all = new Object();
+	
+	static play(source,object = new Object()){
 		
 		let audio = new Audio();
+		
+		if( ('volume' in object) && (object.volume) ){
+			
+			audio.volume = object.volume;
+			
+		}
+		
+		if('loop' in object){
+			
+			audio.loop = true;
+			
+		}
 		
 		audio.preload = 'auto';
 		
 		audio.src = source;
 		
 		audio.play();
+		
+		if( ('id' in object) && (object.id) ){
+			
+			if( !(object.id in Sound.all) ){
+				
+				Sound.all[object.id] = audio;
+				
+			}
+			
+		}
+		
+	}
+	
+	static stop(id){
+		
+		if(id in Sound.all){
+			
+			Sound.all[id].pause();
+			
+			delete Sound.all[id];
+			
+		}
 		
 	}
 	
