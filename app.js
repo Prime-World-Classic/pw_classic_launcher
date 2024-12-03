@@ -4873,8 +4873,8 @@ class MM {
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
 			hero.onclick = async () => {
-				Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
-				return;
+				//Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
+				//return;
 				MM.targetHeroId = item.id;
 				
 				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
