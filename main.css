@@ -618,6 +618,8 @@ button.sets {
 	overflow: hidden;
 }
 .build-talents {
+	margin-top: -7px;
+
 	display: flex;
 	flex-flow: row wrap;
 
