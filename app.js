@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.0 (TEST)';
+APP_VERSION = '1.9.10 (TEST)';
 
 PW_VERSION = '1.9';
 
@@ -1236,6 +1236,8 @@ class View {
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
 		/*
+		setTimeout(() => {
+			
 		MM.lobby({id:1,users:{
 		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
 		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
@@ -1248,7 +1250,10 @@ class View {
 		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+		
+		},5000);
 		*/
+		
 		return body;
 		
 	}
@@ -1853,7 +1858,7 @@ class Build{
 		1: 12.0
 	}
 	
-	static async view(user,hero,nickname = ''){
+	static async view(user,hero,nickname = '',animate = true){
 		
 		let request = await App.api.request('build','get',{user:user,hero:hero});
 		
@@ -1885,7 +1890,11 @@ class Build{
 		
 		let bottom = DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`));
 		
-		bottom.style.opacity = 0;
+		if(animate){
+			
+			bottom.style.opacity = 0;
+			
+		}
 		
 		container.append(Build.viewModel(request,() => {
 			
@@ -2303,7 +2312,8 @@ class Build{
 			provorstvo:'Проворство',
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
-			volia:'Воля'
+			volia:'Воля',
+			damage: 'Урон'
 			
 		};
 		
@@ -2464,7 +2474,7 @@ class Build{
 			
 			Build.dataStats[key] = item;
 			
-			let daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
+			const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
 				
 				if(daw.dataset.status != 0){
 					
@@ -4453,6 +4463,8 @@ class MM {
 	
 	static close(){
 		
+		Sound.stop('tambur');
+		
 		MM.view.style.display = 'none';
 		
 	}
@@ -4486,7 +4498,7 @@ class MM {
 	}
 	
 	static async start(){
-		
+		/*
 		if(!await Protect.checkInstall()){
 			
 			MM.button.innerText = 'Проверка';
@@ -4500,7 +4512,7 @@ class MM {
 			return;
 			
 		}
-		
+		*/
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
@@ -4580,7 +4592,7 @@ class MM {
 		
 		MM.soundEvent();
 		
-		let button = DOM({style:'mm-ready-button',event:['click', async () => {
+		let button = DOM({style:'ready-button',event:['click', async () => {
 			
 			try{
 				
@@ -4599,10 +4611,14 @@ class MM {
 				
 			}
 			
-			
 			button.style.opacity = 0;
 			
 		}]},'Готов!');
+		
+		
+		button.style.fontSize = '2vw';
+		
+		button.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
 		
 		body.append(button);
 		
@@ -4612,7 +4628,11 @@ class MM {
 	
 	static async lobbyBuildView(heroId){
 		
-		let builds = await App.api.request('build','my',{hero:heroId});
+		if(MM.lobbyBuildField.firstChild){
+			
+			MM.lobbyBuildField.firstChild.remove();
+			
+		}
 		
 		while(MM.lobbyBuildTab.firstChild){
 			
@@ -4620,9 +4640,21 @@ class MM {
 			
 		}
 		
+		let builds = await App.api.request('build','my',{hero:heroId});
+		
 		for(let build of builds){
 			
-			let tab = DOM({event:['click',() => {
+			let tab = DOM({event:['click', async () => {
+				
+				await App.api.request('build','target',{id:build.id});
+				
+				for(let child of MM.lobbyBuildTab.children){
+					
+					child.style.background = 'rgba(255,255,255,0)';
+					
+				}
+				
+				tab.style.background = 'rgba(255,255,255,0.3)';
 				
 				if(MM.lobbyBuildField.firstChild){
 					
@@ -4636,7 +4668,7 @@ class MM {
 			
 			if(build.target){
 				
-				tab.style.background = 'rgba(255,255,255,0.4)';
+				tab.style.background = 'rgba(255,255,255,0.3)';
 				
 				if(MM.lobbyBuildField.firstChild){
 					
@@ -4678,13 +4710,27 @@ class MM {
 		
 		MM.lobbyBuildField = DOM();
 		
-		MM.lobbyBuildField.style.width = '28vw';
+		MM.lobbyBuildField.style.margin = '0.5vw 0';
 		
-		MM.lobbyBuildField.style.height = '28vw';
+		MM.lobbyBuildField.style.width = '25vw';
+		
+		MM.lobbyBuildField.style.height = '25vw';
 		
 		MM.lobbyBuildTab = DOM({style:'lobby-build-tab'});
 		
-		lobbyBuild.append(DOM({style:'mm-lobby-ready-button'}),MM.lobbyBuildField,MM.lobbyBuildTab);
+		MM.lobbyConfirm = DOM({style:'ready-button',event:['click', async () => {
+			
+			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
+			
+		}]},'Подтвердить');
+		
+		MM.lobbyConfirm.style.opacity = 0;
+		
+		MM.lobbyConfirm.style.width = '50%';
+		
+		MM.lobbyConfirm.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+		
+		lobbyBuild.append(MM.lobbyConfirm,MM.lobbyBuildField,MM.lobbyBuildTab);
 		
 		if(MM.targetHeroId){
 			
@@ -4699,6 +4745,8 @@ class MM {
 		for(let key of data.map){
 			
 			let player = DOM({id:`PLAYER${key}`,style:'mm-lobby-header-team-player'});
+			
+			player.dataset.hero = data.users[key].hero;
 			
 			let hero = DOM({style:'mm-lobby-header-team-player-hero'});
 			
@@ -4718,24 +4766,37 @@ class MM {
 				
 				player.append(hero,name);
 				
-				leftTeam.append(player);
-				
 			}
 			else{
 				
 				hero.style.backgroundImage = `url(hero/empty.png)`;
 				
-				player.append(hero,name);
-				
 			}
+			
+			player.append(hero,name);
 			
 			if(key == data.target) {
 				
-				//MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
 				
 			}
 			
-			if(data.users[App.storage.data.id].team !== data.users[key].team){
+			if(data.users[App.storage.data.id].team == data.users[key].team){
+				
+				leftTeam.append(player);
+				
+				player.onclick = () => {
+					
+					if(player.dataset.hero){
+						
+						Build.view(key,player.dataset.hero,data.users[key].nickname,false);
+						
+					}
+					
+				}
+				
+			}
+			else{
 				
 				name.style.opacity = 0;
 				
@@ -4751,17 +4812,18 @@ class MM {
 		
 		for(let item of MM.hero){
 			
-			let hero = DOM({id:`HERO${item.id}`,data:{active:0}});
+			let hero = DOM({id:`HERO${item.id}`,data:{ban:0}});
 
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
-			hero.onclick = () => {
-				
+			hero.onclick = async () => {
+				//Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
+				//return;
 				MM.targetHeroId = item.id;
 				
-				MM.lobbyBuildView(MM.targetHeroId);
+				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
-				//App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
+				MM.lobbyBuildView(MM.targetHeroId);
 				
 			}
 			
@@ -4777,23 +4839,16 @@ class MM {
 			
 		}
 		
-		let info = DOM({style:'lobby-info'});
 		
-		MM.selectHeroButton = DOM({style:'lobby-select-hero'},'Выбрать!');
-		
-		MM.selectHeroButton.addEventListener('click', async () => {
+		if(App.storage.data.id == data.target){
 			
-			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
-			
-		});
-		
-		if(App.storage.data.id != data.target){
-			
-			MM.selectHeroButton.style.opacity = 0;
+			MM.lobbyConfirm.style.opacity = 1;
 			
 		}
-		/*
-		await Timer.start(data.id,'Бой найден',() => {
+		
+		let info = DOM({style:'lobby-timer'});
+		
+		await Timer.start(data.id,'',() => {
 			
 			MM.close();
 			
@@ -4801,11 +4856,11 @@ class MM {
 			
 		});
 		
-		info.append(Timer.body,MM.selectHeroButton);
-		*/
+		info.append(Timer.body);
+		
 		MM.chatBody = DOM({style:'mm-lobby-middle-chat-body'});
 		
-		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и <Enter>'})
+		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и нажмите <Enter>'})
 		
 		chatInput.addEventListener('keyup', async (event) => {
 			
@@ -4833,6 +4888,8 @@ class MM {
 		
 		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
+		Sound.play('tambur.mp3',{id:'tambur',volume:0.50,loop:true});
+		
 		MM.show(body);
 		
 		for(let key in data.users){
@@ -4851,7 +4908,7 @@ class MM {
 				
 				findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 				
-				findHero.dataset.active = 1;
+				findHero.dataset.ban = key;
 				
 			}
 			
@@ -4859,33 +4916,25 @@ class MM {
 		
 	}
 	
-	static select(data){
+	static async select(data){
 		
-		Timer.start(() => {
+		Sound.play(`hero/${data.heroId}/revive/${data.sound}.mp3`);
+		
+		await Timer.start(data.id,'',() => {
 			
 			MM.close();
 			
-		},'',30);
+			MM.searchActive(true);
+			
+		});
 		
-		if(MM.intervalId){
-			
-			clearInterval(MM.intervalId);
-			
-		}
-		
-		if(MM.targetPlayerAnimate){
-			
-			MM.targetPlayerAnimate.cancel();
-			
-			MM.targetPlayerAnimate = false;
-			
-		}
-		
-		let findOldPlayer = document.getElementById(`PLAYER${data.id}`);
+		let findOldPlayer = document.getElementById(`PLAYER${data.userId}`);
 		
 		if(findOldPlayer){
 			
-			findOldPlayer.firstChild.src = `hero/${data.heroId}/1.png`;
+			findOldPlayer.dataset.hero = data.heroId;
+			
+			findOldPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
 			
 		}
 		
@@ -4893,7 +4942,25 @@ class MM {
 		
 		if(findPlayer){
 			
-			MM.targetPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
+			MM.lobbyPlayerAnimate.cancel();
+			
+			MM.lobbyPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+			
+		}
+		
+		for(let child of MM.lobbyHeroes.children){
+			
+			if(child.dataset.ban == data.userId){
+				
+				child.dataset.ban = 0;
+				
+				child.style.filter = 'none';
+				
+				child.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+				
+				break;
+				
+			}
 			
 		}
 		
@@ -4901,7 +4968,9 @@ class MM {
 		
 		if(findHero){
 			
-			findHero.style.backgroundColor = 'rgba(255,50,0,0.9)';
+			findHero.style.filter = 'grayscale(100%)';
+			
+			findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 			
 			findHero.onclick = false;
 			
@@ -4909,14 +4978,12 @@ class MM {
 		
 		if(App.storage.data.id == data.target){
 			
-			MM.soundEvent();
-			
-			MM.selectHeroButton.style.opacity = 1;
+			MM.lobbyConfirm.style.opacity = 1;
 			
 		}
 		else{
 			
-			MM.selectHeroButton.style.opacity = 0;
+			MM.lobbyConfirm.style.opacity = 0;
 			
 		}
 		
@@ -4942,10 +5009,12 @@ class MM {
 		
 		if(findPlayer){
 			
-			findPlayer.firstChild.src = `hero/${data.heroId}/1.png`;
+			findPlayer.dataset.hero = data.heroId;
+			
+			findPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
 			
 		}
-		
+		/*
 		let oldHero = MM.lobbyUsers[data.id].hero, countHero = 0;
 		
 		for(let key in MM.lobbyUsers){
@@ -4987,7 +5056,7 @@ class MM {
 			}
 			
 		}
-		
+		*/
 	}
 	
 	static chat(data){
@@ -5010,6 +5079,58 @@ class MM {
 	
 }
 
+class Sound {
+	
+	static all = new Object();
+	
+	static play(source,object = new Object()){
+		
+		let audio = new Audio();
+		
+		if( ('volume' in object) && (object.volume) ){
+			
+			audio.volume = object.volume;
+			
+		}
+		
+		if('loop' in object){
+			
+			audio.loop = true;
+			
+		}
+		
+		audio.preload = 'auto';
+		
+		audio.src = source;
+		
+		audio.play();
+		
+		if( ('id' in object) && (object.id) ){
+			
+			if( !(object.id in Sound.all) ){
+				
+				Sound.all[object.id] = audio;
+				
+			}
+			
+		}
+		
+	}
+	
+	static stop(id){
+		
+		if(id in Sound.all){
+			
+			Sound.all[id].pause();
+			
+			delete Sound.all[id];
+			
+		}
+		
+	}
+	
+}
+
 class Timer {
 	
 	static intervalId = false;
@@ -5023,6 +5144,8 @@ class Timer {
 	}
 	
 	static async start(id,name,callback){
+		
+		Timer.stop();
 		
 		Timer.callback = callback;
 		
@@ -5060,13 +5183,7 @@ class Timer {
 		
 		if( (Date.now() - Timer.timeFinish) >= 0){
 			
-			if(Timer.intervalId){
-				
-				clearInterval(Timer.intervalId);
-				
-				Timer.intervalId = false;
-				
-			}
+			Timer.stop();
 			
 			Timer.callback();
 			
