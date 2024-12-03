@@ -2139,11 +2139,9 @@ class Build{
 		}
 		Build.installedTalents = new Array(36).fill(null);
 		Build.profileStats = new Object();
-		Build.specialStats = new Object();
 		
 		Build.list(request.build);
 
-		// TODO replace to real values
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
 		request.hero.stats['attackSpeed'] = 0;
@@ -2628,7 +2626,7 @@ class Build{
 		{
 			// TODO: make hero damage calculation
 			let damage = Build.heroMainAttackStat == 1 ? statStrength : statInt;
-			Build.specialStats['damage'] = damage * Build.heroAttackModifier;
+			Build.dataStats['damage'].lastChild.innerText = Math.round(damage * Build.heroAttackModifier * 10.0) / 10.0;
 		}
 
 		{
@@ -2643,26 +2641,25 @@ class Build{
 			} else {
 				penetration += 59.83 + 0.57 * statCun - 20.73 * Math.log(statCun);
 			}
-			Build.specialStats['penetration'] = penetration;
+			Build.dataStats['punching'].lastChild.innerText = Math.round(penetration) + '%';;
 		}
 
 		{
 			let defStamina = 0.5355 * (statStamina + 0.3 * statWill) - 20;
 			let defWill = 0.5355 * (statWill + 0.3 * statStamina) - 20;
 
-			Build.specialStats['defStamina'] = defStamina;
-			Build.specialStats['defWill'] = defWill;
+			Build.dataStats['protectionBody'].lastChild.innerText = Math.round(defStamina) + '%';;
+			Build.dataStats['protectionSpirit'].lastChild.innerText = Math.round(defWill) + '%';;
 		}
 
 		{
 			let crit = 62.765 - 11534.0 / (126.04 + statCun);
-			Build.specialStats['crit'] = crit;
+			Build.dataStats['critProb'].lastChild.innerText = Math.round(crit) + '%';
 		}
 
 		{
 			let attackSpeed = Math.min(2.0, 0.00364 * statAg + 0.49);
-			Build.specialStats['attackSpeed'] = attackSpeed;
-			let i = 1;
+			Build.dataStats['attackSpeed'].lastChild.innerText = Math.round(attackSpeed * 100.0) / 100.0;
 		}
 	}
 
