@@ -3124,7 +3124,7 @@ class Build{
 				View.show('build',Build.heroId);
 				Splash.hide();
 			}]}, 'Сбросить')
-			const close = DOM({event:['click',() => Splash.hide()]},'[Х]')
+			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
 			const wrap = DOM({style: 'wrap'}, reset, close);
 			const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
 			Splash.show(dom)
