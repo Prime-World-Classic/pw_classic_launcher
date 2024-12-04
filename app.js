@@ -1826,7 +1826,7 @@ class Build{
 		sv: 'Стойкость/Воля',
 		razum: 'Разум',
 		sila: 'Сила',
-		speedtal: 'Скорость',
+		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
 		krajahp: 'Кража здоровья',
 		regenhp: 'Регенерация здоровья',
@@ -1834,7 +1834,8 @@ class Build{
 		krajamp: 'Кража энергии',
 		stoikostrz: 'Стойкость на родной земле',
 		voliarz: 'Воля на родной земле',
-		speedtalrz: 'Скорость на родной земле',
+		speedtalrz: '%<speedtal></speedtal> на родной земле',
+		speedtalvz: '%<speedtal></speedtal> на вражеской земле',
 		hitrostrz: 'Хитрость на родной земле',
 		provorstvorz: 'Проворство на родной земле',
 		silarz: 'Сила на родной земле',
@@ -1848,7 +1849,10 @@ class Build{
 		razumvz: 'Разум на вражеской земле',
 		svvz: 'Стойкость/Воля на вражеской земле',
 		krajahpvz: 'Кража здоровья на вражеской земле',
-		vs: 'Воля/Стойкость'
+		vs: 'Воля/Стойкость',
+		speed: 'Скорость',
+		speedrz: 'Скорость на родной земле',
+		speedvz: 'Скорость на вражеской или нейтральной земле',
 	};
 	
 	static talentRefineByRarity = {
@@ -2626,7 +2630,10 @@ class Build{
 		{
 			// TODO: make hero damage calculation
 			let damage = Build.heroMainAttackStat == 1 ? statStrength : statInt;
-			Build.dataStats['damage'].lastChild.innerText = Math.round(damage * Build.heroAttackModifier * 10.0) / 10.0;
+			let dmgMin = Math.round(damage * Build.heroAttackModifier * 0.9);
+			let dmgMax = Math.round(damage * Build.heroAttackModifier * 1.1);
+			let dmgTag = Build.heroMainAttackStat == 1 ? '<fiz> </fiz>' : '<mag> </mag>';
+			Build.dataStats['damage'].lastChild.innerHTML = dmgMin + '-' + dmgMax + dmgTag;
 		}
 
 		{
@@ -3783,7 +3790,10 @@ class Build{
 				if( ('stats' in data) && (data.stats) ){
 					
 					for(let key in data.stats){
-						
+						if (key == 'speed' || key == 'speedrz' || key == 'speedvz') {
+							continue;
+						}
+
 						let statValue = parseFloat(data.stats[key]);
 						
 						if ('statsRefine' in data && 'rarity' in data) {
@@ -3792,7 +3802,8 @@ class Build{
 							statValue += refineBonus * refineMul;
 						}
 
-						stats += `+${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
+						let sign = key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz' ? '-' : '+';
+						stats += sign +`${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
 						
 					}
 					
