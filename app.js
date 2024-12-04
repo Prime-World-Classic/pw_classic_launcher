@@ -2674,7 +2674,7 @@ class Build{
 
 		{
 			let crit = 62.765 - 11534.0 / (126.04 + statCun);
-			Build.dataStats['critProb'].lastChild.innerText = Math.round(crit) + '%';
+			Build.dataStats['critProb'].lastChild.innerText = Math.max(0.0, Math.round(crit)) + '%';
 		}
 
 		{
