@@ -2036,13 +2036,7 @@ class Build{
 
 		Build.descriptionView = document.createElement('div');
 		
-		let invalidDescriptions = document.getElementsByClassName('build-description');
-		for (let descElement in invalidDescriptions) {
-			if (invalidDescriptions[descElement].className && invalidDescriptions[descElement].className == 'build-description') {
-				console.log('Удалено протухшее описание');
-				invalidDescriptions[descElement].remove();
-			}
-		}
+		Build.CleanInvalidDescriptions();
 		
 		Build.descriptionView.classList.add('build-description');
 		
@@ -2172,6 +2166,16 @@ class Build{
 		
 	}
 	
+	static CleanInvalidDescriptions() {
+		let invalidDescriptions = document.getElementsByClassName('build-description');
+		for (let descElement in invalidDescriptions) {
+			if (invalidDescriptions[descElement].className && invalidDescriptions[descElement].className == 'build-description') {
+				console.log('Удалено протухшее описание');
+				invalidDescriptions[descElement].remove();
+			}
+		}
+	}
+
 	static skinChange(){
 		
 		let bodyHero = DOM({style:'skin-change'});
@@ -2283,7 +2287,10 @@ class Build{
 
 		Build.listView.append(buildButtonsWrapper);
 
-		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('builds')]},'[X]'));
+		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
+			View.show('builds'); 
+			Build.CleanInvalidDescriptions();
+		}]},'[X]'));
 	}
 
 	static totalStat(stat){
@@ -3827,7 +3834,7 @@ class Build{
 				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
 				let paramIterator = 0;
 				for (let specialTag of innerChilds) {
-					if (specialTag.innerHTML != '%s') {
+					if (specialTag.innerHTML != '%s' || !data.params) {
 						continue;
 					}
 					let params = data.params.split(';');
