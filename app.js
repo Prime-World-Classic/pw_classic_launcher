@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.10 (TEST)';
+APP_VERSION = '1.9.15 (TEST)';
 
 PW_VERSION = '1.9';
 
@@ -4798,26 +4798,15 @@ class MM {
 			
 			let name = DOM({style:'mm-lobby-header-team-player-name'},`${data.users[key].nickname}`);
 			
-			if(data.users[key].hero){
-				
-				hero.style.backgroundImage = `url(hero/${data.users[key].hero}/1.png)`;
-				
-				let rankIcon = DOM({style:'rank-icon'});
-				
-				rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(data.users[key].rating)}.png)`;
-				
-				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.users[key].rating),rankIcon);
-				
-				hero.append(rank);
-				
-				player.append(hero,name);
-				
-			}
-			else{
-				
-				hero.style.backgroundImage = `url(hero/empty.png)`;
-				
-			}
+			let rankIcon = DOM({style:'rank-icon'});
+			
+			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(data.users[key].rating)}.png)`;
+			
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.users[key].rating),rankIcon);
+			
+			hero.append(rank);
+			
+			hero.style.backgroundImage = (data.users[key].hero) ? `url(hero/${data.users[key].hero}/1.png)` : `url(hero/empty.png)`;
 			
 			player.append(hero,name);
 			
@@ -4964,7 +4953,9 @@ class MM {
 	
 	static async select(data){
 		
-		Sound.play(`hero/${data.heroId}/revive/${data.sound}.mp3`);
+		Sound.play(`hero/${data.heroId}/revive/${data.sound}.mp3`,{volume:0.75});
+		
+		MM.lobbyPlayerAnimate.cancel();
 		
 		await Timer.start(data.id,'',() => {
 			
@@ -4982,15 +4973,21 @@ class MM {
 			
 			findOldPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
 			
+			findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
+			
+			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
+			
 		}
 		
-		let findPlayer = document.getElementById(`PLAYER${data.target}`);
-		
-		if(findPlayer){
+		if(data.target != 0){
 			
-			MM.lobbyPlayerAnimate.cancel();
+			let findPlayer = document.getElementById(`PLAYER${data.target}`);
 			
-			MM.lobbyPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+			if(findPlayer){
+				
+				MM.lobbyPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				
+			}
 			
 		}
 		
@@ -5058,6 +5055,10 @@ class MM {
 			findPlayer.dataset.hero = data.heroId;
 			
 			findPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
+			
+			findPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
+			
+			findPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
 			
 		}
 		/*
