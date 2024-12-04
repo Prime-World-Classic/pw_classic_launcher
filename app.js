@@ -1235,7 +1235,6 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		/*
 		setTimeout(() => {
 			
 		MM.lobby({id:1,users:{
@@ -1252,7 +1251,6 @@ class View {
 		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
 		
 		},5000);
-		*/
 		
 		return body;
 		
@@ -4804,7 +4802,7 @@ class MM {
 			
 			if(key == data.target) {
 				
-				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1.1)','scale(1)']},{duration:3500,iterations:Infinity,easing:'ease-in-out'});
 				
 			}
 			
