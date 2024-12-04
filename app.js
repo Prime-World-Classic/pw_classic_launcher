@@ -2297,8 +2297,8 @@ class Build{
 
 		Build.heroPowerFromInstalledTalents = 0.0;
 
-		Build.heroMainAttackStat = 1; // osn_param
-		Build.heroAttackModifier = 1.0; // aa_koef 
+		Build.heroMainAttackStat = data.param; // osn_param
+		Build.heroAttackModifier = data.koef; // aa_koef 
 		
 		for(let stat in data.stats){
 			Build.initialStats[stat] = parseFloat(data.stats[stat]);
@@ -2976,8 +2976,7 @@ class Build{
 		
 		talent.classList.add('build-talent-item');
 
-		// fake params
-		data.params = "all,8,74,num,razum";
+		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
 		
 		Build.talents[data.id] = data;
 		
