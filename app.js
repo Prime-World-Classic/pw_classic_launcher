@@ -3835,65 +3835,73 @@ class Build{
 				
 				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
 				let paramIterator = 0;
-				for (let specialTag of innerChilds) {
-					let tagString = specialTag.innerHTML;
-					if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
-						continue;
-					}
-					let params = data.params.split(';');
-					if (paramIterator >= params.length) {
-						continue;
-					}
-					let param = params[paramIterator];
-					let paramValues = param.split(',');
+				for (let outerTag of innerChilds) {
+					for (let specialTag of outerTag.childNodes) {
+						let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
+						if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
+							continue;
+						}
+						let params = data.params.split(';');
+						if (paramIterator >= params.length) {
+							continue;
+						}
+						let param = params[paramIterator];
+						let paramValues = param.split(',');
 
-					let statAffection, minValue, maxValue;
+						let statAffection, minValue, maxValue;
 
-					if (paramValues.length == 5) {
-						//let applyTo = paramValues[0];
-						minValue = parseFloat(paramValues[1]);
-						maxValue = parseFloat(paramValues[2]);
-						//let applicator = paramValues[3];
-						statAffection = paramValues[4];
-					} 
-					else if (paramValues.length == 3) {
-						minValue = parseFloat(paramValues[0]);
-						maxValue = parseFloat(paramValues[1]);
-						statAffection = paramValues[2];
-					}
+						if (paramValues.length == 5) {
+							//let applyTo = paramValues[0];
+							minValue = parseFloat(paramValues[1]);
+							maxValue = parseFloat(paramValues[2]);
+							//let applicator = paramValues[3];
+							statAffection = paramValues[4];
+						}
+						else if (paramValues.length == 3) {
+							minValue = parseFloat(paramValues[0]);
+							maxValue = parseFloat(paramValues[1]);
+							statAffection = paramValues[2];
+						}
 
-					let resolvedStatAffection;
-					switch (statAffection) {
-						case 'sr_max':
-							resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
-							break;
-						case 'sv_max':		
-							resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
-							break;		
-						case 'ph_max':		
-							resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
-							break;
-						default:
-							resolvedStatAffection = statAffection;
-							break;		
-					}
+						let resolvedStatAffection;
+						switch (statAffection) {
+							case 'sr_max':
+								resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+								break;
+							case 'sv_max':
+								resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+								break;
+							case 'ph_max':
+								resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+								break;
+							default:
+								resolvedStatAffection = statAffection;
+								break;
+						}
 
-					function lerp( a, b, alpha ) {
-						return a + alpha * ( b - a );
-					}
+						function lerp(a, b, alpha) {
+							return a + alpha * (b - a);
+						}
 
-					if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
-						let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
-						const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
-						const param1 = isHpOrEnergy ? 600.0 : 50.0;
-						const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-						specialTag.innerHTML = tagString.replace('%s', Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)));
-					} else {
-						let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-						specialTag.innerHTML = tagString.replace('%s', Math.round(minValue + maxValue * refineBonus));
+						let outputString;
+						if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+							let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+							const param1 = isHpOrEnergy ? 600.0 : 50.0;
+							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+							outputString = Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2));
+						} else {
+							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+							outputString = Math.round(minValue + maxValue * refineBonus);
+						}
+
+						if (specialTag.innerHTML) {
+							specialTag.innerHTML = tagString.replace('%s', outputString);
+						} else {
+							outerTag.innerHTML = tagString.replace('%s', outputString);
+						}
+						paramIterator++;
 					}
-					
-					paramIterator++;
 				}
 			}
 			
