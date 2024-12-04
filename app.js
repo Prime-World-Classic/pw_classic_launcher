@@ -3119,10 +3119,15 @@ class Build{
 		reset.src = 'trash.svg';
 		reset.classList.add('reset');
 		reset.addEventListener('click', async () => {
-			if (confirm('Сбросить таланты в этом билде?')) {
+			const reset = DOM({event:['click', async () => {
 				await App.api.request('build','clear',{id:Build.id});
 				View.show('build',Build.heroId);
-			}
+				Splash.hide();
+			}]}, 'Сбросить')
+			const close = DOM({event:['click',() => Splash.hide()]},'[Х]')
+			const wrap = DOM({style: 'wrap'}, reset, close);
+			const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
+			Splash.show(dom)
 		});
 		Build.rarityView.append(reset);
 	}
