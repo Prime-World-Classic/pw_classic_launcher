@@ -2033,8 +2033,16 @@ class Build{
 	static async init(heroId,targetId){
 		
 		Build.talents = new Object();
-		
+
 		Build.descriptionView = document.createElement('div');
+		
+		let invalidDescriptions = document.getElementsByClassName('build-description');
+		for (let descElement in invalidDescriptions) {
+			if (invalidDescriptions[descElement].className && invalidDescriptions[descElement].className == 'build-description') {
+				console.log('Удалено протухшее описание');
+				invalidDescriptions[descElement].remove();
+			}
+		}
 		
 		Build.descriptionView.classList.add('build-description');
 		
@@ -3763,6 +3771,12 @@ class Build{
 			let positionElement = element.getBoundingClientRect();
 			
 			let data = Build.talents[element.dataset.id];
+
+			if (!data) {
+				console.log("Не найден талант в билде: " + element.dataset.id)
+				Build.descriptionView.style.display = 'none';
+				return;
+			}
 			
 			if( (!data.name) || (!data.description) ){
 				
