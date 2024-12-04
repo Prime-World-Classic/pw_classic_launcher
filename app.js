@@ -1235,22 +1235,20 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		setTimeout(() => {
-			
-		MM.lobby({id:1,users:{
-		1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
-		10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
-		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
-		2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
-		4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
-		5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
-		6:{nickname:'Stagven_YouTube',hero:2,ready:1,rating:1100,select:false,team:2},
-		7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
-		8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
-		9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
-		
-		},5000);
+		// setTimeout(() => {
+		// 	MM.lobby({id:1,users:{
+		// 	1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
+		// 	10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+		// 	1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
+		// 	2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
+		// 	4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
+		// 	5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+		// 	6:{nickname:'Stagven_YouTube',hero:2,ready:1,rating:1100,select:false,team:2},
+		// 	7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
+		// 	8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
+		// 	9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
+		// 	},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+		// }, 5000);
 		
 		return body;
 		
