@@ -1095,11 +1095,10 @@ text-align:center;
 }
 
 .splash-content{
-	
-	width:25vw;
+	width: 35vw;
 	display:flex;
 	flex-flow:column nowrap;
-	font: 1.5rem / 1 Verdana;
+	font: 2rem / 1 Verdana;
 	color:rgba(255,255,255,0.8);
 	
 }
