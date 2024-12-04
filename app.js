@@ -3858,7 +3858,7 @@ class Build{
 						return a + alpha * ( b - a );
 					}
 
-					if (resolvedStatAffection in Build.dataStats) {
+					if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
 						let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
 						const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
 						const param1 = isHpOrEnergy ? 600.0 : 50.0;
