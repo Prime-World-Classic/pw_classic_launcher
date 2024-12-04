@@ -2375,8 +2375,9 @@ class Build{
 						Build.removeSortInventory('stats','regenmpvz');
 					}
 					else if(key == 'speed'){
-						Build.removeSortInventory('stats','speedtal');
-						Build.removeSortInventory('stats','speedtalrz');
+						Build.removeSortInventory('stats','speed');
+						Build.removeSortInventory('stats','speedrz');
+						Build.removeSortInventory('stats','speedvz');
 					}
 					else if(key == 'sila'){
 						Build.removeSortInventory('stats','sila');
@@ -2441,8 +2442,9 @@ class Build{
 						Build.setSortInventory('stats','regenmpvz');
 					}
 					else if(key == 'speed'){
-						Build.setSortInventory('stats','speedtal');
-						Build.setSortInventory('stats','speedtalrz');
+						Build.setSortInventory('stats','speed');
+						Build.setSortInventory('stats','speedrz');
+						Build.setSortInventory('stats','speedvz');
 					}
 					else if(key == 'sila'){
 						Build.setSortInventory('stats','sila');
@@ -3834,7 +3836,8 @@ class Build{
 				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
 				let paramIterator = 0;
 				for (let specialTag of innerChilds) {
-					if (specialTag.innerHTML != '%s' || !data.params) {
+					let tagString = specialTag.innerHTML;
+					if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
 						continue;
 					}
 					let params = data.params.split(';');
@@ -3884,10 +3887,10 @@ class Build{
 						const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
 						const param1 = isHpOrEnergy ? 600.0 : 50.0;
 						const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-						specialTag.innerHTML = Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2));
+						specialTag.innerHTML = tagString.replace('%s', Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)));
 					} else {
 						let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-						specialTag.innerHTML = Math.round(minValue + maxValue * refineBonus);
+						specialTag.innerHTML = tagString.replace('%s', Math.round(minValue + maxValue * refineBonus));
 					}
 					
 					paramIterator++;
