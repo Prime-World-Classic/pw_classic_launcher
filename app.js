@@ -1849,6 +1849,8 @@ class Build{
 		speed: 'Скорость',
 		speedrz: 'Скорость на родной земле',
 		speedvz: 'Скорость на вражеской или нейтральной земле',
+		dopspeed: 'Дополнительный бонус к скорости',
+		speedstak: 'Стак скорости',
 	};
 	
 	static talentRefineByRarity = {
@@ -2141,6 +2143,10 @@ class Build{
 		}
 		Build.installedTalents = new Array(36).fill(null);
 		Build.profileStats = new Object();
+
+		Build.applyRz = true;
+		Build.applyVz = false;
+		Build.applyStak = true;
 		
 		Build.list(request.build);
 
@@ -2785,19 +2791,39 @@ class Build{
 			}
 			
 		}
+
+		function calcualteSpecialStats(keyStat, statChange) {
+			if (keyStat in Build.calculationStats) {
+				if (keyStat == 'speed') {
+					Build.calculationStats[keyStat] = Math.max(Build.calculationStats[keyStat], statChange);
+				} else {
+					Build.calculationStats[keyStat] += fold ? statChange : -statChange;
+				}
+			}
+		}
 			
 		// Apply animation and change stats in Build.calculationStats
 		for(let key2 in add){
+			
+			let statChange = parseFloat(add[key2]);
+			if (Build.applyStak && key2.indexOf('stak') != -1) {
+				calcualteSpecialStats(key2.replace('stak', ''), statChange);
+			}
+			if (Build.applyRz && key2.indexOf('rz') != -1) {
+				calcualteSpecialStats(key2.replace('rz', ''), statChange);
+			}
+			if (Build.applyVz && key2.indexOf('vz') != -1) {
+				calcualteSpecialStats(key2.replace('vz', ''), statChange);
+			}
+			if (key2.indexOf('dop') != -1) {
+				calcualteSpecialStats(key2.replace('dop', ''), statChange);
+			}
+			calcualteSpecialStats(key2, statChange);
 			
 			if( !(key2 in Build.dataStats) ){
 				
 				continue;
 				
-			}
-			
-			if (key2 in Build.calculationStats) {
-				let statChange = parseFloat(add[key2]);
-				Build.calculationStats[key2] += fold ? statChange : -statChange;
 			}
 			
 			if(animation){
@@ -2882,6 +2908,17 @@ class Build{
 			
 		}
 		
+	}
+
+	static talentStatFilter(stat) {
+		return (
+			stat.indexOf('stak') != -1 || 
+			stat.indexOf('rz') != -1 || 
+			stat.indexOf('vz') != -1 || 
+			stat.indexOf('stak') != -1 || 
+			stat.indexOf('dop') != -1 || 
+			stat.indexOf('speed') != -1 && stat.indexOf('speedTal') == -1
+		);
 	}
 	
 	static field(data){
@@ -2992,6 +3029,26 @@ class Build{
 		const talent = document.createElement('div');
 		
 		talent.classList.add('build-talent-item');
+
+		if (data.txtNum) {
+			let params = data.txtNum.split(';');
+			if (!data.stats) {
+				data.stats = new Object();
+			}
+			if (!data.statsRefine) {
+				data.statsRefine = new Object();
+			}
+			for (let param in params) {
+				let paramValues = params[param].split(',');
+				if (
+					Build.talentStatFilter(paramValues[2]) || 
+					!(paramValues[2] in data.stats) && (paramValues[2] in Build.initialStats) && (Build.initialStats[paramValues[2]] > 0)
+				) {
+					data.stats[paramValues[2]] = parseFloat(paramValues[0]);
+					data.statsRefine[paramValues[2]] = parseFloat(paramValues[1]);
+				}
+			}
+		}
 
 		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
 		
@@ -3813,7 +3870,7 @@ class Build{
 				if( ('stats' in data) && (data.stats) ){
 					
 					for(let key in data.stats){
-						if (key == 'speed' || key == 'speedrz' || key == 'speedvz') {
+						if (Build.talentStatFilter(key)) {
 							continue;
 						}
 
