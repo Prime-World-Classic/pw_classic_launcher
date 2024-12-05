@@ -339,15 +339,15 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero-stats-line{
-	
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
 	align-items:center;
 	margin-bottom:5px;
-	
 }
-
+.build-hero-stats-line:nth-child(n+10) {
+	border-bottom: 1px solid #777;
+}
 .build-hero-stats-item{
 	
 	display:flex;
