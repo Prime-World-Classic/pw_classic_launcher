@@ -1427,7 +1427,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 	margin-top:1vh;
 	font: 1vw / 1 Verdana;
-    color: rgba(255, 255, 255, 0.5);
+	color: #fff;
     text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 	text-align:center;
 	white-space: nowrap;
