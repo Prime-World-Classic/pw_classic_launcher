@@ -2086,6 +2086,8 @@ class Build{
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO еще не готово - команда PW Classic работает над этим';
 		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
+		
+		buttonSets.addEventListener('click',() => Build.sets());
 
 		const buttonsTalentsAndSets = document.createElement('div');
 		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
@@ -2181,6 +2183,18 @@ class Build{
 				invalidDescriptions[descElement].remove();
 			}
 		}
+	}
+	
+	static async sets(){
+		
+		let sets = await App.api.request('build','sets');
+		
+		for(let set of sets){
+			
+			console.log(set);
+			
+		}
+		
 	}
 
 	static skinChange(){
