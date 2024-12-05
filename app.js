@@ -2147,6 +2147,7 @@ class Build{
 		Build.applyRz = true;
 		Build.applyVz = false;
 		Build.applyStak = true;
+		Build.applyBuffs = true;
 		
 		Build.list(request.build);
 
@@ -2808,17 +2809,21 @@ class Build{
 			let statChange = parseFloat(add[key2]);
 			if (Build.applyStak && key2.indexOf('stak') != -1) {
 				calcualteSpecialStats(key2.replace('stak', ''), statChange);
-			}
+			} else
 			if (Build.applyRz && key2.indexOf('rz') != -1) {
 				calcualteSpecialStats(key2.replace('rz', ''), statChange);
-			}
+			} else
 			if (Build.applyVz && key2.indexOf('vz') != -1) {
 				calcualteSpecialStats(key2.replace('vz', ''), statChange);
-			}
+			} else
 			if (key2.indexOf('dop') != -1) {
 				calcualteSpecialStats(key2.replace('dop', ''), statChange);
+			} else
+			if (Build.applyBuffs && key2.indexOf('buff') != -1) {
+				calcualteSpecialStats(key2.replace('buff', ''), statChange);
+			} else {
+				calcualteSpecialStats(key2, statChange);
 			}
-			calcualteSpecialStats(key2, statChange);
 			
 			if( !(key2 in Build.dataStats) ){
 				
@@ -2917,6 +2922,7 @@ class Build{
 			stat.indexOf('vz') != -1 || 
 			stat.indexOf('stak') != -1 || 
 			stat.indexOf('dop') != -1 || 
+			stat.indexOf('buff') != -1 || 
 			stat.indexOf('speed') != -1 && stat.indexOf('speedTal') == -1
 		);
 	}
@@ -3040,12 +3046,12 @@ class Build{
 			}
 			for (let param in params) {
 				let paramValues = params[param].split(',');
-				if (
-					Build.talentStatFilter(paramValues[2]) || 
-					!(paramValues[2] in data.stats) && (paramValues[2] in Build.initialStats) && (Build.initialStats[paramValues[2]] > 0)
-				) {
+				if (Build.talentStatFilter(paramValues[2])) {
 					data.stats[paramValues[2]] = parseFloat(paramValues[0]);
 					data.statsRefine[paramValues[2]] = parseFloat(paramValues[1]);
+				} else if (!(paramValues[2] in data.stats) && (paramValues[2] in Build.initialStats) && (Build.initialStats[paramValues[2]] > 0)) {
+					data.stats[paramValues[2] + 'buff'] = parseFloat(paramValues[0]);
+					data.statsRefine[paramValues[2] + 'buff'] = parseFloat(paramValues[1]);
 				}
 			}
 		}
