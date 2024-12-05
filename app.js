@@ -4845,7 +4845,7 @@ class MM {
 		
 		MM.lobbyConfirm.style.width = '50%';
 		
-		MM.lobbyConfirm.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:1500,iterations:Infinity,easing:'ease-in-out'});
+		MM.lobbyConfirm.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:2000,iterations:Infinity,easing:'ease-in-out'});
 		
 		lobbyBuild.append(MM.lobbyConfirm,MM.lobbyBuildField,MM.lobbyBuildTab);
 		
