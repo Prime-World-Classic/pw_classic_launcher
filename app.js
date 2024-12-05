@@ -2937,7 +2937,7 @@ class Build{
 			stat.indexOf('stak') != -1 || 
 			stat.indexOf('dop') != -1 || 
 			stat.indexOf('buff') != -1 || 
-			stat.indexOf('speed') != -1 && stat.indexOf('speedTal') == -1
+			(stat.indexOf('speed') != -1 && stat.indexOf('speedtal') == -1)
 		);
 	}
 	
