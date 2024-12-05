@@ -1424,7 +1424,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 }
 
 .mm-lobby-header-team-player-name{
-	
+	padding: 2px;
 	margin-top:1vh;
 	font: 1vw / 1 Verdana;
 	color: #fff;
