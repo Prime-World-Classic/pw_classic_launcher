@@ -4883,7 +4883,7 @@ class MM {
 			
 			if(key == data.target) {
 				
-				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1.1)','scale(1)']},{duration:3500,iterations:Infinity,easing:'ease-in-out'});
+				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1.1)','scale(1)']},{duration:2500,iterations:Infinity,easing:'ease-in-out'});
 				
 			}
 			
