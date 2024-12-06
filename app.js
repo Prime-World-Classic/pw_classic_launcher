@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.0 (TEST)';
+APP_VERSION = '1.9.15 (TEST)';
 
 PW_VERSION = '1.9';
 
@@ -754,6 +754,14 @@ class View {
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
 	
+	static setCss(name = 'style.css'){
+		
+		let css = DOM({tag:'link',rel:'stylesheet',href:name});
+		
+		document.head.appendChild(css);
+		
+	}
+	
 	static async show(method,value,value2){
 		
 		if( !(method in View) ){
@@ -846,6 +854,22 @@ class View {
 		
 	}
 	
+	static castle(){
+		
+		// View.setCss('castle.css');
+		
+		let canvas = DOM({tag:'canvas',style:'body-canvas'});
+		
+		// App.storage.data.fraction; тут будет инфа о стороне 1 или 2 
+		
+		canvas.style.width = '100vw';
+		
+		canvas.style.height = '100vh';
+		
+		return canvas;
+		
+	}
+	
 	static header(){
 		
 		let play = MM.play();
@@ -854,15 +878,56 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		return DOM({style:'main-header'},
-		DOM({tag:'img',src:'logo.png',event:['click',() => View.show('main')]}),
-		play,
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'logo.png',event:['click',() => View.show('main')]}),play);
+		
+		if(App.isAdmin()){
+			
+			let adm = DOM({style:'main-header-item',event:['click',() => {
+				
+				let body = document.createDocumentFragment();
+				
+				body.append(DOM({style:'splash-content-button',event:['click',() => {
+					
+					View.show('talents');
+					
+					Splash.hide();
+					
+				}]},'Таланты (обычные)'),DOM({style:'splash-content-button',event:['click',() => {
+					
+					View.show('talents2');
+					
+					Splash.hide();
+					
+				}]},'Таланты (классовые)'),DOM({style:'splash-content-button',event:['click',() => {
+					
+					View.show('users');
+					
+					Splash.hide();
+					
+				}]},'Пользователи'),DOM({style:'splash-content-button',event:['click',() => Splash.hide()]},'[X]'));
+				
+				Splash.show(body);
+				
+			}]},'Админ');
+			
+			adm.classList.add('animation1');
+			
+			adm.style.color = 'rgba(255,255,255,1)';
+			
+			menu.append(adm);
+			
+		}
+		
+		menu.append(
+		DOM({style:'main-header-item',event:['click',() => View.show('main')]},'Лобби'),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
-		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Зал славы'),
-		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'3 в ряд'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
+		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
+		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
+		DOM({style:'main-header-item',event:['click',() => App.exit()]},'[X]')
 		);
+		
+		return menu;
 		
 	}
 	
@@ -1170,20 +1235,21 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		/*
-		MM.lobby({id:1,users:{
-		1:{nickname:'ifst',hero:4,ready:1,select:false,team:1},
-		10:{nickname:'Nesh',hero:3,ready:1,select:false,team:1},
-		1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,select:false,team:1},
-		2:{nickname:'Коао',hero:22,ready:1,select:false,team:1},
-		4:{nickname:'XIIIAngel',hero:12,ready:1,select:false,team:1},
-		5:{nickname:'Lantarm',hero:8,ready:1,select:false,team:2},
-		6:{nickname:'Stagven_YouTube',hero:2,ready:1,select:false,team:2},
-		7:{nickname:'Farfania',hero:9,ready:1,select:false,team:2},
-		8:{nickname:'Rekongstor',hero:25,ready:1,select:false,team:2},
-		9:{nickname:'Hatem',hero:0,ready:1,select:false,team:2}
-		},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
-		*/
+		// setTimeout(() => {
+		// 	MM.lobby({id:1,users:{
+		// 	1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
+		// 	10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+		// 	1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
+		// 	2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
+		// 	4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
+		// 	5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+		// 	6:{nickname:'Stagven_YouTube',hero:2,ready:1,rating:1100,select:false,team:2},
+		// 	7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
+		// 	8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
+		// 	9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
+		// 	},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+		// }, 5000);
+		
 		return body;
 		
 	}
@@ -1523,11 +1589,11 @@ class View {
 		
 	}
 	
-	static async adm(){
+	static async talents(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'});
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
 		
-		let result = await App.api.request('build','adm');
+		let result = await App.api.request('build','talentAll');
 		
 		for(let item of result){
 			
@@ -1549,7 +1615,7 @@ class View {
 					
 					object[key] = value;
 					
-					await App.api.request('build','admEdit',{id:item.id,object:object});
+					await App.api.request('build','talentEdit',{id:item.id,object:object});
 					
 				},{value:item[key]}));
 				
@@ -1559,15 +1625,57 @@ class View {
 			
 		}
 		
-		body.append(DOM({event:['click',() => View.show('userAdm')]},'Аккаунты пользователей'),adm);
+		body.append(adm);
 		
 		return body;
 		
 	}
 	
-	static async userAdm(){
+	static async talents2(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'});
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		
+		let result = await App.api.request('build','talentHeroAll');
+		
+		for(let item of result){
+			
+			let div = DOM({tag:'div'});
+			
+			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`htalents/${item.id}.png`}));
+			
+			for(let key in item){
+				
+				if(key == 'id'){
+					
+					continue;
+					
+				}
+				
+				div.append(DOM({tag:'div'},key),App.input( async (value) => {
+					
+					let object = new Object();
+					
+					object[key] = value;
+					
+					await App.api.request('build','talentHeroEdit',{id:item.id,object:object});
+					
+				},{value:item[key]}));
+				
+			}
+			
+			adm.append(div);
+			
+		}
+		
+		body.append(adm);
+		
+		return body;
+		
+	}
+	
+	static async users(){
+		
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
 		
 		let result = await App.api.request('user','all');
 		
@@ -1714,7 +1822,7 @@ class Build{
 		sv: 'Стойкость/Воля',
 		razum: 'Разум',
 		sila: 'Сила',
-		speedtal: 'Скорость',
+		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
 		krajahp: 'Кража здоровья',
 		regenhp: 'Регенерация здоровья',
@@ -1722,7 +1830,8 @@ class Build{
 		krajamp: 'Кража энергии',
 		stoikostrz: 'Стойкость на родной земле',
 		voliarz: 'Воля на родной земле',
-		speedtalrz: 'Скорость на родной земле',
+		speedtalrz: '%<speedtal></speedtal> на родной земле',
+		speedtalvz: '%<speedtal></speedtal> на вражеской земле',
 		hitrostrz: 'Хитрость на родной земле',
 		provorstvorz: 'Проворство на родной земле',
 		silarz: 'Сила на родной земле',
@@ -1736,7 +1845,12 @@ class Build{
 		razumvz: 'Разум на вражеской земле',
 		svvz: 'Стойкость/Воля на вражеской земле',
 		krajahpvz: 'Кража здоровья на вражеской земле',
-		vs: 'Воля/Стойкость'
+		vs: 'Воля/Стойкость',
+		speed: 'Скорость',
+		speedrz: 'Скорость на родной земле',
+		speedvz: 'Скорость на вражеской или нейтральной земле',
+		dopspeed: 'Дополнительный бонус к скорости',
+		speedstak: 'Стак скорости',
 	};
 	
 	static talentRefineByRarity = {
@@ -1746,15 +1860,15 @@ class Build{
 		1: 12.0
 	}
 	
-	static async view(user,hero,nickname = ''){
+	static async view(user,hero,nickname = '',animate = true){
+		
+		let request = await App.api.request('build','get',{user:user,hero:hero});
 		
 		let container = DOM();
 		
-		container.style.width = '35vw';
+		container.style.width = '30vw';
 		
-		container.style.height = '35vw';
-		
-		container.append(await Build.viewModel(user,hero));
+		container.style.height = '30vw';
 		
 		let state = false, get = DOM({event:['click', async () => {
 			
@@ -1768,23 +1882,39 @@ class Build{
 				
 			}
 			
-			// await App.api.request('build','',{user:user,hero:hero});
+			await App.api.request('build','steal',{user:user,hero:hero});
 			
-		}]},`Забрать билд?`);
+			View.show('build',hero);
+			
+			Splash.hide();
+			
+		}]},`Украсть билд?`);
 		
-		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`))),false);
+		let bottom = DOM({style:'build-bottom'},get,DOM({event:['click',() => Splash.hide()]},`[Х]`));
+		
+		if(animate){
+			
+			bottom.style.opacity = 0;
+			
+		}
+		
+		container.append(Build.viewModel(request,() => {
+			
+			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
+			
+		}));
+		
+		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,bottom),false);
 		
 	}
 	
-	static async viewModel(user,hero,animate = true){
-		
-		let request = await App.api.request('build','get',{user:user,hero:hero});
+	static viewModel(data,callback,animate = true){
 		
 		let body = DOM({style:'build-body'}), i = 1, row = DOM({style:'build-body-row'}), elements1 = new Array(), elements2 = new Array();
 		
 		body.append(row);
 		
-		for(let item of request){
+		for(let item of data){
 			
 			let talent = DOM();
 			
@@ -1860,13 +1990,31 @@ class Build{
 					
 					setTimeout(() => {
 						
+						let number = 1;
+						
 						delay = 0;
 						
 						for(let element of elements2){
 							
 							delay += 50;
 							
-							element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+							let animate = element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
+							
+							if(number == elements2.length){
+								
+								animate.onfinish = () => {
+									
+									if(callback){
+										
+										callback();
+										
+									}
+									
+								}
+								
+							}
+							
+							number++;
 							
 						}
 						
@@ -1887,8 +2035,10 @@ class Build{
 	static async init(heroId,targetId){
 		
 		Build.talents = new Object();
-		
+
 		Build.descriptionView = document.createElement('div');
+		
+		Build.CleanInvalidDescriptions();
 		
 		Build.descriptionView.classList.add('build-description');
 		
@@ -1936,6 +2086,8 @@ class Build{
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO еще не готово - команда PW Classic работает над этим';
 		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
+		
+		buttonSets.addEventListener('click',() => Build.sets());
 
 		const buttonsTalentsAndSets = document.createElement('div');
 		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
@@ -1993,9 +2145,20 @@ class Build{
 		}
 		Build.installedTalents = new Array(36).fill(null);
 		Build.profileStats = new Object();
+
+		Build.applyRz = true;
+		Build.applyVz = false;
+		Build.applyStak = true;
+		Build.applyBuffs = true;
 		
 		Build.list(request.build);
-		
+
+		request.hero.stats['damage'] = 0;
+		request.hero.stats['critProb'] = 0;
+		request.hero.stats['attackSpeed'] = 0;
+		request.hero.stats['punching'] = 0;
+		request.hero.stats['protectionBody'] = 0;
+		request.hero.stats['protectionSpirit'] = 0;
 		Build.hero(request.hero);
 		
 		Build.level();
@@ -2005,13 +2168,35 @@ class Build{
 		Build.inventory();
 		
 		Build.rarity();
-		
+
 		Build.activeBar(request.active);
 		
 		Build.ruleSortInventory = new Object();
 		
 	}
 	
+	static CleanInvalidDescriptions() {
+		let invalidDescriptions = document.getElementsByClassName('build-description');
+		for (let descElement in invalidDescriptions) {
+			if (invalidDescriptions[descElement].className && invalidDescriptions[descElement].className == 'build-description') {
+				console.log('Удалено протухшее описание');
+				invalidDescriptions[descElement].remove();
+			}
+		}
+	}
+	
+	static async sets(){
+		
+		let sets = await App.api.request('build','sets');
+		
+		for(let set of sets){
+			
+			console.log(set);
+			
+		}
+		
+	}
+
 	static skinChange(){
 		
 		let bodyHero = DOM({style:'skin-change'});
@@ -2123,7 +2308,10 @@ class Build{
 
 		Build.listView.append(buildButtonsWrapper);
 
-		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => View.show('builds')]},'[X]'));
+		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
+			View.show('builds'); 
+			Build.CleanInvalidDescriptions();
+		}]},'[X]'));
 	}
 
 	static totalStat(stat){
@@ -2144,6 +2332,9 @@ class Build{
 		Build.heroPowerModifier = Build.dataRequest.hero.overallModifier;
 
 		Build.heroPowerFromInstalledTalents = 0.0;
+
+		Build.heroMainAttackStat = data.param; // osn_param
+		Build.heroAttackModifier = data.koef; // aa_koef 
 		
 		for(let stat in data.stats){
 			Build.initialStats[stat] = parseFloat(data.stats[stat]);
@@ -2162,8 +2353,13 @@ class Build{
 			provorstvo:'Проворство',
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
-			volia:'Воля'
-			
+			volia:'Воля',
+			damage: 'Урон',
+			critProb: 'Шанс крита',
+			attackSpeed: 'Скорость атаки',
+			punching: 'Пробивание',
+			protectionBody: 'Защита тела',
+			protectionSpirit: 'Защита духа',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
@@ -2173,315 +2369,251 @@ class Build{
 		}
 		
 		let i = 0;
+
+		const cond = key =>
+			['damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key);
 		
-		for(let key in template){
+		for(const key in template){
 			
-			let item = DOM({style:'build-hero-stats-item',event:['click',() => {
+			const item = DOM({style:'build-hero-stats-item',event:['click', !cond(key) ? () => {
 				
 				if(item.dataset.active == 1){
 					
 					item.style.background = 'rgba(0,0,0,0)';
 					
 					if(key == 'hp'){
-						
 						Build.removeSortInventory('stats','hp');
-						
 						Build.removeSortInventory('stats','krajahp');
-						
 						Build.removeSortInventory('stats','krajahprz');
-						
 						Build.removeSortInventory('stats','regenhpvz');
-						
 						Build.removeSortInventory('stats','krajahpvz');
-						
 						Build.removeSortInventory('stats','regenhp');
-						
-						
 					}
 					else if(key == 'mp'){
-						
 						Build.removeSortInventory('stats','mp');
-						
 						Build.removeSortInventory('stats','regenmp');
-						
 						Build.removeSortInventory('stats','krajamp');
-						
 						Build.removeSortInventory('stats','regenmpvz');
-						
 					}
 					else if(key == 'speed'){
-						
-						Build.removeSortInventory('stats','speedtal');
-						
-						Build.removeSortInventory('stats','speedtalrz');
-						
+						Build.removeSortInventory('stats','speed');
+						Build.removeSortInventory('stats','speedrz');
+						Build.removeSortInventory('stats','speedvz');
 					}
 					else if(key == 'sila'){
-						
 						Build.removeSortInventory('stats','sila');
-						
 						Build.removeSortInventory('stats','sr');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','silarz');
-						
 						Build.removeSortInventory('stats','silavz');
-						
 					}
 					else if(key == 'razum'){
-						
 						Build.removeSortInventory('stats','razum');
-						
 						Build.removeSortInventory('stats','sr');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','razumrz');
-						
 						Build.removeSortInventory('stats','razumvz');
-						
 					}
 					else if(key == 'provorstvo'){
-						
 						Build.removeSortInventory('stats','provorstvo');
-						
 						Build.removeSortInventory('stats','ph');
-						
 						Build.removeSortInventory('stats','provorstvorz');
-						
 						Build.removeSortInventory('stats','provorstvovz');
 						
 					}
 					else if(key == 'hitrost'){
-						
 						Build.removeSortInventory('stats','hitrost');
-						
 						Build.removeSortInventory('stats','ph');
-						
 						Build.removeSortInventory('stats','hitrostrz');
-						
 						Build.removeSortInventory('stats','hitrostvz');
 						
 					}
 					else if(key == 'stoikost'){
-						
 						Build.removeSortInventory('stats','stoikost');
-						
 						Build.removeSortInventory('stats','sv');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','stoikostrz');
-						
 						Build.removeSortInventory('stats','svvz');
-						
 						Build.removeSortInventory('stats','vs');
-						
 					}
 					else if(key == 'volia'){
-						
 						Build.removeSortInventory('stats','volia');
-						
 						Build.removeSortInventory('stats','sv');
-						
 						Build.removeSortInventory('stats','srsv');
-						
 						Build.removeSortInventory('stats','voliarz');
-						
 						Build.removeSortInventory('stats','svvz');
-						
 						Build.removeSortInventory('stats','vs');
-						
 					}
-					
 					Build.sortInventory();
-					
 					item.dataset.active = 0;
-					
-				}
-				else{
-					
+				} else {
 					item.style.background = '#5899';
-					
 					if(key == 'hp'){
-						
 						Build.setSortInventory('stats','hp');
-						
 						Build.setSortInventory('stats','krajahp');
-						
 						Build.setSortInventory('stats','krajahprz');
-						
 						Build.setSortInventory('stats','regenhpvz');
-						
 						Build.setSortInventory('stats','krajahpvz');
-						
 						Build.setSortInventory('stats','regenhp');
-						
 					}
 					else if(key == 'mp'){
-						
 						Build.setSortInventory('stats','mp');
-						
 						Build.setSortInventory('stats','regenmp');
-						
 						Build.setSortInventory('stats','krajamp');
-						
 						Build.setSortInventory('stats','regenmpvz');
-						
 					}
 					else if(key == 'speed'){
-						
-						Build.setSortInventory('stats','speedtal');
-						
-						Build.setSortInventory('stats','speedtalrz');
-						
+						Build.setSortInventory('stats','speed');
+						Build.setSortInventory('stats','speedrz');
+						Build.setSortInventory('stats','speedvz');
 					}
 					else if(key == 'sila'){
-						
 						Build.setSortInventory('stats','sila');
-						
 						Build.setSortInventory('stats','sr');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','silarz');
-						
 						Build.setSortInventory('stats','silavz');
-						
 					}
 					else if(key == 'razum'){
-						
 						Build.setSortInventory('stats','razum');
-						
 						Build.setSortInventory('stats','sr');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','razumrz');
-						
 						Build.setSortInventory('stats','razumvz');
-						
 					}
 					else if(key == 'provorstvo'){
-						
 						Build.setSortInventory('stats','provorstvo');
-						
 						Build.setSortInventory('stats','ph');
-						
 						Build.setSortInventory('stats','provorstvorz');
-						
 						Build.setSortInventory('stats','provorstvovz');
-						
 					}
 					else if(key == 'hitrost'){
-						
 						Build.setSortInventory('stats','hitrost');
-						
 						Build.setSortInventory('stats','ph');
-						
 						Build.setSortInventory('stats','hitrostrz');
-						
 						Build.setSortInventory('stats','hitrostvz');
-						
 					}
 					else if(key == 'stoikost'){
-						
 						Build.setSortInventory('stats','stoikost');
-						
 						Build.setSortInventory('stats','sv');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','stoikostrz');
-						
 						Build.setSortInventory('stats','svvz');
-						
 						Build.setSortInventory('stats','vs');
-						
 					}
 					else if(key == 'volia'){
-						
 						Build.setSortInventory('stats','volia');
-						
 						Build.setSortInventory('stats','sv');
-						
 						Build.setSortInventory('stats','srsv');
-						
 						Build.setSortInventory('stats','voliarz');
-						
 						Build.setSortInventory('stats','svvz');
-						
 						Build.setSortInventory('stats','vs');
-						
-					}
-					else{
-						
+					} else {
 						Build.setSortInventory('stats',key);
-						
 					}
 					// Build.setSortInventory('stats','hp');
 					
 					Build.sortInventory();
-					
 					item.dataset.active = 1;
 					
 				}
 				
-			}]},DOM({tag:'div'},template[key]),DOM({tag:'div'},data.stats[key]));
+			} : null]},
+				DOM({tag:'div'}, template[key]),
+				DOM({tag:'div'}, data.stats[key] || 0)
+			);
 			
 			item.dataset.active = 0;
-			
-			Build.dataStats[key] = item;
-			
-			let daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
-				
-				if(daw.dataset.status != 0){
-					
-					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
-					
-					daw.dataset.status = 0;
-					daw.src = 'circle.png';
-					
-					Build.profileStats[key] = 0;
-
-					Build.updateHeroStats();
-				}
-				else{
-					
-					await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
-					
-					daw.dataset.status = 1;
-					daw.src = 'checkbox.png';
-					
-					Build.profileStats[key] = 1;
-
-					Build.updateHeroStats();
-				}
-			}]});
-			
-			daw.dataset.index = i;
-			
-			daw.dataset.status = Build.dataRequest.profile[i];
-			
-			Build.profileStats[key] = parseInt(daw.dataset.status);
-			
-			if(daw.dataset.status == 1){
-				daw.src = 'checkbox.png';
-			} else {
-				daw.src = 'circle.png';
+			if (cond(key)) {
+				item.classList.add('passive');
 			}
 			
-			stats.append(DOM({style:'build-hero-stats-line'},daw,item));
-			
+			Build.dataStats[key] = item;
+		
+			if (!['hp', 'mp', 'speed', 'damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key)) {
+				const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
+					
+					if(daw.dataset.status != 0){
+						
+						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
+						
+						daw.dataset.status = 0;
+						daw.src = 'circle.png';
+						
+						Build.profileStats[key] = 0;
+
+						Build.updateHeroStats();
+					}
+					else{
+						
+						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
+						
+						daw.dataset.status = 1;
+						daw.src = 'checkbox.png';
+						
+						Build.profileStats[key] = 1;
+
+						Build.updateHeroStats();
+					}
+				}]});
+				
+				daw.dataset.index = i;
+				
+				daw.dataset.status = Build.dataRequest.profile[i];
+				
+				Build.profileStats[key] = parseInt(daw.dataset.status);
+				
+				if(daw.dataset.status == 1){
+					daw.src = 'checkbox.png';
+				} else {
+					daw.src = 'circle.png';
+				}
+				
+				stats.append(DOM({style:'build-hero-stats-line'}, daw, item));
+			} else {
+				stats.append(DOM({style:'build-hero-stats-line'}, item));
+			}
 			i++;
 			
 		}
 		
 		Build.heroName = DOM({tag: 'p', style: 'name'});
-		Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
+		
+		if(MM.hero){
+			
+			Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
+			
+		}
 
 		Build.heroImg = DOM({style:'avatar'});
+		
+		if(App.isAdmin()){
+			
+			Build.heroImg.onclick = async () => {
+				
+				let body = document.createDocumentFragment(), request = await App.api.request('build','heroData',{id:data.id});
+				
+				for(let key in request){
+					
+					body.append(App.input((value) => {
+						
+						let object = new Object();
+						
+						object[key] = value;
+						
+						App.api.request('build','heroEdit',{id:data.id,object:object});
+						
+					},{value:request[key]}));
+					
+				}
+				
+				body.append(DOM({style:'splash-content-button',event:['click',() => Splash.hide()]},'Закрыть'));
+				
+				Splash.show(body);
+				
+			}
+			
+		}
 		
 		Build.heroImg.style.backgroundImage = `url(hero/${data.id}/${Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1}.png)`;
 		
@@ -2521,16 +2653,65 @@ class Build{
 			Build.dataStats[key2].lastChild.innerText = Math.round(Build.totalStat(key2));
 			
 		}
+
+		const statAg = Build.totalStat('provorstvo')
+		const statCun = Build.totalStat('hitrost')
+		const statStamina = Build.totalStat('stoikost');
+		const statWill = Build.totalStat('volia');
+		const statStrength = Build.totalStat('sila');
+		const statInt = Build.totalStat('razum');
+
+		{
+			// TODO: make hero damage calculation
+			let damage = Build.heroMainAttackStat == 1 ? statStrength : statInt;
+			let dmgMin = Math.round(damage * Build.heroAttackModifier * 0.9);
+			let dmgMax = Math.round(damage * Build.heroAttackModifier * 1.1);
+			let dmgTag = Build.heroMainAttackStat == 1 ? '<fiz> </fiz>' : '<mag> </mag>';
+			Build.dataStats['damage'].lastChild.innerHTML = dmgMin + '-' + dmgMax + dmgTag;
+		}
+
+		{
+			let penetration = 0.0;
+			if (statAg > 500.0) {
+				penetration += 61.72 + 0.6876 * statAg - 10.035 * Math.sqrt(statAg);
+			} else {
+				penetration += 48.45 + 0.764 * statAg - 11.15 * Math.sqrt(statAg);
+			}
+			if (statCun > 500.0) {
+				penetration += 85.78 + 0.43 * statCun - 15.55 * Math.log(statCun);
+			} else {
+				penetration += 59.83 + 0.57 * statCun - 20.73 * Math.log(statCun);
+			}
+			Build.dataStats['punching'].lastChild.innerText = Math.round(penetration) + '%';;
+		}
+
+		{
+			let defStamina = 0.5355 * (statStamina + 0.3 * statWill) - 20;
+			let defWill = 0.5355 * (statWill + 0.3 * statStamina) - 20;
+
+			Build.dataStats['protectionBody'].lastChild.innerText = Math.round(defStamina) + '%';;
+			Build.dataStats['protectionSpirit'].lastChild.innerText = Math.round(defWill) + '%';;
+		}
+
+		{
+			let crit = 62.765 - 11534.0 / (126.04 + statCun);
+			Build.dataStats['critProb'].lastChild.innerText = Math.max(0.0, Math.round(crit)) + '%';
+		}
+
+		{
+			let attackSpeed = Math.min(2.0, 0.00364 * statAg + 0.49);
+			Build.dataStats['attackSpeed'].lastChild.innerText = Math.round(attackSpeed * 100.0) / 100.0;
+		}
 	}
 
 	static calcStatsFromPower(maxTalentId){
 		const talentPowerByLine = {
-			5: 0.055,
-			4: 0.038,
-			3: 0.027,
-			2: 0.022,
-			1: 0.015,
-			0: 0.0097
+			5: (33.0 / 600.0),
+			4: (23.0 / 600.0),
+			3: (16.0 / 600.0),
+			2: (13.0 / 600.0),
+			1: (9.0 / 600.0),
+			0: (6.0 / 600.0)
 		}
 
 		Build.heroPowerFromInstalledTalents = 0.0;
@@ -2549,6 +2730,35 @@ class Build{
 			let m = Build.heroPower * Build.heroPowerFromInstalledTalents;
 			Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0);
 		}
+	}
+
+	static getMaxStat(stats){
+		const fakeStat = 999;
+		let maxStat = stats[0];
+		let maxValue = Build.totalStat(maxStat);
+		if (maxStat in Build.profileStats) {
+			maxValue += Build.profileStats[maxStat] * fakeStat;
+		} 
+
+		for(let s = 1; s < stats.length; s++) {
+			let possibleMaxStat = Build.totalStat(stats[s]);
+			if (stats[s] in Build.profileStats) {
+				possibleMaxStat += Build.profileStats[stats[s]] * fakeStat;
+			} 
+			if (possibleMaxStat > maxValue) {
+				maxStat = stats[s];
+				maxValue = Build.totalStat(maxStat);
+				if (maxStat in Build.profileStats) {
+					maxValue += Build.profileStats[maxStat] * fakeStat;
+				} 
+			}
+		}
+
+		return maxStat;
+	}
+
+	static getTalentRefineByRarity(rarity){
+		return rarity ? Build.talentRefineByRarity[rarity] - 1.0 : 4.0;
 	}
 	
 	static setStat(talent,fold = true,animation = true){
@@ -2570,70 +2780,69 @@ class Build{
 		function registerStat(stat, key) {
 			let statValue = parseFloat(talent.stats[key]);
 			if ('statsRefine' in talent && 'rarity' in talent) {
-				let refineBonus = Build.talentRefineByRarity[talent.rarity] - 1.0;
+				let refineBonus = Build.getTalentRefineByRarity(talent.rarity);
 				let refineMul = parseFloat(talent.statsRefine[key]);
 				statValue += refineBonus * refineMul;
 			}
 			add[stat] = statValue;
 		}
-
-		function statByMax(stats, key) {
-			const fakeStat = 999;
-			let maxStat = stats[0];
-			let maxValue = Build.totalStat(maxStat);
-			if (maxStat in Build.profileStats) {
-				maxValue += Build.profileStats[maxStat] * fakeStat;
-			} 
-
-			for(let s = 1; s < stats.length; s++) {
-				let possibleMaxStat = Build.totalStat(stats[s]);
-				if (stats[s] in Build.profileStats) {
-					possibleMaxStat += Build.profileStats[stats[s]] * fakeStat;
-				} 
-				if (possibleMaxStat > maxValue) {
-					maxStat = stats[s];
-					maxValue = Build.totalStat(maxStat);
-					if (maxStat in Build.profileStats) {
-						maxValue += Build.profileStats[maxStat] * fakeStat;
-					} 
-				}
-			}
-
-			registerStat(maxStat, key);
-		}
 		
 		for(let key in talent.stats){
 			
 			if(key == 'sr'){
-				statByMax(['sila', 'razum'], key)
+				registerStat(Build.getMaxStat(['sila', 'razum']), key)
 			}
 			else if(key == 'ph'){
-				statByMax(['provorstvo', 'hitrost'], key)
+				registerStat(Build.getMaxStat(['provorstvo', 'hitrost']), key)
 			}
 			else if(key == 'sv'){
-				statByMax(['stoikost', 'volia'], key)
+				registerStat(Build.getMaxStat(['stoikost', 'volia']), key)
 			}
 			else if(key == 'srsv'){
-				statByMax(['sila', 'razum', 'stoikost', 'volia'], key)
+				registerStat(Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']), key)
 			}
 			else{
 				registerStat(key, key);
 			}
 			
 		}
+
+		function calcualteSpecialStats(keyStat, statChange) {
+			if (keyStat in Build.calculationStats) {
+				if (keyStat == 'speed') {
+					Build.calculationStats[keyStat] = Math.max(Build.calculationStats[keyStat], statChange);
+				} else {
+					Build.calculationStats[keyStat] += fold ? statChange : -statChange;
+				}
+			}
+		}
 			
 		// Apply animation and change stats in Build.calculationStats
 		for(let key2 in add){
+			
+			let statChange = parseFloat(add[key2]);
+			if (Build.applyStak && key2.indexOf('stak') != -1) {
+				calcualteSpecialStats(key2.replace('stak', ''), statChange);
+			} else
+			if (Build.applyRz && key2.indexOf('rz') != -1) {
+				calcualteSpecialStats(key2.replace('rz', ''), statChange);
+			} else
+			if (Build.applyVz && key2.indexOf('vz') != -1) {
+				calcualteSpecialStats(key2.replace('vz', ''), statChange);
+			} else
+			if (key2.indexOf('dop') != -1) {
+				calcualteSpecialStats(key2.replace('dop', ''), statChange);
+			} else
+			if (Build.applyBuffs && key2.indexOf('buff') != -1) {
+				calcualteSpecialStats(key2.replace('buff', ''), statChange);
+			} else {
+				calcualteSpecialStats(key2, statChange);
+			}
 			
 			if( !(key2 in Build.dataStats) ){
 				
 				continue;
 				
-			}
-			
-			if (key2 in Build.calculationStats) {
-				let statChange = parseFloat(add[key2]);
-				Build.calculationStats[key2] += fold ? statChange : -statChange;
 			}
 			
 			if(animation){
@@ -2718,6 +2927,18 @@ class Build{
 			
 		}
 		
+	}
+
+	static talentStatFilter(stat) {
+		return (
+			stat.indexOf('stak') != -1 || 
+			stat.indexOf('rz') != -1 || 
+			stat.indexOf('vz') != -1 || 
+			stat.indexOf('stak') != -1 || 
+			stat.indexOf('dop') != -1 || 
+			stat.indexOf('buff') != -1 || 
+			(stat.indexOf('speed') != -1 && stat.indexOf('speedtal') == -1)
+		);
 	}
 	
 	static field(data){
@@ -2828,6 +3049,28 @@ class Build{
 		const talent = document.createElement('div');
 		
 		talent.classList.add('build-talent-item');
+
+		if (data.txtNum) {
+			let params = data.txtNum.split(';');
+			if (!data.stats) {
+				data.stats = new Object();
+			}
+			if (!data.statsRefine) {
+				data.statsRefine = new Object();
+			}
+			for (let param in params) {
+				let paramValues = params[param].split(',');
+				if (Build.talentStatFilter(paramValues[2])) {
+					data.stats[paramValues[2]] = parseFloat(paramValues[0]);
+					data.statsRefine[paramValues[2]] = parseFloat(paramValues[1]);
+				} else if (!(paramValues[2] in data.stats) && (paramValues[2] in Build.initialStats) && (Build.initialStats[paramValues[2]] > 0)) {
+					data.stats[paramValues[2] + 'buff'] = parseFloat(paramValues[0]);
+					data.statsRefine[paramValues[2] + 'buff'] = parseFloat(paramValues[1]);
+				}
+			}
+		}
+
+		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
 		
 		Build.talents[data.id] = data;
 		
@@ -2965,15 +3208,23 @@ class Build{
 		reset.src = 'trash.svg';
 		reset.classList.add('reset');
 		reset.addEventListener('click', async () => {
-			if (confirm('Сбросить таланты в этом билде?')) {
+			const reset = DOM({event:['click', async () => {
 				await App.api.request('build','clear',{id:Build.id});
 				View.show('build',Build.heroId);
-			}
+				Splash.hide();
+			}]}, 'Сбросить')
+			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
+			const wrap = DOM({style: 'wrap'}, reset, close);
+			const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
+			Splash.show(dom)
 		});
 		Build.rarityView.append(reset);
 	}
 	
 	static activeBar(data){
+		
+		Build.activeBarItems = data;
+
 		console.log('activeBar',data)
 		let index = 0;
 		
@@ -3054,6 +3305,7 @@ class Build{
 					try{
 						
 						App.api.request('build','setZeroActive',{buildId:Build.id,index:element.dataset.index});
+						Build.activeBarItems[element.dataset.index] = 0;
 						
 						clone.remove();
 						
@@ -3319,6 +3571,17 @@ class Build{
 						}
 					}
 				}
+
+				let removeFromActive = async (position) => {
+					for (let i = 0; i < Build.activeBarItems.length; i++) {
+						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
+						if (talPos == position) {
+							Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
+							Build.activeBarItems[i] = 0;
+							await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
+						}
+					}
+				}
 				
 				if( isFieldTarget ){
 					
@@ -3326,12 +3589,19 @@ class Build{
 
 					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
 
+					if (elemBelow.childNodes[0] && elemBelow.childNodes[0].className == 'build-talent-item') {
+						// Select 'build-talent-item' if selected its parent
+						elemBelow = elemBelow.childNodes[0];
+					}
+
 					let swapParentNode = element.parentNode;
 					let performSwap = false;
+					let performSwapFromLibrary = false;
 
 					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-field-item') {
 						elemBelow = elemBelow.parentElement;
-						performSwap = true;
+						performSwap = swapParentNode.dataset.position ? true : false;
+						performSwapFromLibrary = !performSwap;
 					}
 					
 					if (isClick && data.level > 0) {
@@ -3372,8 +3642,9 @@ class Build{
 
 								element.dataset.state = 2;
 								
+								let swappingTal = null;
 								if (performSwap) {
-									let swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
+									swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 									let swappedTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = swappingTal;
 									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = swappedTal;
@@ -3381,22 +3652,42 @@ class Build{
 									swapParentNode.append(elemBelow.firstChild);
 									elemBelow.append(element);
 								} else {
+									if (performSwapFromLibrary) {
+										swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
+									}
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+									if (performSwapFromLibrary) {
+										swapParentNode.prepend(elemBelow.firstChild);
+									}
 									elemBelow.append(element);
 								}
 								
 								try{
+									if (data.active && swapParentNode.dataset.position) {
+										await removeFromActive(swapParentNode.dataset.position);
+									}
 									if (performSwap) {
 										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
-
+										
+										if (swappedTalent.active) {
+											await removeFromActive(elemBelow.dataset.position);
+										}
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
-										Build.setStat(data, false);
+										
+										Build.setStat(data, true, false);
 									} else {
+										if (performSwapFromLibrary) {
+											if (swappingTal.active) {
+												await removeFromActive(elemBelow.dataset.position);
+											}
+											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
+										}
 										Build.setStat(data, true);
 									}
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
+
 							
 									
 								}catch(e){
@@ -3438,6 +3729,9 @@ class Build{
 						
 						
 						try{
+							if (data.active && oldParentNode.dataset.position) {
+								await removeFromActive(oldParentNode.dataset.position);
+							}
 							
 							await App.api.request('build','setZero',{buildId:Build.id,index:oldParentNode.dataset.position});
 
@@ -3488,6 +3782,7 @@ class Build{
 						try{
 							
 							await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+							Build.activeBarItems[index] = position;
 							
 							let clone = element.cloneNode(true);
 							
@@ -3498,6 +3793,7 @@ class Build{
 								try{
 									
 									App.api.request('build','setZeroActive',{buildId:Build.id,index:index});
+									Build.activeBarItems[index] = null;
 									
 									clone.remove();
 									
@@ -3561,6 +3857,12 @@ class Build{
 			let positionElement = element.getBoundingClientRect();
 			
 			let data = Build.talents[element.dataset.id];
+
+			if (!data) {
+				console.log("Не найден талант в билде: " + element.dataset.id)
+				Build.descriptionView.style.display = 'none';
+				return;
+			}
 			
 			if( (!data.name) || (!data.description) ){
 				
@@ -3588,23 +3890,96 @@ class Build{
 				if( ('stats' in data) && (data.stats) ){
 					
 					for(let key in data.stats){
-						
+						if (Build.talentStatFilter(key)) {
+							continue;
+						}
+
 						let statValue = parseFloat(data.stats[key]);
 						
 						if ('statsRefine' in data && 'rarity' in data) {
-							let refineBonus = Build.talentRefineByRarity[data.rarity] - 1.0;
+							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
 							let refineMul = parseFloat(data.statsRefine[key]);
 							statValue += refineBonus * refineMul;
 						}
 
-						stats += `+${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
+						let sign = key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz' ? '-' : '+';
+						stats += sign +`${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
 						
 					}
 					
 				}
-				
 				Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${data.name}</b><div>${data.description}</div><span>${stats}</span>`;
 				
+				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
+				let paramIterator = 0;
+				for (let outerTag of innerChilds) {
+					for (let specialTag of outerTag.childNodes) {
+						let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
+						if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
+							continue;
+						}
+						let params = data.params.split(';');
+						if (paramIterator >= params.length) {
+							continue;
+						}
+						let param = params[paramIterator];
+						let paramValues = param.split(',');
+
+						let statAffection, minValue, maxValue;
+
+						if (paramValues.length == 5) {
+							//let applyTo = paramValues[0];
+							minValue = parseFloat(paramValues[1]);
+							maxValue = parseFloat(paramValues[2]);
+							//let applicator = paramValues[3];
+							statAffection = paramValues[4];
+						}
+						else if (paramValues.length == 3) {
+							minValue = parseFloat(paramValues[0]);
+							maxValue = parseFloat(paramValues[1]);
+							statAffection = paramValues[2];
+						}
+
+						let resolvedStatAffection;
+						switch (statAffection) {
+							case 'sr_max':
+								resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+								break;
+							case 'sv_max':
+								resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+								break;
+							case 'ph_max':
+								resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+								break;
+							default:
+								resolvedStatAffection = statAffection;
+								break;
+						}
+
+						function lerp(a, b, alpha) {
+							return a + alpha * (b - a);
+						}
+
+						let outputString;
+						if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+							let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+							const param1 = isHpOrEnergy ? 600.0 : 50.0;
+							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+							outputString = Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2));
+						} else {
+							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+							outputString = Math.round(minValue + maxValue * refineBonus);
+						}
+
+						if (specialTag.innerHTML) {
+							specialTag.innerHTML = tagString.replace('%s', outputString);
+						} else {
+							outerTag.innerHTML = tagString.replace('%s', outputString);
+						}
+						paramIterator++;
+					}
+				}
 			}
 			
 			let positionDescription = Build.descriptionView.getBoundingClientRect();
@@ -3797,7 +4172,7 @@ class App {
 		
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
-		// ws://192.168.9.167:7373
+		
 		await Store.init();
 		
 		App.storage = new Store('u1');
@@ -3812,7 +4187,16 @@ class App {
 			
 			await App.api.init();
 			
-			View.show('main');
+			if(window.location.hash == '#castle'){
+				
+				View.show('castle');
+				
+			}
+			else{
+				
+				View.show('main');
+				
+			}
 			
 		}
 		else{
@@ -3824,7 +4208,7 @@ class App {
 		}
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
-		//
+		
 		document.body.append(DOM({id:'STAT'}));
 		
 	}
@@ -4069,6 +4453,12 @@ class App {
 		
 	}
 	
+	static isAdmin(){
+		
+		return [1,2,24,134,2220].includes(Number(App.storage.data.id));
+		
+	}
+	
 }
 
 class Protect {
@@ -4164,8 +4554,6 @@ class MM {
 		
 		Timer.init();
 		
-		//setTimeout(() => MM.ready(),5000);
-		
 	}
 	
 	static soundEvent(){
@@ -4206,6 +4594,8 @@ class MM {
 	
 	static close(){
 		
+		Sound.stop('tambur');
+		
 		MM.view.style.display = 'none';
 		
 	}
@@ -4239,7 +4629,7 @@ class MM {
 	}
 	
 	static async start(){
-		
+		/*
 		if(!await Protect.checkInstall()){
 			
 			MM.button.innerText = 'Проверка';
@@ -4253,7 +4643,7 @@ class MM {
 			return;
 			
 		}
-		
+		*/
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
@@ -4333,7 +4723,7 @@ class MM {
 		
 		MM.soundEvent();
 		
-		let button = DOM({style:'mm-ready-button',event:['click', async () => {
+		let button = DOM({style:'ready-button',event:['click', async () => {
 			
 			try{
 				
@@ -4352,10 +4742,14 @@ class MM {
 				
 			}
 			
-			
 			button.style.opacity = 0;
 			
 		}]},'Готов!');
+		
+		
+		button.style.fontSize = '2vw';
+		
+		button.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
 		
 		body.append(button);
 		
@@ -4363,19 +4757,68 @@ class MM {
 		
 	}
 	
-	static async lobbyBuildView(){
+	static async lobbyBuildView(heroId){
 		
+		if(MM.lobbyBuildField.firstChild){
+			
+			MM.lobbyBuildField.firstChild.remove();
+			
+		}
 		
+		while(MM.lobbyBuildTab.firstChild){
+			
+			MM.lobbyBuildTab.firstChild.remove();
+			
+		}
 		
+		let builds = await App.api.request('build','my',{hero:heroId});
 		
-		
-		
-		
+		for(let build of builds){
+			
+			let tab = DOM({event:['click', async () => {
+				
+				await App.api.request('build','target',{id:build.id});
+				
+				for(let child of MM.lobbyBuildTab.children){
+					
+					child.style.background = 'rgba(255,255,255,0)';
+					
+				}
+				
+				tab.style.background = 'rgba(255,255,255,0.3)';
+				
+				if(MM.lobbyBuildField.firstChild){
+					
+					MM.lobbyBuildField.firstChild.remove();
+					
+				}
+				
+				MM.lobbyBuildField.append(Build.viewModel(build.body,false,false));
+				
+			}]},build.name);
+			
+			if(build.target){
+				
+				tab.style.background = 'rgba(255,255,255,0.3)';
+				
+				if(MM.lobbyBuildField.firstChild){
+					
+					MM.lobbyBuildField.firstChild.remove();
+					
+				}
+				
+				MM.lobbyBuildField.append(Build.viewModel(build.body,false,false));
+				
+			}
+			
+			MM.lobbyBuildTab.append(tab);
+			
+		}
 		
 	}
 	
 	static async lobby(data){
-		console.log('MM.LOBBY DATA',data);
+		
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
@@ -4388,11 +4831,37 @@ class MM {
 			
 		}
 		
+		MM.searchActive(false);
+		
 		MM.lobbyUsers = data.users;
 		
 		MM.targetHeroId = data.users[App.storage.data.id].hero;
 		
-		MM.lobbyBuild = DOM({style:'mm-lobby-middle-build'},`123`);
+		let lobbyBuild = DOM({style:'mm-lobby-middle-build'});
+		
+		MM.lobbyBuildField = DOM();
+		
+		MM.lobbyBuildField.style.margin = '0.5vw 0';
+		
+		MM.lobbyBuildField.style.width = '25vw';
+		
+		MM.lobbyBuildField.style.height = '25vw';
+		
+		MM.lobbyBuildTab = DOM({style:'lobby-build-tab'});
+		
+		MM.lobbyConfirm = DOM({style:'ready-button',event:['click', async () => {
+			
+			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
+			
+		}]},'Подтвердить');
+		
+		MM.lobbyConfirm.style.opacity = 0;
+		
+		MM.lobbyConfirm.style.width = '50%';
+		
+		MM.lobbyConfirm.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:2000,iterations:Infinity,easing:'ease-in-out'});
+		
+		lobbyBuild.append(MM.lobbyConfirm,MM.lobbyBuildField,MM.lobbyBuildTab);
 		
 		if(MM.targetHeroId){
 			
@@ -4408,30 +4877,51 @@ class MM {
 			
 			let player = DOM({id:`PLAYER${key}`,style:'mm-lobby-header-team-player'});
 			
-			let hero = DOM({tag:'img'});
+			player.dataset.hero = data.users[key].hero;
 			
-			if(data.users[key].hero){
-				
-				hero.src = `hero/${data.users[key].hero}/1.png`;
-	
-				const name = DOM({tag:'div', style: 'name'},`${data.users[key].nickname}`);
+			let hero = DOM({style:'mm-lobby-header-team-player-hero'});
 			
-				const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
-				const rank = DOM({tag:'img', src: 'ransk/1.png', style: 'rank'}); // TODO from hardcode to server data
-
-				player.append(hero, lvl, name, rank);
-				leftTeam.append(player);
-			} else {
-				hero.src = `hero/empty-ru.avif`;
-				player.append(hero);
-			}
+			let name = DOM({style:'mm-lobby-header-team-player-name'},`${data.users[key].nickname}`);
+			
+			let rankIcon = DOM({style:'rank-icon'});
+			
+			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(data.users[key].rating)}.png)`;
+			
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.users[key].rating),rankIcon);
+			
+			hero.append(rank);
+			
+			hero.style.backgroundImage = (data.users[key].hero) ? `url(hero/${data.users[key].hero}/1.png)` : `url(hero/empty.png)`;
+			
+			player.append(hero,name);
 			
 			if(key == data.target) {
-				MM.targetPlayerAnimate = player.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
+				
+				MM.lobbyPlayerAnimate = player.animate({transform:['scale(1)','scale(0.8)','scale(1.1)','scale(1)']},{duration:2000,iterations:Infinity,easing:'ease-in-out'});
+				
 			}
 			
-			if(data.users[App.storage.data.id].team !== data.users[key].team) {
+			if(data.users[App.storage.data.id].team == data.users[key].team){
+				
+				leftTeam.append(player);
+				
+				player.onclick = () => {
+					
+					if(player.dataset.hero){
+						
+						Build.view(key,player.dataset.hero,data.users[key].nickname,false);
+						
+					}
+					
+				}
+				
+			}
+			else{
+				
+				name.style.opacity = 0;
+				
 				rightTeam.append(player);
+				
 			}
 
 		}
@@ -4440,60 +4930,57 @@ class MM {
 		
 		let preload = new PreloadImages(MM.lobbyHeroes);
 		
-		for(const item of MM.hero){
-		
+		for(let item of MM.hero){
 			
-			const lvl = DOM({tag:'div', style: 'lvl'}, 1100); // TODO hardcode 1100 to the data from server
-			const rank = DOM({tag:'img', src: 'ransk/1.png', style: 'rank'}); // TODO from hardcode to server data
-			const hero = DOM({id:`HERO${item.id}`,data:{active:0}}, lvl, rank);
+			let hero = DOM({id:`HERO${item.id}`,data:{ban:0}});
 
 			hero.dataset.url = `hero/${item.id}/1.png`;
 			
-			hero.onclick = () => {
-				
+			hero.onclick = async () => {
+				//Sound.play(`hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
+				//return;
 				MM.targetHeroId = item.id;
+				
+				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
-				App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
-				
 			}
+			
+			let rankIcon = DOM({style:'rank-icon'});
+			
+			rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
+			
+			let rank = DOM({style:'rank'},rankIcon);
+			
+			hero.append(rank);
 			
 			preload.add(hero);
 			
 		}
 		
-		let info = DOM({style:'lobby-info'});
 		
-		MM.selectHeroButton = DOM({style:'lobby-select-hero'},'Выбрать!');
-		
-		MM.selectHeroButton.addEventListener('click', async () => {
+		if(App.storage.data.id == data.target){
 			
-			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
-			
-		});
-		
-		if(App.storage.data.id != data.target){
-			
-			MM.selectHeroButton.style.opacity = 0;
+			MM.lobbyConfirm.style.opacity = 1;
 			
 		}
 		
-		Timer.start(() => {
+		let info = DOM({style:'lobby-timer'});
+		
+		await Timer.start(data.id,'',() => {
 			
-			//MM.close();
+			MM.close();
 			
-		},'',30);
+			MM.searchActive(true);
+			
+		});
 		
-		Timer.body.style.fontSize = '3.5vh';
-		
-		Timer.body.style.fontWeight = 600;
-		
-		info.append(Timer.body,MM.selectHeroButton);
+		info.append(Timer.body);
 		
 		MM.chatBody = DOM({style:'mm-lobby-middle-chat-body'});
 		
-		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и <Enter>'})
+		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и нажмите <Enter>'})
 		
 		chatInput.addEventListener('keyup', async (event) => {
 			
@@ -4519,7 +5006,9 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),MM.lobbyBuild,MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
+		
+		Sound.play('tambur.mp3',{id:'tambur',volume:0.50,loop:true});
 		
 		MM.show(body);
 		
@@ -4535,9 +5024,11 @@ class MM {
 			
 			if(findHero){
 				
-				findHero.style.backgroundColor = 'rgba(51, 255, 51, 0.8)';
+				findHero.style.filter = 'grayscale(100%)';
 				
-				findHero.dataset.active = 1;
+				findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+				
+				findHero.dataset.ban = key;
 				
 			}
 			
@@ -4545,41 +5036,59 @@ class MM {
 		
 	}
 	
-	static select(data){
+	static async select(data){
 		
-		Timer.start(() => {
+		Sound.play(`hero/${data.heroId}/revive/${data.sound}.mp3`,{volume:0.75});
+		
+		MM.lobbyPlayerAnimate.cancel();
+		
+		await Timer.start(data.id,'',() => {
 			
 			MM.close();
 			
-		},'',30);
+			MM.searchActive(true);
+			
+		});
 		
-		if(MM.intervalId){
-			
-			clearInterval(MM.intervalId);
-			
-		}
-		
-		if(MM.targetPlayerAnimate){
-			
-			MM.targetPlayerAnimate.cancel();
-			
-			MM.targetPlayerAnimate = false;
-			
-		}
-		
-		let findOldPlayer = document.getElementById(`PLAYER${data.id}`);
+		let findOldPlayer = document.getElementById(`PLAYER${data.userId}`);
 		
 		if(findOldPlayer){
 			
-			findOldPlayer.firstChild.src = `hero/${data.heroId}/1.png`;
+			findOldPlayer.dataset.hero = data.heroId;
+			
+			findOldPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
+			
+			findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
+			
+			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
 			
 		}
 		
-		let findPlayer = document.getElementById(`PLAYER${data.target}`);
-		
-		if(findPlayer){
+		if(data.target != 0){
 			
-			MM.targetPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.9)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-out'});
+			let findPlayer = document.getElementById(`PLAYER${data.target}`);
+			
+			if(findPlayer){
+				
+				MM.lobbyPlayerAnimate = findPlayer.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
+				
+			}
+			
+		}
+		
+		for(let child of MM.lobbyHeroes.children){
+			
+			if(child.dataset.ban == data.userId){
+				
+				child.dataset.ban = 0;
+				
+				child.style.filter = 'none';
+				
+				child.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+				
+				break;
+				
+			}
 			
 		}
 		
@@ -4587,7 +5096,9 @@ class MM {
 		
 		if(findHero){
 			
-			findHero.style.backgroundColor = 'rgba(255,50,0,0.9)';
+			findHero.style.filter = 'grayscale(100%)';
+			
+			findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 			
 			findHero.onclick = false;
 			
@@ -4595,14 +5106,12 @@ class MM {
 		
 		if(App.storage.data.id == data.target){
 			
-			MM.soundEvent();
-			
-			MM.selectHeroButton.style.opacity = 1;
+			MM.lobbyConfirm.style.opacity = 1;
 			
 		}
 		else{
 			
-			MM.selectHeroButton.style.opacity = 0;
+			MM.lobbyConfirm.style.opacity = 0;
 			
 		}
 		
@@ -4628,10 +5137,16 @@ class MM {
 		
 		if(findPlayer){
 			
-			findPlayer.firstChild.src = `hero/${data.heroId}/1.png`;
+			findPlayer.dataset.hero = data.heroId;
+			
+			findPlayer.firstChild.style.backgroundImage = `url(hero/${data.heroId}/1.png)`;
+			
+			findPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
+			
+			findPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(ransk/${Rank.icon(data.rating)}.png)`;
 			
 		}
-		
+		/*
 		let oldHero = MM.lobbyUsers[data.id].hero, countHero = 0;
 		
 		for(let key in MM.lobbyUsers){
@@ -4673,7 +5188,7 @@ class MM {
 			}
 			
 		}
-		
+		*/
 	}
 	
 	static chat(data){
@@ -4696,6 +5211,58 @@ class MM {
 	
 }
 
+class Sound {
+	
+	static all = new Object();
+	
+	static play(source,object = new Object()){
+		
+		let audio = new Audio();
+		
+		if( ('volume' in object) && (object.volume) ){
+			
+			audio.volume = object.volume;
+			
+		}
+		
+		if('loop' in object){
+			
+			audio.loop = true;
+			
+		}
+		
+		audio.preload = 'auto';
+		
+		audio.src = source;
+		
+		audio.play();
+		
+		if( ('id' in object) && (object.id) ){
+			
+			if( !(object.id in Sound.all) ){
+				
+				Sound.all[object.id] = audio;
+				
+			}
+			
+		}
+		
+	}
+	
+	static stop(id){
+		
+		if(id in Sound.all){
+			
+			Sound.all[id].pause();
+			
+			delete Sound.all[id];
+			
+		}
+		
+	}
+	
+}
+
 class Timer {
 	
 	static intervalId = false;
@@ -4709,6 +5276,8 @@ class Timer {
 	}
 	
 	static async start(id,name,callback){
+		
+		Timer.stop();
 		
 		Timer.callback = callback;
 		
@@ -4746,13 +5315,7 @@ class Timer {
 		
 		if( (Date.now() - Timer.timeFinish) >= 0){
 			
-			if(Timer.intervalId){
-				
-				clearInterval(Timer.intervalId);
-				
-				Timer.intervalId = false;
-				
-			}
+			Timer.stop();
 			
 			Timer.callback();
 			
