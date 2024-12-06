@@ -94,7 +94,9 @@ function moveMouse(e) {
 
 var scenesJson;
 
-var InitDemo = function (sceneName) {
+var globalCanvas;
+
+var InitDemo = function (sceneName, canvas) {
 	window.addEventListener('resize', function(event) {
 		canvas.width = document.body.offsetWidth;
 		canvas.height = document.body.offsetHeight;
@@ -106,7 +108,8 @@ var InitDemo = function (sceneName) {
 
 	// Prepare WebGL
 	{
-		var canvas = document.getElementById('game-surface');
+		globalCanvas = canvas;
+		//var canvas = document.getElementById('game-surface');
 
 		canvas.width = document.body.offsetWidth;
 		canvas.height = document.body.offsetHeight;
@@ -532,10 +535,10 @@ var LoadResources = function (sceneObjects, sceneBuildings, shaderNames, texName
 
 	function waitInitialization() {
 		if (shadersLoaded == shaderNames.length && texturesLoaded == texNames.length && meshesLoaded == totalMeshes) {
-			var canvas = document.getElementById('game-surface');
+			var canvas = globalCanvas; //document.getElementById('game-surface');
 			canvas.classList.add('castle-fade-in');
-			var backgroundImage = document.getElementById('background-img');
-			backgroundImage.classList.add('background-image-fade-out');
+			var backgroundImage = document.getElementById('castle-background-img');
+			backgroundImage.classList.add('castle-background-image-fade-out');
 			MainLoop(sceneObjects, sceneBuildings, sceneShaders, sceneTextures);
 		} else {
 			window.setTimeout(waitInitialization, 100);
@@ -681,21 +684,21 @@ var MainLoop = function(sceneObjects, sceneBuildings, sceneShaders, sceneTexture
 var UpdateMainCam = function () {
 	mat4.perspective(projMatrix, glMatrix.toRadian(fov), canvasWidth / canvasHeight, zNear, zFar);
 
-	var camPosElements = document.getElementsByClassName("camPosition");
-	var camPosX = Number(camPosElements[0].value) + camDeltaPos[0];
-	var camPosY = Number(camPosElements[2].value) - camDeltaPos[1];
-	var camPosZ = Number(camPosElements[1].value) + cameraHeight;
+	var camPosElements = [-1373, -473, -1523];
+	var camPosX = camPosElements[0] + camDeltaPos[0];
+	var camPosY = camPosElements[2] - camDeltaPos[1];
+	var camPosZ = camPosElements[1] + cameraHeight;
 	var camPos = vec3.fromValues(camPosX, camPosZ, camPosY);
 
-	var camForwElements = document.getElementsByClassName("camForward");
+	var camForwElements = [-2.01, -2.36, 3.14];
 	var quatStart = quat.create();
 	quat.identity(quatStart);
 	var quatX = quat.create();
 	var quatY = quat.create();
 	var quatZ = quat.create();
-	quat.rotateX(quatX, quatStart, Number(camForwElements[0].value) + rotationTilt);
-	quat.rotateY(quatY, quatX, Number(camForwElements[1].value));
-	quat.rotateZ(quatZ, quatY, Number(camForwElements[2].value));
+	quat.rotateX(quatX, quatStart, camForwElements[0] + rotationTilt);
+	quat.rotateY(quatY, quatX, camForwElements[1]);
+	quat.rotateZ(quatZ, quatY, camForwElements[2]);
 
 	mat4.fromRotationTranslation(viewMatrix, quatZ, vec3.create());
 	mat4.translate(viewMatrix, viewMatrix, camPos);
