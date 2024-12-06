@@ -1674,14 +1674,27 @@ class View {
 	}
 	
 	static async users(){
+
+		let filter = DOM({event:['click', () => {
+			let users = document.getElementsByClassName('user-item');
+			for (let user in users) {
+				if (users[user].className && users[user].className == 'user-item') {
+					let isBlocked = users[user].getElementsByClassName('userParam-blocked')[0].nextSibling.value != '0';
+					if (!isBlocked) {
+						users[user].style.display = users[user].style.display == 'none' ? 'inherit' : 'none';
+					}
+				}
+			}
+		}]}, 'Filter only banned');
+
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'), filter);
 		
 		let result = await App.api.request('user','all');
 		
 		for(let item of result){
 			
-			let div = DOM({tag:'div'});
+			let div = DOM({tag:'div', className: 'user-item'});
 			
 			div.append(DOM(`id${item.id}`),DOM(`inv ${item.invite}`));
 			
@@ -1701,7 +1714,7 @@ class View {
 					
 				}
 				
-				div.append(DOM({tag:'div'},key),App.input( async (value) => {
+				div.append(DOM({tag:'div', className:'userParam-' + key},key),App.input( async (value) => {
 					
 					let object = new Object();
 					
