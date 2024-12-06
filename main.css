@@ -1349,10 +1349,10 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 }
 
 .lobby-build-tab{
-	
 	display:flex;
 	flex-flow:row nowrap;
-	
+	width: 32vw;
+	overflow-x: auto;
 }
 
 .lobby-build-tab div{
