@@ -3656,6 +3656,8 @@ class Build{
 										swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
 									}
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = null;
+
 									if (performSwapFromLibrary) {
 										swapParentNode.prepend(elemBelow.firstChild);
 									}
