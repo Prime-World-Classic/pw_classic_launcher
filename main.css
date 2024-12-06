@@ -1663,9 +1663,10 @@ cursor:pointer;
 
 .top-filter:after {
 	content: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям';
-	position: relative;
-	margin-top: 14vh;
-	right: 30vw;
+	position: absolute;
+	width:100%;
+	text-align:center;
+	margin-top: 8vw;
 	font-size: small;
 }
 
