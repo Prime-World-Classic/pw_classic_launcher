@@ -2289,6 +2289,10 @@ class Build{
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
 
+			if (build.target) {
+				div.classList.add('highlight');
+			}
+
 			item.onclick = () => {
 				setTimeout(_ => {
 					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
