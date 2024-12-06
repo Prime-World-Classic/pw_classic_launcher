@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.15 (TEST)';
+APP_VERSION = '1.9.20 (TEST)';
 
 PW_VERSION = '1.9';
 
@@ -4631,7 +4631,7 @@ class MM {
 	}
 	
 	static async start(){
-		/*
+		
 		if(!await Protect.checkInstall()){
 			
 			MM.button.innerText = 'Проверка';
@@ -4645,7 +4645,7 @@ class MM {
 			return;
 			
 		}
-		*/
+		
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
