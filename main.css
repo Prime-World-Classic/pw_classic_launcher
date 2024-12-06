@@ -1659,6 +1659,14 @@ cursor:pointer;
 	
 }
 
+.top-filter:after {
+	content: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям';
+	position: relative;
+	margin-top: 14vh;
+	right: 30vw;
+	font-size: small;
+}
+
 .top-item{
 	
 	width:23vw;
