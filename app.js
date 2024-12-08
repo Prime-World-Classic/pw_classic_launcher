@@ -924,7 +924,16 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'[X]')
+		DOM({style:'main-header-item',event:['click',() => {
+			const logout = DOM({event:['click', async () => {
+				App.exit()
+				Splash.hide();
+			}]}, 'Logout')
+			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
+			const wrap = DOM({style: 'wrap'}, logout, close);
+			const dom = DOM({style: 'div'}, 'Выйти из аккаунта?', wrap);
+			Splash.show(dom)
+		}]},'[X]')
 		);
 		
 		return menu;
