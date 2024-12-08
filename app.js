@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.15 (TEST)';
+APP_VERSION = '1.9.0';
 
 PW_VERSION = '1.9';
 
@@ -929,7 +929,16 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'[X]')
+		DOM({style:'main-header-item',event:['click',() => {
+			const logout = DOM({event:['click', async () => {
+				App.exit()
+				Splash.hide();
+			}]}, 'Logout')
+			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
+			const wrap = DOM({style: 'wrap'}, logout, close);
+			const dom = DOM({style: 'div'}, 'Выйти из аккаунта?', wrap);
+			Splash.show(dom)
+		}]},'[X]')
 		);
 		
 		return menu;
@@ -1002,7 +1011,7 @@ class View {
 		
 		let players = new Array();
 		
-		data = (data) ? data : await App.api.request('mmtest','loadParty');
+		data = (data) ? data : await App.api.request('mm','loadParty');
 		
 		MM.partyId = data.id;
 		
@@ -1069,7 +1078,7 @@ class View {
 							
 						}
 						
-						await App.api.request('mmtest','readyParty',{id:MM.partyId});
+						await App.api.request('mm','readyParty',{id:MM.partyId});
 						
 						status.onclick = false;
 						
@@ -1105,7 +1114,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mmtest','leaderKickParty',{id:player.dataset.id});
+					await App.api.request('mm','leaderKickParty',{id:player.dataset.id});
 					
 				}]},'[X]'));
 				
@@ -1115,7 +1124,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
+					await App.api.request('mm','leaveParty',{id:MM.partyId});
 					
 					View.show('main');
 					
@@ -1151,7 +1160,7 @@ class View {
 							
 							try{
 								
-								await App.api.request('mmtest','heroParty',{id:MM.partyId,hero:item.id});
+								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
 								
 							}
 							catch(error){
@@ -1199,7 +1208,7 @@ class View {
 					
 					input.addEventListener('input', async () => {
 						
-						let request = await App.api.request('mmtest','findUser',{name:input.value});
+						let request = await App.api.request('mm','findUser',{name:input.value});
 						
 						if(body.firstChild){
 							
@@ -1215,7 +1224,7 @@ class View {
 							
 							body.append(DOM({event:['click', async () => {
 								
-								await App.api.request('mmtest','inviteParty',{id:item.id});
+								await App.api.request('mm','inviteParty',{id:item.id});
 								
 								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
 								
@@ -1263,7 +1272,7 @@ class View {
 		
 		let body = DOM({style:'main'}), history = DOM({style:'history'});
 		
-		let result = await App.api.request('mmtest','history');
+		let result = await App.api.request('mm','history');
 		
 		for(let item of result){
 			
@@ -1293,7 +1302,7 @@ class View {
 		
 		let body = DOM({style:'main'});
 		
-		let result = await App.api.request('mmtest','top',{limit:100,hero:hero});
+		let result = await App.api.request('mm','top',{limit:100,hero:hero});
 		
 		if(!result){
 			
@@ -1679,14 +1688,27 @@ class View {
 	}
 	
 	static async users(){
+
+		let filter = DOM({event:['click', () => {
+			let users = document.getElementsByClassName('user-item');
+			for (let user in users) {
+				if (users[user].className && users[user].className == 'user-item') {
+					let isBlocked = users[user].getElementsByClassName('userParam-blocked')[0].nextSibling.value != '0';
+					if (!isBlocked) {
+						users[user].style.display = users[user].style.display == 'none' ? 'inherit' : 'none';
+					}
+				}
+			}
+		}]}, 'Filter only banned');
+
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'), filter);
 		
 		let result = await App.api.request('user','all');
 		
 		for(let item of result){
 			
-			let div = DOM({tag:'div'});
+			let div = DOM({tag:'div', className: 'user-item'});
 			
 			div.append(DOM(`id${item.id}`),DOM(`inv ${item.invite}`));
 			
@@ -1706,7 +1728,7 @@ class View {
 					
 				}
 				
-				div.append(DOM({tag:'div'},key),App.input( async (value) => {
+				div.append(DOM({tag:'div', className:'userParam-' + key},key),App.input( async (value) => {
 					
 					let object = new Object();
 					
@@ -2293,6 +2315,10 @@ class Build{
 			);
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
+
+			if (build.target) {
+				div.classList.add('highlight');
+			}
 
 			item.onclick = () => {
 				setTimeout(_ => {
@@ -3661,6 +3687,8 @@ class Build{
 										swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
 									}
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
+									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = null;
+
 									if (performSwapFromLibrary) {
 										swapParentNode.prepend(elemBelow.firstChild);
 									}
@@ -4079,7 +4107,7 @@ class Events {
 		
 		let b1 = DOM({style:'splash-content-button',event:['click', async () => {
 			
-			await App.api.request('mmtest','joinParty',{code:data.code,version:PW_VERSION});
+			await App.api.request('mm','joinParty',{code:data.code,version:PW_VERSION});
 			
 			Splash.hide();
 			
@@ -4482,7 +4510,7 @@ class Protect {
 			
 			if(Protect.storage.data.c){
 				
-				let request = await App.api.request('mmtest','check',{id:Protect.storage.data.c});
+				let request = await App.api.request('mm','check',{id:Protect.storage.data.c});
 				
 				if(request){
 					
@@ -4503,7 +4531,7 @@ class Protect {
 				
 				await Protect.storage.set({c:c});
 				
-				await App.api.request('mmtest','check',{id:c});
+				await App.api.request('mm','check',{id:c});
 				
 			}
 			
@@ -4634,7 +4662,7 @@ class MM {
 	}
 	
 	static async start(){
-		/*
+		
 		if(!await Protect.checkInstall()){
 			
 			MM.button.innerText = 'Проверка';
@@ -4648,7 +4676,7 @@ class MM {
 			return;
 			
 		}
-		*/
+		
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
@@ -4659,7 +4687,7 @@ class MM {
 			
 			try{
 				
-				MM.id = await App.api.request('mmtest','cancel');
+				MM.id = await App.api.request('mm','cancel');
 				
 			}
 			catch(error){
@@ -4675,7 +4703,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request('mmtest','start',{hero:MM.activeSelectHero,version:PW_VERSION});
+				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero,version:PW_VERSION});
 				
 				MM.id = request.id;
 				
@@ -4704,7 +4732,7 @@ class MM {
 	
 	static async cancel(){
 		
-		await App.api.request('mmtest','start');
+		await App.api.request('mm','start');
 		
 		MM.id = '';
 		
@@ -4732,7 +4760,7 @@ class MM {
 			
 			try{
 				
-				await App.api.request('mmtest','ready',{id:MM.id});
+				await App.api.request('mm','ready',{id:MM.id});
 				
 			}
 			catch(error){
@@ -4856,7 +4884,7 @@ class MM {
 		
 		MM.lobbyConfirm = DOM({style:'ready-button',event:['click', async () => {
 			
-			await App.api.request('mmtest','hero',{id:MM.id,heroId:MM.targetHeroId});
+			await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
 			
 		}]},'Подтвердить');
 		
@@ -4946,7 +4974,7 @@ class MM {
 				//return;
 				MM.targetHeroId = item.id;
 				
-				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
+				await App.api.request('mm','eventChangeHero',{id:MM.id,heroId:item.id});
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
@@ -5003,7 +5031,7 @@ class MM {
 					
 				}
 				
-				await App.api.request('mmtest','chat',{id:MM.id,message:chatInput.value});
+				await App.api.request('mm','chat',{id:MM.id,message:chatInput.value});
 				
 				chatInput.value = '';
 				
@@ -5288,7 +5316,7 @@ class Timer {
 		
 		Timer.message = name;
 
-		Timer.timeFinish = await App.api.request('mmtest','getTimer',{id:id,time:Date.now()});
+		Timer.timeFinish = await App.api.request('mm','getTimer',{id:id,time:Date.now()});
 		
 		if(Timer.end()){
 			
