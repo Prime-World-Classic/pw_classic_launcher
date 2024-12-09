@@ -1069,7 +1069,7 @@ class View {
 				else if(item.id == App.storage.data.id){
 					
 					status.onclick = async () => {
-						
+						/*
 						if(!await Protect.checkInstall()){
 							
 							App.error('Проверка');
@@ -1077,6 +1077,9 @@ class View {
 							return;
 							
 						}
+						*/
+						
+						await PWGame.check();
 						
 						await App.api.request('mm','readyParty',{id:MM.partyId});
 						
@@ -4245,13 +4248,13 @@ class App {
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
 		document.body.append(DOM({id:'STAT'}));
-		
+		/*
 		setTimeout(() => {
 			
 			PWGame.reconnect('Tester00Tester00Tester00Tester00a99dfed1f15ff8621202607bb6d416c7ec3581717ec1d76c24b269615400033b');
 			
 		},2000);
-		
+		*/
 	}
 	
 	static async authorization(login,password){
@@ -4548,11 +4551,19 @@ class PWGame {
 		
 	}
 	
-	static check(){
+	static async check(){
 		
+		if(!NativeAPI.status){
+			
+			throw 'Необходима Windows версия лаунчера';
+			
+		}
 		
-		
-		
+		if(!await NativeAPI.fileSystem.access(PWGame.PATH)){
+			
+			throw `Не найден файл ${PWGame.PATH}`;
+			
+		}
 		
 	}
 	
@@ -4595,7 +4606,7 @@ class NativeAPI {
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
-		NativeAPI.fs = require('fs/promises');
+		NativeAPI.fileSystem = require('fs/promises');
 		
 		NativeAPI.childProcess = require('child_process');
 		
@@ -4628,13 +4639,13 @@ class NativeAPI {
 		});
 		
 	}
-	
+	/*
 	static async write(){
 		
-		// await NativeAPI.fs.writeFile('ifst.txt','Hello ifst!');
+		await NativeAPI.fileSystem.writeFile('ifst.txt','Hello ifst!');
 		
 	}
-
+	*/
 }
 
 class Protect {
@@ -4806,6 +4817,8 @@ class MM {
 	
 	static async start(){
 		
+		await PWGame.check();
+		/*
 		if(!await Protect.checkInstall()){
 			
 			MM.button.innerText = 'Проверка';
@@ -4819,7 +4832,7 @@ class MM {
 			return;
 			
 		}
-		
+		*/
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
