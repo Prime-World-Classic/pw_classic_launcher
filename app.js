@@ -4201,6 +4201,8 @@ class App {
 	
 	static async init(){
 		
+		NativeAPI.init();
+		
 		Splash.init();
 		
 		// ws://192.168.31.194:3737
@@ -4243,6 +4245,12 @@ class App {
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
 		document.body.append(DOM({id:'STAT'}));
+		
+		setTimeout(() => {
+			
+			PWGame.reconnect('Tester00Tester00Tester00Tester00a99dfed1f15ff8621202607bb6d416c7ec3581717ec1d76c24b269615400033b');
+			
+		},2000);
 		
 	}
 	
@@ -4492,6 +4500,141 @@ class App {
 		
 	}
 	
+	static href(url){
+		
+		let a = DOM({tag:'a',href:url});
+		
+		a.click();
+		
+	}
+	
+}
+
+class PWGame {
+	
+	static PATH = '../bin/PW_Game.exe';
+	
+	static async start(id){
+		
+		let request = `pwclassic://runGame/${id}/${PW_VERSION}`;
+		
+		if(NativeAPI.status){
+			
+			await NativeAPI.exec(PWGame.PATH,[`protocol ${request}`]);
+			
+		}
+		else{
+			
+			App.href(request);
+			
+		}
+		
+	}
+	
+	static async reconnect(id){
+		
+		let request = `pwclassic://reconnect/${id}/${PW_VERSION}`;
+		
+		if(NativeAPI.status){
+			
+			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
+			
+		}
+		else{
+			
+			App.href(request);
+			
+		}
+		
+	}
+	
+	static check(){
+		
+		
+		
+		
+		
+	}
+	
+}
+
+class NativeAPI {
+	
+	static status = false;
+	
+	static init(){
+		
+		try{
+			
+			if(!nw){
+				
+				return;
+				
+			}
+			
+		}
+		catch(e){
+			
+			return;
+			
+		}
+		
+		NativeAPI.app = nw.App;
+		
+		NativeAPI.window = nw.Window.get();
+		
+		NativeAPI.window.width = 1920;
+		
+		NativeAPI.window.height = 1080;
+		
+		NativeAPI.window.setResizable(true);
+		
+		NativeAPI.window.setPosition('center');
+		
+		NativeAPI.window.enterFullscreen();
+		
+		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
+		
+		NativeAPI.fs = require('fs/promises');
+		
+		NativeAPI.childProcess = require('child_process');
+		
+		NativeAPI.status = true;
+		
+	}
+	
+	static async exec(path,args){
+		
+		return new Promise((resolve,reject) => {
+			
+			if(!NativeAPI.status){
+				
+				reject();
+				
+			}
+			
+			NativeAPI.childProcess.execFile(path,args,(error,stdout,stderr) => {
+				
+				if(error){
+					
+					reject(error);
+					
+				}
+				
+				resolve(stdout);
+				
+			});
+			
+		});
+		
+	}
+	
+	static async write(){
+		
+		// await NativeAPI.fs.writeFile('ifst.txt','Hello ifst!');
+		
+	}
+
 }
 
 class Protect {
@@ -4709,9 +4852,7 @@ class MM {
 				
 				if(request.type == 'reconnect'){
 					
-					let reconnect = DOM({tag:'a',href:`pwclassic://reconnect/${request.id}/${PW_VERSION}`});
-		
-					reconnect.click();
+					PWGame.reconnect(request.id);
 					
 					return;
 					
@@ -5156,9 +5297,7 @@ class MM {
 		
 		MM.close();
 		
-		let play = DOM({tag:'a',href:`pwclassic://runGame/${data.key}/${PW_VERSION}`});
-		
-		play.click();
+		PWGame.start(data.key);
 		
 		View.show('main');
 		
