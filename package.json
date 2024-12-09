@@ -1,0 +1,12 @@
+{
+  "name": "Prime World Classic #1",
+  "main": "index.html",
+  "window": {
+	  "frame": true,
+	  "fullscreen":true,
+	  "width": 1920,
+        "height": 1080,
+        "position": "center",
+        "resizable": true
+    }
+}
