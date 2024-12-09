@@ -750,7 +750,7 @@ class View {
 	
 	static activeAnimation = false;
 	
-	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],/*backdropFilter:['blur(0)','blur(15px)']*/};
+	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(15px)']};
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
 	
