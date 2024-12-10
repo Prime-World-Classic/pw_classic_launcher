@@ -930,15 +930,30 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => {
-			const logout = DOM({event:['click', async () => {
-				App.exit()
+			
+			if(NativeAPI.exit()){
+				
+				return;
+				
+			}
+			
+			let logout = DOM({event:['click', async () => {
+				
+				App.exit();
+				
 				Splash.hide();
-			}]}, 'Logout')
-			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
-			const wrap = DOM({style: 'wrap'}, logout, close);
-			const dom = DOM({style: 'div'}, 'Выйти из аккаунта?', wrap);
-			Splash.show(dom)
-		}]},'[X]')
+				
+			}]},'Logout');
+			
+			let close = DOM({event:['click',() => Splash.hide()]},'Отмена');
+			
+			let wrap = DOM({style:'wrap'},logout,close);
+			
+			let dom = DOM({style:'div'},'Выйти из аккаунта?',wrap);
+			
+			Splash.show(dom);
+			
+		}]},'Выйти')
 		);
 		
 		return menu;
@@ -4680,11 +4695,13 @@ class NativeAPI {
 		
 		if(!NativeAPI.status){
 			
-			return;
+			return false;
 			
 		}
 		
 		await NativeAPI.app.quit();
+		
+		return true;
 		
 	}
 	/*
