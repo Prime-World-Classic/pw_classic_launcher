@@ -5162,6 +5162,8 @@ class MM {
 				
 				name.style.opacity = 0;
 				
+				rank.style.opacity = 0;
+				
 				rightTeam.append(player);
 				
 			}
