@@ -5093,7 +5093,22 @@ class MM {
 		
 		MM.lobbyConfirm = DOM({style:'ready-button',event:['click', async () => {
 			
-			await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
+			try{
+				
+				await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
+				
+			}
+			catch(error){
+				
+				MM.lobbyConfirm.innerText = error;
+				
+				setTimeout(() => {
+					
+					MM.lobbyConfirm.innerText = 'Подтвердить';
+					
+				},1500);
+				
+			}
 			
 		}]},'Подтвердить');
 		
