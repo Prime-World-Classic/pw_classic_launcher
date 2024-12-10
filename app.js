@@ -1069,17 +1069,23 @@ class View {
 				else if(item.id == App.storage.data.id){
 					
 					status.onclick = async () => {
-						/*
-						if(!await Protect.checkInstall()){
+						
+						if(NativeAPI.status){
 							
-							App.error('Проверка');
-							
-							return;
+							await PWGame.check();
 							
 						}
-						*/
-						
-						await PWGame.check();
+						else{
+							
+							if(!await Protect.checkInstall()){
+								
+								App.error('Проверка');
+								
+								return;
+								
+							}
+							
+						}
 						
 						await App.api.request('mm','readyParty',{id:MM.partyId});
 						
@@ -4207,7 +4213,6 @@ class App {
 		NativeAPI.init();
 		
 		Splash.init();
-		
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
 		
@@ -4232,14 +4237,31 @@ class App {
 			}
 			else{
 				
-				View.show('main');
+				try{
+					
+					View.show('main');
+					
+				}
+				catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
+					
+					App.exit();
+					
+				}
 				
 			}
 			
 		}
 		else{
 			
-			App.api.init();
+			try{
+				
+				App.api.init();
+				
+			}
+			catch(e){
+				
+				
+			}
 			
 			View.show('authorization');
 			
@@ -4333,7 +4355,7 @@ class App {
 	
 	static async exit(){
 		
-		await App.storage.set({token:'',login:''});
+		await App.storage.set({id:0,token:'',login:''});
 		
 		View.show('authorization');
 		
@@ -4639,6 +4661,32 @@ class NativeAPI {
 		});
 		
 	}
+	
+	static async reset(){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		await App.exit();
+		
+		await NativeAPI.app.clearCache();
+		
+	}
+	
+	static exit(){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		await NativeAPI.app.quit();
+		
+	}
 	/*
 	static async write(){
 		
@@ -4817,22 +4865,29 @@ class MM {
 	
 	static async start(){
 		
-		await PWGame.check();
-		/*
-		if(!await Protect.checkInstall()){
+		if(NativeAPI.status){
 			
-			MM.button.innerText = 'Проверка';
-			
-			setTimeout(() => {
-				
-				MM.button.innerText = 'В бой!';
-				
-			},5000);
-			
-			return;
+			await PWGame.check();
 			
 		}
-		*/
+		else{
+			
+			if(!await Protect.checkInstall()){
+				
+				MM.button.innerText = 'Проверка';
+				
+				setTimeout(() => {
+					
+					MM.button.innerText = 'В бой!';
+					
+				},5000);
+				
+				return;
+				
+			}
+			
+		}
+		
 		if(!MM.hero){
 			
 			MM.hero = await App.api.request('build','heroAll');
