@@ -1,4 +1,4 @@
-APP_VERSION = '1.9.0';
+APP_VERSION = '1';
 
 PW_VERSION = '1.9';
 
@@ -738,7 +738,7 @@ class Api {
 	
 	async say(request,object,method,data = ''){
 		
-		this.WebSocket.send(JSON.stringify({token:App.storage.data.token,request:request,object:object,method:method,data:data,version:APP_VERSION}));
+		this.WebSocket.send(JSON.stringify({token:App.storage.data.token,request:request,object:object,method:method,data:data,version:`${PW_VERSION}.${APP_VERSION}`}));
 		
 	}
 	
@@ -815,7 +815,7 @@ class View {
 			View.show('registration');
 			
 		}]},'Регистрация'))
-		)),DOM({style:'author'},`Launcher v.${APP_VERSION} | Prime World v.${PW_VERSION}`));
+		)),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 		
 	}
 	
@@ -850,7 +850,7 @@ class View {
 		),
 		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'logo_classic.png'}))
 		
-		),DOM({style:'author'},`Версия ${APP_VERSION} by ifst.`));
+		),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 		
 	}
 	
@@ -4197,7 +4197,7 @@ class Events {
 		
 		console.log('stat',data);
 		
-		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Лаунчер v.${APP_VERSION} | PW v.${PW_VERSION}`
+		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
 		
 	}
 	
@@ -4699,7 +4699,7 @@ class NativeAPI {
 			
 		}
 		
-		await NativeAPI.app.quit();
+		NativeAPI.app.quit();
 		
 		return true;
 		
