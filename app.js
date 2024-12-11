@@ -4567,7 +4567,7 @@ class App {
 
 class PWGame {
 	
-	static PATH = '../bin/PW_Game.exe';
+	static PATH = '../Bin/PW_Game.exe';
 	
 	static async start(id){
 		
@@ -4575,7 +4575,7 @@ class PWGame {
 		
 		if(NativeAPI.status){
 			
-			await NativeAPI.exec(PWGame.PATH,[`protocol ${request}`]);
+			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
 			
 		}
 		else{
@@ -4611,11 +4611,7 @@ class PWGame {
 			
 		}
 		
-		if(!await NativeAPI.fileSystem.access(PWGame.PATH)){
-			
-			throw `Не найден файл ${PWGame.PATH}`;
-			
-		}
+		await NativeAPI.fileSystem.access(PWGame.PATH);
 		
 	}
 	
@@ -4722,7 +4718,7 @@ class NativeAPI {
 	
 	static async write(){
 		
-		await NativeAPI.fileSystem.writeFile('ifst.txt','Hello ifst!');
+		await NativeAPI.fileSystem.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Data().toLocaleString()}.`);
 		
 	}
 	
@@ -4899,7 +4895,16 @@ class MM {
 		
 		if(NativeAPI.status){
 			
-			await PWGame.check();
+			try{
+				
+				await PWGame.check();
+				
+			}
+			catch(error){
+				
+				return App.error(error);
+				
+			}
 			
 		}
 		else{
