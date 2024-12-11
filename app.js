@@ -4718,7 +4718,7 @@ class NativeAPI {
 	
 	static async write(){
 		
-		await NativeAPI.fileSystem.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Data().toLocaleString()}.`);
+		await NativeAPI.fileSystem.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
 		
 	}
 	
