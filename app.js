@@ -4989,6 +4989,8 @@ class MM {
 		}
 		else{
 			
+			MM.searchActive(true);
+			
 			try{
 				
 				let request = await App.api.request('mmtest','start',{hero:MM.activeSelectHero,version:PW_VERSION});
@@ -4996,6 +4998,8 @@ class MM {
 				MM.id = request.id;
 				
 				if(request.type == 'reconnect'){
+					
+					MM.searchActive(false);
 					
 					PWGame.reconnect(request.id);
 					
@@ -5006,11 +5010,11 @@ class MM {
 			}
 			catch(error){
 				
+				MM.searchActive(false);
+				
 				return App.error(error);
 				
 			}
-			
-			MM.searchActive(true);
 			
 		}
 		
