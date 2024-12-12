@@ -1,8 +1,10 @@
-APP_VERSION = '1 (TEST)';
+APP_VERSION = '2 (TEST)';
 
 PW_VERSION = '1.9';
 
 window.addEventListener('DOMContentLoaded',() => {
+	
+	NativeAPI.init();
 	
 	App.init();
 	
@@ -4225,23 +4227,6 @@ class App {
 	
 	static async init(){
 		
-		NativeAPI.init();
-		
-		setTimeout(() => {
-			
-			try{
-				
-				NativeAPI.write();
-				
-			}
-			catch(e){
-				
-				
-			}
-			
-			
-		},3000);
-		
 		Splash.init();
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
@@ -4621,6 +4606,13 @@ class NativeAPI {
 	
 	static status = false;
 	
+	static modules = {
+		
+		fileSystem:'fs/promises',
+		childProcess:'child_process'
+		
+	};
+	
 	static init(){
 		
 		try{
@@ -4638,6 +4630,8 @@ class NativeAPI {
 			
 		}
 		
+		NativeAPI.status = true;
+		
 		NativeAPI.app = nw.App;
 		
 		NativeAPI.window = nw.Window.get();
@@ -4645,6 +4639,8 @@ class NativeAPI {
 		NativeAPI.window.width = 1920;
 		
 		NativeAPI.window.height = 1080;
+		
+		NativeAPI.window.setMinimumSize(1280,720);
 		
 		NativeAPI.window.setResizable(true);
 		
@@ -4654,11 +4650,17 @@ class NativeAPI {
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
-		NativeAPI.fileSystem = require('fs/promises');
+		NativeAPI.loadModules();
 		
-		NativeAPI.childProcess = require('child_process');
+	}
+	
+	static loadModules(){
 		
-		NativeAPI.status = true;
+		for(let module in NativeAPI.modules){
+			
+			NativeAPI[module] = require(NativeAPI.modules[module]);
+			
+		}
 		
 	}
 	
@@ -4702,6 +4704,32 @@ class NativeAPI {
 		
 	}
 	
+	static progress(value = 0.0){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.window.setProgressBar(value);
+		
+	}
+	
+	static attention(){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.window.focus();
+		
+		NativeAPI.window.requestAttention(true);
+		
+	}
+	
 	static exit(){
 		
 		if(!NativeAPI.status){
@@ -4716,7 +4744,19 @@ class NativeAPI {
 		
 	}
 	
-	static async write(){
+	static async update(){
+		
+		if(!NativeAPI.status){
+			
+			return false;
+			
+		}
+		
+		// базовая логика обновления, загрузка файлов и работа с файловой системой
+		
+	}
+	
+	static async write(){ // test method
 		
 		await NativeAPI.fileSystem.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
 		
