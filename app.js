@@ -2594,24 +2594,16 @@ class Build{
 						return
 					}
 					const home = DOM({style: 'home'}, 'Родная');
-					const neutral = DOM({style: 'neutral'}, 'Нейтральная');
 					const enemy = DOM({style: 'enemy'}, 'Вражеская');
 					home.onclick = _ => {
 						home.classList.add('highlight');
 						enemy.classList.remove('highlight');
-						neutral.classList.remove('highlight');
-					}
-					neutral.onclick = _ => {
-						home.classList.remove('highlight');
-						neutral.classList.add('highlight');
-						enemy.classList.remove('highlight');
 					}
 					enemy.onclick = _ => {
 						home.classList.remove('highlight');
-						neutral.classList.remove('highlight');
 						enemy.classList.add('highlight');
 					}
-					const wrapper = DOM({style: 'wrapper'}, home, neutral, enemy);
+					const wrapper = DOM({style: 'wrapper'}, home, enemy);
 					item.parentNode.append(wrapper)
 					setTimeout(_ => {
 						wrapper.remove();
