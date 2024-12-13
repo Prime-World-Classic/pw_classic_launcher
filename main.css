@@ -392,7 +392,7 @@ background-color:rgba(15,15,15,0.7);
 	cursor: default;
 }
 .build-hero-stats-item.highlight {
-	background: #2a6d3d;
+	background: #2a6d3d !important;
 }
 
 
