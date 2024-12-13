@@ -2252,3 +2252,81 @@ cursor:pointer;
 		width: 17vw;
 	}
 }
+
+@media (height < 1200px) {
+	.build-hero {
+		min-width: 20vw;
+		margin-top: -14vh;
+	}
+
+	.build-hero > div:first-child {
+		height: 23vh;
+	}
+	.build-hero .avatar {
+		width: 166px;
+		height: 166px;
+	}
+	.build-hero .name {
+		margin: 1vh;
+	}
+
+	.build-hero-stats {
+		font-size: 1rem;
+	}
+
+	.build-hero-stats-line {
+		margin: 0;
+	}
+
+	.build-level {
+		min-height: 500px;
+		height: 10vh;
+	}
+
+	.build-level div {
+		width:  70px;
+		height: 70px;
+		font-size: 1rem;
+	}
+
+	.build-talent {
+		height: 70vh;
+	}
+
+	.build-talent-item {
+		width: 64px;
+		height: 64px;
+	}
+	.build .build-talent-item[data-active="1"]::after {
+		transform: scale(0.60);
+		position: relative;
+		top: -16px;
+		margin-left: -30px;
+	}
+
+	.build-field-item {
+		width:  70px;
+		height: 79px;
+	}
+
+	.build-field {
+		min-width: 30vw;
+		width: 30vw;
+		min-height: 500px;
+		height: 500px;
+	}
+
+	.build-talents {
+		height: 530px;
+	}
+
+	.build-field-bottom {
+		margin-top: 0vh;
+	}
+
+	.build-active-bar-item {
+		width: 3vw;
+		height: 3vw;
+	}
+
+}
