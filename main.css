@@ -348,6 +348,27 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-line:nth-child(n+10) {
 	border-bottom: 1px solid #777;
 }
+.build-hero-stats-line .wrapper {
+	position: absolute;
+	border: 1px solid #000;
+	padding: 5px;
+	left: 21vw;
+	bottom: 2vh;
+	color: #fff;
+	cursor: pointer;
+}
+.build-hero-stats-line .wrapper div {
+	padding: 5px;
+}
+.build-hero-stats-line .wrapper .home.highlight {
+	background: darkgreen;
+}
+.build-hero-stats-line .wrapper .neutral.highlight {
+	background: gray;
+}
+.build-hero-stats-line .wrapper .enemy.highlight {
+	background: red;
+}
 .build-hero-stats-item{
 	
 	display:flex;
@@ -368,6 +389,10 @@ background-color:rgba(15,15,15,0.7);
 	background: none;
 	cursor: default;
 }
+.build-hero-stats-item.highlight {
+	background: darkgreen !important;
+}
+
 
 .build-hero-stats-daw {
 	

@@ -2585,16 +2585,42 @@ class Build{
 
 			if (key === 'groundType') {
 				item.onclick = _ => {
-					if (item.firstChild.innerText === 'Тип земли') {
-						item.firstChild.innerText = 'Родная земля';
-					} else if (item.firstChild.innerText === 'Родная земля') {
-						item.firstChild.innerText = 'Нейтральная земля';
-					} else if (item.firstChild.innerText === 'Нейтральная земля') {
-						item.firstChild.innerText = 'Вражеская земля';
-					} else if (item.firstChild.innerText === 'Вражеская земля') {
-						item.firstChild.innerText = 'Родная земля';
+					item.classList.toggle('highlight');
+				}
+				item.onmouseover = _ => {
+					if (item.parentNode.querySelector('.wrapper')) {
+						// Node already here
+						return
 					}
+					const home = DOM({style: 'home'}, 'Родная');
+					const neutral = DOM({style: 'neutral'}, 'Нейтральная');
+					const enemy = DOM({style: 'enemy'}, 'Вражеская');
+					home.onclick = _ => {
+						home.classList.add('highlight');
+						enemy.classList.remove('highlight');
+						neutral.classList.remove('highlight');
+					}
+					neutral.onclick = _ => {
+						home.classList.remove('highlight');
+						neutral.classList.add('highlight');
+						enemy.classList.remove('highlight');
+					}
+					enemy.onclick = _ => {
+						home.classList.remove('highlight');
+						neutral.classList.remove('highlight');
+						enemy.classList.add('highlight');
+					}
+					const wrapper = DOM({style: 'wrapper'}, home, neutral, enemy);
+					item.parentNode.append(wrapper)
+					setTimeout(_ => {
+						wrapper.remove();
+					}, 5_000)
+				}
+			}
 
+			if (key === 'considerStacks' || key === 'considerBuff') {
+				item.onclick = _ => {
+					item.classList.toggle('highlight');
 				}
 			}
 			
