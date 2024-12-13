@@ -2596,12 +2596,16 @@ class Build{
 					const home = DOM({style: 'home'}, 'Родная');
 					const enemy = DOM({style: 'enemy'}, 'Вражеская');
 					home.onclick = _ => {
-						home.classList.add('highlight');
-						enemy.classList.remove('highlight');
+						if (home.parentNode.parentNode.querySelector('.build-hero-stats-item.highlight')) {
+							home.classList.add('highlight');
+							enemy.classList.remove('highlight');
+						}
 					}
 					enemy.onclick = _ => {
-						home.classList.remove('highlight');
-						enemy.classList.add('highlight');
+						if (home.parentNode.parentNode.querySelector('.build-hero-stats-item.highlight')) {
+							home.classList.remove('highlight');
+							enemy.classList.add('highlight');
+						}
 					}
 					const wrapper = DOM({style: 'wrapper'}, home, enemy);
 					item.parentNode.append(wrapper)
