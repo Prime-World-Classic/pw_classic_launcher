@@ -2419,7 +2419,7 @@ class Build{
 			protectionSpirit: 'Защита духа',
 			considerStacks: 'Учитывать стаки',
 			considerBuff: 'Учитывать бафф',
-			groundType: 'Тип земли',
+			groundType: 'Учитывать землю',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
