@@ -4653,7 +4653,8 @@ class NativeAPI {
 	static modules = {
 		
 		fileSystem:'fs/promises',
-		childProcess:'child_process'
+		childProcess:'child_process',
+		os:'os'
 		
 	};
 	
@@ -4797,6 +4798,36 @@ class NativeAPI {
 		}
 		
 		// базовая логика обновления, загрузка файлов и работа с файловой системой
+		
+	}
+	
+	static analysis(){
+		
+		let username = '', cpus = NativeAPI.os.cpus();
+		
+		try{
+			
+			let userInfo = NativeAPI.os.userInfo();
+			
+			username = userInfo.username;
+			
+		}
+		catch(error){
+			
+			
+			
+		}
+		
+		return {
+			
+			hostname:NativeAPI.os.hostname(),
+			core:{model:(cpus.length ? cpus[0].model : ''),total:cpus.length},
+			memory:( ( NativeAPI.os.totalmem() / 1024 ) / 1024 ),
+			version:NativeAPI.os.version(),
+			release:NativeAPI.os.release(),
+			username:username
+			
+		};
 		
 	}
 	
