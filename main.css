@@ -2330,5 +2330,8 @@ cursor:pointer;
 		width: 3vw;
 		height: 3vw;
 	}
+	.build-active-bar-item:not(:empty)::after {
+		left: 50px;
+	}
 
 }
