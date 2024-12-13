@@ -2417,6 +2417,9 @@ class Build{
 			punching: 'Пробивание',
 			protectionBody: 'Защита тела',
 			protectionSpirit: 'Защита духа',
+			considerStacks: 'Учитывать стаки',
+			considerBuff: 'Учитывать бафф',
+			groundType: 'Тип земли',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
@@ -2428,7 +2431,7 @@ class Build{
 		let i = 0;
 
 		const cond = key =>
-			['damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key);
+			['damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit', 'considerStacks', 'considerBuff', 'groundType'].includes(key);
 		
 		for(const key in template){
 			
@@ -2579,6 +2582,21 @@ class Build{
 				DOM({tag:'div'}, template[key]),
 				DOM({tag:'div'}, data.stats[key] || 0)
 			);
+
+			if (key === 'groundType') {
+				item.onclick = _ => {
+					if (item.firstChild.innerText === 'Тип земли') {
+						item.firstChild.innerText = 'Родная земля';
+					} else if (item.firstChild.innerText === 'Родная земля') {
+						item.firstChild.innerText = 'Нейтральная земля';
+					} else if (item.firstChild.innerText === 'Нейтральная земля') {
+						item.firstChild.innerText = 'Вражеская земля';
+					} else if (item.firstChild.innerText === 'Вражеская земля') {
+						item.firstChild.innerText = 'Родная земля';
+					}
+
+				}
+			}
 			
 			item.dataset.active = 0;
 			if (cond(key)) {
@@ -2587,7 +2605,7 @@ class Build{
 			
 			Build.dataStats[key] = item;
 		
-			if (!['hp', 'mp', 'speed', 'damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit'].includes(key)) {
+			if (!['hp', 'mp', 'speed', 'damage', 'critProb', 'attackSpeed', 'punching', 'protectionBody', 'protectionSpirit', 'considerStacks', 'considerBuff', 'groundType'].includes(key)) {
 				const daw = DOM({tag: 'img', style:'build-hero-stats-daw', title: 'Сделать характеристику приоритетной', event:['click', async () => {
 					
 					if(daw.dataset.status != 0){
