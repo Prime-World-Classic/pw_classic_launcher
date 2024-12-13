@@ -2315,7 +2315,11 @@ cursor:pointer;
 	}
 
 	.build-talents {
-		height: 530px;
+		height: 524px;
+	}
+
+	.build-talents .build-talent-item {
+		margin: 12px;
 	}
 
 	.build-field-bottom {
