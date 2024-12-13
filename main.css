@@ -2254,7 +2254,7 @@ cursor:pointer;
 @media (height < 1200px) {
 	.build-hero {
 		min-width: 20vw;
-		margin-top: -14vh;
+		margin-top: -180px;
 	}
 
 	.build-hero > div:first-child {
