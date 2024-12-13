@@ -2584,6 +2584,7 @@ class Build{
 			);
 
 			if (key === 'groundType') {
+				item.classList.add('noNumber');
 				item.onclick = _ => {
 					item.classList.toggle('highlight');
 				}
@@ -2619,6 +2620,7 @@ class Build{
 			}
 
 			if (key === 'considerStacks' || key === 'considerBuff') {
+				item.classList.add('noNumber');
 				item.onclick = _ => {
 					item.classList.toggle('highlight');
 				}

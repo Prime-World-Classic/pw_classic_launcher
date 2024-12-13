@@ -369,6 +369,10 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-line .wrapper .enemy.highlight {
 	background: red;
 }
+.build-hero-stats-line .noNumber div:last-child {
+	display: none;
+}
+
 .build-hero-stats-item{
 	
 	display:flex;
