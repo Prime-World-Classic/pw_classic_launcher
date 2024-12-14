@@ -863,15 +863,84 @@ class View {
 		let body = DOM({tag:'div', id: 'castle-body'});
 		let backgroundImage = DOM({tag:'div', id:'castle-background-img'});
 		let canvas = DOM({tag:'canvas', id:'castle-game-surface'});
-		
 		//App.storage.data.fraction; //тут будет инфа о стороне 1 или 2 
-		InitDemo('ad', canvas);
-
-		let menu = await View.main();
-
-		body.append(backgroundImage);
-		body.append(canvas);
-		body.append(menu);
+		InitDemo('doct',canvas);
+		
+		body.append(backgroundImage,canvas,View.castleMenu(),View.castleHeroes());
+		
+		return body;
+		
+	}
+	
+	static castleMenu(){
+		
+		let body = DOM({style:'castle-menu'},DOM(`123`),DOM(`456`));
+		
+		return body;
+		
+	}
+	
+	static castleHeroes(){
+		
+		let body = DOM({style:'castle-hero'}), preload = new PreloadImages(body);
+		
+		body.addEventListener('wheel',function(event){
+			
+			let modifier = 0;
+			
+			if (event.deltaMode == event.DOM_DELTA_PIXEL) {
+				
+				modifier = 1;
+				
+			} else if (event.deltaMode == event.DOM_DELTA_LINE) {
+				
+				modifier = parseInt(getComputedStyle(this).lineHeight);
+				
+			} else if (event.deltaMode == event.DOM_DELTA_PAGE) {
+				
+				modifier = this.clientHeight;
+				
+			}
+			
+			if (event.deltaY != 0) {
+				
+				this.scrollLeft += modifier * event.deltaY;
+				
+				event.preventDefault();
+				
+			}
+			
+		});
+		
+		App.api.silent((result) => {
+			
+			MM.hero = result;
+			
+			for(const item of result){
+				
+				let rankIcon = DOM({style:'rank-icon'});
+				
+				rankIcon.style.backgroundImage = `url(ransk/${Rank.icon(item.rating)}.png)`;
+				
+				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
+				
+				const hero = DOM({style:'castle-hero-item'},rank);
+				
+				hero.addEventListener('click',() => View.show('build',item.id));
+				
+				hero.dataset.id = item.id;
+				
+				hero.dataset.slide = 1;
+				
+				hero.dataset.total = item.total;
+				
+				hero.dataset.url = `hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+				
+				preload.add(hero);
+				
+			}
+			
+		},'build','heroAll');
 		
 		return body;
 		
