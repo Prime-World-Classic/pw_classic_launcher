@@ -2308,6 +2308,10 @@ cursor:pointer;
 		margin-left: -23px;
 	}
 
+	.build-field {
+		justify-content: center;
+	}
+
 	.build-field-item {
 		width:  70px;
 		height: 79px;
