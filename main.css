@@ -2341,6 +2341,7 @@ cursor:pointer;
 		height: 3vw;
 	}
 	.build-active-bar-item:not(:empty)::after {
+		/* Build screen: active panels: circle green/gray */
 		left: 50px;
 	}
 
