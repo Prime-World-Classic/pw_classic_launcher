@@ -2653,17 +2653,63 @@ class Build{
 			);
 
 			if (key === 'groundType') {
+				let isMouseOverItem = false;
+				let isMouseOverWrapper = false;
 				item.classList.add('noNumber');
+				if (Build.applyRz || Build.applyVz) {
+					item.classList.add('highlight');
+				}
+				let mouseOutEvent = function(){
+					if (isMouseOverWrapper || isMouseOverItem) {
+						return;
+					}
+					let wrapper = item.parentNode.querySelector('.wrapper');
+					if (wrapper) {
+						wrapper.remove();
+					}
+				}
 				item.onclick = _ => {
 					item.classList.toggle('highlight');
+					let wrapper = item.parentNode.querySelector('.wrapper');
+					if (Build.applyRz || Build.applyVz) {
+						// Disable
+						Build.applyRz = false;
+						Build.applyVz = false;
+						if (wrapper) {
+							if (wrapper.querySelector('.home.highlight')) {
+							}
+							wrapper.querySelector('.home').classList.remove('highlight');
+							if (wrapper.querySelector('.enemy.highlight')) {
+							}
+							wrapper.querySelector('.enemy').classList.remove('highlight');
+						}
+					} else {
+						// Enable home
+						Build.applyRz = true;
+						Build.applyVz = false;
+						if (wrapper) {
+							wrapper.querySelector('.home').classList.add('highlight');
+							if (wrapper.querySelector('.enemy.highlight')) {
+								wrapper.querySelector('.enemy.highlight').classList.remove('highlight');
+							}
+						}
+					}
+					Build.updateHeroStats();
 				}
 				item.onmouseover = _ => {
+					isMouseOverItem = true;
+					console.log('in item');
 					if (item.parentNode.querySelector('.wrapper')) {
 						// Node already here
 						return;
 					}
 					const home = DOM({style: 'home'}, 'Родная');
 					const enemy = DOM({style: 'enemy'}, 'Вражеская');
+					if (Build.applyRz) {
+						home.classList.add('highlight');
+					} else if (Build.applyVz) {
+						enemy.classList.add('highlight');
+					}
 					home.onclick = _ => {
 						// Remove applicator if already selected
 						if (home.classList.contains('highlight')) {
@@ -2699,16 +2745,37 @@ class Build{
 						Build.updateHeroStats();
 					}
 					const wrapper = DOM({style: 'wrapper'}, home, enemy);
+					wrapper.onmouseover = _ => {
+						console.log('in wrapper');
+						isMouseOverWrapper = true;
+					}
+					wrapper.onmouseout = _ => {
+						console.log('out wrapper');
+						isMouseOverWrapper = false;
+						setTimeout(_ => {
+							mouseOutEvent();
+						}, 100)
+					}
 					item.parentNode.append(wrapper)
 					
+				}
+				item.onmouseout = _ => {
+					isMouseOverItem = false;
+					console.log('out item');
 					setTimeout(_ => {
-						wrapper.remove();
-					}, 1_000)
+						mouseOutEvent();
+					}, 100)
 				}
 			}
 
 			if (key === 'considerStacks' || key === 'considerBuff') {
 				item.classList.add('noNumber');
+				if (Build.applyStak && key === 'considerStacks') {
+					item.classList.add('highlight');
+				}
+				if (Build.applyBuffs && key === 'considerBuff') {
+					item.classList.add('highlight');
+				}
 				item.onclick = _ => {
 					item.classList.toggle('highlight');
 					if (key == 'considerStacks') {
