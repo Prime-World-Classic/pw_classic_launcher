@@ -4707,7 +4707,7 @@ class PWGame {
 			
 		}
 		
-		await NativeAPI.fileSystem.access(PWGame.PATH);
+		await NativeAPI.fileSystem.promises.access(PWGame.PATH);
 		
 	}
 	
@@ -4719,7 +4719,7 @@ class NativeAPI {
 	
 	static modules = {
 		
-		fileSystem:'fs/promises',
+		fileSystem:'fs',
 		childProcess:'child_process',
 		os:'os'
 		
@@ -4763,6 +4763,8 @@ class NativeAPI {
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
 		NativeAPI.loadModules();
+
+		NativeAPI.update();
 		
 	}
 	
@@ -4823,8 +4825,8 @@ class NativeAPI {
 			return;
 			
 		}
-		
-		NativeAPI.window.setProgressBar(value);
+		App.error(value);
+		//NativeAPI.window.setProgressBar(value);
 		
 	}
 	
@@ -4864,7 +4866,19 @@ class NativeAPI {
 			
 		}
 		
-		// базовая логика обновления, загрузка файлов и работа с файловой системой
+		let updaterExe = '../Tools/PW_NanoUpdater.exe';
+
+		var child = NativeAPI.childProcess.spawn(updaterExe);
+
+		child.stdout.on('data', function(data) {
+			let progressData = JSON.parse(data.toString().split('#').pop());
+			if (progressData.type == 'bar') {
+				NativeAPI.progress(progressData.data);
+			} else if (progressData.type == 'label') {
+				// Set update label (Now updating 'game data')
+				// NativeAPI.setUpdateLabel(progressData.data);
+			}
+		});
 		
 	}
 	
@@ -4900,7 +4914,7 @@ class NativeAPI {
 	
 	static async write(){ // test method
 		
-		await NativeAPI.fileSystem.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
+		await NativeAPI.fileSystem.promises.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
 		
 	}
 	
