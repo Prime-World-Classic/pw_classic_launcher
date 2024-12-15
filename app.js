@@ -2698,7 +2698,6 @@ class Build{
 				}
 				item.onmouseover = _ => {
 					isMouseOverItem = true;
-					console.log('in item');
 					if (item.parentNode.querySelector('.wrapper')) {
 						// Node already here
 						return;
@@ -2746,11 +2745,9 @@ class Build{
 					}
 					const wrapper = DOM({style: 'wrapper'}, home, enemy);
 					wrapper.onmouseover = _ => {
-						console.log('in wrapper');
 						isMouseOverWrapper = true;
 					}
 					wrapper.onmouseout = _ => {
-						console.log('out wrapper');
 						isMouseOverWrapper = false;
 						setTimeout(_ => {
 							mouseOutEvent();
@@ -2761,7 +2758,6 @@ class Build{
 				}
 				item.onmouseout = _ => {
 					isMouseOverItem = false;
-					console.log('out item');
 					setTimeout(_ => {
 						mouseOutEvent();
 					}, 100)
