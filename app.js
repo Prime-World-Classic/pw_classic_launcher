@@ -4663,7 +4663,7 @@ class App {
 
 class PWGame {
 	
-	static PATH = '../Bin/PW_Game.exe';
+	static PATH = '../Game/Bin/PW_Game.exe';
 	
 	static async start(id){
 		
