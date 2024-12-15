@@ -2297,9 +2297,13 @@ cursor:pointer;
 		height: 70vh;
 	}
 
-	.buttons-talents-and-sets button {
+	.buttons-talents-and-sets button,
+	button.skins {
 		width: 150px;
 		height: 45px;
+	}
+	button.skins {
+		margin-left: 248px;
 	}
 
 	.build-talent-item {
