@@ -2348,6 +2348,9 @@ cursor:pointer;
 	.build-active-bar-item:not(:empty)::after {
 		/* Build screen: active panels: circle green/gray */
 		left: 50px;
+		width: 10px;
+		height: 10px;
+		border-width: 1px;
 	}
 
 }
