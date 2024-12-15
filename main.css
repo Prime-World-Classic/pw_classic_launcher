@@ -2342,7 +2342,7 @@ cursor:pointer;
 	}
 
 	.build-active-bar-item {
-		border-width: 3px;
+		border-width: 4px;
 	}
 
 	.build-active-bar-item:not(:empty)::after {
