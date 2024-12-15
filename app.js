@@ -2660,27 +2660,50 @@ class Build{
 				item.onmouseover = _ => {
 					if (item.parentNode.querySelector('.wrapper')) {
 						// Node already here
-						return
+						return;
 					}
 					const home = DOM({style: 'home'}, 'Родная');
 					const enemy = DOM({style: 'enemy'}, 'Вражеская');
 					home.onclick = _ => {
-						if (home.parentNode.parentNode.querySelector('.build-hero-stats-item.highlight')) {
+						// Remove applicator if already selected
+						if (home.classList.contains('highlight')) {
+							home.classList.remove('highlight');
+							item.classList.remove('highlight');
+							Build.applyRz = false;
+						} else {
+							if (!item.classList.contains('.build-hero-stats-item.highlight')) {
+								item.classList.add('highlight');
+							}
 							home.classList.add('highlight');
 							enemy.classList.remove('highlight');
+							Build.applyRz = true;
+							Build.applyVz = false;
 						}
+						Build.updateHeroStats();
 					}
 					enemy.onclick = _ => {
-						if (home.parentNode.parentNode.querySelector('.build-hero-stats-item.highlight')) {
-							home.classList.remove('highlight');
+						// Remove applicator if already selected
+						if (enemy.classList.contains('highlight')) {
+							enemy.classList.remove('highlight');
+							item.classList.remove('highlight');
+							Build.applyVz = false;
+						} else {
+							if (!item.classList.contains('.build-hero-stats-item.highlight')) {
+								item.classList.add('highlight');
+							}
 							enemy.classList.add('highlight');
+							home.classList.remove('highlight');
+							Build.applyVz = true;
+							Build.applyRz = false;
 						}
+						Build.updateHeroStats();
 					}
 					const wrapper = DOM({style: 'wrapper'}, home, enemy);
 					item.parentNode.append(wrapper)
+					
 					setTimeout(_ => {
 						wrapper.remove();
-					}, 5_000)
+					}, 1_000)
 				}
 			}
 
@@ -2688,6 +2711,12 @@ class Build{
 				item.classList.add('noNumber');
 				item.onclick = _ => {
 					item.classList.toggle('highlight');
+					if (key == 'considerStacks') {
+						Build.applyStak = !Build.applyStak;
+					} else if (key == 'considerBuff') {
+						Build.applyBuffs = !Build.applyBuffs;
+					}
+					Build.updateHeroStats();
 				}
 			}
 			
