@@ -477,7 +477,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-field-bottom {
-	margin: 44px 0 34px 315px;
+	margin: 44px 0 34px 236px;
 }
 .build-field-bottom:after {
 	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст\a(автоматическое применение)';
@@ -487,6 +487,7 @@ background-color:rgba(15,15,15,0.7);
 	display: flex;
 	justify-content: end;
 	text-align: center;
+	padding-right: 20px;
 }
 
 .new-random-skins-buttons--wrapper {
@@ -629,14 +630,14 @@ button.sets {
 
 .build-field{
     min-width: 676px;
-	width:660px;
-	height:660px;
-	min-height:660px;
-	display:flex;
-	flex-flow:row wrap;
-	margin:0 2px;
-	border-radius:18px;
-	
+    width:660px;
+    height:660px;
+    min-height:660px;
+    display:flex;
+    flex-flow:row wrap;
+    margin:0 2px;
+    border-radius:18px;
+    background: #fff2;
 }
 
 .build-field-row{
@@ -651,12 +652,9 @@ button.sets {
 }
 
 .build-field-item{
-	
 	width:100px;
 	height:100px;
-	background:rgba(255,255,255,0.2);
 	padding: 5px;
-	
 }
 
 .build-talent{
@@ -666,15 +664,12 @@ button.sets {
 	overflow: hidden;
 }
 .build-talents {
-	margin-top: -7px;
-
+	margin-top: 2px;
 	display: flex;
 	flex-flow: row wrap;
-
 	height: 660px;
 	overflow: auto;
-
-	background: #3332;
+	background: #33333352;
 	border-radius: 4%;
 	width: 97%;
 }
@@ -1087,7 +1082,6 @@ text-align:center;
 
 .build-active-bar{
 	position: relative;
-	left: 11px;
 	display:flex;
 	flex-flow:row nowrap;
 }
@@ -2356,7 +2350,7 @@ cursor:pointer;
 
 	.build-field {
 		justify-content: center;
-		margin: 0 0 12px -28px;
+		margin: 0 33px 12px 0px;
 	}
 
 	.build-field-item {
@@ -2365,14 +2359,14 @@ cursor:pointer;
 	}
 
 	.build-field {
-		min-width: 27vw;
-		width: 23vw;
+		min-width: 25vw;
+		width: 20vw;
 		min-height: 536px;
 		height: 512px;
 	}
 
 	.build-talents {
-		height: 543px;
+		height: 536px;
 		width: 100%;
 	}
 
