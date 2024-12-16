@@ -1,10 +1,41 @@
-APP_VERSION = '2 (TEST)';
+APP_VERSION = '3 (TEST)';
 
 PW_VERSION = '1.9';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
+	Splash.init();
+	
 	NativeAPI.init();
+	
+	NativeAPI.update((data) => {
+		
+		let progress = false;
+		
+		if(data.update){
+			
+			if(!progress){
+				
+				progress = View.progress();
+				
+				progress.firstChild.style.width = data.total+'%';
+				
+				progress.lastChild.innerText = `${data.title} ${data.total}%...`;
+				
+			}
+			
+		}
+		else{
+			
+			if(progress){
+				
+				Splash.hide();
+				
+			}
+			
+		}
+		
+	});
 	
 	App.init();
 	
@@ -853,6 +884,16 @@ class View {
 		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.png'}))
 		
 		),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
+		
+	}
+	
+	static progress(){
+		
+		let body = DOM({style:'progress'},DOM({style:'animation1'}),DOM());
+		
+		Splash.show(body,false);
+		
+		return body;
 		
 	}
 	
@@ -4429,8 +4470,6 @@ class Events {
 class App {
 	
 	static async init(){
-		
-		Splash.init();
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
 		
@@ -4779,6 +4818,8 @@ class PWGame {
 	
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
+	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
+	
 	static async start(id){
 		
 		let request = `pwclassic://runGame/${id}/${PW_VERSION}`;
@@ -4790,7 +4831,7 @@ class PWGame {
 		}
 		else{
 			
-			App.href(request);
+			// App.href(request);
 			
 		}
 		
@@ -4807,7 +4848,7 @@ class PWGame {
 		}
 		else{
 			
-			App.href(request);
+			// App.href(request);
 			
 		}
 		
@@ -4918,7 +4959,7 @@ class NativeAPI {
 		
 	}
 	
-	static async reset(){
+	static reset(){
 		
 		if(!NativeAPI.status){
 			
@@ -4926,9 +4967,9 @@ class NativeAPI {
 			
 		}
 		
-		await App.exit();
+		NativeAPI.app.clearCache();
 		
-		await NativeAPI.app.clearCache();
+		NativeAPI.window.reload();
 		
 	}
 	
@@ -4939,8 +4980,8 @@ class NativeAPI {
 			return;
 			
 		}
-		App.error(value);
-		//NativeAPI.window.setProgressBar(value);
+		
+		NativeAPI.window.setProgressBar(value);
 		
 	}
 	
@@ -4972,55 +5013,69 @@ class NativeAPI {
 		
 	}
 	
-	static async update(){
+	static async update(callback){
 
 		if(!NativeAPI.status){
 			
 			return false;
 			
 		}
-
-		//let oldMd5 = md5('content/app.js');
 		
-		let updaterExe = '../Tools/PW_NanoUpdater.exe';
+		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 
-		var child = NativeAPI.childProcess.spawn(updaterExe);
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений';
 
-		child.stdout.on('data', function(data) {
+		spawn.stdout.on('data',(data) => {
+			
 			let progressDataElements = data.toString().substring(1).split('#');
-			for (let progressDataElement of progressDataElements) {
-				let progressData = JSON.parse(progressDataElement);
-				if (progressData.type) {
-					if (progressData.type == 'bar') {
-						NativeAPI.progress(progressData.data);
-					} else if (progressData.type == 'label') {
-						switch (progressData.data) {
-							case 'game':
-								App.error('Обновление игры');
-								break;
-							case 'content':
-								App.error('Обновление лаунчера');
-								break;
-							case 'game_data':
-								App.error('Загрузка игровых архивов');
-								break;
-						}
+			
+			for(let progressDataElement of progressDataElements){
+				
+				let json = JSON.parse(progressDataElement);
+				
+				if(json.type){
+					
+					if(json.type == 'bar'){
+						
+						callback({update:true,title:title,total:Number(json.data)});
+						
+						NativeAPI.progress(Number(json.data) / 100);
+						
 					}
+					else if(json.type == 'label'){
+						
+						switch(json.data){
+							
+							case 'game': title = 'Обновление игры'; break;
+							
+							case 'content': title = 'Обновление лаунчера'; break;
+							
+							case 'game_data': title = 'Загрузка игровых архивов'; break;
+							
+						}
+						
+					}
+					
 				}
+				
 			}
+			
 		});
-
-
-		child.on('close', function(code) {
-			// if (code == 0)
-			// Обновление завершено!
-			// else
-			// Обновление завершено с ошибкой
-
-			// СРАВНИ 
-			// if (oldMd5 != md5('content/app.js'))
-			// refreshPage();
+		
+		spawn.on('close', (code) => {
+			
+			callback({update:false,title:'',total:0});
+			
+			NativeAPI.progress(-1);
+			
+			if(code == 0){
+				
+				NativeAPI.reset();
+				
+			}
+			
 		});
+		
 	}
 	
 	static analysis(){
@@ -5177,6 +5232,8 @@ class Castle {
 	
 	static globalCanvas;
 
+	static musicVolume = 0.5;
+
 	static sceneObjects = [];
 	
 	static zoom(event) {
@@ -5193,7 +5250,7 @@ class Castle {
 		// Setup new target
 		Castle.targetFixedValue = Castle.currentFixedValue + (event.deltaY > 0 ? -1 : +1);
 		
-		Castle.targetFixedValue = clamp(Castle.targetFixedValue, 0, Castle.fixedFovValues.length - 1);
+		Castle.targetFixedValue = Castle.clamp(Castle.targetFixedValue, 0, Castle.fixedFovValues.length - 1);
 		
 	}
 	
@@ -5531,6 +5588,12 @@ class Castle {
 		//var canvas = globalCanvas; //document.getElementById('game-surface');
 		
 		Castle.globalCanvas.classList.add('castle-fade-in');
+
+		if (NativeAPI.fileSystem) {
+			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
+
+			Sound.play('content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)],{id:'castle',volume:Castle.musicVolume,loop:true});
+		}
 		
 		let backgroundImage = document.getElementById('castle-background-img');
 		
@@ -6397,6 +6460,8 @@ class MM {
 	static close(){
 		
 		Sound.stop('tambur');
+
+		Sound.setVolume('castle', musicVolume);
 		
 		MM.view.style.display = 'none';
 		
@@ -6849,6 +6914,8 @@ class MM {
 		
 		Sound.play('content/sounds/tambur.mp3',{id:'tambur',volume:0.50,loop:true});
 		
+		Sound.setVolume('castle', 0.0);
+		
 		MM.show(body);
 		
 		for(let key in data.users){
@@ -7053,6 +7120,8 @@ class Sound {
 	static all = new Object();
 	
 	static play(source,object = new Object()){
+
+		App.error(source);
 		
 		let audio = new Audio();
 		
@@ -7096,6 +7165,15 @@ class Sound {
 			
 		}
 		
+	}
+
+	static setVolume(id, volume){
+
+		if(id in Sound.all){
+			
+			Sound.all[id].volume = volume;
+
+		}
 	}
 	
 }
@@ -8096,8 +8174,6 @@ class Splash{
 		Splash.body.style.display = 'none';
 		
 		Splash.body.classList.add('splash');
-		
-
 		
 		document.body.append(Splash.body);
 		
