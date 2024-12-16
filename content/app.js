@@ -1,10 +1,41 @@
-APP_VERSION = '2 (TEST)';
+APP_VERSION = '3 (TEST)';
 
 PW_VERSION = '1.9';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
+	Splash.init();
+	
 	NativeAPI.init();
+	
+	NativeAPI.update((data) => {
+		
+		let progress = false;
+		
+		if(data.update){
+			
+			if(!progress){
+				
+				progress = View.progress();
+				
+				progress.firstChild.style.width = data.total+'%';
+				
+				progress.lastChild.innerText = `${data.title} ${data.total}%...`;
+				
+			}
+			
+		}
+		else{
+			
+			if(progress){
+				
+				Splash.hide();
+				
+			}
+			
+		}
+		
+	});
 	
 	App.init();
 	
@@ -853,6 +884,16 @@ class View {
 		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.png'}))
 		
 		),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
+		
+	}
+	
+	static progress(){
+		
+		let body = DOM({style:'progress'},DOM({style:'animation1'}),DOM());
+		
+		Splash.show(body,false);
+		
+		return body;
 		
 	}
 	
@@ -4429,8 +4470,6 @@ class Events {
 class App {
 	
 	static async init(){
-		
-		Splash.init();
 		// ws://192.168.31.194:3737
 		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
 		
@@ -4792,7 +4831,7 @@ class PWGame {
 		}
 		else{
 			
-			App.href(request);
+			// App.href(request);
 			
 		}
 		
@@ -4809,7 +4848,7 @@ class PWGame {
 		}
 		else{
 			
-			App.href(request);
+			// App.href(request);
 			
 		}
 		
@@ -4998,7 +5037,7 @@ class NativeAPI {
 					
 					if(json.type == 'bar'){
 						
-						callback({update:true,title:title,status:Number(json.data)});
+						callback({update:true,title:title,total:Number(json.data)});
 						
 						NativeAPI.progress(Number(json.data) / 100);
 						
@@ -5025,7 +5064,7 @@ class NativeAPI {
 		
 		spawn.on('close', (code) => {
 			
-			callback({update:false,title:'',status:0});
+			callback({update:false,title:'',total:0});
 			
 			NativeAPI.progress(-1);
 			
@@ -8112,8 +8151,6 @@ class Splash{
 		Splash.body.style.display = 'none';
 		
 		Splash.body.classList.add('splash');
-		
-
 		
 		document.body.append(Splash.body);
 		
