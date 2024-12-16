@@ -593,7 +593,7 @@ button.sets {
 	border: 1px solid darkorange !important;
 }
 .button-build--wrapper .build-list-item {
-	width: 200px !important;
+	width: 160px !important;
 }
 
 .build-list-item{
@@ -2179,8 +2179,8 @@ cursor:pointer;
 
 @media (width > 1900px) {
 	.build-buttons--wrapper {
-		margin-left: 23.5vw;
-		width: 34vw;
+		margin-left: 29vw;
+		width: 25vw;
 	}
 }
 
@@ -2319,6 +2319,7 @@ cursor:pointer;
 
 	.build-field {
 		justify-content: center;
+		margin-left: -55px;
 	}
 
 	.build-field-item {
