@@ -4979,6 +4979,8 @@ class NativeAPI {
 			return false;
 			
 		}
+
+		//let oldMd5 = md5('content/app.js');
 		
 		let updaterExe = '../Tools/PW_NanoUpdater.exe';
 
@@ -4992,16 +4994,17 @@ class NativeAPI {
 					if (progressData.type == 'bar') {
 						NativeAPI.progress(progressData.data);
 					} else if (progressData.type == 'label') {
-						// Установи надпись (например, 
-						// if (label == 'game_data') 
-						// 		msg = 'Загрузка игровых архивов')
-
-						// game - Обновление игры
-						// content - Обновление лаунчера
-						// game_data - Загрузка игровых архивов
-
-						// NativeAPI.setUpdateLabel(progressData.data);
-
+						switch (progressData.data) {
+							case 'game':
+								App.error('Обновление игры');
+								break;
+							case 'content':
+								App.error('Обновление лаунчера');
+								break;
+							case 'game_data':
+								App.error('Загрузка игровых архивов');
+								break;
+						}
 					}
 				}
 			}
@@ -5013,6 +5016,10 @@ class NativeAPI {
 			// Обновление завершено!
 			// else
 			// Обновление завершено с ошибкой
+
+			// СРАВНИ 
+			// if (oldMd5 != md5('content/app.js'))
+			// refreshPage();
 		});
 	}
 	
