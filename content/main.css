@@ -2336,6 +2336,7 @@ cursor:pointer;
 
 	.build-talents {
 		height: 543px;
+		width: 85%;
 	}
 
 	.build-talents .build-talent-item {
