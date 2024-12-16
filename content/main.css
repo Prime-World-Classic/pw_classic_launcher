@@ -34,7 +34,7 @@ html,body{padding:0;margin:0;background:#dcdcdc;font:22px/1.5 Verdana}
 body{
 overscroll-behavior: contain;
 overscroll-behavior-y: none;
-background-image:url('./bg1.jpg');
+background-image:url('img/bg.jpg');
 background-position:center;
 background-attachment:fixed;
 background-repeat:repeat-y;
@@ -507,7 +507,7 @@ button.skins,
 button.new-build {
 	color: #eee;
 	font-size: 70px;
-	background-image: url(plus.svg) !important;
+	background-image: url(icons/plus.svg) !important;
 	background-color: #279aac !important;
 	background-size: 77px;
 	background-position-x: -8px;
@@ -524,7 +524,7 @@ button.new-build:hover {
 button.random-build {
 	background: transparent;
 	border: 0;
-	background-image: url(dice.svg) !important;
+	background-image: url(icons/dice.svg) !important;
 	background-color: #279aac;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -723,7 +723,7 @@ button.sets {
 
 .build .build-talent-item[data-active='1']:after {
 	content: '';
-	background-image: url('activeBorder.png');
+	background-image: url('icons/activeBorder.png');
 	display: block;
 	width: 128px;
 	height: 120px;
