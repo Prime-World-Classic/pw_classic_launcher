@@ -5232,6 +5232,8 @@ class Castle {
 	
 	static globalCanvas;
 
+	static musicVolume = 0.5;
+
 	static sceneObjects = [];
 	
 	static zoom(event) {
@@ -5248,7 +5250,7 @@ class Castle {
 		// Setup new target
 		Castle.targetFixedValue = Castle.currentFixedValue + (event.deltaY > 0 ? -1 : +1);
 		
-		Castle.targetFixedValue = clamp(Castle.targetFixedValue, 0, Castle.fixedFovValues.length - 1);
+		Castle.targetFixedValue = Castle.clamp(Castle.targetFixedValue, 0, Castle.fixedFovValues.length - 1);
 		
 	}
 	
@@ -5586,6 +5588,12 @@ class Castle {
 		//var canvas = globalCanvas; //document.getElementById('game-surface');
 		
 		Castle.globalCanvas.classList.add('castle-fade-in');
+
+		if (NativeAPI.fileSystem) {
+			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
+
+			Sound.play('content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)],{id:'castle',volume:Castle.musicVolume,loop:true});
+		}
 		
 		let backgroundImage = document.getElementById('castle-background-img');
 		
@@ -6452,6 +6460,8 @@ class MM {
 	static close(){
 		
 		Sound.stop('tambur');
+
+		Sound.setVolume('castle', musicVolume);
 		
 		MM.view.style.display = 'none';
 		
@@ -6904,6 +6914,8 @@ class MM {
 		
 		Sound.play('content/sounds/tambur.mp3',{id:'tambur',volume:0.50,loop:true});
 		
+		Sound.setVolume('castle', 0.0);
+		
 		MM.show(body);
 		
 		for(let key in data.users){
@@ -7108,6 +7120,8 @@ class Sound {
 	static all = new Object();
 	
 	static play(source,object = new Object()){
+
+		App.error(source);
 		
 		let audio = new Audio();
 		
@@ -7151,6 +7165,15 @@ class Sound {
 			
 		}
 		
+	}
+
+	static setVolume(id, volume){
+
+		if(id in Sound.all){
+			
+			Sound.all[id].volume = volume;
+
+		}
 	}
 	
 }
