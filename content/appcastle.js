@@ -263,7 +263,7 @@ var InitDemo = function (sceneName, canvas) {
 
 		var sceneMeshesToLoadCount = -1; // Initial value. Scene must have objects
 
-		loadJSONResource('scenes', function (err, result) {
+		loadJSONResource('content/scenes', function (err, result) {
 			if (err) {
 				console.error('Fatal error getting scene (see console)');
 				console.error(err);
@@ -330,7 +330,7 @@ var InitDemo = function (sceneName, canvas) {
 		});
 	}
 
-	// Remove duplicates from shaders/textures. Associate object with its shader and texture by id
+	// Remove duplicates from content/shaders/textures. Associate object with its shader and texture by id
 	function waitLoadScene() {
 		if (sceneMeshesToLoadCount == 0) {
 			uniqShaderNames = [...new Set(shaderNames)];
@@ -379,20 +379,20 @@ var LoadResources = function (sceneObjects, sceneBuildings, shaderNames, texName
 	var shadersLoaded = 0;
 
 	function loadShaders(shaderId) {
-		loadTextResource(shaderNames[shaderId], '.glsl', async function (shaderErr, definesText) { // defines
+		loadTextResource('content/shaders/' + shaderNames[shaderId], '.glsl', async function (shaderErr, definesText) { // defines
 			if (shaderErr) {
 				console.error('Fatal error getting vertex shader ( ' + shaderNames[shaderId] + ' )');
 				console.error(vsErr);
 				return 1;
 			} else {
-				loadTextResource('shader', '.vs.glsl', async function (vsErr, vsText) { // uber shader VS
+				loadTextResource('content/shaders/shader', '.vs.glsl', async function (vsErr, vsText) { // uber shader VS
 					if (vsErr) {
 						console.error('Fatal error getting vertex shader ( shader.vs.glsl )');
 						console.error(vsErr);
 						return 1;
 					} else {
 						console.debug('test');
-						loadTextResource('shader', '.fs.glsl', async function (fsErr, fsText) { // uber shader FS
+						loadTextResource('content/shaders/shader', '.fs.glsl', async function (fsErr, fsText) { // uber shader FS
 							if (fsErr) {
 								console.error('Fatal error getting fragment shader ( shader.fs.glsl )');
 								console.error(fsErr);
@@ -453,7 +453,7 @@ var LoadResources = function (sceneObjects, sceneBuildings, shaderNames, texName
 	}
 
 	async function loadTexture(textureId) {
-		texName = 'textures/' + texNames[textureId] + '.webp';
+		texName = 'content/textures/' + texNames[textureId] + '.webp';
 		loadImage(texName, function (imgErr, img) {
 			if (imgErr) {
 				console.error('Fatal error getting texture ( ' + texName + ' )');
@@ -485,7 +485,7 @@ var LoadResources = function (sceneObjects, sceneBuildings, shaderNames, texName
 		loadTexture(i);
 	}
 	async function loadMesh(sceneObjectsContainer, objectId) {
-		var meshName = 'meshes/' + sceneObjectsContainer[objectId].meshName;
+		var meshName = 'content/meshes/' + sceneObjectsContainer[objectId].meshName;
 		loadRawTriangles(meshName, async function (meshErr, meshData) {
 			if (meshErr) {
 				console.error('Fatal error getting mesh (' + meshName + ')');
