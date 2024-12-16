@@ -5200,7 +5200,7 @@ class Castle {
 		
 	}
 	
-	static initDemo(sceneName, canvas){
+	static async initDemo(sceneName, canvas){
 		
 		window.addEventListener('resize', function(event) {
 			
@@ -5366,76 +5366,82 @@ class Castle {
 		let shaderNames = [], texNames = [], sceneObjects = [], sceneBuildings = new Map, uniqShaderNames = [], uniqTexNames = [];
 
 		let sceneMeshesToLoadCount = -1; // Initial value. Scene must have objects
-
-		loadJSONResource('content/scenes', function (err, result) {
-			if (err) {
-				console.error('Fatal error getting scene (see console)');
-				console.error(err);
-				return 1;
-			} else {
-				Castle.scenesJson = result;
-				Castle.currentScene = result.scenes.find(value => value.sceneName === sceneName);
-
-				sceneMeshesToLoadCount = currentScene.objects.length + currentScene.buildings.length; // Set scene objects count to some valid value
-
-				let loadedBuildings = [];
-				loadedBuildings.push(currentScene.buildings);
-
-				function loadObjectResources(obj) {
-					shaderNames.push(obj.shader);
-					texNames.push(obj.texture);
-					if (obj.texture_2) {
-						texNames.push(obj.texture_2);
-					}
-					if (obj.texture_3) {
-						texNames.push(obj.texture_3);
-					}
-					if (obj.texture_4) {
-						texNames.push(obj.texture_4);
-					}
-				}
-
-				for (const obj of currentScene.objects) {
-					sceneObjects.push({
-						meshName: obj.mesh, meshData: {}, shader: obj.shader, shaderId: {}, blend: obj.blend,
-						tintColor: obj.tintColor, uvScale: obj.uvScale, uvScroll: obj.uvScroll,
-						texture: obj.texture, texture_2: obj.texture_2, texture_3: obj.texture_3, texture_4: obj.texture_4,
-						textureId: {}, texture2Id: {}, texture3Id: {}, texture4Id: {}, strip: obj.strip, transform: obj.transform, indexCount: obj.indexCount
-					});
-					loadObjectResources(obj);
-
-					sceneMeshesToLoadCount--; // Decrement after each loaded object
+		
+		let result = await HTTP.request('content/scenes.json');
+		
+		Castle.scenesJson = result;
+		
+		Castle.currentScene = result.scenes.find(value => value.sceneName === sceneName);
+		
+		sceneMeshesToLoadCount = currentScene.objects.length + currentScene.buildings.length; // Set scene objects count to some valid value
+		
+		let loadedBuildings = [];
+		
+		loadedBuildings.push(currentScene.buildings);
+		
+		for(let obj of currentScene.objects) {
+			
+			sceneObjects.push({
+				meshName: obj.mesh, meshData: {}, shader: obj.shader, shaderId: {}, blend: obj.blend,
+				tintColor: obj.tintColor, uvScale: obj.uvScale, uvScroll: obj.uvScroll,
+				texture: obj.texture, texture_2: obj.texture_2, texture_3: obj.texture_3, texture_4: obj.texture_4,
+				textureId: {}, texture2Id: {}, texture3Id: {}, texture4Id: {}, strip: obj.strip, transform: obj.transform, indexCount: obj.indexCount
+			});
+			
+			Castle.loadObjectResources(shaderNames,texNames,obj);
+			
+			sceneMeshesToLoadCount--; // Decrement after each loaded object
+			
+		}
+		
+		Castle.identityMatrix = new Float32Array(16);
+		
+		mat4.identity(Castle.identityMatrix);
+		
+		for(let building of currentScene.buildings) {
+			
+			let buildingTranslation = building.translation ? building.translation : [0, 0];
+			
+			for(let obj of building.objects){
+				
+				obj.transform[3] -= buildingTranslation[0];
+				
+				obj.transform[11] -= buildingTranslation[1];
+				
+				if (!sceneBuildings.has(building.name)) {
+					
+					sceneBuildings.set(building.name, {size: building.size, objects: [], transparentObjects: []});
+					
 				}
 				
-				Castle.identityMatrix = new Float32Array(16);
-				mat4.identity(Castle.identityMatrix);
-				for (const building of currentScene.buildings) {
-					var buildingTranslation = building.translation ? building.translation : [0, 0];
-					for (const obj of building.objects) {
-						obj.transform[3] -= buildingTranslation[0];
-						obj.transform[11] -= buildingTranslation[1];
-
-						if (!sceneBuildings.has(building.name)) {
-							sceneBuildings.set(building.name, {size: building.size, objects: [], transparentObjects: []});
-						}
-						var selectedContainer = obj.blend ? sceneBuildings.get(building.name).transparentObjects : sceneBuildings.get(building.name).objects;
-						selectedContainer.push({
-							meshName: obj.mesh, meshData: {}, shader: obj.shader, shaderId: {}, blend: obj.blend,
-							tintColor: obj.tintColor, uvScale: obj.uvScale, uvScroll: obj.uvScroll,
-							texture: obj.texture, texture_2: obj.texture_2, texture_3: obj.texture_3, texture_4: obj.texture_4,
-							textureId: {}, texture2Id: {}, texture3Id: {}, texture4Id: {}, strip: obj.strip, transform: obj.transform, indexCount: obj.indexCount
-						});
-						loadObjectResources(obj);
-					}
-
-					sceneMeshesToLoadCount--;
-				}
+				let selectedContainer = obj.blend ? sceneBuildings.get(building.name).transparentObjects : sceneBuildings.get(building.name).objects;
+				
+				selectedContainer.push({
+					meshName: obj.mesh, meshData: {}, shader: obj.shader, shaderId: {}, blend: obj.blend,
+					tintColor: obj.tintColor, uvScale: obj.uvScale, uvScroll: obj.uvScroll,
+					texture: obj.texture, texture_2: obj.texture_2, texture_3: obj.texture_3, texture_4: obj.texture_4,
+					textureId: {}, texture2Id: {}, texture3Id: {}, texture4Id: {}, strip: obj.strip, transform: obj.transform, indexCount: obj.indexCount
+				});
+				
+				Castle.loadObjectResources(shaderNames,texNames,obj);
+				
 			}
+			
+			sceneMeshesToLoadCount--;
+			
+		}
 
-		});
-		
-			// Remove duplicates from content/shaders/textures. Associate object with its shader and texture by id
-	function async waitLoadScene() {
+
+
+
+
+
+
+
+
+	/*	
+	// Remove duplicates from content/shaders/textures. Associate object with its shader and texture by id
+	async function waitLoadScene() {
 		if (sceneMeshesToLoadCount == 0) {
 			uniqShaderNames = [...new Set(shaderNames)];
 			uniqTexNames = [...new Set(texNames)];
@@ -5465,8 +5471,6 @@ class Castle {
 
 			let loadResources = await Castle.loadResources(sceneObjects, sceneBuildings, uniqShaderNames, uniqTexNames);
 			
-			
-			
 			//var canvas = globalCanvas; //document.getElementById('game-surface');
 			Castle.globalCanvas.classList.add('castle-fade-in');
 			let backgroundImage = document.getElementById('castle-background-img');
@@ -5486,8 +5490,45 @@ class Castle {
 
 
 	waitLoadScene();
+	*/
+	
+	    let loadResources = await Castle.loadResources(sceneObjects, sceneBuildings, uniqShaderNames, uniqTexNames);
 		
+		//var canvas = globalCanvas; //document.getElementById('game-surface');
 		
+		Castle.globalCanvas.classList.add('castle-fade-in');
+		
+		let backgroundImage = document.getElementById('castle-background-img');
+		
+		backgroundImage.classList.add('castle-background-image-fade-out');
+		
+		Castle.MainLoop(sceneObjects, sceneBuildings, loadResources.shader, loadResources.texture);
+		
+	}
+	
+	static loadObjectResources(shaderNames,texNames,obj){
+		
+		shaderNames.push(obj.shader);
+		
+		texNames.push(obj.texture);
+		
+		if (obj.texture_2) {
+			
+			texNames.push(obj.texture_2);
+			
+		}
+		
+		if (obj.texture_3) {
+			
+			texNames.push(obj.texture_3);
+			
+		}
+		
+		if (obj.texture_4) {
+			
+			texNames.push(obj.texture_4);
+			
+		}
 		
 	}
 	
@@ -5513,19 +5554,15 @@ class Castle {
 			
 		}
 		
-		for (let i = 0; i < texNames.length; ++i) {
+		for(let i = 0; i < texNames.length; ++i){
 			
-			PreloadImages.load((image) => {
-				
-				sceneTextures[i] = Castle.loadTexture(image);
-				
-				loaded.texture++;
-				
-			},`content/textures/${texNames[i]}.webp`);
+			sceneTextures[i] = Castle.loadTexture(await PreloadImages.loadAsync(`content/textures/${texNames[i]}.webp`));
+			
+			loaded.texture++;
 			
 		}
 		
-		for (let i = 0; i < sceneObjects.length; ++i) {
+		for(let i = 0; i < sceneObjects.length; ++i){
 			
 			await Castle.loadMesh(shaderNames,sceneObjects,i);
 			
@@ -5535,7 +5572,7 @@ class Castle {
 		
 		let totalMeshes = sceneObjects.length;
 		
-		for (let i = 0; i < sceneBuildings.length; ++i) {
+		for(let i = 0; i < sceneBuildings.length; ++i){
 			
 			let building = sceneBuildings[i].objects;
 			
@@ -7072,7 +7109,23 @@ class PreloadImages {
 		
 		preload.addEventListener('load',() => {
 			
-			callback(preload);
+			callback();
+			
+		});
+		
+	}
+	
+	static async loadAsync(url){
+		
+		let image = new Image();
+		
+		image.src = url;
+		
+		return new Promise((resolve,reject) => {
+			
+			image.addEventListener('load',() => resolve(image));
+			
+			image.addEventListener('error',(error) => reject(error));
 			
 		});
 		
