@@ -5154,7 +5154,7 @@ class Castle {
 	
 	static zNear = 0.1;
 	
-	static zFar = 10000.0;
+	static zFar = 4000.0;
 	
 	static canvasWidth;
 	
