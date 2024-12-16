@@ -1129,7 +1129,47 @@ text-align:center;
 	
 }
 
+.progress{
+	
+	position:relative;
+	width:90vw;
+	height:15vh;
+	background:rgba(255,255,255,0.1);
+	border-radius:3vw;
+	
+	
+}
+
+.progress div{
+	
+	position:absolute;
+	height:15vh;
+	border-radius:3vw;
+	
+}
+
+.progress div:first-child{
+	
+	width:0%;
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+	transition: all 0.3s ease-out;
+	
+}
+
+.progress div:last-child{
+	
+	width:100%;
+	line-height:15vh;
+	text-align:center;
+	color: rgba(255, 255, 255, 0.9);
+    text-shadow: rgba(0, 0, 0, 0.5) 0 0 5px;
+    font-size:2.5vw;
+	font-weight:800;
+	
+}
+
 .splash-content{
+	
 	width: 35vw;
 	display:flex;
 	flex-flow:column nowrap;
