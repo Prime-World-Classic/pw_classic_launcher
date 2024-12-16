@@ -41,11 +41,16 @@ varying vec4 v_projectedTexcoord;
 varying vec2 posXZ;
 uniform vec2 cursorGridPosition;
 #endif
+#ifdef SNOW
+varying float posDepth;
+#endif
 
 uniform mat4 mViewProj;
 uniform vec4 tintColor;
 uniform vec4 uvScale;
+#ifndef SNOW
 uniform vec2 uvScroll;
+#endif
 
 vec3 neutral(vec3 color) {
   const float startCompression = 0.8 - 0.04;
@@ -152,5 +157,9 @@ void main()
 
   // Tonemapping
   gl_FragColor.xyz = neutral(gl_FragColor.xyz);
+#ifdef SNOW
+  snow(gl_FragColor, fragTexCoord * uvScale.zw);
+  gl_FragColor.w = posDepth * 0.002;
+#endif
 #endif
 }
