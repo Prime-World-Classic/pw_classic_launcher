@@ -4779,6 +4779,8 @@ class PWGame {
 	
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
+	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
+	
 	static async start(id){
 		
 		let request = `pwclassic://runGame/${id}/${PW_VERSION}`;
@@ -4918,7 +4920,7 @@ class NativeAPI {
 		
 	}
 	
-	static async reset(){
+	static reset(){
 		
 		if(!NativeAPI.status){
 			
@@ -4926,9 +4928,9 @@ class NativeAPI {
 			
 		}
 		
-		await App.exit();
+		NativeAPI.app.clearCache();
 		
-		await NativeAPI.app.clearCache();
+		NativeAPI.window.reload();
 		
 	}
 	
@@ -4939,8 +4941,8 @@ class NativeAPI {
 			return;
 			
 		}
-		App.error(value);
-		//NativeAPI.window.setProgressBar(value);
+		
+		NativeAPI.window.setProgressBar(value);
 		
 	}
 	
@@ -4972,55 +4974,69 @@ class NativeAPI {
 		
 	}
 	
-	static async update(){
+	static async update(callback){
 
 		if(!NativeAPI.status){
 			
 			return false;
 			
 		}
-
-		//let oldMd5 = md5('content/app.js');
 		
-		let updaterExe = '../Tools/PW_NanoUpdater.exe';
+		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 
-		var child = NativeAPI.childProcess.spawn(updaterExe);
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений';
 
-		child.stdout.on('data', function(data) {
+		spawn.stdout.on('data',(data) => {
+			
 			let progressDataElements = data.toString().substring(1).split('#');
-			for (let progressDataElement of progressDataElements) {
-				let progressData = JSON.parse(progressDataElement);
-				if (progressData.type) {
-					if (progressData.type == 'bar') {
-						NativeAPI.progress(progressData.data);
-					} else if (progressData.type == 'label') {
-						switch (progressData.data) {
-							case 'game':
-								App.error('Обновление игры');
-								break;
-							case 'content':
-								App.error('Обновление лаунчера');
-								break;
-							case 'game_data':
-								App.error('Загрузка игровых архивов');
-								break;
-						}
+			
+			for(let progressDataElement of progressDataElements){
+				
+				let json = JSON.parse(progressDataElement);
+				
+				if(json.type){
+					
+					if(json.type == 'bar'){
+						
+						callback({update:true,title:title,status:Number(json.data)});
+						
+						NativeAPI.progress(Number(json.data) / 100);
+						
 					}
+					else if(json.type == 'label'){
+						
+						switch(json.data){
+							
+							case 'game': title = 'Обновление игры'; break;
+							
+							case 'content': title = 'Обновление лаунчера'; break;
+							
+							case 'game_data': title = 'Загрузка игровых архивов'; break;
+							
+						}
+						
+					}
+					
 				}
+				
 			}
+			
 		});
-
-
-		child.on('close', function(code) {
-			// if (code == 0)
-			// Обновление завершено!
-			// else
-			// Обновление завершено с ошибкой
-
-			// СРАВНИ 
-			// if (oldMd5 != md5('content/app.js'))
-			// refreshPage();
+		
+		spawn.on('close', (code) => {
+			
+			callback({update:false,title:'',status:0});
+			
+			NativeAPI.progress(-1);
+			
+			if(code == 0){
+				
+				NativeAPI.reset();
+				
+			}
+			
 		});
+		
 	}
 	
 	static analysis(){
