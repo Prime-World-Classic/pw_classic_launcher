@@ -4973,7 +4973,7 @@ class NativeAPI {
 	}
 	
 	static async update(){
-		
+
 		if(!NativeAPI.status){
 			
 			return false;
@@ -5006,7 +5006,14 @@ class NativeAPI {
 				}
 			}
 		});
-		
+
+
+		child.on('close', function(code) {
+			// if (code == 0)
+			// Обновление завершено!
+			// else
+			// Обновление завершено с ошибкой
+		});
 	}
 	
 	static analysis(){
