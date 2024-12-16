@@ -4985,12 +4985,25 @@ class NativeAPI {
 		var child = NativeAPI.childProcess.spawn(updaterExe);
 
 		child.stdout.on('data', function(data) {
-			let progressData = JSON.parse(data.toString().split('#').pop());
-			if (progressData.type == 'bar') {
-				NativeAPI.progress(progressData.data);
-			} else if (progressData.type == 'label') {
-				// Set update label (Now updating 'game data')
-				// NativeAPI.setUpdateLabel(progressData.data);
+			let progressDataElements = data.toString().substring(1).split('#');
+			for (let progressDataElement of progressDataElements) {
+				let progressData = JSON.parse(progressDataElement);
+				if (progressData.type) {
+					if (progressData.type == 'bar') {
+						NativeAPI.progress(progressData.data);
+					} else if (progressData.type == 'label') {
+						// Установи надпись (например, 
+						// if (label == 'game_data') 
+						// 		msg = 'Загрузка игровых архивов')
+
+						// game - Обновление игры
+						// content - Обновление лаунчера
+						// game_data - Загрузка игровых архивов
+
+						// NativeAPI.setUpdateLabel(progressData.data);
+
+					}
+				}
 			}
 		});
 		
