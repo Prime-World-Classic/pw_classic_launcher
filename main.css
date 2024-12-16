@@ -2319,6 +2319,7 @@ cursor:pointer;
 
 	.build-field {
 		justify-content: center;
+		margin-left: -55px;
 	}
 
 	.build-field-item {
