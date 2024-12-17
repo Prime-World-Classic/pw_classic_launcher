@@ -4866,35 +4866,17 @@ class PWGame {
 	
 	static async start(id){
 		
-		let request = `pwclassic://runGame/${id}/${PW_VERSION}`;
+		await PWGame.check();
 		
-		if(NativeAPI.status){
-			
-			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
-			
-		}
-		else{
-			
-			// App.href(request);
-			
-		}
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`]);
 		
 	}
 	
 	static async reconnect(id){
 		
-		let request = `pwclassic://reconnect/${id}/${PW_VERSION}`;
+		await PWGame.check();
 		
-		if(NativeAPI.status){
-			
-			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
-			
-		}
-		else{
-			
-			// App.href(request);
-			
-		}
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`]);
 		
 	}
 	
@@ -5105,7 +5087,7 @@ class NativeAPI {
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 
-		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений';
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false;
 
 		spawn.stdout.on('data',(data) => {
 			
@@ -5118,6 +5100,8 @@ class NativeAPI {
 				if(json.type){
 					
 					if(json.type == 'bar'){
+						
+						updated = true;
 						
 						callback({update:true,title:title,total:Number(json.data)});
 						
@@ -5150,7 +5134,7 @@ class NativeAPI {
 			
 			NativeAPI.progress(-1);
 			
-			if(code == 0){
+			if( (code == 0) && (updated) ){
 				
 				NativeAPI.reset();
 				
