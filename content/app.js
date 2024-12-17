@@ -4972,8 +4972,8 @@ class PWGame {
 		};
 
 		let gameServerIps = [
-			'http://81.88.210.30:37122/api',
-			'http://26.250.19.245:37122/api' // test connection to Radmin IP
+			'http://81.88.210.30:27302/api',
+			'http://26.250.19.245:27302/api' // test connection to Radmin IP
 		];
 
 		for (let ip of gameServerIps) {
