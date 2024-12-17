@@ -11127,6 +11127,42 @@
                     "texture": "trees"
                 },
                 {
+                    "mesh": "ad/highland.bin",
+                    "indexCount": 43950,
+                    "shader": "shader_pos_norm_uv16_uv_ak",
+                    "texture": "trees",
+                    "transform": [
+                        1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1
+                    ]
+                },
+                {
+                    "mesh": "ad/highland02.bin",
+                    "indexCount": 255,
+                    "shader": "shader_pos_norm_uv16_uv_ak",
+                    "texture": "trees",
+                    "transform": [
+                        1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1
+                    ]
+                },
+                {
+                    "mesh": "ad/highland03.bin",
+                    "indexCount": 54,
+                    "shader": "shader_pos_norm_uv16_uv_ak",
+                    "texture": "trees",
+                    "transform": [
+                        1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1
+                    ]
+                },
+                {
                     "mesh": "ad/trees_10_07.bin",
                     "indexCount": 21831,
                     "shader": "shader_pos_norm_uv2_ak",
@@ -11769,7 +11805,7 @@
                 {
                     "mesh": "ad/particle_9_01.bin",
                     "indexCount": 48,
-                    "shader": "shader_pos_color_uv",
+                    "shader": "shader_pos_color_uv_falloff",
                     "texture": "particle4873",
                     "blend": [
                         "SRC_ALPHA",
