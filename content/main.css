@@ -331,10 +331,9 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats{
 	display:flex;
 	align-self: start;
-	width: 370px;
+	width: 311px;
 	flex-flow:column nowrap;
 	font: 1.2rem / 1 Tahoma;
-	
 }
 
 .build-hero-stats-line{
@@ -376,17 +375,15 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero-stats-item{
-	
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
 	text-shadow:0 0 5px rgba(25,25,25,0.9);
 	cursor:pointer;
-	padding:0.8vh 0.5vw;
+	padding: 0.66vh 0.5vw;
 	border-radius:15px;
 	box-shadow:0 0 25px rgba(0,0,0,0.3);
 	flex-grow:1;
-	
 }
 .build-hero-stats-item.passive {
 	box-shadow: none;
@@ -2289,7 +2286,7 @@ cursor:pointer;
 
 @media (height < 1200px) {
 	.build-hero {
-		min-width: 20vw;
+		min-width: 16vw;
 		margin-top: -180px;
 	}
 
@@ -2305,7 +2302,7 @@ cursor:pointer;
 	}
 
 	.build-hero-stats {
-		font-size: 1rem;
+		font-size: 0.8rem;
 	}
 
 	.build-hero-stats-line {
