@@ -1140,11 +1140,6 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => {
 			
-			if(NativeAPI.exit()){
-				
-				return;
-				
-			}
 			
 			let logout = DOM({event:['click', async () => {
 				
@@ -1152,11 +1147,19 @@ class View {
 				
 				Splash.hide();
 				
-			}]},'Logout');
+			}]},'Выйти из аккаунта');
 			
 			let close = DOM({event:['click',() => Splash.hide()]},'Отмена');
 			
 			let wrap = DOM({style:'wrap'},logout,close);
+
+			if (NativeAPI.status) {
+			
+				let exit = DOM({event:['click',() => NativeAPI.exit()]},'Выйти из игры');
+			
+				wrap = DOM({style:'wrap'},logout,exit,close);
+
+			}
 			
 			let dom = DOM({style:'div'},'Выйти из аккаунта?',wrap);
 			
@@ -4952,6 +4955,8 @@ class PWGame {
 
 	static gameConnectionTestIsActive = false;
 
+	static isUpToDate = false;
+
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
 	
 	static async start(id){
@@ -5017,6 +5022,9 @@ class PWGame {
 		}
 		if (!PWGame.gameServerHasConnection) {
 			throw 'Игровой сервер недоступен!';
+		}
+		if (!PWGame.isUpToDate) {
+			throw 'Проверка обновления не завершена! Подождите';
 		}
 	}
 	
@@ -5152,7 +5160,7 @@ class NativeAPI {
 	}
 	
 	static exit(){
-		
+		App.error('exit');
 		if(!NativeAPI.status){
 			
 			return false;
@@ -5175,7 +5183,7 @@ class NativeAPI {
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 
-		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false;
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false; curLabel;
 
 		spawn.stdout.on('data',(data) => {
 			
@@ -5189,7 +5197,9 @@ class NativeAPI {
 					
 					if(json.type == 'bar'){
 						
-						updated = true;
+						if (curLabel == 'content') {
+							updated = true;
+						}
 						
 						callback({update:true,title:title,total:Number(json.data)});
 						
@@ -5200,11 +5210,11 @@ class NativeAPI {
 						
 						switch(json.data){
 							
-							case 'game': title = 'Обновление игры'; break;
+							case 'game': title = 'Обновление игры'; curLabel = json.data; break;
 							
-							case 'content': title = 'Обновление лаунчера'; break;
+							case 'content': title = 'Обновление лаунчера'; curLabel = json.data; break;
 							
-							case 'game_data': title = 'Загрузка игровых архивов'; break;
+							case 'game_data': title = 'Загрузка игровых архивов'; curLabel = json.data; break;
 							
 						}
 						
@@ -5222,10 +5232,12 @@ class NativeAPI {
 			
 			NativeAPI.progress(-1);
 			
-			if( (code == 0) && (updated) ){
+			if( (code == 0) ){
 				
-				NativeAPI.reset();
-				
+				if (updated) {
+					NativeAPI.reset();
+				}
+				PWGame.isUpToDate = true;
 			}
 			
 		});
@@ -6655,7 +6667,7 @@ class MM {
 			if (PWGame.gameConnectionTestIsActive) {
 				return;
 			}
-			if (!PWGame.gameServerHasConnection) {
+			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate) {
 				MM.button.innerText = 'Проверка';
 			}
 			
@@ -6674,12 +6686,12 @@ class MM {
 			}
 			catch(error){
 				
+				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate) { // Неудача
+					MM.button.innerText = 'В бой!';
+				}
+				
 				return App.error(error);
 				
-			}
-				
-			if (!PWGame.gameServerHasConnection) { // Неудача
-				MM.button.innerText = 'В бой!';
 			}
 			
 		}
