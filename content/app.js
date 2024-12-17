@@ -3930,7 +3930,7 @@ class Build{
 			element.onmouseup = async (event) => {
 
 				let moveEnd = Date.now();
-				let isClick = moveEnd - moveStart < 100;
+				let isClick = moveEnd - moveStart < 300;
 				
 				document.onmousemove = null;
 				
