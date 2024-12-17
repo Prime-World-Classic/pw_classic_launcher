@@ -961,15 +961,39 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,canvas,View.castleMenu(),View.castleHeroes());
+		body.append(backgroundImage,canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes());
 		
 		return body;
 		
 	}
 	
+	static castlePlay(){
+		
+		let body = DOM({style:'castle-play'});
+		
+		let play = MM.play();
+		
+		play.classList.add('main-header-item');
+		
+		play.classList.add('button-play');
+		
+		let lobby = DOM({style:'castle-play-lobby'},
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'})
+		);
+		
+		body.append(lobby,play);
+		
+		return body; 
+		
+	}
+	
 	static castleMenu(){
 		
-		let body = DOM({style:'castle-menu'},DOM(`123`),DOM(`456`));
+		let body = DOM({style:'castle-menu'});
 		
 		return body;
 		
