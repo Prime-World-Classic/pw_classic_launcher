@@ -1198,8 +1198,22 @@ class View {
 					status.onclick = async () => {
 						
 						if(NativeAPI.status){
+							if (PWGame.gameConnectionTestIsActive) {
+								return;
+							}
 							
-							await PWGame.check();
+							PWGame.gameConnectionTestIsActive = true;
+
+							try {
+								await PWGame.check();
+
+								await PWGame.testGameServerConnection();
+							} catch (e) {
+								PWGame.gameConnectionTestIsActive = false;
+								throw e;
+							}
+
+							PWGame.gameConnectionTestIsActive = false;
 							
 						}
 						else{
@@ -1403,7 +1417,7 @@ class View {
 		return body;
 		
 	}
-	
+
 	static async history(){
 		
 		let body = DOM({style:'main'}), history = DOM({style:'history'});
@@ -4797,8 +4811,6 @@ class HTTP {
 	static async request(url,type = ''){
 		
 		let response = await fetch(url);
-
-		console.log('Loaded ' + url);
 		
 		switch(type){
 			
@@ -4819,6 +4831,12 @@ class PWGame {
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
+
+	static gameServerHasConnection = false;
+
+	static gameConnectionTestIsActive = false;
+
+	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
 	
 	static async start(id){
 		
@@ -4864,6 +4882,44 @@ class PWGame {
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH);
 		
+	}
+	
+	static async testGameServerConnection() {
+		if (PWGame.gameServerHasConnection) {
+			return;
+		}
+		const data = {
+			method: 'checkConnection'
+		};
+
+		let gameServerIps = [
+			'http://81.88.210.30:37122/api',
+			'http://26.250.19.245:37122/api' // test connection to Radmin IP
+		];
+
+		for (let ip of gameServerIps) {
+			try {
+				let response = await fetch(ip, {
+					method: "POST",
+					body: JSON.stringify(data),
+					headers: {
+					"Content-type": "application/json; charset=UTF-8"
+					}
+				});
+
+				PWGame.gameServerHasConnection = true;
+
+				setTimeout(_ => {
+					PWGame.gameServerHasConnection = false;
+				}, PWGame.gameServerConnectionCheckTimeout);
+
+				break;
+			} catch (e) {
+			};
+		}
+		if (!PWGame.gameServerHasConnection) {
+			throw 'Игровой сервер недоступен!';
+		}
 	}
 	
 }
@@ -6498,16 +6554,34 @@ class MM {
 	static async start(){
 		
 		if(NativeAPI.status){
+			if (PWGame.gameConnectionTestIsActive) {
+				return;
+			}
+			if (!PWGame.gameServerHasConnection) {
+				MM.button.innerText = 'Проверка';
+			}
 			
 			try{
 				
-				await PWGame.check();
+				if (!MM.active) {
+					PWGame.gameConnectionTestIsActive = true;
+
+					await PWGame.check();
+
+					await PWGame.testGameServerConnection();
+
+					PWGame.gameConnectionTestIsActive = false;
+				}
 				
 			}
 			catch(error){
 				
 				return App.error(error);
 				
+			}
+				
+			if (!PWGame.gameServerHasConnection) { // Неудача
+				MM.button.innerText = 'В бой!';
 			}
 			
 		}
