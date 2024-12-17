@@ -599,7 +599,7 @@ button.sets {
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 }
 .button-build--wrapper {
-	height: 61px;
+	height: 55px;
 }
 .button-build--wrapper.highlight .build-list-item {
 	border-bottom-width: 0 !important;
