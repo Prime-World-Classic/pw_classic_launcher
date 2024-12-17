@@ -541,7 +541,7 @@ class Api {
 	
 	async connect(){
 		
-		this.WebSocket = new WebSocket(`${this.host}`); // + ${App.storage.data.token}
+		this.WebSocket = new WebSocket(`${this.host}`); // + ${App.storage.data.token}		
 		
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data) );
 		
@@ -549,7 +549,9 @@ class Api {
 			
 			try{
 				
-				await this.connect();
+				if (App.api == this) {
+					await this.connect();
+				}
 				
 			}
 			catch(error){
@@ -4484,8 +4486,11 @@ class Events {
 class App {
 	
 	static async init(){
+
+		let mainServer = 'wss://playpw.fun:443/api/v1/';
+		let mirrorServer = 'wss://pw.26rus-game.ru:8443/';
 		// ws://192.168.31.194:3737
-		App.api = new Api('wss://playpw.fun:443/api/v1/',Events); // wss://playpw.fun:443/api/v1/
+		App.api = new Api(mainServer, Events); // wss://playpw.fun:443/api/v1/
 		
 		await Store.init();
 		
@@ -4499,7 +4504,18 @@ class App {
 		
 		if(App.storage.data.login){
 			
-			await App.api.init();
+			try {
+
+				await App.api.init();
+
+			} catch (e) {
+				
+				// Try with mirror
+
+				App.api = new Api(mirrorServer, Events); 
+
+				await App.api.init();
+			}
 			
 			if(window.location.hash == '#castle'){
 				
@@ -4526,11 +4542,16 @@ class App {
 			
 			try{
 				
-				App.api.init();
+				await App.api.init();
 				
 			}
 			catch(e){
 				
+				// Try with mirror
+
+				App.api = new Api(mirrorServer, Events); 
+
+				await App.api.init();
 				
 			}
 			
