@@ -854,6 +854,8 @@ class View {
 			View.activeAnimation.addEventListener('finish',() => {
 				
 				View.active.remove();
+
+				Castle.isStaticSMCached = false;
 				
 				View.active = template;
 				
