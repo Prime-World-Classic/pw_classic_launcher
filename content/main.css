@@ -559,7 +559,7 @@ button.sets {
 }
 
 .build-buttons--wrapper {
-	margin-top: 118px;
+	margin-top: 132px;
 	display: flex;
 	margin-left: 21vw;
 	width: 37vw;
@@ -573,6 +573,7 @@ button.sets {
 	margin: 0;
 	padding: 0 10px 0 10px;
 	width: auto;
+	height: 40px;
 	overflow: hidden;
 }
 .build-buttons--wrapper::-webkit-scrollbar {
@@ -599,7 +600,7 @@ button.sets {
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 }
 .button-build--wrapper {
-	height: 55px;
+	height: 40px;
 }
 .button-build--wrapper.highlight .build-list-item {
 	border-bottom-width: 0 !important;
