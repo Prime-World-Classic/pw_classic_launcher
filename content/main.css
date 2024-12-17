@@ -574,6 +574,7 @@ button.sets {
 	padding: 0 10px 0 10px;
 	width: auto;
 	height: 40px;
+	font-size: 17px;
 	overflow: hidden;
 }
 .build-buttons--wrapper::-webkit-scrollbar {
