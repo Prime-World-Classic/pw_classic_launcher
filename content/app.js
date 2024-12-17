@@ -5152,9 +5152,9 @@ class Castle {
 	
 	static depthTextureSize = 8192;
 	
-	static zNear = 0.1;
+	static zNear = 10.0;
 	
-	static zFar = 4000.0;
+	static zFar = 4500.0;
 	
 	static canvasWidth;
 	
@@ -5178,11 +5178,11 @@ class Castle {
 	
 	static maxFov = 55;
 	
-	static fixedFovValues = [55, 45, 35, 55, 50];
+	static fixedFovValues = [45, 35, 55, 50];
 	
-	static fixedRotationTiltValues = [0, 0, 0, -0.8, -1.0];
+	static fixedRotationTiltValues = [ 0, 0, -0.8, -1.0];
 	
-	static fixedCameraHeightValues = [0, 0, 0, 370, 380];
+	static fixedCameraHeightValues = [ 0, 0, 370, 380];
 	
 	static initialFixedValue = 0.0;
 	
@@ -5190,7 +5190,7 @@ class Castle {
 	
 	static targetFixedValue = 0.0;
 	
-	static cameraAnimationSpeed = 7.0;
+	static cameraAnimationSpeed = 4.0;
 	
 	static fov = Castle.fixedFovValues[Math.floor(Castle.currentFixedValue)];
 	
@@ -6020,7 +6020,7 @@ class Castle {
 		
 		mat4.perspective(Castle.projMatrix, glMatrix.toRadian(Castle.fov), Castle.canvasWidth / Castle.canvasHeight, Castle.zNear, Castle.zFar);
 		
-		var camPosElements = [-1373, -473, -1523];
+		var camPosElements = [-1432, -440, -1582];
 		
 		var camPosX = camPosElements[0] + Castle.camDeltaPos[0];
 		
@@ -6030,7 +6030,7 @@ class Castle {
 		
 		var camPos = vec3.fromValues(camPosX, camPosZ, camPosY);
 		
-		var camForwElements = [-2.01, -2.36, 3.14];
+		var camForwElements = [-2.170, -2.36, 3.14];
 		
 		var quatStart = quat.create();
 		
