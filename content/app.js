@@ -5055,8 +5055,6 @@ class NativeAPI {
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
 		NativeAPI.loadModules();
-
-		NativeAPI.update();
 		
 	}
 	
