@@ -6702,7 +6702,7 @@ class MM {
 			
 			Splash.show(DOM({tag:'div'},`Поиск боя возможен с Windows версии лаунчера!`));
 			
-			//return;
+			return;
 			
 		}
 		
