@@ -2121,7 +2121,7 @@ class Build{
 			
 			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
 			
-		}));
+		},animate));
 		
 		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,bottom),false);
 		
@@ -6612,7 +6612,7 @@ class MM {
 			
 		}
 		else{
-			
+			/*
 			if(!await Protect.checkInstall()){
 				
 				MM.button.innerText = 'Проверка';
@@ -6623,9 +6623,14 @@ class MM {
 					
 				},5000);
 				
-				return;
+				
 				
 			}
+			*/
+			
+			Splash.show(DOM({tag:'div'},`Поиск боя возможен с Windows версии лаунчера!`));
+			
+			return;
 			
 		}
 		
@@ -6920,14 +6925,20 @@ class MM {
 			}
 			else{
 				
+				name.innerText = 'Анонимус';
+				
 				name.style.opacity = 0;
+				
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.png)`;
+				
+				rank.firstChild = 1100;
 				
 				rank.style.opacity = 0;
 				
 				rightTeam.append(player);
 				
 			}
-
+			
 		}
 		
 		MM.lobbyHeroes = DOM({style:'mm-lobby-middle-hero'});
@@ -6941,8 +6952,7 @@ class MM {
 			hero.dataset.url = `content/hero/${item.id}/1.png`;
 			
 			hero.onclick = async () => {
-				//Sound.play(`content/hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
-				//return;
+				
 				MM.targetHeroId = item.id;
 				
 				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
