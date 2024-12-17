@@ -527,6 +527,12 @@ class Api {
 		
 		this.host = host;
 		
+		this.MAIN_HOST = ( Array.isArray(this.host) ? this.host[0] : this.host );
+		
+		this.CONNECTION_FALLED = 0;
+		
+		this.CONNECTION_FALLED_TIME = Date.now();
+		
 		this.awaiting = new Object();
 		
 		this.events = (events) ? events : new Object();
@@ -535,26 +541,60 @@ class Api {
 	
 	async init(){
 		
-		await this.connect();
+		try{
+			
+			await this.connect();
+			
+		}
+		catch(e){
+			
+			
+			
+		}
 		
 	}
 	
 	async connect(){
 		
-		this.WebSocket = new WebSocket(`${this.host}`); // + ${App.storage.data.token}		
+		this.WebSocket = new WebSocket(`${this.MAIN_HOST}`); // + ${App.storage.data.token}		
 		
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data) );
 		
 		this.WebSocket.addEventListener('close', async () => {
+			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
+			if( ( Date.now() - this.CONNECTION_FALLED_TIME ) < 15000){
+				
+				this.CONNECTION_FALLED++;
+				
+				this.CONNECTION_FALLED_TIME = Date.now();
+				
+			}
+			
+			if( (this.CONNECTION_FALLED >= 3) && (Array.isArray(this.host)) ){
+				
+				if( ( this.host.indexOf(this.MAIN_HOST) + 1 ) <= (this.host.length - 1) ){
+					
+					this.MAIN_HOST = this.host[( this.host.indexOf(this.MAIN_HOST) + 1 )];
+					
+				}
+				else{
+					
+					this.MAIN_HOST = this.host[0];
+					
+				}
+				console.log(`Переподключаем API (${this.MAIN_HOST})`);
+				this.CONNECTION_FALLED = 0;
+				
+				this.CONNECTION_FALLED_TIME = Date.now();
+				
+			}
 			
 			try{
 				
-				if (App.api == this) {
-					await this.connect();
-				}
+				await this.connect();
 				
 			}
-			catch(error){
+			catch(e){
 				
 				// разрыв соединения
 				
@@ -628,7 +668,7 @@ class Api {
 			}
 			
 			if(action in this.events){
-				console.log('EVENNNNEETTT',action,data);
+				console.log('Событие API',json.from);
 				try{
 					
 					this.events[action](data);
@@ -907,17 +947,53 @@ class View {
 		let backgroundImage = DOM({tag:'div', id:'castle-background-img'});
 		let canvas = DOM({tag:'canvas', id:'castle-game-surface'});
 		//App.storage.data.fraction; //тут будет инфа о стороне 1 или 2 
-		Castle.initDemo('doct',canvas);
 		
-		body.append(backgroundImage,canvas,View.castleMenu(),View.castleHeroes());
+		try{
+			
+			Castle.initDemo('doct',canvas);
+			
+		}
+		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
+			
+			App.error(error);
+			
+			return await View.main();
+			
+		}
+		
+		body.append(backgroundImage,canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes());
 		
 		return body;
 		
 	}
 	
+	static castlePlay(){
+		
+		let body = DOM({style:'castle-play'});
+		
+		let play = MM.play();
+		
+		play.classList.add('main-header-item');
+		
+		play.classList.add('button-play');
+		
+		let lobby = DOM({style:'castle-play-lobby'},
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'}),
+		DOM({style:'castle-play-lobby-player'})
+		);
+		
+		body.append(lobby,play);
+		
+		return body; 
+		
+	}
+	
 	static castleMenu(){
 		
-		let body = DOM({style:'castle-menu'},DOM(`123`),DOM(`456`));
+		let body = DOM({style:'castle-menu'});
 		
 		return body;
 		
@@ -997,7 +1073,7 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.png',event:['click',() => View.show('main')]}),play);
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.png',event:['click',() => View.show('castle')]}),play);
 		
 		if(App.isAdmin()){
 			
@@ -1038,7 +1114,7 @@ class View {
 		}
 		
 		menu.append(
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},'Лобби'),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},'Лобби'),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
@@ -1278,7 +1354,7 @@ class View {
 					
 					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
 					
-					View.show('main');
+					View.show('castle');
 					
 				}]},'[X]'));
 				
@@ -1660,7 +1736,7 @@ class View {
 
 		body.append(DOM({style:'main-header'},
 		DOM({tag:'img',src:'content/img/logo.png'}),
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},App.storage.data.login),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},App.storage.data.login),
 		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
@@ -1692,7 +1768,7 @@ class View {
 			
 			request.back = () => {
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
@@ -1706,13 +1782,13 @@ class View {
 				
 				await App.api.request('gamev2','finish');
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
 			request.exit = () => {
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
@@ -1729,7 +1805,7 @@ class View {
 		DOM({tag:'p'},'— засчитывается комбинация минимум из трёх одинаковых талантов;'),
 		DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
-		DOM({style:'game-button',event:['click',() => View.show('main')]},'Назад')
+		DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
 		);
 		
 		body.append(dscription);
@@ -1757,7 +1833,7 @@ class View {
 	
 	static async talents(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'));
 		
 		let result = await App.api.request('build','talentAll');
 		
@@ -1799,7 +1875,7 @@ class View {
 	
 	static async talents2(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'));
 		
 		let result = await App.api.request('build','talentHeroAll');
 		
@@ -1854,7 +1930,7 @@ class View {
 		}]}, 'Filter only banned');
 
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'), filter);
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'), filter);
 		
 		let result = await App.api.request('user','all');
 		
@@ -2081,7 +2157,7 @@ class Build{
 			
 			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
 			
-		}));
+		},animate));
 		
 		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,bottom),false);
 		
@@ -4341,11 +4417,25 @@ class Events {
 	
 	static MMReady(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.attention();
+		
 		MM.ready(data);
 		
 	}
 	
 	static MMReadyCount(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		let find = document.getElementById('MMReady');
 		
@@ -4359,11 +4449,25 @@ class Events {
 	
 	static MMStart(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.attention();
+		
 		MM.lobby(data);
 		
 	}
 	
 	static MMChangeHero(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		MM.eventChangeHero(data);
 		
@@ -4371,17 +4475,35 @@ class Events {
 	
 	static MMChat(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
 		MM.chat(data);
 		
 	}
 	
 	static MMHero(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
 		MM.select(data);
 		
 	}
 	
 	static MMEnd(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		MM.finish(data);
 		
@@ -4409,7 +4531,7 @@ class Events {
 	
 	static PUpdate(data){
 		
-		View.show('main',data);
+		View.show('castle',data);
 		
 	}
 	
@@ -4431,7 +4553,7 @@ class Events {
 	
 	static PExit(){
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -4456,8 +4578,6 @@ class Events {
 	}
 
 	static stat(data) {
-		
-		console.log('stat',data);
 		
 		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
 		
@@ -4486,11 +4606,8 @@ class Events {
 class App {
 	
 	static async init(){
-
-		let mainServer = 'wss://playpw.fun:443/api/v1/';
-		let mirrorServer = 'wss://pw.26rus-game.ru:8443/';
-		// ws://192.168.31.194:3737
-		App.api = new Api(mainServer, Events); // wss://playpw.fun:443/api/v1/
+		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/
+		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
 		await Store.init();
 		
@@ -4502,59 +4619,24 @@ class App {
 		
 		await MM.init();
 		
+		await App.api.init();
+		
 		if(App.storage.data.login){
 			
-			try {
-
-				await App.api.init();
-
-			} catch (e) {
-				
-				// Try with mirror
-
-				App.api = new Api(mirrorServer, Events); 
-
-				await App.api.init();
-			}
-			
-			if(window.location.hash == '#castle'){
+			try{
 				
 				View.show('castle');
 				
 			}
-			else{
+			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
 				
-				try{
-					
-					View.show('main');
-					
-				}
-				catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
-					
-					App.exit();
-					
-				}
+				App.exit();
 				
 			}
 			
 		}
 		else{
-			
-			try{
-				
-				await App.api.init();
-				
-			}
-			catch(e){
-				
-				// Try with mirror
 
-				App.api = new Api(mirrorServer, Events); 
-
-				await App.api.init();
-				
-			}
-			
 			View.show('authorization');
 			
 		}
@@ -4562,13 +4644,7 @@ class App {
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
 		document.body.append(DOM({id:'STAT'}));
-		/*
-		setTimeout(() => {
-			
-			PWGame.reconnect('Tester00Tester00Tester00Tester00a99dfed1f15ff8621202607bb6d416c7ec3581717ec1d76c24b269615400033b');
-			
-		},2000);
-		*/
+		
 	}
 	
 	static async authorization(login,password){
@@ -4604,7 +4680,7 @@ class App {
 		
 		await App.storage.set({id:request.id,token:request.token,login:login.value});
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -4641,7 +4717,7 @@ class App {
 
 		await App.storage.set({id:request.id,token:request.token,login:login.value});
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -4861,35 +4937,17 @@ class PWGame {
 	
 	static async start(id){
 		
-		let request = `pwclassic://runGame/${id}/${PW_VERSION}`;
+		await PWGame.check();
 		
-		if(NativeAPI.status){
-			
-			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
-			
-		}
-		else{
-			
-			// App.href(request);
-			
-		}
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`]);
 		
 	}
 	
 	static async reconnect(id){
 		
-		let request = `pwclassic://reconnect/${id}/${PW_VERSION}`;
+		await PWGame.check();
 		
-		if(NativeAPI.status){
-			
-			await NativeAPI.exec(PWGame.PATH,['protocol',request]);
-			
-		}
-		else{
-			
-			// App.href(request);
-			
-		}
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`]);
 		
 	}
 	
@@ -5100,7 +5158,7 @@ class NativeAPI {
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 
-		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений';
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false;
 
 		spawn.stdout.on('data',(data) => {
 			
@@ -5113,6 +5171,8 @@ class NativeAPI {
 				if(json.type){
 					
 					if(json.type == 'bar'){
+						
+						updated = true;
 						
 						callback({update:true,title:title,total:Number(json.data)});
 						
@@ -5145,7 +5205,7 @@ class NativeAPI {
 			
 			NativeAPI.progress(-1);
 			
-			if(code == 0){
+			if( (code == 0) && (updated) ){
 				
 				NativeAPI.reset();
 				
@@ -6607,7 +6667,7 @@ class MM {
 			
 		}
 		else{
-			
+			/*
 			if(!await Protect.checkInstall()){
 				
 				MM.button.innerText = 'Проверка';
@@ -6618,9 +6678,14 @@ class MM {
 					
 				},5000);
 				
-				return;
+				
 				
 			}
+			*/
+			
+			Splash.show(DOM({tag:'div'},`Поиск боя возможен с Windows версии лаунчера!`));
+			
+			return;
 			
 		}
 		
@@ -6915,14 +6980,20 @@ class MM {
 			}
 			else{
 				
+				name.innerText = 'Анонимус';
+				
 				name.style.opacity = 0;
+				
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.png)`;
+				
+				rank.firstChild = 1100;
 				
 				rank.style.opacity = 0;
 				
 				rightTeam.append(player);
 				
 			}
-
+			
 		}
 		
 		MM.lobbyHeroes = DOM({style:'mm-lobby-middle-hero'});
@@ -6936,8 +7007,7 @@ class MM {
 			hero.dataset.url = `content/hero/${item.id}/1.png`;
 			
 			hero.onclick = async () => {
-				//Sound.play(`content/hero/${item.id}/revive/${App.getRandomInt(1,4)}.mp3`); // тест
-				//return;
+				
 				MM.targetHeroId = item.id;
 				
 				await App.api.request('mmtest','eventChangeHero',{id:MM.id,heroId:item.id});
@@ -7126,7 +7196,7 @@ class MM {
 		
 		PWGame.start(data.key);
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
