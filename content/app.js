@@ -947,7 +947,19 @@ class View {
 		let backgroundImage = DOM({tag:'div', id:'castle-background-img'});
 		let canvas = DOM({tag:'canvas', id:'castle-game-surface'});
 		//App.storage.data.fraction; //тут будет инфа о стороне 1 или 2 
-		Castle.initDemo('doct',canvas);
+		
+		try{
+			
+			Castle.initDemo('doct',canvas);
+			
+		}
+		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
+			
+			App.error(error);
+			
+			return await View.main();
+			
+		}
 		
 		body.append(backgroundImage,canvas,View.castleMenu(),View.castleHeroes());
 		
@@ -1037,7 +1049,7 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.png',event:['click',() => View.show('main')]}),play);
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.png',event:['click',() => View.show('castle')]}),play);
 		
 		if(App.isAdmin()){
 			
@@ -1078,7 +1090,7 @@ class View {
 		}
 		
 		menu.append(
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},'Лобби'),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},'Лобби'),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
@@ -1318,7 +1330,7 @@ class View {
 					
 					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
 					
-					View.show('main');
+					View.show('castle');
 					
 				}]},'[X]'));
 				
@@ -1700,7 +1712,7 @@ class View {
 
 		body.append(DOM({style:'main-header'},
 		DOM({tag:'img',src:'content/img/logo.png'}),
-		DOM({style:'main-header-item',event:['click',() => View.show('main')]},App.storage.data.login),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},App.storage.data.login),
 		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
@@ -1732,7 +1744,7 @@ class View {
 			
 			request.back = () => {
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
@@ -1746,13 +1758,13 @@ class View {
 				
 				await App.api.request('gamev2','finish');
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
 			request.exit = () => {
 				
-				View.show('main');
+				View.show('castle');
 				
 			}
 			
@@ -1769,7 +1781,7 @@ class View {
 		DOM({tag:'p'},'— засчитывается комбинация минимум из трёх одинаковых талантов;'),
 		DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
-		DOM({style:'game-button',event:['click',() => View.show('main')]},'Назад')
+		DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
 		);
 		
 		body.append(dscription);
@@ -1797,7 +1809,7 @@ class View {
 	
 	static async talents(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'));
 		
 		let result = await App.api.request('build','talentAll');
 		
@@ -1839,7 +1851,7 @@ class View {
 	
 	static async talents2(){
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'));
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'));
 		
 		let result = await App.api.request('build','talentHeroAll');
 		
@@ -1894,7 +1906,7 @@ class View {
 		}]}, 'Filter only banned');
 
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('main')]},'[X]'), filter);
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'), filter);
 		
 		let result = await App.api.request('user','all');
 		
@@ -4495,7 +4507,7 @@ class Events {
 	
 	static PUpdate(data){
 		
-		View.show('main',data);
+		View.show('castle',data);
 		
 	}
 	
@@ -4517,7 +4529,7 @@ class Events {
 	
 	static PExit(){
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -4583,34 +4595,23 @@ class App {
 		
 		await MM.init();
 		
+		await App.api.init();
+		
 		if(App.storage.data.login){
 			
-			await App.api.init();
-			
-			if(window.location.hash == '#castle'){
+			try{
 				
 				View.show('castle');
 				
 			}
-			else{
+			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
 				
-				try{
-					
-					View.show('main');
-					
-				}
-				catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
-					
-					App.exit();
-					
-				}
+				App.exit();
 				
 			}
 			
 		}
 		else{
-			
-			await App.api.init();
 
 			View.show('authorization');
 			
@@ -4655,7 +4656,7 @@ class App {
 		
 		await App.storage.set({id:request.id,token:request.token,login:login.value});
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -4692,7 +4693,7 @@ class App {
 
 		await App.storage.set({id:request.id,token:request.token,login:login.value});
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
@@ -7171,7 +7172,7 @@ class MM {
 		
 		PWGame.start(data.key);
 		
-		View.show('main');
+		View.show('castle');
 		
 	}
 	
