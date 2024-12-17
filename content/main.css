@@ -708,7 +708,7 @@ button.sets {
 	border-radius: 50%;
 	background: gray;
 	left: 83px;
-	bottom: 9px;
+	bottom: 4px;
 	border: 2px solid #000;
 }
 
@@ -2380,7 +2380,7 @@ cursor:pointer;
 
 	.build-active-bar-item:not(:empty)::after {
 		/* Build screen: active panels: circle green/gray */
-		left: 50px;
+		left: 54px;
 		width: 10px;
 		height: 10px;
 		border-width: 1px;
