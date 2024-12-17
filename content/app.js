@@ -5178,11 +5178,11 @@ class Castle {
 	
 	static maxFov = 55;
 	
-	static fixedFovValues = [45, 35, 55, 50];
+	static fixedFovValues = [45, 35, 55, 45];
 	
-	static fixedRotationTiltValues = [ 0, 0, -0.8, -1.0];
+	static fixedRotationTiltValues = [ 0, 0, -0.8, -0.9];
 	
-	static fixedCameraHeightValues = [ 0, 0, 370, 380];
+	static fixedCameraHeightValues = [ 0, 0, 350, 350];
 	
 	static initialFixedValue = 0.0;
 	
