@@ -811,10 +811,19 @@ class Api {
 		
 	}
 	
-	async say(request,object,method,data = ''){
+	async say(request,object,method,data = '', retryCount = 0){
+		
+		if (this.WebSocket.readyState === this.WebSocket.OPEN) {
 		
 		this.WebSocket.send(JSON.stringify({token:App.storage.data.token,request:request,object:object,method:method,data:data,version:`${PW_VERSION}.${APP_VERSION}`}));
 		
+		} else {
+
+			if (retryCount < 5) {
+				setTimeout(() => this.say(request,object,method,data, retryCount + 1) ,3000);
+			}
+			
+		}
 	}
 	
 }
@@ -7444,7 +7453,6 @@ class PreloadImages {
 		return new Promise((resolve,reject) => {
 			
 			image.addEventListener('load',() => {
-				console.log('Loaded ' + url);
 				resolve(image);
 			});
 			
