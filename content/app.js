@@ -1,6 +1,6 @@
 APP_VERSION = '3 (TEST)';
 
-PW_VERSION = '1.9';
+PW_VERSION = '2.0.0';
 
 window.addEventListener('DOMContentLoaded',() => {
 	
