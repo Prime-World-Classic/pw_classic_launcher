@@ -4381,11 +4381,25 @@ class Events {
 	
 	static MMReady(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.attention();
+		
 		MM.ready(data);
 		
 	}
 	
 	static MMReadyCount(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		let find = document.getElementById('MMReady');
 		
@@ -4399,11 +4413,25 @@ class Events {
 	
 	static MMStart(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		NativeAPI.attention();
+		
 		MM.lobby(data);
 		
 	}
 	
 	static MMChangeHero(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		MM.eventChangeHero(data);
 		
@@ -4411,17 +4439,35 @@ class Events {
 	
 	static MMChat(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
 		MM.chat(data);
 		
 	}
 	
 	static MMHero(data){
 		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
 		MM.select(data);
 		
 	}
 	
 	static MMEnd(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
 		
 		MM.finish(data);
 		
