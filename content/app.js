@@ -527,6 +527,12 @@ class Api {
 		
 		this.host = host;
 		
+		this.MAIN_HOST = ( Array.isArray(this.host) ? this.host[0] : this.host );
+		
+		this.CONNECTION_FALLED = 0;
+		
+		this.CONNECTION_FALLED_TIME = Date.now();
+		
 		this.awaiting = new Object();
 		
 		this.events = (events) ? events : new Object();
@@ -535,26 +541,60 @@ class Api {
 	
 	async init(){
 		
-		await this.connect();
+		try{
+			
+			await this.connect();
+			
+		}
+		catch(e){
+			
+			
+			
+		}
 		
 	}
 	
 	async connect(){
 		
-		this.WebSocket = new WebSocket(`${this.host}`); // + ${App.storage.data.token}		
+		this.WebSocket = new WebSocket(`${this.MAIN_HOST}`); // + ${App.storage.data.token}		
 		
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data) );
 		
 		this.WebSocket.addEventListener('close', async () => {
+			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
+			if( ( Date.now() - this.CONNECTION_FALLED_TIME ) < 15000){
+				
+				this.CONNECTION_FALLED++;
+				
+				this.CONNECTION_FALLED_TIME = Date.now();
+				
+			}
+			
+			if( (this.CONNECTION_FALLED >= 3) && (Array.isArray(this.host)) ){
+				
+				if( ( this.host.indexOf(this.MAIN_HOST) + 1 ) <= (this.host.length - 1) ){
+					
+					this.MAIN_HOST = this.host[( this.host.indexOf(this.MAIN_HOST) + 1 )];
+					
+				}
+				else{
+					
+					this.MAIN_HOST = this.host[0];
+					
+				}
+				console.log(`Переподключаем API (${this.MAIN_HOST})`);
+				this.CONNECTION_FALLED = 0;
+				
+				this.CONNECTION_FALLED_TIME = Date.now();
+				
+			}
 			
 			try{
 				
-				if (App.api == this) {
-					await this.connect();
-				}
+				await this.connect();
 				
 			}
-			catch(error){
+			catch(e){
 				
 				// разрыв соединения
 				
@@ -628,7 +668,7 @@ class Api {
 			}
 			
 			if(action in this.events){
-				console.log('EVENNNNEETTT',action,data);
+				console.log('Событие API',json.from);
 				try{
 					
 					this.events[action](data);
@@ -4457,8 +4497,6 @@ class Events {
 
 	static stat(data) {
 		
-		console.log('stat',data);
-		
 		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
 		
 	}
@@ -4486,11 +4524,8 @@ class Events {
 class App {
 	
 	static async init(){
-
-		let mainServer = 'wss://playpw.fun:443/api/v1/';
-		let mirrorServer = 'wss://pw.26rus-game.ru:8443/';
-		// ws://192.168.31.194:3737
-		App.api = new Api(mainServer, Events); // wss://playpw.fun:443/api/v1/
+		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/
+		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
 		await Store.init();
 		
@@ -4504,18 +4539,7 @@ class App {
 		
 		if(App.storage.data.login){
 			
-			try {
-
-				await App.api.init();
-
-			} catch (e) {
-				
-				// Try with mirror
-
-				App.api = new Api(mirrorServer, Events); 
-
-				await App.api.init();
-			}
+			await App.api.init();
 			
 			if(window.location.hash == '#castle'){
 				
@@ -4540,21 +4564,8 @@ class App {
 		}
 		else{
 			
-			try{
-				
-				await App.api.init();
-				
-			}
-			catch(e){
-				
-				// Try with mirror
+			await App.api.init();
 
-				App.api = new Api(mirrorServer, Events); 
-
-				await App.api.init();
-				
-			}
-			
 			View.show('authorization');
 			
 		}
@@ -4562,13 +4573,7 @@ class App {
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
 		document.body.append(DOM({id:'STAT'}));
-		/*
-		setTimeout(() => {
-			
-			PWGame.reconnect('Tester00Tester00Tester00Tester00a99dfed1f15ff8621202607bb6d416c7ec3581717ec1d76c24b269615400033b');
-			
-		},2000);
-		*/
+		
 	}
 	
 	static async authorization(login,password){
