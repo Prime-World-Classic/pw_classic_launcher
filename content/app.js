@@ -7285,8 +7285,6 @@ class Sound {
 	static all = new Object();
 	
 	static play(source,object = new Object()){
-
-		App.error(source);
 		
 		let audio = new Audio();
 		
