@@ -27,7 +27,7 @@ void snow( out vec4 fragColor, in vec2 fragCoord )
     vec2 pixel = fragCoord/iResolution.xy;
     vec2 uv;
     float totalDepth = 0.0;
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < 3; i++)
     {
 
         uv = fract(2.0*pow(1.5,float(i+1))*fragCoord/iResolution.y);
@@ -37,12 +37,12 @@ void snow( out vec4 fragColor, in vec2 fragCoord )
         uv = fract(motion);
         if (rnd(cell.x*cell.y) > .5)
         {
-            col = col + vec3(draw_circle(uv+.5*sin(rnd(cell.x*cell.y)), cell, i+1)) * ((pixel.x+pixel.y) * 1.0); 
-            totalDepth += min(col.x, 1.0);
+            float circle = draw_circle(uv+.5*sin(rnd(cell.x*cell.y)), cell, i+1);
+            col = col + vec3(circle) * ((pixel.x+pixel.y) * 1.0); 
         }
 
     }
 
     // Output to screen
-    fragColor = vec4(col,1.0 / totalDepth);
+    fragColor = vec4(col, 1.0);
 }

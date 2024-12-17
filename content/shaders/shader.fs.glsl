@@ -159,7 +159,7 @@ void main()
   gl_FragColor.xyz = neutral(gl_FragColor.xyz);
 #ifdef SNOW
   snow(gl_FragColor, fragTexCoord * uvScale.zw);
-  gl_FragColor.w = posDepth * 0.002;
+  gl_FragColor.w *= posDepth * 0.002;
 #endif
 #endif
 }
