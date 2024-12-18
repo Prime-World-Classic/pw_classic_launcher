@@ -7419,10 +7419,14 @@ class Sound {
 	}
 
 	static pause(id){
-		Sound.all[id].pause();
+		if(id in Sound.all){
+			Sound.all[id].pause();
+		}
 	}
 	static unpause(id){
-		Sound.all[id].play();
+		if(id in Sound.all){
+			Sound.all[id].play();
+		}
 	}
 	
 }
