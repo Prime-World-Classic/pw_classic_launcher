@@ -5755,10 +5755,12 @@ class Castle {
 		
 		Castle.globalCanvas.classList.add('castle-fade-in');
 
-		if (NativeAPI.fileSystem) {
+		if (NativeAPI.fileSystem && !('castle' in Sound.all)) {
 			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
 
-			Sound.play('content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)],{id:'castle',volume:Castle.musicVolume,loop:true});
+			let selectMusic = function() {return 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)]}
+
+			Sound.play(selectMusic(),{id:'castle',volume:Castle.musicVolume}, selectMusic);
 		}
 		
 		let backgroundImage = document.getElementById('castle-background-img');
@@ -7313,7 +7315,7 @@ class Sound {
 	
 	static all = new Object();
 	
-	static play(source,object = new Object()){
+	static play(source,object = new Object(), callback){
 		
 		let audio = new Audio();
 		
@@ -7334,6 +7336,15 @@ class Sound {
 		audio.src = source;
 		
 		audio.play();
+
+		if (callback) {
+			
+			audio.addEventListener("ended", (event) => {
+				Sound.stop(object.id);
+				Sound.play(callback(), object, callback)
+			});
+			
+		}
 		
 		if( ('id' in object) && (object.id) ){
 			
