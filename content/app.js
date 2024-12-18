@@ -5244,7 +5244,16 @@ class NativeAPI {
 							
 							case 'content': title = 'Обновление лаунчера'; curLabel = json.data; break;
 							
-							case 'game_data': title = 'Загрузка игровых архивов'; curLabel = json.data; break;
+							case 'game_data0': title = 'Загрузка игровых архивов 1/8'; curLabel = json.data; break;
+							case 'game_data1': title = 'Загрузка игровых архивов 2/8'; curLabel = json.data; break;
+							case 'game_data2': title = 'Загрузка игровых архивов 3/8'; curLabel = json.data; break;
+							case 'game_data3': title = 'Загрузка игровых архивов 4/8'; curLabel = json.data; break;
+							case 'game_data4': title = 'Загрузка игровых архивов 5/8'; curLabel = json.data; break;
+							case 'game_data5': title = 'Загрузка игровых архивов 6/8'; curLabel = json.data; break;
+							case 'game_data6': title = 'Загрузка игровых архивов 7/8'; curLabel = json.data; break;
+							case 'game_data7': title = 'Загрузка игровых архивов 8/8'; curLabel = json.data; break;
+
+							default: title = 'Загрузка игровых архивов'; curLabel = json.data; break;
 							
 						}
 						
