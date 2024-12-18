@@ -4951,6 +4951,8 @@ class PWGame {
 	
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
+	static WORKING_DIR_PATH = '../Game/Bin/';
+	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
 
 	static gameServerHasConnection = false;
@@ -4965,7 +4967,7 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`], callback);
 		
 	}
 	
@@ -4973,7 +4975,7 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`], callback);
 		
 	}
 	
@@ -5043,7 +5045,8 @@ class NativeAPI {
 		
 		fileSystem:'fs',
 		childProcess:'child_process',
-		os:'os'
+		os:'os',
+		path:'path',
 		
 	};
 	
@@ -5114,31 +5117,34 @@ class NativeAPI {
 		
 	}
 	
-	static async exec(path,args,callback){
+	static async exec(exeFile, workingDir, args, callback){
 		
 		return new Promise((resolve,reject) => {
 			
-			if(!NativeAPI.status){
-				
-				reject();
+		if(!NativeAPI.status){
+			
+			reject();
+			
+		}
+		
+		let workingDirPath = NativeAPI.path.join(process.cwd(), workingDir);		
+		let executablePath = NativeAPI.path.join(process.cwd(), exeFile);
+		
+		NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
+
+			if(error){
+					
+				reject(error);
 				
 			}
 			
-			NativeAPI.childProcess.execFile(path,args,(error,stdout,stderr) => {
-				
-				if(error){
-					
-					reject(error);
-					
-				}
-				
-				resolve(stdout);
-
-				if (callback) {
-					callback();
-				}
-				
-			});
+			resolve(stdout);
+		
+			if (callback) {
+				callback();
+			}
+			
+		});
 			
 		});
 		
