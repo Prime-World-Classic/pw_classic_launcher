@@ -5253,6 +5253,8 @@ class NativeAPI {
 							case 'game_data6': title = 'Загрузка игровых архивов 7/8'; curLabel = json.data; break;
 							case 'game_data7': title = 'Загрузка игровых архивов 8/8'; curLabel = json.data; break;
 
+							case 'error': App.error('Ошибка обновления: ' + json.data); break;
+
 							default: title = 'Загрузка игровых архивов'; curLabel = json.data; break;
 							
 						}
