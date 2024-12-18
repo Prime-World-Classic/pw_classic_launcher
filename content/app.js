@@ -6594,11 +6594,11 @@ class MM {
 	static activeSelectHero = 0;
 	
 	static gameRunEvent(){
-		Sound.stop('castle');
+		Sound.pause('castle');
 	}
 
 	static gameStopEvent(){
-		Sound.play('castle');
+		Sound.resume('castle');
 	}
 	
 	static async init(){
@@ -7409,6 +7409,13 @@ class Sound {
 			Sound.all[id].volume = volume;
 
 		}
+	}
+
+	static pause(id){
+
+	}
+	static resume(id){
+
 	}
 	
 }
