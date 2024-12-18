@@ -1161,7 +1161,7 @@ class View {
 
 			}
 			
-			let dom = DOM({style:'div'},'Выйти из аккаунта?',wrap);
+			let dom = DOM({style:'div'},'Выйти?',wrap);
 			
 			Splash.show(dom);
 			
