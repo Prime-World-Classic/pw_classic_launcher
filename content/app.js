@@ -5215,6 +5215,8 @@ class NativeAPI {
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
 		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false, curLabel;
 
+		App.notify('Проверка обновлений');
+
 		spawn.stdout.on('data',(data) => {
 			
 			let progressDataElements = data.toString().substring(1).split('#');
@@ -5237,7 +5239,7 @@ class NativeAPI {
 						
 					}
 					else if(json.type == 'label'){
-						App.error(json.data);
+						
 						switch(json.data){
 							
 							case 'game': title = 'Обновление игры'; curLabel = json.data; break;
@@ -5253,12 +5255,13 @@ class NativeAPI {
 							case 'game_data6': title = 'Загрузка игровых архивов 7/8'; curLabel = json.data; break;
 							case 'game_data7': title = 'Загрузка игровых архивов 8/8'; curLabel = json.data; break;
 
-							case 'error': App.error('Ошибка обновления: ' + json.data); break;
-
 							default: title = 'Загрузка игровых архивов'; curLabel = json.data; break;
 							
 						}
 						
+					}
+					else if(json.type == 'error'){
+						App.error('Ошибка обновления: ' + json.data);
 					}
 					
 				}
@@ -5272,6 +5275,8 @@ class NativeAPI {
 			callback({update:false,title:'',total:0});
 			
 			NativeAPI.progress(-1);
+
+			App.notify('Обновление завершено');
 			
 			if( (code == 0) ){
 				
