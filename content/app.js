@@ -5061,6 +5061,8 @@ class NativeAPI {
 		
 		NativeAPI.status = true;
 		
+		
+		
 		NativeAPI.app = nw.App;
 		
 		NativeAPI.window = nw.Window.get();
@@ -5082,6 +5084,18 @@ class NativeAPI {
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'F5',active:() => NativeAPI.window.reload()}));
 		
 		NativeAPI.loadModules();
+		
+		window.addEventListener('error', (event) => {
+			
+			NativeAPI.write('error.txt',event.error.toString());
+			
+		});
+		
+		window.addEventListener('unhandledrejection', (event) => {
+			
+			NativeAPI.write('unhandledrejection.txt',event.reason.message);
+			
+		});
 		
 	}
 	
@@ -5276,9 +5290,9 @@ class NativeAPI {
 		
 	}
 	
-	static async write(){ // test method
+	static async write(file,body){
 		
-		await NativeAPI.fileSystem.promises.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
+		await NativeAPI.fileSystem.promises.writeFile(file,body);
 		
 	}
 	
