@@ -1308,6 +1308,8 @@ class View {
 								await PWGame.check();
 
 								await PWGame.testGameServerConnection();
+
+								await PWGame.checkUpdates();
 							} catch (e) {
 								PWGame.gameConnectionTestIsActive = false;
 								throw e;
@@ -4986,6 +4988,12 @@ class PWGame {
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH);
 		
 	}
+
+	static async checkUpdates() {
+		if (!PWGame.isUpToDate) {
+			throw 'Проверка обновления не завершена! Подождите';
+		}
+	}
 	
 	static async testGameServerConnection() {
 		if (PWGame.gameServerHasConnection) {
@@ -5022,9 +5030,6 @@ class PWGame {
 		}
 		if (!PWGame.gameServerHasConnection) {
 			throw 'Игровой сервер недоступен!';
-		}
-		if (!PWGame.isUpToDate) {
-			throw 'Проверка обновления не завершена! Подождите';
 		}
 	}
 	
@@ -5202,8 +5207,7 @@ class NativeAPI {
 		}
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
-
-		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false; curLabel;
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false, curLabel;
 
 		spawn.stdout.on('data',(data) => {
 			
@@ -6598,7 +6602,7 @@ class MM {
 	}
 
 	static gameStopEvent(){
-		Sound.resume('castle');
+		Sound.unpause('castle');
 	}
 	
 	static async init(){
@@ -6657,7 +6661,7 @@ class MM {
 		
 		Sound.stop('tambur');
 
-		Sound.setVolume('castle', musicVolume);
+		Sound.setVolume('castle', Castle.musicVolume);
 		
 		MM.view.style.display = 'none';
 		
@@ -6710,11 +6714,14 @@ class MM {
 
 					await PWGame.testGameServerConnection();
 
+					await PWGame.checkUpdates();
+
 					PWGame.gameConnectionTestIsActive = false;
 				}
 				
 			}
 			catch(error){
+				PWGame.gameConnectionTestIsActive = false;
 				
 				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate) { // Неудача
 					MM.button.innerText = 'В бой!';
@@ -7412,10 +7419,10 @@ class Sound {
 	}
 
 	static pause(id){
-
+		Sound.all[id].pause();
 	}
-	static resume(id){
-
+	static unpause(id){
+		Sound.all[id].play();
 	}
 	
 }
