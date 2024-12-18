@@ -899,7 +899,7 @@ class View {
 		
 		let login = DOM({tag:'input',placeholder:'Никнейм'}), password = DOM({tag:'input',placeholder:'Пароль',type:'password'});
 		
-		return DOM({style:'login_box'},DOM({style:'login-box-forma'},DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.png'})),
+		return DOM({style:'login_box'},DOM({style:'login-box-forma'},DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.webp'})),
 		
 		DOM({style:'login-box-forma-inputs'},
 		login,
@@ -942,7 +942,7 @@ class View {
 		DOM({style:'login-box-forma-button',event:['click',() => View.show('authorization')]},'Назад')
 		)
 		),
-		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.png'}))
+		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.webp'}))
 		
 		),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 		
@@ -1058,7 +1058,7 @@ class View {
 				
 				let rankIcon = DOM({style:'rank-icon'});
 				
-				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.png)`;
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
 				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
@@ -1072,7 +1072,7 @@ class View {
 				
 				hero.dataset.total = item.total;
 				
-				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
 				preload.add(hero);
 				
@@ -1092,7 +1092,7 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.png',event:['click',() => View.show('castle')]}),play);
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.webp',event:['click',() => View.show('castle')]}),play);
 		
 		if(App.isAdmin()){
 			
@@ -1194,11 +1194,11 @@ class View {
 				
 				let rank = DOM({style:'top-item-hero-rank'});
 				
-				rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.png)`;
+				rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 				
 				let hero = DOM({style:'top-item-hero'},rank);
 				
-				hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
+				hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
 				
 				let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero,player.nickname)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 				
@@ -1268,7 +1268,7 @@ class View {
 			
 			let rankIcon = DOM({style:'rank-icon'});
 			
-			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.png)`;
+			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 			
 			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 			
@@ -1340,7 +1340,7 @@ class View {
 					
 				}
 				
-				img.style.backgroundImage = (item.hero) ? `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.png)` : `url(content/hero/empty-ru.avif)`;
+				img.style.backgroundImage = (item.hero) ? `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 				
 			}
 			else{
@@ -1429,12 +1429,12 @@ class View {
 						
 						if(item.id){
 							
-							hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+							hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 							
 						}
 						else{
 							
-							hero.dataset.url = `content/hero/empty-ru.avif`;
+							hero.dataset.url = `content/hero/empty.webp`;
 							
 						}
 						
@@ -1530,7 +1530,7 @@ class View {
 			
 			let hero = DOM();
 			
-			hero.style.backgroundImage = `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.png)`;
+			hero.style.backgroundImage = `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.webp)`;
 			
 			let game = DOM({style:'history-item'},hero,DOM({tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({tag:'div'},(item.team == item.win) ? +item.rating : -item.rating),DOM({tag:'div'},new Date(item.added).toLocaleString()));
 			
@@ -1578,12 +1578,12 @@ class View {
 				
 				if(item.id){
 					
-					hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+					hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 					
 				}
 				else{
 					
-					hero.dataset.url = `content/hero/empty-ru.avif`;
+					hero.dataset.url = `content/hero/empty.webp`;
 					
 				}
 				
@@ -1605,7 +1605,7 @@ class View {
 		
 		top.firstChild.classList.add('animation1');
 		
-		top.firstChild.firstChild.style.backgroundImage = `url(content/hero/${result[0].hero}/${result[0].skin ? result[0].skin : 1}.png)`;
+		top.firstChild.firstChild.style.backgroundImage = `url(content/hero/${result[0].hero}/${result[0].skin ? result[0].skin : 1}.webp)`;
 		
 		top.firstChild.lastChild.innerText = `#1. ${result[0].nickname}`;
 		
@@ -1615,11 +1615,11 @@ class View {
 			
 			let rank = DOM({style:'top-item-hero-rank'});
 			
-			rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.png)`;
+			rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 			
 			let hero = DOM({style:'top-item-hero'},rank);
 			
-			hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.png)`;
+			hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
 			
 			let item = DOM({style:'top-item',event:['click',() => Build.view(player.id,player.hero,player.nickname)]},hero,DOM({style:'top-item-player'},DOM(`#${number}. ${player.nickname}`),DOM(`${player.rating}`)));
 			
@@ -1661,7 +1661,7 @@ class View {
 					
 					element.append(twoSlide);
 					
-					twoSlide.style.backgroundImage = `url("content/hero/${element.dataset.id}/${element.dataset.slide}.png")`;
+					twoSlide.style.backgroundImage = `url("content/hero/${element.dataset.id}/${element.dataset.slide}.webp")`;
 					
 					firstSlide.animate({opacity:[1,0]},{duration:500,easing:'ease-out',fill:'forwards'});
 					
@@ -1683,7 +1683,7 @@ class View {
 						
 					}
 					
-				},`content/hero/${element.dataset.id}/${element.dataset.slide}.png`);
+				},`content/hero/${element.dataset.id}/${element.dataset.slide}.webp`);
 				
 			}
 			
@@ -1707,7 +1707,7 @@ class View {
 				//item.rating = App.getRandomInt(1100,3000);
 				let rankIcon = DOM({style:'rank-icon'});
 				
-				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.png)`;
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
 				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
@@ -1721,7 +1721,7 @@ class View {
 				
 				hero.dataset.total = item.total;
 				
-				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.png`;
+				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
 				preload.add(hero);
 				
@@ -1747,7 +1747,7 @@ class View {
 				
 				let unit = DOM({style:`rarity${item.rarity}`});
 				
-				unit.style.backgroundImage = `url(content/talents/${item.id}.png)`;
+				unit.style.backgroundImage = `url(content/talents/${item.id}.webp)`;
 				
 				unit.append(DOM({tag:'span'},item.score));
 				
@@ -1759,7 +1759,7 @@ class View {
 		
 
 		body.append(DOM({style:'main-header'},
-		DOM({tag:'img',src:'content/img/logo.png'}),
+		DOM({tag:'img',src:'content/img/logo.webp'}),
 		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},App.storage.data.login),
 		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
@@ -1865,7 +1865,7 @@ class View {
 			
 			let div = DOM({tag:'div'});
 			
-			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`content/talents/${item.id}.png`}));
+			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`content/talents/${item.id}.webp`}));
 			
 			for(let key in item){
 				
@@ -1907,7 +1907,7 @@ class View {
 			
 			let div = DOM({tag:'div'});
 			
-			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`content/htalents/${item.id}.png`}));
+			div.append(DOM(`id${item.id}`),DOM({tag:'img',src:`content/htalents/${item.id}.webp`}));
 			
 			for(let key in item){
 				
@@ -2218,7 +2218,7 @@ class Build{
 					
 				}
 				
-				talent.style.backgroundImage = (item > 0) ? `url(content/talents/${item}.png)` : `url(content/htalents/${Math.abs(item)}.png)`;
+				talent.style.backgroundImage = (item > 0) ? `url(content/talents/${item}.webp)` : `url(content/htalents/${Math.abs(item)}.webp)`;
 				
 			}
 			
@@ -2486,7 +2486,7 @@ class Build{
 			
 			let hero = DOM();
 			
-			hero.dataset.url = `content/hero/${Build.heroId}/${(i + 1)}.png`;
+			hero.dataset.url = `content/hero/${Build.heroId}/${(i + 1)}.webp`;
 			
 			hero.dataset.skin = (i + 1);
 			
@@ -2494,7 +2494,7 @@ class Build{
 				
 				await App.api.request('build','skinChange',{hero:Build.heroId,skin:hero.dataset.skin});
 				
-				Build.heroImg.style.backgroundImage = `url(content/hero/${Build.heroId}/${hero.dataset.skin}.png)`;
+				Build.heroImg.style.backgroundImage = `url(content/hero/${Build.heroId}/${hero.dataset.skin}.webp)`;
 				
 				Splash.hide();
 				
@@ -2955,7 +2955,7 @@ class Build{
 						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:false});
 						
 						daw.dataset.status = 0;
-						daw.src = 'content/icons/circle.png';
+						daw.src = 'content/icons/circle.webp';
 						
 						Build.profileStats[key] = 0;
 
@@ -2966,7 +2966,7 @@ class Build{
 						await App.api.request('build','setProfile',{id:Build.id,index:daw.dataset.index,value:true});
 						
 						daw.dataset.status = 1;
-						daw.src = 'content/icons/checkbox.png';
+						daw.src = 'content/icons/checkbox.webp';
 						
 						Build.profileStats[key] = 1;
 
@@ -2981,9 +2981,9 @@ class Build{
 				Build.profileStats[key] = parseInt(daw.dataset.status);
 				
 				if(daw.dataset.status == 1){
-					daw.src = 'content/icons/checkbox.png';
+					daw.src = 'content/icons/checkbox.webp';
 				} else {
-					daw.src = 'content/icons/circle.png';
+					daw.src = 'content/icons/circle.webp';
 				}
 				
 				stats.append(DOM({style:'build-hero-stats-line'}, daw, item));
@@ -3032,11 +3032,11 @@ class Build{
 			
 		}
 		
-		Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1}.png)`;
+		Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1}.webp)`;
 		
 		let rankIcon = DOM({style:'rank-icon'});
 		
-		rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.png)`;
+		rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 		
 		let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.rating),rankIcon);
 		
@@ -3497,7 +3497,7 @@ class Build{
 		
 		talent.dataset.state = data.state;
 		
-		talent.dataset.url = (data.id > 0) ? `content/talents/${data.id}.png` : `content/htalents/${Math.abs(data.id)}.png`;
+		talent.dataset.url = (data.id > 0) ? `content/talents/${data.id}.webp` : `content/htalents/${Math.abs(data.id)}.webp`;
 		
 		Build.move(talent);
 		
@@ -4565,11 +4565,11 @@ class Events {
 		
 		if(find){
 			
-			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.png)` : `url(content/hero/empty-ru.avif)`;
+			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 			
 			find.children[1].firstChild.children[0].innerText = data.rating;
 			
-			find.children[1].firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.png)`;
+			find.children[1].firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		
@@ -5237,7 +5237,7 @@ class NativeAPI {
 						
 					}
 					else if(json.type == 'label'){
-						
+						App.error(json.data);
 						switch(json.data){
 							
 							case 'game': title = 'Обновление игры'; curLabel = json.data; break;
@@ -5279,6 +5279,8 @@ class NativeAPI {
 					NativeAPI.reset();
 				}
 				PWGame.isUpToDate = true;
+			} else {
+				App.error(code);
 			}
 			
 		});
@@ -6644,7 +6646,7 @@ class MM {
 		
 		audio.preload = 'auto';
 		
-		audio.src = 'content/sounds/found.mp3';
+		audio.src = 'content/sounds/found.ogg';
 		
 		audio.play();
 		
@@ -7032,13 +7034,13 @@ class MM {
 			
 			let rankIcon = DOM({style:'rank-icon'});
 			
-			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.png)`;
+			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.webp)`;
 			
 			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.users[key].rating),rankIcon);
 			
 			hero.append(rank);
 			
-			hero.style.backgroundImage = (data.users[key].hero) ? `url(content/hero/${data.users[key].hero}/1.png)` : `url(content/hero/empty.png)`;
+			hero.style.backgroundImage = (data.users[key].hero) ? `url(content/hero/${data.users[key].hero}/1.webp)` : `url(content/hero/empty.webp)`;
 			
 			player.append(hero,name);
 			
@@ -7069,7 +7071,7 @@ class MM {
 				
 				name.style.opacity = 0;
 				
-				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.png)`;
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.webp)`;
 				
 				rank.firstChild.innerText = 1100;
 				
@@ -7089,7 +7091,7 @@ class MM {
 			
 			let hero = DOM({id:`HERO${item.id}`,data:{ban:0}});
 
-			hero.dataset.url = `content/hero/${item.id}/1.png`;
+			hero.dataset.url = `content/hero/${item.id}/1.webp`;
 			
 			hero.onclick = async () => {
 				
@@ -7103,7 +7105,7 @@ class MM {
 			
 			let rankIcon = DOM({style:'rank-icon'});
 			
-			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.png)`;
+			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 			
 			let rank = DOM({style:'rank'},rankIcon);
 			
@@ -7162,7 +7164,7 @@ class MM {
 		
 		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
-		Sound.play('content/sounds/tambur.mp3',{id:'tambur',volume:0.50,loop:true});
+		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume:0.50,loop:true});
 		
 		Sound.setVolume('castle', 0.0);
 		
@@ -7194,7 +7196,7 @@ class MM {
 	
 	static async select(data){
 		
-		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.mp3`,{volume:0.75});
+		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`,{volume:0.75});
 		
 		MM.lobbyPlayerAnimate.cancel();
 		
@@ -7212,11 +7214,11 @@ class MM {
 			
 			findOldPlayer.dataset.hero = data.heroId;
 			
-			findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.png)`;
+			findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.webp)`;
 			
 			findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 			
-			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.png)`;
+			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		
@@ -7295,11 +7297,11 @@ class MM {
 			
 			findPlayer.dataset.hero = data.heroId;
 			
-			findPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.png)`;
+			findPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.webp)`;
 			
 			findPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 			
-			findPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.png)`;
+			findPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		/*
@@ -7813,7 +7815,7 @@ class Game {
 			
 			unit.style.margin = '7px 0';
 			
-			unit.style.backgroundImage = `url(content/talents/${id}.png)`;
+			unit.style.backgroundImage = `url(content/talents/${id}.webp)`;
 			
 			unit.style.position = 'relative';
 			
@@ -7883,7 +7885,7 @@ class Game {
 			
 		}
 		
-		unit.style.backgroundImage = `url(content/talents/${id}.png)`;
+		unit.style.backgroundImage = `url(content/talents/${id}.webp)`;
 		
 		unit.style.backgroundRepeat = 'no-repeat';
 		
@@ -7919,7 +7921,7 @@ class Game {
 		
 		unit.style.zIndex = 9998;
 		
-		unit.style.backgroundImage = `url(content/talents/763.png)`;
+		unit.style.backgroundImage = `url(content/talents/763.webp)`;
 		
 		unit.style.backgroundRepeat = 'no-repeat';
 		
