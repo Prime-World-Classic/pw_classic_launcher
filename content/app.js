@@ -959,7 +959,7 @@ class View {
 	}
 	
 	static async castle(){
-		
+		return await View.main();
 		View.setCss('content/castle.css');
 		
 		let body = DOM({tag:'div', id: 'castle-body'});
@@ -4445,7 +4445,7 @@ class Events {
 			
 		}
 		
-		NativeAPI.attention();
+		// NativeAPI.attention();
 		
 		MM.ready(data);
 		
@@ -4477,7 +4477,7 @@ class Events {
 			
 		}
 		
-		NativeAPI.attention();
+		// NativeAPI.attention();
 		
 		MM.lobby(data);
 		
@@ -4628,7 +4628,7 @@ class Events {
 class App {
 	
 	static async init(){
-		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/
+		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
 		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
 		await Store.init();
@@ -5061,6 +5061,8 @@ class NativeAPI {
 		
 		NativeAPI.status = true;
 		
+		
+		
 		NativeAPI.app = nw.App;
 		
 		NativeAPI.window = nw.Window.get();
@@ -5079,7 +5081,21 @@ class NativeAPI {
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
+		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'F5',active:() => NativeAPI.window.reload()}));
+		
 		NativeAPI.loadModules();
+		
+		window.addEventListener('error', (event) => {
+			
+			NativeAPI.write('error.txt',event.error.toString());
+			
+		});
+		
+		window.addEventListener('unhandledrejection', (event) => {
+			
+			NativeAPI.write('unhandledrejection.txt',event.reason.message);
+			
+		});
 		
 	}
 	
@@ -5278,9 +5294,9 @@ class NativeAPI {
 		
 	}
 	
-	static async write(){ // test method
+	static async write(file,body){
 		
-		await NativeAPI.fileSystem.promises.writeFile('ifst.txt',`Hello ifst! Current datetime ${new Date().toLocaleString()}.`);
+		await NativeAPI.fileSystem.promises.writeFile(file,body);
 		
 	}
 	
@@ -7031,7 +7047,7 @@ class MM {
 				
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.png)`;
 				
-				rank.firstChild = 1100;
+				rank.firstChild.innerText = 1100;
 				
 				rank.style.opacity = 0;
 				
