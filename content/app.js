@@ -959,7 +959,7 @@ class View {
 	}
 	
 	static async castle(){
-		
+		return await View.main();
 		View.setCss('content/castle.css');
 		
 		let body = DOM({tag:'div', id: 'castle-body'});
@@ -4445,7 +4445,7 @@ class Events {
 			
 		}
 		
-		NativeAPI.attention();
+		// NativeAPI.attention();
 		
 		MM.ready(data);
 		
@@ -4477,7 +4477,7 @@ class Events {
 			
 		}
 		
-		NativeAPI.attention();
+		// NativeAPI.attention();
 		
 		MM.lobby(data);
 		
@@ -4628,7 +4628,7 @@ class Events {
 class App {
 	
 	static async init(){
-		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/
+		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
 		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
 		await Store.init();
@@ -7017,7 +7017,7 @@ class MM {
 				
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.png)`;
 				
-				rank.firstChild = 1100;
+				rank.firstChild.innerText = 1100;
 				
 				rank.style.opacity = 0;
 				
