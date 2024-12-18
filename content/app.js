@@ -4959,19 +4959,19 @@ class PWGame {
 
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
 	
-	static async start(id){
+	static async start(id, callback){
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`]);
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`], callback);
 		
 	}
 	
-	static async reconnect(id){
+	static async reconnect(id, callback){
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`]);
+		await NativeAPI.exec(PWGame.PATH,['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`], callback);
 		
 	}
 	
@@ -5093,7 +5093,7 @@ class NativeAPI {
 		
 	}
 	
-	static async exec(path,args){
+	static async exec(path,args,callback){
 		
 		return new Promise((resolve,reject) => {
 			
@@ -5112,6 +5112,10 @@ class NativeAPI {
 				}
 				
 				resolve(stdout);
+
+				if (callback) {
+					callback();
+				}
 				
 			});
 			
@@ -6573,6 +6577,14 @@ class MM {
 	
 	static activeSelectHero = 0;
 	
+	static gameRunEvent(){
+		Sound.stop('castle');
+	}
+
+	static gameStopEvent(){
+		Sound.play('castle');
+	}
+	
 	static async init(){
 		
 		MM.view.classList.add('mm');
@@ -6755,8 +6767,10 @@ class MM {
 				if(request.type == 'reconnect'){
 					
 					MM.searchActive(false);
+
+					MM.gameRunEvent();
 					
-					PWGame.reconnect(request.id);
+					PWGame.reconnect(request.id, MM.gameStopEvent);
 					
 					return;
 					
@@ -7224,8 +7238,10 @@ class MM {
 		Timer.stop();
 		
 		MM.close();
+
+		MM.gameRunEvent();
 		
-		PWGame.start(data.key);
+		PWGame.start(data.key, MM.gameStopEvent);
 		
 		View.show('castle');
 		
