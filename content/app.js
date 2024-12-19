@@ -973,7 +973,7 @@ class View {
 		try{
 			
 			if (!Castle.gl) {
-				Castle.initDemo('doct',Castle.canvas);
+				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
 			
 			Castle.render = true;
@@ -4644,7 +4644,7 @@ class App {
 		
 		await Store.init();
 		
-		App.storage = new Store('u1');
+		App.storage = new Store('u3');
 		
 		await App.storage.init({id:0,token:'',login:''});
 		
@@ -4711,7 +4711,7 @@ class App {
 			
 		}
 		
-		await App.storage.set({id:request.id,token:request.token,login:login.value});
+		await App.storage.set({id:request.id,token:request.token,login:login.value,fraction:request.fraction});
 		
 		View.show('castle');
 		
