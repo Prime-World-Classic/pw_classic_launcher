@@ -2206,30 +2206,41 @@ cursor:pointer;
 
 .chat{
 	
-	width:90%;
-	height:90%;
+	width:80%;
+	height:14vh;
 	padding:5%;
+	transition: all 0.3s ease-out;
+	opacity: 70%;
+	background-image:linear-gradient(1.0turn,rgba(38, 109, 103, 0.8),rgba(18, 69, 73, 0.9),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
+	box-shadow: -2vh 10vh 5vh #0c1f2220;
+	
+	border-radius: 2vh 2vh 2vh 2vh / 2vh 2vh 2vh 2vh;
+}
+
+.chat:hover{
+	height:59vh;
+	opacity: 100%;
 	transition: all 0.3s ease-out;
 	
 }
 
-.chat:hover{
-	
-	background:rgba(0,0,0,0.7);
-	
+.chat-body{
+	height:10vh;
+	overflow-y:scroll;
+	transition: all 0.3s ease-out;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-.chat-body{
-	
-	height:93%;
-	overflow-y:scroll;
-	
+.chat:hover .chat-body{
+	height:55vh;
 }
 
 .chat-input{
-	
-	width:100%;
-	height:7%;
+	position: absolute;
+	bottom: 1vh;
+	width:90%;
+	height:4vh;
 	background:none;
 	font:1.2vw / 1 Verdana;
 	color:rgba(255,255,255,0.9)
@@ -2247,8 +2258,14 @@ cursor:pointer;
 	
 	display:inline;
 	font:1.2vw / 1 Verdana;
-	text-shadow:rgba(0,0,0,0.5) 0 0 1vw;
+	text-shadow:rgb(0, 0, 0) 0 0 0.5vw;
+	transition: all 0.3s ease-out;
+	opacity: 80%;
 	
+}
+
+.chat-body:hover .chat-body-item div{
+	opacity: 100%;
 }
 
 .chat-body-item:hover{

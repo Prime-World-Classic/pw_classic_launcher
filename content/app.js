@@ -5331,7 +5331,7 @@ class Chat {
 			
 		});
 		
-		Chat.body.firstChild.append(item);
+		Chat.body.firstChild.prepend(item);
 		
 		item.scrollIntoView({block:'end',behavior:'smooth'});
 		

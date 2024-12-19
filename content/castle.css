@@ -266,6 +266,7 @@
 	
 	position:absolute;
 	left:0;
+	bottom: 22vh;
 	display:flex;
 	justify-content:center;
 	align-items:center;
@@ -274,4 +275,9 @@
 	height:62vh;
 	width:25vw;
 	
+}
+
+.castle-chat .chat{
+	position: absolute;
+	bottom: 0;
 }
