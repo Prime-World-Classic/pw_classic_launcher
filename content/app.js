@@ -987,7 +987,7 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,Castle.canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes());
+		body.append(backgroundImage,Castle.canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes(), View.castleMusic());
 		
 		return body;
 		
@@ -1012,6 +1012,14 @@ class View {
 		);
 		
 		body.append(lobby,play);
+		
+		return body; 
+		
+	}
+	
+	static castleMusic(){
+		
+		let body = DOM({style:['castle-music','button-outline'],event:['click',() => Castle.toggleMusic()]});
 		
 		return body; 
 		
@@ -5345,6 +5353,10 @@ class Castle {
 	
 	static gl;
 
+	static musicVolume = 0.5;
+
+	static currentVolume = this.musicVolume;
+
 	static render = true;
 	
 	static identityMatrix;
@@ -5459,9 +5471,16 @@ class Castle {
 	
 	static globalCanvas;
 
-	static musicVolume = 0.5;
-
 	static sceneObjects = [];
+
+	static toggleMusic() {
+		if (this.currentVolume == 0.0) {
+			this.currentVolume = this.musicVolume;
+		} else {
+			this.currentVolume = 0.0;
+		}
+		Sound.setVolume('castle', this.currentVolume);
+	}
 	
 	static zoom(event) {
 		
