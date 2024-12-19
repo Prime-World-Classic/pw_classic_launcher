@@ -47,6 +47,14 @@
 	
 }
 
+.castle-button-play{
+	
+	background:rgba(255,50,0,0.9);
+	font: 3vh / 1 Verdana;
+	color:rgba(255,255,255,0.9);
+	
+}
+
 .castle-play-lobby{
 	
 	display:flex;
@@ -75,7 +83,7 @@
 }
 
 .castle-party-middle-item-ready{
-	
+	margin-top: 0.1vw;
 	text-align:center;
 	font:2.5vh / 1 Verdana;
 	color:rgba(153,255,51,0.8);
@@ -83,11 +91,16 @@
 	font-weight:600;
 	font-style:italic;
 	cursor:pointer;
+	background:#244;
+	border:1px solid orange;
+	padding: 0.5vh 0.4vh;
+	width: 8vw;
+	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	
 }
 
 .castle-party-middle-item-not-ready{
-	
+	margin-top: 0.1vw;
 	text-align:center;
 	font:2.5vh / 1 Verdana;
 	color:rgba(255,255,255,0.3);
@@ -95,12 +108,17 @@
 	font-weight:600;
 	font-style:italic;
 	cursor:pointer;
+	background:#244;
+	border:1px solid orange;
+	padding: 0.5vh 0.4vh;
+	width: 8vw;
+	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	
 }
 
 .castle-party-middle-item {
 	
-	margin:0 1vw;
+	margin:0 0vw;
 	
 	
 }
@@ -141,11 +159,18 @@
 }
 
 .castle-party-middle-item-nickname {
-	margin:1vw 0;
+	margin:0.1vw 0;
 	text-align:center;
 	font: bold 1.0vw / 1 Verdana;
+	padding: 0.5vh 0.4vh;
+	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	flex-flow:row nowrap;
 	color: #ccc;
+	background:#244;
+	width: 8vw;
+	height: 2vw;
+	
+	border:1px solid orange;
 	
 }
 
