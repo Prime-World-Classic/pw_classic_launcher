@@ -1024,24 +1024,32 @@ class View {
 			
 			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
 			
+			let rankIcon = DOM({style:'castle-rank-icon'});
+			
 			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 			
-			let status = DOM(); // должна быть иконка в виде галки
+			let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'}, player.rating),rankIcon);
+			
+			if (player.rating) {
+				item.append(rank);
+			}
+			
+			let status = DOM({style:'castle-party-middle-item-not-ready'},'Не готов');
 			
 			if(player.id){
 				
 				if(player.ready){
 					
-					//status.innerText = 'Готов';
+					status.innerText = 'Готов';
 					
-					//status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == player.id){
 					
-					//status.innerText = 'Готов';
+					status.innerText = 'Готов';
 					
-					//status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
 					
 				}
@@ -1074,9 +1082,9 @@ class View {
 							
 							//if(!await Protect.checkInstall()){
 								
-								App.error('Нужен windows лаунчер');
+								//App.error('Нужен windows лаунчер');
 								
-								return;
+								//return;
 								
 							//}
 							
@@ -1091,6 +1099,52 @@ class View {
 					status.innerText = 'Подтвердить';
 					
 				}
+
+				item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
+				
+				
+			}
+			else{
+				
+				item.innerText = '+';
+				
+				status.style.opacity = 0;
+				
+				// lvl.style.opacity = 0;
+				
+				//rank.style.opacity = 0;
+				
+			}
+
+			let shortenNickname = player.nickname ? (
+			player.nickname.length > 10 ? player.nickname.substring(0, 8) + '…' : player.nickname
+			) : null;
+
+			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${shortenNickname ? shortenNickname : 'Добавить'}`);
+			
+			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item'},nickname,item,status); 
+			
+			playerX.dataset.id = player.id;
+			
+			if( (MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0) ){
+				
+				nickname.append(DOM({style: 'rz', tag:'span',event:['click', async () => {
+					
+					await App.api.request('mmtest','leaderKickParty',{id:playerX.dataset.id});
+					
+				}]},'[X]'));
+				
+			}
+			
+			if( (MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id) ){
+				
+				nickname.append(DOM({tag:'span',event:['click', async () => {
+					
+					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
+					
+					View.show('castle');
+					
+				}]},'[X]'));
 				
 			}
 			
@@ -1208,7 +1262,7 @@ class View {
 				
 			})
 			
-			lobby.append(item);
+			lobby.append(playerX);
 			
 		}
 		
