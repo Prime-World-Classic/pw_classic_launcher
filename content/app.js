@@ -5275,8 +5275,6 @@ class NativeAPI {
 			callback({update:false,title:'',total:0});
 			
 			NativeAPI.progress(-1);
-
-			App.notify('Обновление завершено');
 			
 			if( (code == 0) ){
 				
@@ -5284,8 +5282,10 @@ class NativeAPI {
 					NativeAPI.reset();
 				}
 				PWGame.isUpToDate = true;
+
+				App.notify('Обновление завершено');
 			} else {
-				App.error(code);
+				App.error('Обновление завершено с ошибкой: ' + code);
 			}
 			
 		});
