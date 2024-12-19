@@ -959,17 +959,22 @@ class View {
 	}
 	
 	static async castle(){
-		return await View.main();
+		
 		View.setCss('content/castle.css');
 		
 		let body = DOM({tag:'div', id: 'castle-body'});
 		let backgroundImage = DOM({tag:'div', id:'castle-background-img'});
-		let canvas = DOM({tag:'canvas', id:'castle-game-surface'});
+
+		if (!Castle.canvas) {
+			Castle.canvas = DOM({tag:'canvas', id:'castle-game-surface'});
+		}
 		//App.storage.data.fraction; //тут будет инфа о стороне 1 или 2 
 		
 		try{
 			
-			Castle.initDemo('doct',canvas);
+			if (!Castle.gl) {
+				Castle.initDemo('doct',Castle.canvas);
+			}
 			
 			Castle.render = true;
 			
@@ -982,7 +987,7 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes());
+		body.append(backgroundImage,Castle.canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes());
 		
 		return body;
 		
@@ -5335,6 +5340,8 @@ class NativeAPI {
 }
 
 class Castle {
+
+	static canvas;
 	
 	static gl;
 
@@ -6165,7 +6172,7 @@ class Castle {
 		Castle.updateMainCam();
 		
 		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects) {
-			Castle.isStaticSMCached = false;
+			Castle.isStaticSMCached = true;
 			Castle.gl.bindFramebuffer(Castle.gl.FRAMEBUFFER, Castle.depthFramebuffer);
 			Castle.gl.viewport(0, 0, Castle.depthTextureSize, Castle.depthTextureSize);
 			Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
