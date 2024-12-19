@@ -13,6 +13,26 @@
 	
 }
 
+.castle-music{
+	
+	background-image: url('htalents/194.webp');
+	background-size: cover;
+	position:absolute;
+	right: 1vh;
+    width: 7vh;
+	height: 7vh;
+    object-fit: cover;
+}
+
+.button-outline:hover{
+	filter: drop-shadow(-0.1vh 0.1vh 0vh rgb(221, 255, 0))
+			drop-shadow(0.1vh -0.1vh 0vh rgb(221, 255, 0));
+	transition: 300ms;
+}
+.button-outline:not(:hover){
+	transition: 300ms;
+}
+
 .castle-play{
 	
 	position:absolute;
