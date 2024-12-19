@@ -431,7 +431,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-level{
-	margin: 12px -16px 0 12px;
+	margin: 14px -16px 0 12px;
 	min-width:100px;
 	width:100px;
 	height:660px;
@@ -450,13 +450,11 @@ background-color:rgba(15,15,15,0.7);
 	text-align:center;
 	line-height:94px;
 	background:rgba(255,255,255,0.2);
-	margin: 9px 0;
+	margin: 10px 0;
 	border-radius:50%;
 	cursor:pointer;
 	transform:scale(0.8);
 	box-shadow:0 0 50px rgba(25,25,25,0.5);
-
-	
 }
 
 .build-list-close {
