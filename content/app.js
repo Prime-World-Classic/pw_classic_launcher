@@ -4818,28 +4818,6 @@ class App {
 		return body;
 		
 	}
-	
-	static scrollHorizontally(e) {
-
-    var scrollPos = this.scrollLeft;  // Сколько прокручено по горизонтали, до прокрутки (не перемещать эту строку!)
-
-    // Горизонтальная прокрутка
-    e = window.event || e;
-    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    this.scrollLeft -= (delta*100); // Multiplied by 10
-
-    var widthElem = this.scrollWidth; // Ширина всего элемента
-    var widthBrowser = document.documentElement.clientWidth;  // Ширина окна минус размер вертикального скролла
-
-
-    // Прокрутка вверх, но элемент уже в крайней левой позиции, то двигаемся вверх
-    if ((delta == 1 ) && (this.scrollLeft == 0)) return;
-    // Прокрутка вниз, но элемент виден полностью. Или элемент до конца прокручен в правый край
-    if ((widthBrowser >= widthElem) || (scrollPos == this.scrollLeft)) return;
-
-    e.preventDefault(); // запрещает прокрутку по вертикали
-
-  }
   
  	static getRandomInt(min,max){
 		
@@ -4848,53 +4826,6 @@ class App {
 		max = Math.floor(max);
 		
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-		
-	}
-	
-	static input(callback,object = new Object()){
-		
-		if(!('tag' in object)){
-			
-			object.tag = 'input';
-			
-		}
-		
-		if(!('value' in object)){
-			
-			object.value = '';
-			
-		}
-		
-		let body = DOM(object);
-		
-		body.addEventListener('blur', async () => {
-			
-			if(body.value == object.value){
-				
-				return;
-				
-			}
-			
-			if(callback){
-				
-				try{
-					
-					await callback(body.value);
-					
-				}
-				catch(e){
-					
-					return;
-					
-				}
-				
-			}
-			
-			object.value = body.value;
-			
-		});
-		
-		return body;
 		
 	}
 	
@@ -4930,9 +4861,9 @@ class App {
 		
 	}
 	
-	static isAdmin(){
+	static isAdmin(id = 0){
 		
-		return [1,2,24,134,2220].includes(Number(App.storage.data.id));
+		return [1,2,24,134,865,2220].includes(Number((id ? id : App.storage.data.id)));
 		
 	}
 	
@@ -4988,7 +4919,7 @@ class Chat {
 			message.style.color = '';
 			
 		}
-		else if(App.isAdmin()){
+		else if(App.isAdmin(data.id)){
 			
 			message.classList.add();
 			
