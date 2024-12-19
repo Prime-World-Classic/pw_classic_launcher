@@ -3948,6 +3948,10 @@ class Build{
 			// Without "-5" onmouseup will not trigger - because mouse will be not on the node - if mousedown on top-left,
 			// "mouseup event is released while the pointer is located inside" - from https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
 			element.style.top = event.pageY - shiftY - 5 + 'px';
+
+			element.style.display = 'none';
+			let startingElementBelow = document.elementFromPoint(event.clientX, event.clientY);
+			element.style.display = 'block';
 			
 			document.onmousemove = (e) => {
 				
@@ -3960,7 +3964,7 @@ class Build{
 			element.onmouseup = async (event) => {
 
 				let moveEnd = Date.now();
-				let isClick = moveEnd - moveStart < 300;
+				let isClick = moveEnd - moveStart < 200;
 				
 				document.onmousemove = null;
 				
@@ -3983,6 +3987,13 @@ class Build{
 				let isInventoryTarget = (left > inventory.x) && (left < (inventory.x + inventory.width) ) && (top > inventory.y) && (top < (inventory.y + inventory.height) );
 
 				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) );
+
+				if (isClick && isFieldTarget) {
+					element.style.display = 'none';
+					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					element.style.display = 'block';
+					isClick = elemBelow == startingElementBelow;
+				}
 
 				if (isClick) {
 					if (element.dataset.state == 2) {
