@@ -2418,7 +2418,20 @@ cursor:pointer;
 
 @media (height <= 720px) {
 
+	.build-hero {
+		width: 240px;
+	}
+
+	.build-level {
+		height: 410px;
+		min-height: 270px;
+	}
+	.build-level div {
+		margin: 2px 0;
+	}
+
 	.build-field {
+		width: 430px;
 		height: 440px;
 		min-height: 440px;
 	}
@@ -2435,5 +2448,21 @@ cursor:pointer;
 	}
 
 	.build-talent {
+		height: 530px;
+		width: 440px;
 	}
+	.build-talents {
+		width: 450px;
+	}
+
+	.build-rarity {
+		min-width: 20px;
+		width: 50px;
+		margin-left: 10px;
+	}
+
+	.build-field-bottom {
+		margin-top: -70px;
+	}
+
 }
