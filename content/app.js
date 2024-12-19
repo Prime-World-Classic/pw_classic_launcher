@@ -5102,21 +5102,11 @@ class NativeAPI {
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
-		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'F5',active:() => NativeAPI.window.reload()}));
-		
 		NativeAPI.loadModules();
 		
-		window.addEventListener('error', (event) => {
-			
-			NativeAPI.write('error.txt',event.error.toString());
-			
-		});
+		window.addEventListener('error', (event) => NativeAPI.write('error.txt',event.error.toString()));
 		
-		window.addEventListener('unhandledrejection', (event) => {
-			
-			NativeAPI.write('unhandledrejection.txt',event.reason.message);
-			
-		});
+		window.addEventListener('unhandledrejection', (event) => NativeAPI.write('unhandledrejection.txt',event.reason.message));
 		
 	}
 	
@@ -5134,30 +5124,31 @@ class NativeAPI {
 		
 		return new Promise((resolve,reject) => {
 			
-		if(!NativeAPI.status){
-			
-			reject();
-			
-		}
-		
-		let workingDirPath = NativeAPI.path.join(process.cwd(), workingDir);		
-		let executablePath = NativeAPI.path.join(process.cwd(), exeFile);
-		
-		NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
-
-			if(error){
-					
-				reject(error);
+			if(!NativeAPI.status){
+				
+				reject();
 				
 			}
 			
-			resolve(stdout);
-		
-			if (callback) {
-				callback();
-			}
+			let workingDirPath = NativeAPI.path.join(process.cwd(), workingDir), executablePath = NativeAPI.path.join(process.cwd(), exeFile);
 			
-		});
+			NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
+				
+				if(error){
+					
+					reject(error);
+					
+				}
+				
+				resolve(stdout);
+				
+				if(callback){
+					
+					callback();
+					
+				}
+				
+			});
 			
 		});
 		
