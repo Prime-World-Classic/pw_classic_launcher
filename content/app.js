@@ -980,6 +980,12 @@ class View {
 		
 		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),View.castleHeroes(), View.castleMusic());
 		
+		setTimeout(() => {
+			
+			Chat.scroll();
+			
+		},1500);
+		
 		return body;
 		
 	}
@@ -5230,7 +5236,25 @@ class Chat {
 		
 		let message = DOM({tag:'div'});
 		
-		message.innerText = `${data.message}`;
+		if(data.id == 1){
+			
+			if(String(data.message).slice(0,5) == 'https'){
+				
+				message.append(DOM({tag:'img',src:data.message}));
+				
+			}
+			else{
+				
+				message.innerText = `${data.message}`;
+				
+			}
+			
+		}
+		else{
+			
+			message.innerText = `${data.message}`;
+			
+		}
 		
 		if(data.to == -1){
 			
@@ -5269,6 +5293,8 @@ class Chat {
 			Chat.to = data.id;
 			
 			Chat.body.lastChild.value = `@${data.nickname}, `;
+			
+			Chat.input.focus();
 			
 		}]},nickname,message);
 		
@@ -5311,6 +5337,16 @@ class Chat {
 		await App.api.request('user','chat',{message:Chat.input.value,to:Chat.to});
 		
 		Chat.input.value = '';
+		
+	}
+	
+	static scroll(){
+		
+		if(Chat.body.firstChild.children.length){
+			
+			Chat.body.firstChild.lastChild.scrollIntoView({block:'end',behavior:'smooth'});
+			
+		}
 		
 	}
 	
