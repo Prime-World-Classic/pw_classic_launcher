@@ -992,7 +992,7 @@ class View {
 		
 		play.classList.add('main-header-item');
 		
-		play.classList.add('castle-button-play');
+		play.classList.add('button-play');
 		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
@@ -1035,7 +1035,7 @@ class View {
 				item.append(rank);
 			}
 			
-			let status = DOM({style:'castle-party-middle-item-not-ready'},'Не готов');
+			let status = DOM({style:['castle-party-middle-item-ready-notready', 'castle-party-middle-item-not-ready']},'Не готов');
 			
 			if(player.id){
 				
@@ -5842,7 +5842,7 @@ class Castle {
 		} else {
 			this.currentVolume = 0.0;
 		}
-		Sound.setVolume('castle', this.currentVolume);
+		Sound.setVolume('castle', Castle.currentVolume);
 	}
 	
 	static zoom(event) {
@@ -6201,9 +6201,13 @@ class Castle {
 		if (NativeAPI.fileSystem && !('castle' in Sound.all)) {
 			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
 
-			let selectMusic = function() {return 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)]}
-
-			Sound.play(selectMusic(),{id:'castle',volume:Castle.musicVolume}, selectMusic);
+			let playCastleMusic = function() {
+				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
+				Sound.stop('castle');
+				Sound.play(musicName, {id:'castle',volume:Castle.musicVolume}, playCastleMusic)
+				Sound.setVolume(Castle.currentVolume);
+			}
+			playCastleMusic();
 		}
 		
 		let backgroundImage = document.getElementById('castle-background-img');
@@ -7815,10 +7819,10 @@ class Sound {
 		audio.play();
 
 		if (callback) {
+
 			
 			audio.addEventListener("ended", (event) => {
-				Sound.stop(object.id);
-				Sound.play(callback(), object, callback)
+				callback();
 			});
 			
 		}
