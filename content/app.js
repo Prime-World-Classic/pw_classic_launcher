@@ -1061,6 +1061,10 @@ class View {
 			MM.hero = result;
 			
 			for(const item of result){
+
+				let heroName = DOM({style:'castle-hero-name'}, item.name.length > 12 ? item.name.substring(0, 10) + '…' : item.name);
+
+				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
 				let rankIcon = DOM({style:'rank-icon'});
 				
@@ -1068,7 +1072,7 @@ class View {
 				
 				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
-				const hero = DOM({style:'castle-hero-item'},rank);
+				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
 				

@@ -74,11 +74,11 @@
 	display:flex;
 	align-items:center;
 	flex-flow:row nowrap;
-	background:rgba(255,0,0,0.3);
-	height:19vh;
+	background:rgba(255,0,0,0.0);
+	height:18vh;
 	width:100vw;
 	overflow-x:scroll;
-	background-image:linear-gradient(rgba(38,109,103,0.8),rgba(18,69,73,0.8),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
+	background-image:linear-gradient(rgba(38, 109, 103, 0),rgba(18, 69, 73, 0.596),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
 	
 }
 
@@ -92,6 +92,28 @@
 	background-size:cover;
 	background-position:center;
 	background-repeat:no-repeat;
+	
+}
+
+.castle-hero-name{
+	height: 0.9vw;
+	background: #244;
+	border: 1px solid darkorange;
+	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
+	color: #fdd;
+	font: 0.9vw / 1 Arial;
+	padding:0.1vw 0.5vw;
+}
+
+.castle-item-hero-name{
+	
+	width:100%;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:space-between;
+	align-items:center;
+	position:absolute;
+	top:0;	
 	
 }
 
