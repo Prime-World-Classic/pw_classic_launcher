@@ -1279,6 +1279,10 @@ class View {
 			MM.hero = result;
 			
 			for(const item of result){
+
+				let heroName = DOM({style:'castle-hero-name'}, item.name.length > 12 ? item.name.substring(0, 10) + '…' : item.name);
+
+				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
 				let rankIcon = DOM({style:'rank-icon'});
 				
@@ -1286,7 +1290,7 @@ class View {
 				
 				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
-				const hero = DOM({style:'castle-hero-item'},rank);
+				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
 				
@@ -3139,6 +3143,19 @@ class Build{
 						mouseOutEvent();
 					}, 100)
 				}
+			}
+
+			if (key === 'considerStacks') {
+				item.title = `Учитывание талантов, которые дают постепенную прибавку к определенному параметру Ваших характеристик
+(например таланты оранжевого качества "Убийственная логика", Неудержимая сила")`
+			}
+			if (key === 'considerBuff') {
+				item.title = `Учитывание талантов, которые действуют "на всех союзников/врагов" кратковременно или постоянно, активно или пассивно
+(например таланты красного качества "Гимн решительности", Воодушевляющий гимн")`
+			}
+			if (key === 'groundType') {
+				item.title = `Учитывание талантов, которые дают дополнительный баф от типа территории (земли) - родная, вражеская/нейтральная 
+(например таланты красного качества "Оберег жизни", "Сияние естества")`
 			}
 
 			if (key === 'considerStacks' || key === 'considerBuff') {
