@@ -355,8 +355,8 @@ background-color:rgba(15,15,15,0.7);
 	position: absolute;
 	border: 1px solid #000;
 	padding: 5px;
-	left: 21vw;
-	bottom: 2vh;
+	left: 27vw;
+	bottom: 6vh;
 	color: #fff;
 	background: #333b;
 	cursor: pointer;
@@ -669,9 +669,7 @@ button.sets {
 	width: 97%;
 }
 .build-talent-item {
-	
 	margin:5px;
-	
 }
 .build-active-bar-item .build-talent-item {
 	margin: 0;
@@ -2425,7 +2423,7 @@ cursor:pointer;
 
 	.build-field {
 		min-width: 25vw;
-		width: 20vw;
+		width: 486px;
 		min-height: 536px;
 		height: 512px;
 	}
@@ -2444,8 +2442,8 @@ cursor:pointer;
 	}
 
 	.build-active-bar-item {
-		width: 3vw;
-		height: 3vw;
+		width: 57px;
+		height: 57px;
 	}
 
 	.build-active-bar-item {
@@ -2458,6 +2456,89 @@ cursor:pointer;
 		width: 10px;
 		height: 10px;
 		border-width: 1px;
+	}
+
+}
+
+
+@media (height <= 900px) {
+	.build-hero {
+		margin-top: -130px;
+		width: 200px;
+	}
+	.build-hero-stats {
+		width: 230px;
+	}
+
+	.build-hero .name {
+		display: none;
+	}
+
+	.new-random-skins-buttons--wrapper {
+		margin-top: -98px;
+	}
+	
+	.build-buttons--wrapper {
+		width: 470px;
+		margin-left: 23vw;
+	}
+
+	button.skins {
+		margin-top: -38px;
+	}
+
+	.build-field-bottom:after {
+		content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
+	}
+}
+
+@media (height <= 720px) {
+
+	.build-hero {
+		width: 240px;
+	}
+
+	.build-level {
+		height: 410px;
+		min-height: 270px;
+	}
+	.build-level div {
+		margin: 2px 0;
+	}
+
+	.build-field {
+		width: 430px;
+		height: 440px;
+		min-height: 440px;
+	}
+	
+	.build-field-item {
+		width: 60px;
+		margin: 0px 5px;
+		padding: 0px;
+		height: 50px;
+	}
+		
+	.build-talent-item {
+		margin: 5px !important;!i;!;
+	}
+
+	.build-talent {
+		height: 530px;
+		width: 440px;
+	}
+	.build-talents {
+		width: 450px;
+	}
+
+	.build-rarity {
+		min-width: 20px;
+		width: 50px;
+		margin-left: 10px;
+	}
+
+	.build-field-bottom {
+		margin-top: -70px;
 	}
 
 }
