@@ -126,13 +126,12 @@
 }
 
 .castle-rank{
-	width:100%;
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
 	align-items:center;
 	position:absolute;
-	bottom:0;
+	bottom: 13px;
 }
 
 .castle-rank-icon{
@@ -157,7 +156,7 @@
 	color: #fdd;
 	font: 0.9vw / 1 Arial;
 	padding:0.1vw 0.5vw;
-
+	margin: 0 3vw 0 -1vw;
 }
 
 .castle-party-middle-item-nickname {

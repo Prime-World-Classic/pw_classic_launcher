@@ -1023,8 +1023,9 @@ class View {
 		for(let player of players){
 			
 			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
-			
-			let rankIcon = DOM({style:'castle-rank-icon'});
+
+			const rankIcon = DOM({style:'castle-rank-icon'});
+			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 			
 			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : '';
 			
