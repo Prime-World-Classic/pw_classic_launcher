@@ -992,7 +992,7 @@ class View {
 		
 		play.classList.add('main-header-item');
 		
-		play.classList.add('button-play');
+		play.classList.add('castle-button-play');
 		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
@@ -1117,7 +1117,7 @@ class View {
 			}
 
 			let shortenNickname = player.nickname ? (
-			player.nickname.length > 10 ? player.nickname.substring(0, 8) + '…' : player.nickname
+			player.nickname.length > 17 ? player.nickname.substring(0, 17) + '…' : player.nickname
 			) : null;
 
 			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${shortenNickname ? shortenNickname : 'Добавить'}`);
