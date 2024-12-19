@@ -669,9 +669,7 @@ button.sets {
 	width: 97%;
 }
 .build-talent-item {
-	
 	margin:5px;
-	
 }
 .build-active-bar-item .build-talent-item {
 	margin: 0;
@@ -2415,5 +2413,27 @@ cursor:pointer;
 
 	.build-field-bottom:after {
 		content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
+	}
+}
+
+@media (height <= 720px) {
+
+	.build-field {
+		height: 440px;
+		min-height: 440px;
+	}
+	
+	.build-field-item {
+		width: 60px;
+		margin: 0px 5px;
+		padding: 0px;
+		height: 50px;
+	}
+		
+	.build-talent-item {
+		margin: 5px !important;!i;!;
+	}
+
+	.build-talent {
 	}
 }
