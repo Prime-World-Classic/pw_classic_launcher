@@ -968,7 +968,6 @@ class View {
 		if (!Castle.canvas) {
 			Castle.canvas = DOM({tag:'canvas', id:'castle-game-surface'});
 		}
-		//App.storage.data.fraction; //тут будет инфа о стороне 1 или 2 
 		
 		try{
 			
@@ -1080,12 +1079,6 @@ class View {
 				const hero = DOM({style:'castle-hero-item'},rank);
 				
 				hero.addEventListener('click',() => View.show('build',item.id));
-				
-				hero.dataset.id = item.id;
-				
-				hero.dataset.slide = 1;
-				
-				hero.dataset.total = item.total;
 				
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
@@ -4767,7 +4760,7 @@ class App {
 			
 		}
 
-		await App.storage.set({id:request.id,token:request.token,login:login.value});
+		await App.storage.set({id:request.id,token:request.token,login:login.value,fraction:fraction.value});
 		
 		View.show('castle');
 		
