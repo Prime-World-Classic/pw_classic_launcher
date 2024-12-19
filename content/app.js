@@ -978,13 +978,13 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,Castle.canvas,View.castlePlay(),View.castleMenu(),View.castleHeroes(), View.castleMusic());
+		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),View.castleHeroes(), View.castleMusic());
 		
 		return body;
 		
 	}
 	
-	static castlePlay(){
+	static async castlePlay(){
 		
 		let body = DOM({style:'castle-play'});
 		
@@ -994,15 +994,225 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		let lobby = DOM({style:'castle-play-lobby'},
-		DOM({style:'castle-play-lobby-player'}),
-		DOM({style:'castle-play-lobby-player'}),
-		DOM({style:'castle-play-lobby-player'}),
-		DOM({style:'castle-play-lobby-player'}),
-		DOM({style:'castle-play-lobby-player'})
-		);
+		let lobby = DOM({style:'castle-play-lobby'});
 		
-		body.append(lobby,play);
+		let data = await App.api.request('mmtest','loadParty'), players = new Array();
+		
+		MM.partyId = data.id;
+		
+		MM.activeSelectHero = data.users[App.storage.data.id].hero;
+		
+		MM.searchActive(data.users[MM.partyId].ready);
+		
+		for(let key in data.users){
+			
+			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready,rating:data.users[key].rating,skin:data.users[key].skin});
+			
+		}
+		
+		if(players.length < 5){
+			
+			while(players.length < 5){
+				
+				players.push({id:0,hero:0,nickname:'',ready:0});
+				
+			}
+			
+		}
+		
+		for(let player of players){
+			
+			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
+			
+			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
+			
+			let status = DOM(); // должна быть иконка в виде галки
+			
+			if(player.id){
+				
+				if(player.ready){
+					
+					//status.innerText = 'Готов';
+					
+					//status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					
+				}
+				else if(MM.partyId == player.id){
+					
+					//status.innerText = 'Готов';
+					
+					//status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					
+					
+				}
+				else if(player.id == App.storage.data.id){
+					
+					status.onclick = async () => {
+						
+						if(NativeAPI.status){
+							if (PWGame.gameConnectionTestIsActive) {
+								return;
+							}
+							
+							PWGame.gameConnectionTestIsActive = true;
+
+							try {
+								await PWGame.check();
+
+								await PWGame.testGameServerConnection();
+
+								await PWGame.checkUpdates();
+							} catch (e) {
+								PWGame.gameConnectionTestIsActive = false;
+								throw e;
+							}
+
+							PWGame.gameConnectionTestIsActive = false;
+							
+						}
+						else{
+							
+							//if(!await Protect.checkInstall()){
+								
+								App.error('Нужен windows лаунчер');
+								
+								return;
+								
+							//}
+							
+						}
+						
+						await App.api.request('mmtest','readyParty',{id:MM.partyId});
+						
+						status.onclick = false;
+						
+					}
+					
+					status.innerText = 'Подтвердить';
+					
+				}
+				
+			}
+			
+			item.addEventListener('click', async () => {
+				
+				if(item.dataset.id == App.storage.data.id){
+					
+					if(MM.active){
+						
+						return;
+						
+					}
+					
+					let request = await App.api.request('build','heroAll');
+					
+					MM.hero = request;
+					
+					request.push({id:0});
+					
+					let bodyHero = DOM({style:'party-hero'});
+					
+					let preload = new PreloadImages(bodyHero);
+					
+					for(let item2 of request){
+						
+						let hero = DOM();
+						
+						hero.addEventListener('click', async () => {
+							
+							try{
+								
+								await App.api.request('mmtest','heroParty',{id:MM.partyId,hero:item2.id});
+								
+							}
+							catch(error){
+								
+								return App.error(error);
+								
+							}
+							
+							item.style.backgroundImage = (item2.id) ? `url(content/hero/${item2.id}/${item2.skin ? item2.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
+							
+							MM.activeSelectHero = item2.id;
+							
+							Splash.hide();
+							
+						});
+						
+						if(item2.id){
+							
+							hero.dataset.url = `content/hero/${item2.id}/${item2.skin ? item2.skin : 1}.webp`;
+							
+						}
+						else{
+							
+							hero.dataset.url = `content/hero/empty.webp`;
+							
+						}
+						
+						preload.add(hero);
+						
+					}
+					
+					Splash.show(bodyHero,false);
+					
+				}
+				
+				if( ( (item.dataset.id == 0) && ( (!MM.partyId ) || (MM.partyId == App.storage.data.id) ) ) ){
+					
+					let input = DOM({tag:'input',style:'search-input'});
+					
+					let body = DOM({style:'search-body'});
+					
+					let search = DOM({style:'search'},input,body,DOM({style:'search-bottom',event:['click',() => {
+						
+						Splash.hide();
+						
+					}]},`[Назад]`));
+					
+					input.addEventListener('input', async () => {
+						
+						let request = await App.api.request('mmtest','findUser',{name:input.value});
+						
+						if(body.firstChild){
+							
+							while(body.firstChild){
+								
+								body.firstChild.remove();
+								
+							}
+							
+						}
+						
+						for(let item of request){
+							
+							body.append(DOM({event:['click', async () => {
+								
+								await App.api.request('mmtest','inviteParty',{id:item.id});
+								
+								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
+								
+								// Splash.hide();
+								
+							}]},item.nickname));
+							
+						}
+						
+					});
+					
+					Splash.show(search,false);
+					
+					input.focus();
+					
+				}
+				
+			})
+			
+			lobby.append(item);
+			
+		}
+		
+		body.append(play,lobby);
 		
 		return body; 
 		
@@ -1019,6 +1229,14 @@ class View {
 	static castleMenu(){
 		
 		let body = DOM({style:'castle-menu'});
+		
+		return body;
+		
+	}
+	
+	static castleChat(){
+		
+		let body = DOM({style:'castle-chat'},Chat.body);
 		
 		return body;
 		
@@ -4632,7 +4850,7 @@ class Events {
 		
 		let button = DOM({style:'splash-content-button',event:['click', async () => Splash.hide()]},'Больше так не буду');
 		
-		body.append(DOM(`${data.party ? 'Один из участников пати был АФК, поэтому вы исключены из подбора матча' : 'Вы были исключены из матчмейкинга за АФК!'}`),button)
+		body.append(DOM(`${data.party ? 'Один из участников пати был АФК, поэтому вы исключены из подбора матча' : 'Вы были исключены из матчмейкинга за АФК!'}`),button);
 		
 		Splash.show(body);
 		
@@ -4650,7 +4868,7 @@ class App {
 	
 	static async init(){
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
-		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
+		App.api = new Api('ws://192.168.31.194:3737', Events);
 		
 		await Store.init();
 		
@@ -4661,6 +4879,8 @@ class App {
 		await Protect.init();
 		
 		await MM.init();
+		
+		Chat.init();
 		
 		await App.api.init();
 		
@@ -4881,19 +5101,58 @@ class Chat {
 	
 	static body;
 	
+	static hide = false;
+	
 	static to = 0;
 	
 	static init(){
 		
-		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),DOM({tag:'input',style:'chat-input',event:['input',() => {
+		Chat.input = DOM({tag:'input',style:'chat-input',placeholder:'Введите текст и нажмите Enter'});
+		
+		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),Chat.input);
+		
+		Chat.input.addEventListener('input',() => {
 			
-			if(!Chat.body.lastChild.value){
+			if(!Chat.input.value){
 				
 				Chat.to = 0;
 				
 			}
 			
-		}]}));
+		});
+		
+		Chat.input.addEventListener('keyup', async () => {
+			
+			if(event.code === 'Enter'){
+				
+				Chat.sendMessage();
+				
+			}
+			
+		});
+		
+		document.addEventListener('keydown', (event) => {
+			
+			if(event.code == 'KeyM' && (event.ctrlKey || event.metaKey)){
+				
+				if(Chat.hide){
+					
+					Chat.body.style.display = 'block';
+					
+					Chat.hide = false;
+					
+				}
+				else{
+					
+					Chat.body.style.display = 'none';
+					
+					Chat.hide = true;
+					
+				}
+				
+			}
+			
+		});
 		
 	}
 	
@@ -4901,27 +5160,39 @@ class Chat {
 		
 		let nickname = DOM({tag:'div'},data.nickname);
 		
-		let message = DOM({tag:'div'},data.message);
+		let message = DOM({tag:'div'});
+		
+		message.innerText = `${data.message}`;
 		
 		if(data.to == -1){
 			
-			// системное
+			message.style.color = 'rgb(255,50,0)';
+			
+			message.style.fontWeight = 600;
+			
+			message.style.fontStyle = 'italic';
 			
 		}
 		else if(data.to == App.storage.data.id){
 			
-			// личное
+			message.style.color = 'rgba(51,255,0,0.9)';
 			
 		}
 		
 		if(data.id == 1){
 			
-			message.style.color = '';
+			message.style.color = 'rgb(255,50,0)';
+			
+			message.style.fontWeight = 600;
 			
 		}
 		else if(App.isAdmin(data.id)){
 			
-			message.classList.add();
+			message.style.color = 'transparent';
+			
+			message.style.fontWeight = 600;
+			
+			message.classList.add('animation-text');
 			
 		}
 		
@@ -4933,21 +5204,45 @@ class Chat {
 			
 		}]},nickname,message);
 		
+		item.addEventListener('contextmenu',() => {
+			
+			if(App.isAdmin()){
+				
+				let body = document.createDocumentFragment();
+				
+				body.append(DOM(`Выдать мут чата ${data.nickname}?`),DOM({style:'splash-content-button',event:['click', async () => {
+					
+					await App.api.request('user','mute',{id:data.id});
+					
+					Splash.hide();
+					
+				}]},'Да'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()]},'Нет'));
+				
+				Splash.show(body);
+				
+			}
+			
+			return false;
+			
+		});
+		
 		Chat.body.firstChild.append(item);
 		
 		item.scrollIntoView({block:'end',behavior:'smooth'});
 		
 	}
 	
-	static async sendMessage(message){
+	static async sendMessage(){
 		
-		if(message.length > 128){
+		if(Chat.input.value.length > 128){
 			
 			return;
 			
 		}
 		
-		await App.api.request('user','chat',{message:message,to:Chat.to});
+		await App.api.request('user','chat',{message:Chat.input.value,to:Chat.to});
+		
+		Chat.input.value = '';
 		
 	}
 	

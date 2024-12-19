@@ -41,7 +41,7 @@
 	justify-content:center;
 	align-items:center;
 	/**background:rgba(0,0,255,0.3);**/
-	height:10vh;
+	height:12vh;
 	width:100vw;
 	
 }
@@ -52,18 +52,20 @@
 	flex-flow:row nowrap;
 	justify-content:center;
 	align-items:center;
+	margin-left:3vh;
 	
 }
 
 .castle-play-lobby-player{
 	
-	width:2vw;
-	height:2vw;
+	width:10vh;
+	height:10vh;
 	border-radius:50%;
 	background-size:110%;
 	background-position:center;
 	background-repeat:no-repeat;
-	background-image:rgba(255,255,255,0.1);
+	margin:0 0.5vh;
+	cursor:pointer;
 	
 }
 
@@ -89,9 +91,11 @@
 	height:16vh;
 	margin:0 0.5vw;
 	cursor:pointer;
-	background-size:cover;
+	background-size:110%;
 	background-position:center;
 	background-repeat:no-repeat;
+	border-radius:50%;
+	/**background-color:linear-gradient(rgba(238,221,119,0.9),rgba(163,125,58,0.9),rgba(212,178,83,0.9),rgba(189,135,48,0.9),rgba(241,225,119,0.9));**/
 	
 }
 
@@ -114,8 +118,16 @@
 	
 }
 
-#STAT{
+.castle-chat{
 	
-	display:none;
+	position:absolute;
+	left:0;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	flex-flow:column nowrap;
+	margin-top:19vh;
+	height:62vh;
+	width:25vw;
 	
 }
