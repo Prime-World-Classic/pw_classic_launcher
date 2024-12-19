@@ -4637,6 +4637,12 @@ class Events {
 		Splash.show(body);
 		
 	}
+	
+	static UChat(data){
+		
+		Chat.viewMessage(data);
+		
+	}
 
 }
 
@@ -4935,6 +4941,82 @@ class App {
 		let a = DOM({tag:'a',href:url});
 		
 		a.click();
+		
+	}
+	
+}
+
+class Chat {
+	
+	static body;
+	
+	static to = 0;
+	
+	static init(){
+		
+		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),DOM({tag:'input',style:'chat-input',event:['input',() => {
+			
+			if(!Chat.body.lastChild.value){
+				
+				Chat.to = 0;
+				
+			}
+			
+		}]}));
+		
+	}
+	
+	static viewMessage(data){
+		
+		let nickname = DOM({tag:'div'},data.nickname);
+		
+		let message = DOM({tag:'div'},data.message);
+		
+		if(data.to == -1){
+			
+			// системное
+			
+		}
+		else if(data.to == App.storage.data.id){
+			
+			// личное
+			
+		}
+		
+		if(data.id == 1){
+			
+			message.style.color = '';
+			
+		}
+		else if(App.isAdmin()){
+			
+			message.classList.add();
+			
+		}
+		
+		let item = DOM({style:'chat-body-item',event:['click',() => {
+			
+			Chat.to = data.id;
+			
+			Chat.body.lastChild.value = `@${data.nickname}, `;
+			
+		}]},nickname,message);
+		
+		Chat.body.firstChild.append(item);
+		
+		item.scrollIntoView({block:'end',behavior:'smooth'});
+		
+	}
+	
+	static async sendMessage(message){
+		
+		if(message.length > 128){
+			
+			return;
+			
+		}
+		
+		await App.api.request('user','chat',{message:message,to:Chat.to});
 		
 	}
 	
