@@ -2,14 +2,6 @@ APP_VERSION = '3 (TEST)';
 
 PW_VERSION = '2.0.0';
 
-window.onbeforeunload = () => {
-	if (NativeAPI.status) {
-		if (MM.active) {
-			MM.start();
-		}
-	}
-};
-
 window.addEventListener('DOMContentLoaded',() => {
 	
 	Splash.init();
@@ -6683,6 +6675,20 @@ class MM {
 		MM.button.onclick = () => MM.start();
 		
 		Timer.init();
+		
+		window.addEventListener('beforeunload',() => {
+			
+			if(NativeAPI.status){
+				
+				if(MM.active){
+					
+					MM.start();
+					
+				}
+				
+			}
+			
+		});
 		
 	}
 	
