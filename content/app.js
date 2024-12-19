@@ -1122,7 +1122,7 @@ class View {
 
 			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${shortenNickname ? shortenNickname : 'Добавить'}`);
 			
-			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item'},nickname,item,status); 
+			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 			
 			playerX.dataset.id = player.id;
 			
