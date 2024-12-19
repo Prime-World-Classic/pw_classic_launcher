@@ -1026,7 +1026,7 @@ class View {
 			
 			let rankIcon = DOM({style:'castle-rank-icon'});
 			
-			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
+			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : '';
 			
 			let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'}, player.rating),rankIcon);
 			
@@ -1116,11 +1116,7 @@ class View {
 				
 			}
 
-			let shortenNickname = player.nickname ? (
-			player.nickname.length > 17 ? player.nickname.substring(0, 17) + '…' : player.nickname
-			) : null;
-
-			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${shortenNickname ? shortenNickname : 'Добавить'}`);
+			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${player.nickname ? player.nickname : 'Добавить'}`);
 			
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 			

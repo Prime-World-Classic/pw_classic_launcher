@@ -67,19 +67,21 @@
 
 .castle-play-lobby-player{
 	
-	width:12vh;
-	height:12vh;
+	width: 10vh;
+	height: 10vh;
 	border-radius:50%;
-	background-size:110%;
+	background-size: 10vh !important;
+	background-repeat: no-repeat !important;
 	background-position:center;
 	background-repeat:no-repeat;
-	margin:0 0.5vh;
+	margin: 0 auto;
 	cursor:pointer;
-	font:5vh / 1 Verdana;
-	line-height:9.5vh;
+	font: 8vh / 1 Verdana;
+	line-height: 10vh;
 	text-align:center;
-	color:rgba(255,255,255,0.2);
-	
+	color:rgba(255,255,255,.6);
+	background: #9999;
+	box-shadow: 0 0 5px #bbb;
 }
 
 .castle-party-middle-item-ready{
