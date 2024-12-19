@@ -168,10 +168,13 @@
 	color: #ccc;
 	background:#244;
 	width: 8vw;
-	height: 2vw;
+	height: 1vw;
 	
 	border:1px solid orange;
-	
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .castle-hero{
