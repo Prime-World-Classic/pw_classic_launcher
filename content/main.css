@@ -2349,7 +2349,7 @@ cursor:pointer;
 
 	.build-field {
 		min-width: 25vw;
-		width: 20vw;
+		width: 486px;
 		min-height: 536px;
 		height: 512px;
 	}
@@ -2368,8 +2368,8 @@ cursor:pointer;
 	}
 
 	.build-active-bar-item {
-		width: 3vw;
-		height: 3vw;
+		width: 57px;
+		height: 57px;
 	}
 
 	.build-active-bar-item {
@@ -2384,4 +2384,36 @@ cursor:pointer;
 		border-width: 1px;
 	}
 
+}
+
+
+@media (height <= 900px) {
+	.build-hero {
+		margin-top: -130px;
+		width: 200px;
+	}
+	.build-hero-stats {
+		width: 230px;
+	}
+
+	.build-hero .name {
+		display: none;
+	}
+
+	.new-random-skins-buttons--wrapper {
+		margin-top: -98px;
+	}
+	
+	.build-buttons--wrapper {
+		width: 470px;
+		margin-left: 23vw;
+	}
+
+	button.skins {
+		margin-top: -38px;
+	}
+
+	.build-field-bottom:after {
+		content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (автоматическое применение)';
+	}
 }
