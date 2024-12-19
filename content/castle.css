@@ -149,6 +149,22 @@
 	margin: 0 3vw 0 -1vw;
 }
 
+.castle-player-nickname {
+	width: 90%;
+}
+
+.castle-party-remove {
+	position:relative;
+	top: -2.55vh;
+	left: 14.4vh;
+	width: 3vh;
+	height: 3vh;
+	background-size:4vh 4vh;
+	background-position: top -0.5vh left -0.5vh;
+	background-repeat:no-repeat;
+	cursor: pointer;
+}
+
 .castle-party-middle-item-nickname {
 	margin:0.1vw 0;
 	text-align:center;
@@ -165,6 +181,11 @@
 
 	white-space: nowrap;
 	overflow: hidden;
+}
+
+.castle-party-middle-item-nickname div {
+	white-space:nowrap;
+	overflow:hidden;
 	text-overflow: ellipsis;
 }
 
@@ -206,6 +227,8 @@
 	color: #fdd;
 	font: 0.9vw / 1 Arial;
 	padding:0.1vw 0.5vw;
+	text-overflow: ellipsis;
+	white-space:nowrap;
 }
 
 .castle-item-hero-name{

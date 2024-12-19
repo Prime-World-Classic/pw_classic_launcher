@@ -30,7 +30,7 @@
   
 }
 
-html,body{padding:0;margin:0;background:#dcdcdc;font:22px/1.5 Verdana}
+html,body{padding:0;margin:0;background:#dcdcdc;font:2.13vh/1.5 Verdana}
 body{
 overscroll-behavior: contain;
 overscroll-behavior-y: none;
@@ -964,6 +964,7 @@ text-align:center;
 }
 
 .hero-item .name {
+	margin: -10vh;
 	position:absolute;
 	top:-20px;
 	width: 169px;
@@ -1938,7 +1939,7 @@ cursor:pointer;
 	flex-flow:row wrap;
 	justify-content:space-between;
 	align-items:center;
-	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 2.2vh rgba(0, 0, 0, 0.3);
     border-radius: 5vw;
 	margin:1vw 3vw;
 	padding-right:3vw;
@@ -1947,13 +1948,18 @@ cursor:pointer;
 
 .history-item div:first-child{
 	
-	width: 3vw;
-    min-width: 3vw;
-    height: 3vw;
+	width: 4vw;
+    min-width: 4vw;
+    height: 4vw;
     background-size: 105%;
     background-position: center;
     background-repeat: no-repeat;
 	
+}
+
+.history-text-box {
+	width: 20vh;
+	text-align: center;
 }
 
 .ready-button{
@@ -2236,12 +2242,6 @@ cursor:pointer;
 	
 }
 
-.chat-body-item{
-	
-	margin-bottom:1.5vh;
-	
-}
-
 .chat-body-item div{
 	
 	
@@ -2255,12 +2255,6 @@ cursor:pointer;
 	
 	background:rgba(255,255,255,0.1);
 	cursor:pointer;
-	
-}
-
-.chat-body-item img{
-	
-	width:100%;
 	
 }
 

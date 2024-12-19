@@ -834,7 +834,7 @@ class View {
 	
 	static activeAnimation = false;
 	
-	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(15px)']};
+	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(1vh)']};
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
 	
@@ -1123,31 +1123,42 @@ class View {
 				
 			}
 
-			let nickname = DOM({style:'castle-party-middle-item-nickname'},`${player.nickname ? player.nickname : 'Добавить'}`);
+			let removeButton = DOM({style:'castle-party-remove'});
+			
+			removeButton.style.backgroundImage = `url(content/icons/close-cropped.svg)`;
+
+			let nicknameText = DOM({},`${player.nickname ? player.nickname : 'Добавить'}`);
+
+			let nickname = DOM({style:'castle-party-middle-item-nickname'}, nicknameText);
 			
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 			
 			playerX.dataset.id = player.id;
 			
 			if( (MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0) ){
-				
-				nickname.append(DOM({style: 'rz', tag:'span',event:['click', async () => {
+				removeButton.addEventListener('click', async () => {
 					
 					await App.api.request('mmtest','leaderKickParty',{id:playerX.dataset.id});
 					
-				}]},'[X]'));
-				
+				})
+
+				nickname.firstChild.classList.add('castle-player-nickname');
+
+				nickname.append(removeButton);
 			}
 			
 			if( (MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id) ){
-				
-				nickname.append(DOM({tag:'span',event:['click', async () => {
+				removeButton.addEventListener('click', async () => {
 					
 					await App.api.request('mmtest','leaveParty',{id:MM.partyId});
 					
 					View.show('castle');
 					
-				}]},'[X]'));
+				})
+
+				nickname.firstChild.classList.add('castle-player-nickname');
+				
+				nickname.append(removeButton);
 				
 			}
 			
@@ -1811,7 +1822,7 @@ class View {
 			
 			hero.style.backgroundImage = `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.webp)`;
 			
-			let game = DOM({style:'history-item'},hero,DOM({tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({tag:'div'},(item.team == item.win) ? +item.rating : -item.rating),DOM({tag:'div'},new Date(item.added).toLocaleString()));
+			let game = DOM({style:'history-item'},hero,DOM({style:'history-text-box',tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({style:'history-text-box',tag:'div'},Math.round((item.team == item.win) ? +item.rating : -item.rating * 10.0) / 10.0),DOM({style:'history-text-box',tag:'div'},new Date(item.added).toLocaleString()));
 			
 			if(item.team == item.win){
 				
