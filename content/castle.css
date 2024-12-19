@@ -77,42 +77,34 @@
 	margin: 0 auto;
 	cursor:pointer;
 	font: 8vh / 1 Verdana;
-	line-height: 10vh;
+	line-height: 9vh;
 	text-align:center;
 	color:rgba(255,255,255,.6);
 	background: #9996;
 	box-shadow: 0 0 26px #000;
 }
 
-.castle-party-middle-item-ready{
+.castle-party-middle-item-ready-notready{
 	margin-top: 0.1vw;
 	text-align:center;
-	font:2.5vh / 1 Verdana;
-	color: rgba(150, 255, 150, .8);
-	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
+	font:1.8vh / 1 Verdana;
+	padding: 0.5vh 0.4vh;
+	text-shadow:rgba(0,0,0,0.3) 0 0 1vh;
 	font-weight:600;
 	font-style:italic;
 	cursor:pointer;
 	background:#244;
-	border:1px solid orange;
+	border:0.1vh solid orange;
 	width: 8vw;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
-	
+}
+
+.castle-party-middle-item-ready{
+	color: rgba(150, 255, 150, .8);
 }
 
 .castle-party-middle-item-not-ready{
-	margin-top: 0.1vw;
-	text-align:center;
-	font:2.5vh / 1 Verdana;
 	color:rgba(255,255,255,0.3);
-	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
-	font-weight:600;
-	font-style:italic;
-	cursor:pointer;
-	background:#244;
-	border:1px solid orange;
-	width: 8vw;
-	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	
 }
 
@@ -137,7 +129,7 @@
 	width: 1.5vw;
 	height: 1.5vw;
 	background:#244;
-	border:1px solid orange;
+	border:0.1vh solid orange;
 	border-radius:50%;
 	background-size:80%;
 	background-position:center;
@@ -149,7 +141,7 @@
 	
 	height: 0.9vw;
 	background: #244;
-	border: 1px solid darkorange;
+	border: 0.1vh solid darkorange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	color: #fdd;
 	font: 0.9vw / 1 Arial;
@@ -169,7 +161,7 @@
 	width: 8vw;
 	height: 1vw;
 	
-	border:1px solid orange;
+	border:0.1vh solid orange;
 
 	white-space: nowrap;
 	overflow: hidden;
@@ -209,7 +201,7 @@
 .castle-hero-name{
 	height: 0.9vw;
 	background: #244;
-	border: 1px solid darkorange;
+	border: 0.1vh solid darkorange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	color: #fdd;
 	font: 0.9vw / 1 Arial;
