@@ -48,7 +48,7 @@
 }
 
 .castle-button-play{
-	
+	margin-top: -160px;
 	background:rgba(255,50,0,0.9);
 	font: 3vh / 1 Verdana;
 	color:rgba(255,255,255,0.9);
