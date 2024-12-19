@@ -1330,7 +1330,7 @@ class View {
 			
 			for(const item of result){
 
-				let heroName = DOM({style:'castle-hero-name'}, item.name.length > 12 ? item.name.substring(0, 10) + '…' : item.name);
+				const heroName = DOM({style:'castle-hero-name'}, item.name);
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
