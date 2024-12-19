@@ -971,6 +971,8 @@ class View {
 			
 			Castle.initDemo('doct',canvas);
 			
+			Castle.render = true;
+			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
 			
@@ -1133,7 +1135,7 @@ class View {
 		}
 		
 		menu.append(
-		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},'Лобби'),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},NativeAPI.status ? 'Лобби' : 'Замок'),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
@@ -1839,6 +1841,8 @@ class View {
 	}
 	
 	static async build(heroId,targetId = 0){
+
+		Castle.render = false;
 		
 		const body = DOM({style:'main-vertical'});
 		
@@ -5285,7 +5289,7 @@ class NativeAPI {
 
 				App.notify('Обновление завершено');
 			} else {
-				App.error('Обновление завершено с ошибкой: ' + code);
+				App.notify('Обновление завершено с ошибкой: ' + code);
 			}
 			
 		});
@@ -5333,6 +5337,8 @@ class NativeAPI {
 class Castle {
 	
 	static gl;
+
+	static render = true;
 	
 	static identityMatrix;
 	
@@ -6078,6 +6084,11 @@ class Castle {
 	}
 	
 	static loop(){
+
+		if (!Castle.render) {
+			requestAnimationFrame(Castle.loop);
+			return;
+		}
 		
 		Castle.prevTime = Castle.currentTime;
 		
@@ -6154,7 +6165,7 @@ class Castle {
 		Castle.updateMainCam();
 		
 		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects) {
-			Castle.isStaticSMCached = true;
+			Castle.isStaticSMCached = false;
 			Castle.gl.bindFramebuffer(Castle.gl.FRAMEBUFFER, Castle.depthFramebuffer);
 			Castle.gl.viewport(0, 0, Castle.depthTextureSize, Castle.depthTextureSize);
 			Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
