@@ -2236,6 +2236,12 @@ cursor:pointer;
 	
 }
 
+.chat-body-item{
+	
+	margin-bottom:1.5vh;
+	
+}
+
 .chat-body-item div{
 	
 	
@@ -2249,6 +2255,12 @@ cursor:pointer;
 	
 	background:rgba(255,255,255,0.1);
 	cursor:pointer;
+	
+}
+
+.chat-body-item img{
+	
+	width:100%;
 	
 }
 
