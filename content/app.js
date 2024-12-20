@@ -587,7 +587,7 @@ class Api {
 					this.MAIN_HOST = this.host[this.currentHost];
 					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
 				}
-			}, this.retryCount * 500);
+			}, Math.min(15000, this.retryCount * 5000));
 		}
 
 		setTimeout
