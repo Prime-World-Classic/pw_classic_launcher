@@ -48,9 +48,15 @@
 }
 
 .castle-button-play{
-	margin-top: -160px;
+	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
+	text-align:center;
+	padding:0.8vh 1vw;
+	cursor:pointer;
+	border-radius:15px;
+	box-shadow:0 0 25px rgba(0,0,0,0.3);
+
 	background:rgba(255,50,0,0.9);
-	font: 3vh / 1 Verdana;
+	font: 5vh / 1 Verdana;
 	color:rgba(255,255,255,0.9);
 	
 }
@@ -66,22 +72,29 @@
 }
 
 .castle-play-lobby-player{
-	
-	width: 10vh;
-	height: 10vh;
-	border-radius:50%;
-	background-size: 10vh !important;
-	background-repeat: no-repeat !important;
+	height: 12vh;
+	margin:0 0.5vw;
+	cursor:pointer;
+	background-size:12vh;
 	background-position:center;
 	background-repeat:no-repeat;
+	border-radius:50%;
+
+}
+
+.castle-play-lobby-player .castle-play-lobby-empty{
+	width: 100%;
+	height: 100%;
+	border-radius:50%;
 	margin: 0 auto;
 	cursor:pointer;
+	
 	font: 8vh / 1 Verdana;
-	line-height: 9vh;
+	line-height: 11vh;
 	text-align:center;
 	color:rgba(255,255,255,.6);
 	background: #9996;
-	box-shadow: 0 0 26px #000;
+	box-shadow: 0 0 2.2vh #000;
 }
 
 .castle-party-middle-item-ready-notready{
@@ -95,7 +108,6 @@
 	cursor:pointer;
 	background:#244;
 	border:0.1vh solid orange;
-	width: 8vw;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 }
 
@@ -110,18 +122,19 @@
 
 .castle-party-middle-item {
 	
-	margin:0 0vw;
-	
+	margin:0 1vh;
+	width: 16vh;
 	
 }
 
 .castle-rank{
+	width:100%;
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
 	align-items:center;
 	position:absolute;
-	bottom: 13px;
+	bottom: 0;
 }
 
 .castle-rank-icon{
@@ -138,7 +151,6 @@
 }
 
 .castle-rank-lvl{
-	
 	height: 0.9vw;
 	background: #244;
 	border: 0.1vh solid darkorange;
@@ -146,47 +158,71 @@
 	color: #fdd;
 	font: 0.9vw / 1 Arial;
 	padding:0.1vw 0.5vw;
-	margin: 0 3vw 0 -1vw;
+}
+
+.castle-player-nickname-wremove {
+	width: 80%;
+	
+	text-align: center;
+}
+
+.castle-player-nickname-woremove {
+	width: 100%;
+	text-align: center;
 }
 
 .castle-player-nickname {
-	width: 90%;
+	white-space:nowrap;
+	display: inline-block;
+	position: relative;
+	text-overflow: clip;
 }
 
+.castle-player-nickname-autoscroll:hover {
+	animation-timing-function: linear;
+	animation-name: scroll-rtl;
+	animation-duration: 4s;
+	animation-direction: forwards;
+	animation-iteration-count: infinite;
+  }
+  @keyframes scroll-rtl {
+	  0% {
+		transform: translate(0);
+	  }
+	  100% {
+		transform: translate(-40%);
+	  }
+	}
+
 .castle-party-remove {
-	position:relative;
-	top: -2.55vh;
-	left: 14.4vh;
-	width: 3vh;
-	height: 3vh;
-	background-size:4vh 4vh;
-	background-position: top -0.5vh left -0.5vh;
+	position: relative;
+	top: -4.1vh;
+	left: 11.9vh;
+	width: 6vh;
+	height: 6vh;
+	background-size: 4.8vh;
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
 
 .castle-party-middle-item-nickname {
-	margin:0.1vw 0;
+	width: 100%;
+	height: 2.2vh;
+	margin:0.1vh 0;
 	text-align:center;
-	font: bold 1.0vw / 1 Verdana;
+	font: bold 1.2vh / 1 Verdana;
 	padding: 0.5vh 0.4vh;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
-	flex-flow:row nowrap;
+
 	color: #ccc;
 	background:#244;
-	width: 8vw;
-	height: 1vw;
-	
 	border:0.1vh solid orange;
+	
+	display: flex;
+	align-items:center;
+	flex-flow:row nowrap;
 
-	white-space: nowrap;
 	overflow: hidden;
-}
-
-.castle-party-middle-item-nickname div {
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow: ellipsis;
 }
 
 .castle-hero{
@@ -206,20 +242,20 @@
 
 .castle-hero-item{
 	
-	width:16vh;
-	min-width:16vh;
-	height:16vh;
+	width:14vh;
+	min-width:14vh;
+	height:14vh;
 	margin:0 0.5vw;
 	cursor:pointer;
-	background-size:110%;
+	background-size:100%;
 	background-position:center;
 	background-repeat:no-repeat;
 	border-radius:50%;
-	/**background-color:linear-gradient(rgba(238,221,119,0.9),rgba(163,125,58,0.9),rgba(212,178,83,0.9),rgba(189,135,48,0.9),rgba(241,225,119,0.9));**/
-	
+	margin-bottom: 2vh;
 }
 
 .castle-hero-name{
+	overflow: hidden;
 	height: 0.9vw;
 	background: #244;
 	border: 0.1vh solid darkorange;
