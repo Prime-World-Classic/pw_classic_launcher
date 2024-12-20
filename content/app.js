@@ -1480,7 +1480,7 @@ class View {
 
 			}
 			
-			let dom = DOM({style:'div'},'Выйти?',wrap);
+			let dom = DOM({style:'div'},'',wrap);
 			
 			Splash.show(dom);
 			
