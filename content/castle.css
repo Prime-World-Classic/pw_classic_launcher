@@ -137,10 +137,21 @@
 	bottom: 0;
 }
 
+.castle-play-lobby-ranks{
+	width: 12vh;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:space-between;
+	align-items:center;
+	position:absolute;
+	bottom: 0;
+}
+
 .castle-rank-icon{
-	
-	width: 1.5vw;
-	height: 1.5vw;
+	position: relative;
+	right: 0;
+	width: 2.5vh;
+	height: 2.5vh;
 	background:#244;
 	border:0.1vh solid orange;
 	border-radius:50%;
