@@ -996,9 +996,11 @@ class View {
 		
 		let play = MM.play();
 		
-		play.classList.add('main-header-item');
+		play.classList.remove('main-header-item');
 		
-		play.classList.add('button-play');
+		play.classList.remove('button-play');
+		
+		play.classList.add('castle-button-play');
 		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
@@ -1113,7 +1115,7 @@ class View {
 			}
 			else{
 				
-				item.innerText = '+';
+				item.innerHTML = '<div class="castle-play-lobby-empty">+</div>';
 				
 				status.style.opacity = 0;
 				
@@ -1133,7 +1135,14 @@ class View {
 			
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 			
+			if (player.nickname.length > 20) {
+				nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+			}
+
 			playerX.dataset.id = player.id;
+
+			nickname.firstChild.classList.add('castle-player-nickname');
+			nickname.firstChild.classList.add('castle-player-nickname-woremove');
 			
 			if( (MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0) ){
 				removeButton.addEventListener('click', async () => {
@@ -1142,9 +1151,14 @@ class View {
 					
 				})
 
-				nickname.firstChild.classList.add('castle-player-nickname');
+				nickname.firstChild.classList.add('castle-player-nickname-wremove');
+				nickname.firstChild.classList.remove('castle-player-nickname-woremove');
 
-				nickname.append(removeButton);
+				if (player.nickname.length > 15) {
+					nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+				}
+
+				item.append(removeButton);
 			}
 			
 			if( (MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id) ){
@@ -1156,9 +1170,14 @@ class View {
 					
 				})
 
-				nickname.firstChild.classList.add('castle-player-nickname');
+				nickname.firstChild.classList.add('castle-player-nickname-wremove');
+				nickname.firstChild.classList.remove('castle-player-nickname-woremove');
+
+				if (player.nickname.length > 15) {
+					nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+				}
 				
-				nickname.append(removeButton);
+				item.append(removeButton);
 				
 			}
 			
@@ -1173,6 +1192,8 @@ class View {
 					}
 					
 					let request = await App.api.request('build','heroAll');
+
+					request.sort((a, b) => b.rating - a.rating);
 					
 					MM.hero = request;
 					
@@ -1343,6 +1364,8 @@ class View {
 		});
 		
 		App.api.silent((result) => {
+
+			result.sort((a, b) => b.rating - a.rating)
 			
 			MM.hero = result;
 			
@@ -1352,11 +1375,11 @@ class View {
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
-				let rankIcon = DOM({style:'rank-icon'});
+				let rankIcon = DOM({style:'castle-rank-icon'});
 				
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
-				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
+				let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'},item.rating),rankIcon);
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
@@ -1382,7 +1405,11 @@ class View {
 		
 		play.classList.add('button-play');
 		
-		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.webp',event:['click',() => View.show('castle')]}),play);
+		play.classList.remove('castle-button-play');
+
+		let playButton = DOM({style:'menu-button-play'}, play)
+		
+		let menu = DOM({style:'main-header'},DOM({tag:'img',src:'content/img/logo.webp',event:['click',() => View.show('castle')]}),playButton);
 		
 		if(App.isAdmin()){
 			
@@ -1423,7 +1450,7 @@ class View {
 		}
 		
 		menu.append(
-		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},NativeAPI.status ? 'Лобби' : 'Замок'),
+		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},Castle.gl ? 'Замок' : 'Лобби' ),
 		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
