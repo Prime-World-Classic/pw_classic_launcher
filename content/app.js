@@ -1039,8 +1039,10 @@ class View {
 			
 			let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'}, player.rating),rankIcon);
 			
+			let rankContainer = DOM({style:'castle-play-lobby-ranks'}, rank);
+
 			if (player.rating) {
-				item.append(rank);
+				item.append(rankContainer);
 			}
 			
 			let status = DOM({style:['castle-party-middle-item-ready-notready', 'castle-party-middle-item-not-ready']},'Не готов');
