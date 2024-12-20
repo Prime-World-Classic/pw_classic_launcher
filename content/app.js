@@ -7126,6 +7126,12 @@ class MM {
 		
 		MM.button.onclick = () => MM.start();
 		
+		MM.audio = new Audio();
+		
+		MM.audio.preload = 'auto';
+		
+		MM.audio.src = 'content/sounds/found.ogg';
+		
 		Timer.init();
 		
 		window.addEventListener('beforeunload',() => {
@@ -7146,13 +7152,7 @@ class MM {
 	
 	static soundEvent(){
 		
-		let audio = new Audio();
-		
-		audio.preload = 'auto';
-		
-		audio.src = 'content/sounds/found.ogg';
-		
-		audio.play();
+		MM.audio.play();
 		
 	}
 	
