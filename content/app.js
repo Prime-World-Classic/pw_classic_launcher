@@ -532,6 +532,14 @@ class Api {
 		this.CONNECTION_FALLED = 0;
 		
 		this.CONNECTION_FALLED_TIME = Date.now();
+
+		this.states = {TRY_CONNECT: 0, CONNECTION_ESTABLISHED: 1};
+		
+		this.state = 0;
+
+		this.currentHost = 0;
+
+		this.retryCount = 1;
 		
 		this.awaiting = new Object();
 		
@@ -559,6 +567,30 @@ class Api {
 		this.WebSocket = new WebSocket(`${this.MAIN_HOST}`); // + ${App.storage.data.token}		
 		
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data) );
+
+		if (Array.isArray(this.host)) {
+			console.log('Selecting host');
+			this.state = this.states.TRY_CONNECT;
+
+			this.WebSocket.addEventListener('open', async () => {
+				this.state = this.states.CONNECTION_ESTABLISHED;
+			});
+
+			setTimeout(() => {
+				console.log('Testing connection');
+				if (this.state == this.states.TRY_CONNECT) {	
+					console.log('Failed connection');	
+					this.currentHost = (this.currentHost + 1) % this.host.length;	
+					if (this.currentHost == 0) {
+						this.retryCount++;
+					}
+					this.MAIN_HOST = this.host[this.currentHost];
+					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
+				}
+			}, this.retryCount * 500);
+		}
+
+		setTimeout
 		
 		this.WebSocket.addEventListener('close', async () => {
 			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
@@ -6287,10 +6319,6 @@ class Castle {
 			}
 			playCastleMusic();
 		}
-		
-		let backgroundImage = document.getElementById('castle-background-img');
-		
-		backgroundImage.classList.add('castle-background-image-fade-out');
 		
 		Castle.MainLoop(Castle.sceneObjects, sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
 		
