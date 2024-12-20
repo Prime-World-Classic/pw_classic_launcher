@@ -5739,7 +5739,9 @@ class NativeAPI {
 
 				App.notify('Обновление завершено');
 			} else {
-				App.notify('Обновление завершено с ошибкой: ' + code);
+
+				NativeAPI.reset();
+
 			}
 			
 		});
@@ -6552,7 +6554,8 @@ class Castle {
 	
 	static loop(){
 
-		if (!(false in Castle.render)) {
+		let isStopRender = false in Castle.render;
+		if (isStopRender) {
 			requestAnimationFrame(Castle.loop);
 			return;
 		}
