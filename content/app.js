@@ -967,7 +967,7 @@ class View {
 				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
 			
-			Castle.render = true;
+			Castle.render[0] = true;
 			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
@@ -2157,7 +2157,7 @@ class View {
 	
 	static async build(heroId,targetId = 0){
 
-		Castle.render = false;
+		Castle.render[0] = false;
 		
 		const body = DOM({style:'main-vertical'});
 		
@@ -5794,7 +5794,7 @@ class Castle {
 
 	static currentVolume = this.musicVolume;
 
-	static render = true;
+	static render = [true, true];
 	
 	static identityMatrix;
 	
@@ -6552,7 +6552,7 @@ class Castle {
 	
 	static loop(){
 
-		if (!Castle.render) {
+		if (!(false in Castle.render)) {
 			requestAnimationFrame(Castle.loop);
 			return;
 		}
@@ -7100,10 +7100,12 @@ class MM {
 	static activeSelectHero = 0;
 	
 	static gameRunEvent(){
+		Castle.render[1] = false;
 		Sound.pause('castle');
 	}
 
 	static gameStopEvent(){
+		Castle.render[1] = true;
 		Sound.unpause('castle');
 	}
 	
