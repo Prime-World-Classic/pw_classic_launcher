@@ -4944,9 +4944,9 @@ class Events {
 			
 			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 			
-			find.children[1].firstChild.children[0].innerText = data.rating;
+			find.children[1].firstChild.firstChild.children[0].innerText = data.rating;
 			
-			find.children[1].firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+			find.children[1].firstChild.firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		
