@@ -9,30 +9,21 @@ window.addEventListener('DOMContentLoaded',() => {
 	NativeAPI.init();
 	
 	NativeAPI.update((data) => {
-		
-		let progress = false;
+			
+		if(View.updateProgress){
+			
+			Splash.hide();
+			
+		}
 		
 		if(data.update){
 			
-			if(!progress){
+			View.updateProgress = View.progress();
 				
-				progress = View.progress();
-				
-				progress.firstChild.style.width = data.total+'%';
-				
-				progress.lastChild.innerText = `${data.title} ${data.total}%...`;
-				
-			}
+			View.updateProgress.firstChild.style.width = data.total+'%';
 			
-		}
-		else{
-			
-			if(progress){
-				
-				Splash.hide();
-				
-			}
-			
+			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
+
 		}
 		
 	});
@@ -869,6 +860,8 @@ class View {
 	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(1vh)']};
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
+
+	static updateProgress = false;
 	
 	static setCss(name = 'content/style.css'){
 		
