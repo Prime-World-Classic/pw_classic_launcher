@@ -1165,18 +1165,19 @@ class View {
 
 			let nicknameText = DOM({},`${player.nickname ? player.nickname : 'Добавить'}`);
 
-			let nickname = DOM({style:'castle-party-middle-item-nickname'}, nicknameText);
+			let nicknameHideOverflowContainer = DOM({style:'castle-party-middle-item-nickname-hidden-overflow'},nicknameText);
+
+			let nickname = DOM({style:'castle-party-middle-item-nickname'}, nicknameHideOverflowContainer);
 			
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 			
 			if (player.nickname.length > 20) {
-				nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+				nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
 			}
 
 			playerX.dataset.id = player.id;
 
-			nickname.firstChild.classList.add('castle-player-nickname');
-			nickname.firstChild.classList.add('castle-player-nickname-woremove');
+			nickname.firstChild.firstChild.classList.add('castle-player-nickname');
 			
 			if( (MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0) ){
 				removeButton.addEventListener('click', async () => {
@@ -1185,14 +1186,11 @@ class View {
 					
 				})
 
-				nickname.firstChild.classList.add('castle-player-nickname-wremove');
-				nickname.firstChild.classList.remove('castle-player-nickname-woremove');
-
 				if (player.nickname.length > 15) {
-					nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+					nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
 				}
 
-				item.append(removeButton);
+				nickname.append(removeButton);
 			}
 			
 			if( (MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id) ){
@@ -1204,14 +1202,11 @@ class View {
 					
 				})
 
-				nickname.firstChild.classList.add('castle-player-nickname-wremove');
-				nickname.firstChild.classList.remove('castle-player-nickname-woremove');
-
 				if (player.nickname.length > 15) {
-					nickname.firstChild.classList.add('castle-player-nickname-autoscroll');
+					nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
 				}
 				
-				item.append(removeButton);
+				nickname.append(removeButton);
 				
 			}
 			
