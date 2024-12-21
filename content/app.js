@@ -7154,11 +7154,15 @@ class MM {
 			
 			if(NativeAPI.status){
 				
+				// Stop MM search
 				if(MM.active){
 					
 					MM.start();
 					
 				}
+
+				// Kill admin updater exe
+				NativeAPI.childProcess.exec(`taskkill /F /IM PW_NanoUpdaterAdm.exe`, (err, stdout, stderr) => {});
 				
 			}
 			
