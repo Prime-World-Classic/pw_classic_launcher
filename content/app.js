@@ -5539,6 +5539,22 @@ class NativeAPI {
 		path:'path',
 		
 	};
+
+	static setDefaultWindow(){
+
+		NativeAPI.window.width = 1920;
+		
+		NativeAPI.window.height = 1080;
+		
+		NativeAPI.window.setMinimumSize(1280,720);
+		
+		NativeAPI.window.setResizable(true);
+		
+		NativeAPI.window.setPosition('center');
+		
+		NativeAPI.window.enterFullscreen();
+
+	}
 	
 	static init(){
 		
@@ -5558,24 +5574,12 @@ class NativeAPI {
 		}
 		
 		NativeAPI.status = true;
-		
-		
-		
+				
 		NativeAPI.app = nw.App;
 		
 		NativeAPI.window = nw.Window.get();
 		
-		NativeAPI.window.width = 1920;
-		
-		NativeAPI.window.height = 1080;
-		
-		NativeAPI.window.setMinimumSize(1280,720);
-		
-		NativeAPI.window.setResizable(true);
-		
-		NativeAPI.window.setPosition('center');
-		
-		NativeAPI.window.enterFullscreen();
+		NativeAPI.setDefaultWindow();
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
@@ -7125,12 +7129,15 @@ class MM {
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
 		document.body.style.display = 'none';
+		NativeAPI.window.hide();
 	}
 
 	static gameStopEvent(){
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 		document.body.style.display = 'block';
+		NativeAPI.window.show();
+		NativeAPI.setDefaultWindow();
 	}
 	
 	static async init(){
