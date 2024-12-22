@@ -878,6 +878,8 @@ class View {
 			return;
 			
 		}
+
+		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, method == 'castle');
 		
 		let template = await View[method](value,value2);
 		
@@ -991,8 +993,6 @@ class View {
 			if (!Castle.gl) {
 				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
-			
-			Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, true);
 			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
@@ -2185,8 +2185,6 @@ class View {
 	}
 	
 	static async build(heroId,targetId = 0){
-
-		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, false);
 		
 		const body = DOM({style:'main-vertical'});
 		
