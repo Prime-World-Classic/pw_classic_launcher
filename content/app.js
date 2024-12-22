@@ -5753,17 +5753,16 @@ class NativeAPI {
 			NativeAPI.progress(-1);
 			
 			if( (code == 0) ){
-				
-				if (updated) {
-					NativeAPI.reset();
-				}
 				PWGame.isUpToDate = true;
-
 				App.notify('Обновление завершено');
 			} else {
 
-				NativeAPI.reset();
+				App.error('Ошибка обновления: ' + code);
 
+			}
+				
+			if (updated) {
+				NativeAPI.reset();
 			}
 			
 		});
@@ -7160,9 +7159,6 @@ class MM {
 					MM.start();
 					
 				}
-
-				// Kill admin updater exe
-				NativeAPI.childProcess.exec(`taskkill /F /IM PW_NanoUpdaterAdm.exe`, (err, stdout, stderr) => {});
 				
 			}
 			
