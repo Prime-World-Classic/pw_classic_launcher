@@ -992,7 +992,7 @@ class View {
 				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
 			
-			Castle.render[0] = true;
+			Castle.render[Castle.RENDER_LAYER_LAUNCHER] = true;
 			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
@@ -1331,7 +1331,7 @@ class View {
 	
 	static castleMusic(){
 		
-		let body = DOM({style:['castle-music','button-outline'],event:['click',() => Castle.toggleMusic()]});
+		let body = DOM({style:['castle-music','button-outline'],event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
 		
 		return body; 
 		
@@ -2179,7 +2179,7 @@ class View {
 	
 	static async build(heroId,targetId = 0){
 
-		Castle.render[0] = false;
+		Castle.render[Castle.RENDER_LAYER_LAUNCHER] = false;
 		
 		const body = DOM({style:'main-vertical'});
 		
@@ -5815,9 +5815,16 @@ class Castle {
 
 	static musicVolume = 0.5;
 
-	static currentVolume = this.musicVolume;
-
+	static RENDER_LAYER_LAUNCHER = 0;
+	static RENDER_LAYER_GAME = 1;
+	
 	static render = [true, true];
+
+	static MUSIC_LAYER_PLAYER = 0;
+	static MUSIC_LAYER_GAME = 1;
+	static MUSIC_LAYER_TAMBUR = 2;
+
+	static music = [true, true, true];
 	
 	static identityMatrix;
 	
@@ -5912,34 +5919,20 @@ class Castle {
 	static prevTime = Date.now();
 	
 	static deltaTime = 0;
-	
-	static doMove = false;
-	
-	static camDeltaPos = [0.0, 0.0];
-	
-	static camDeltaPosMinMax = [[-10, 10],[-10, 10]];
-	
-	static loadTime = Date.now();
-	
-	static currentTime = Date.now();
-	
-	static prevTime = Date.now();
-	
-	static deltaTime = 0;
-	
+
 	static scenesJson;
 	
 	static globalCanvas;
 
 	static sceneObjects = [];
 
-	static toggleMusic() {
-		if (this.currentVolume == 0.0) {
-			this.currentVolume = this.musicVolume;
+	static toggleMusic(layer, value) {
+		Castle.music[layer] = value ? value : !Castle.music[layer];
+		if (Castle.music.includes(false)) {
+			Sound.pause('castle');
 		} else {
-			this.currentVolume = 0.0;
+			Sound.unpause('castle');
 		}
-		Sound.setVolume('castle', Castle.currentVolume);
 	}
 	
 	static zoom(event) {
@@ -6302,7 +6295,6 @@ class Castle {
 				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
 				Sound.stop('castle');
 				Sound.play(musicName, {id:'castle',volume:Castle.musicVolume}, playCastleMusic)
-				Sound.setVolume(Castle.currentVolume);
 			}
 			playCastleMusic();
 		}
@@ -6571,7 +6563,7 @@ class Castle {
 	
 	static loop(){
 
-		let isStopRender = false in Castle.render;
+		let isStopRender = Castle.render.includes(false);
 		if (isStopRender) {
 			requestAnimationFrame(Castle.loop);
 			return;
@@ -7120,13 +7112,13 @@ class MM {
 	static activeSelectHero = 0;
 	
 	static gameRunEvent(){
-		Castle.render[1] = false;
-		Sound.pause('castle');
+		Castle.render[Castle.RENDER_LAYER_GAME] = false;
+		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
 	}
 
 	static gameStopEvent(){
-		Castle.render[1] = true;
-		Sound.unpause('castle');
+		Castle.render[Castle.RENDER_LAYER_GAME] = true;
+		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 	}
 	
 	static async init(){
@@ -7197,10 +7189,10 @@ class MM {
 	}
 	
 	static close(){
-		
+
 		Sound.stop('tambur');
 
-		Sound.setVolume('castle', Castle.musicVolume);
+		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
 		
 		MM.view.style.display = 'none';
 		
@@ -7686,7 +7678,7 @@ class MM {
 		
 		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume:0.50,loop:true});
 		
-		Sound.setVolume('castle', 0.0);
+		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, false);
 		
 		MM.show(body);
 		
