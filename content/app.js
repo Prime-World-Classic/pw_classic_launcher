@@ -992,7 +992,7 @@ class View {
 				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
 			
-			Castle.render[Castle.RENDER_LAYER_LAUNCHER] = true;
+			Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, true);
 			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
@@ -1003,7 +1003,7 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),View.castleHeroes(), View.castleMusic());
+		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),View.castleHeroes(), View.castleSettings());
 		
 		setTimeout(() => {
 			
@@ -1329,9 +1329,17 @@ class View {
 		
 	}
 	
-	static castleMusic(){
+	static castleSettings(){
 		
-		let body = DOM({style:['castle-music','button-outline'],event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
+		let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта",event:['click',() => View.exitOrLogout()]});
+		
+		let builds = DOM({style:['castle-builds','button-outline'], title: "Билды",event:['click',() => View.show('builds')]});
+		
+		let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка",event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
+		
+		let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]});
+		
+		let body = DOM({style:['castle-settings']}, close, builds, music, render);
 		
 		return body; 
 		
@@ -1418,6 +1426,32 @@ class View {
 		return body;
 		
 	}
+
+	static exitOrLogout(){
+		let logout = DOM({event:['click', async () => {
+			
+			App.exit();
+			
+			Splash.hide();
+			
+		}]},'Выйти из аккаунта');
+		
+		let close = DOM({event:['click',() => Splash.hide()]},'Отмена');
+		
+		let wrap = DOM({style:'wrap'},logout,close);
+
+		if (NativeAPI.status) {
+		
+			let exit = DOM({event:['click',() => NativeAPI.exit()]},'Выйти из игры');
+		
+			wrap = DOM({style:'wrap'},logout,exit,close);
+
+		}
+		
+		let dom = DOM({style:'div'},'',wrap);
+		
+		Splash.show(dom);
+	}
 	
 	static header(){
 		
@@ -1477,34 +1511,7 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
-		DOM({style:'main-header-item',event:['click',() => {
-			
-			
-			let logout = DOM({event:['click', async () => {
-				
-				App.exit();
-				
-				Splash.hide();
-				
-			}]},'Выйти из аккаунта');
-			
-			let close = DOM({event:['click',() => Splash.hide()]},'Отмена');
-			
-			let wrap = DOM({style:'wrap'},logout,close);
-
-			if (NativeAPI.status) {
-			
-				let exit = DOM({event:['click',() => NativeAPI.exit()]},'Выйти из игры');
-			
-				wrap = DOM({style:'wrap'},logout,exit,close);
-
-			}
-			
-			let dom = DOM({style:'div'},'',wrap);
-			
-			Splash.show(dom);
-			
-		}]},'Выйти')
+		DOM({style:'main-header-item',event:['click',() => View.exitOrLogout()]},'Выйти')
 		);
 		
 		return menu;
@@ -2102,7 +2109,7 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},App.storage.data.login),
 		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
-		DOM({style:'main-header-item',event:['click',() => App.exit()]},'Выйти')
+		DOM({style:'main-header-item',event:['click',() => View.exitOrLogout()]},'Выйти')
 		),
 		DOM({style:'main-body-full'},inventory)
 		);
@@ -2179,7 +2186,7 @@ class View {
 	
 	static async build(heroId,targetId = 0){
 
-		Castle.render[Castle.RENDER_LAYER_LAUNCHER] = false;
+		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, false);
 		
 		const body = DOM({style:'main-vertical'});
 		
@@ -5817,8 +5824,9 @@ class Castle {
 
 	static RENDER_LAYER_LAUNCHER = 0;
 	static RENDER_LAYER_GAME = 1;
+	static RENDER_LAYER_PLAYER = 2;
 	
-	static render = [true, true];
+	static render = [true, true, true];
 
 	static MUSIC_LAYER_PLAYER = 0;
 	static MUSIC_LAYER_GAME = 1;
@@ -5933,6 +5941,10 @@ class Castle {
 		} else {
 			Sound.unpause('castle');
 		}
+	}
+
+	static toggleRender(layer, value) {
+		Castle.render[layer] = value ? value : !Castle.render[layer];
 	}
 	
 	static zoom(event) {
@@ -7112,12 +7124,12 @@ class MM {
 	static activeSelectHero = 0;
 	
 	static gameRunEvent(){
-		Castle.render[Castle.RENDER_LAYER_GAME] = false;
+		Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
 	}
 
 	static gameStopEvent(){
-		Castle.render[Castle.RENDER_LAYER_GAME] = true;
+		Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 	}
 	
