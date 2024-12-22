@@ -7124,11 +7124,13 @@ class MM {
 	static gameRunEvent(){
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
+		document.body.style.display = 'none';
 	}
 
 	static gameStopEvent(){
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
+		document.body.style.display = 'block';
 	}
 	
 	static async init(){
