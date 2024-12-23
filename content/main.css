@@ -42,6 +42,9 @@ background-size:cover;
 height: 100vh;
 overflow: hidden;
 }
+.noselect {
+	user-select: none;
+}
 input,select{
 outline: none;
 appearance: none;
@@ -2275,7 +2278,6 @@ cursor:pointer;
 .chat-body-item div:first-child{
 	
 	color:rgba(255,255,255,0.7);
-	padding-right:1vw;
 	
 }
 

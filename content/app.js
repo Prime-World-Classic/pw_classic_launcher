@@ -979,6 +979,9 @@ class View {
 	
 	static async castle(){
 		
+
+		document.body.classList.add('noselect');
+		
 		View.setCss('content/castle.css');
 		
 		let body = DOM({tag:'div', id: 'castle-body'});
@@ -1053,21 +1056,20 @@ class View {
 			
 		}
 		
-		for(let player of players){
+		for(let p in players){
+			let player = players[p];
 			
 			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
 
-			const rankIcon = DOM({style:'castle-rank-icon'});
+			const rankIcon = DOM({style:'castle-play-rank-icon'});
 			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 			
 			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : '';
 			
-			let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'}, player.rating),rankIcon);
-			
-			let rankContainer = DOM({style:'castle-play-lobby-ranks'}, rank);
+			let rank = DOM({style:'castle-play-rank'},DOM({style:'castle-play-rank-lvl'}, player.rating),rankIcon);
 
 			if (player.rating) {
-				item.append(rankContainer);
+				item.append(rank);
 			}
 			
 			let status = DOM({style:['castle-party-middle-item-ready-notready', 'castle-party-middle-item-not-ready']},'Не готов');
@@ -1142,7 +1144,7 @@ class View {
 			}
 			else{
 				
-				item.innerHTML = '<div class="castle-play-lobby-empty">+</div>';
+				item.innerHTML = '<div class="castle-play-lobby-empty"><div>+</div></div>';
 				
 				status.style.opacity = 0;
 				
@@ -1163,9 +1165,13 @@ class View {
 			let nickname = DOM({style:'castle-party-middle-item-nickname'}, nicknameHideOverflowContainer);
 			
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
+
+			if (p > 0 && !players[p - 1].id) {
+				playerX.style.opacity = 0;
+			}
 			
 			if (player.nickname.length > 20) {
-				nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
+				nickname.firstChild.firstChild.classList.add('castle-name-autoscroll');
 			}
 
 			playerX.dataset.id = player.id;
@@ -1180,7 +1186,7 @@ class View {
 				})
 
 				if (player.nickname.length > 15) {
-					nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
+					nickname.firstChild.firstChild.classList.add('castle-name-autoscroll');
 				}
 
 				nickname.append(removeButton);
@@ -1196,7 +1202,7 @@ class View {
 				})
 
 				if (player.nickname.length > 15) {
-					nickname.firstChild.firstChild.classList.add('castle-player-nickname-autoscroll');
+					nickname.firstChild.firstChild.classList.add('castle-name-autoscroll');
 				}
 				
 				nickname.append(removeButton);
@@ -1318,7 +1324,7 @@ class View {
 				}
 				
 			})
-			
+
 			lobby.append(playerX);
 			
 		}
@@ -1401,7 +1407,11 @@ class View {
 			
 			for(const item of result){
 
-				const heroName = DOM({style:'castle-hero-name'}, item.name);
+				const heroName = DOM({style:'castle-hero-name'}, DOM({}, item.name));
+
+				if (item.name.length > 10) {
+					heroName.firstChild.classList.add('castle-name-autoscroll');
+				}
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
@@ -5297,7 +5307,7 @@ class Chat {
 	
 	static viewMessage(data){
 		
-		let nickname = DOM({tag:'div'},data.nickname);
+		let nickname = DOM({tag:'div'},data.nickname + ": ");
 		
 		let message = DOM({tag:'div'});
 		
@@ -5542,9 +5552,9 @@ class NativeAPI {
 
 	static setDefaultWindow(){
 
-		NativeAPI.window.width = 1920;
+		NativeAPI.window.width = 1280;
 		
-		NativeAPI.window.height = 1080;
+		NativeAPI.window.height = 720;
 		
 		NativeAPI.window.setMinimumSize(1280,720);
 		
