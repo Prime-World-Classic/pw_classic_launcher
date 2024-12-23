@@ -1630,22 +1630,22 @@ class View {
 			
 			img.append(rank);
 			
-			let status = DOM({style:'party-middle-item-not-ready'},'Не готов');
+			let status = DOM({style:'party-middle-item-not-ready'},DOM({},'Не готов'));
 			
 			if(item.id){
 				
 				if(item.ready){
 					
-					status.innerText = 'Готов';
+					status.firstChild.innerText = 'Готов';
 					
-					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == item.id){
 					
-					status.innerText = 'Готов';
+					status.firstChild.innerText = 'Готов';
 					
-					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 					
 				}
@@ -4967,9 +4967,9 @@ class Events {
 		
 		if(find){
 			
-			find.children[2].innerText = 'Готов';
+			find.children[2].firstChild.innerText = 'Готов';
 			
-			find.children[2].classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+			find.children[2].firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 			
 		}
 		
