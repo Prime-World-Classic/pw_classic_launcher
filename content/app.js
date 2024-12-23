@@ -1072,20 +1072,20 @@ class View {
 				item.append(rank);
 			}
 			
-			let status = DOM({style:['castle-party-middle-item-ready-notready', 'castle-party-middle-item-not-ready']},'Не готов');
+			let status = DOM({style:['castle-party-middle-item-ready-notready', 'castle-party-middle-item-not-ready']},DOM({},'Не готов'));
 			
 			if(player.id){
 				
 				if(player.ready){
 					
-					status.innerText = 'Готов';
+					status.firstChild.innerText = 'Готов';
 					
 					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == player.id){
 					
-					status.innerText = 'Готов';
+					status.firstChild.innerText = 'Готов';
 					
 					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
@@ -1345,7 +1345,7 @@ class View {
 		
 		let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]});
 		
-		let body = DOM({style:['castle-settings']}, close, builds, music, render);
+		let body = DOM({style:['castle-settings']}, close, render, music, builds);
 		
 		return body; 
 		
