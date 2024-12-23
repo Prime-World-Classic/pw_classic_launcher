@@ -333,7 +333,7 @@ background-color:rgba(15,15,15,0.7);
 	align-self: start;
 	width: 311px;
 	flex-flow:column nowrap;
-	font: 1.2rem / 1 Tahoma;
+	font: 1rem / 1 Tahoma;
 }
 
 .build-hero-stats-line{
