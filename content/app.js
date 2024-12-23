@@ -1888,7 +1888,7 @@ class View {
 			
 			hero.style.backgroundImage = `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.webp)`;
 			
-			let game = DOM({style:'history-item'},hero,DOM({style:'history-text-box',tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({style:'history-text-box',tag:'div'},Math.round((item.team == item.win) ? +item.rating : -item.rating * 10.0) / 10.0),DOM({style:'history-text-box',tag:'div'},new Date(item.added).toLocaleString()));
+			let game = DOM({style:'history-item'},hero,DOM({style:'history-text-box',tag:'div'},(item.team == 1) ? 'Докты' : 'Адорния'),DOM({style:'history-text-box',tag:'div'},Math.round(((item.team == item.win) ? +item.rating : -item.rating) * 10.0) / 10.0),DOM({style:'history-text-box',tag:'div'},new Date(item.added).toLocaleString()));
 			
 			if(item.team == item.win){
 				
