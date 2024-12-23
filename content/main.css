@@ -2399,6 +2399,13 @@ cursor:pointer;
 	}
 }
 
+@media (width >= 3440px) {
+	.build-buttons--wrapper {
+		margin-left: 38vw;
+		width: 19vw;
+	}
+}
+
 /* Zoom 50% (4k) */
 @media (width >= 3840px) {
 	.build-buttons--wrapper {
