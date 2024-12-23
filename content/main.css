@@ -2408,11 +2408,28 @@ cursor:pointer;
 	}
 }
 
+@media (height >= 1650px) {
+	.build-buttons--wrapper {
+		margin-top: 8vh;
+		height: 70px;
+	}
+}
+@media (height >= 1700px) {
+	.build-buttons--wrapper {
+		margin-top: 6vh;
+	}
+}
 /* Zoom 50% (4k) */
 @media (width >= 3840px) {
 	.build-buttons--wrapper {
 		margin-left: 36vw;
 		width: 17vw;
+	}
+}
+@media (height >= 2160px) {
+	.build-buttons--wrapper {
+		margin: 5vh 0 0 39vw;
+		height: 70px;
 	}
 }
 
