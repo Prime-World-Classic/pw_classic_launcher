@@ -1167,7 +1167,7 @@ class View {
 			let playerX = DOM({id:`PP${player.id}`,style:'castle-party-middle-item', title: nickname.innerText},nickname,item,status); 
 
 			if (p > 0 && !players[p - 1].id) {
-				playerX.style.opacity = 0;
+				playerX.style.display = 'none';
 			}
 			
 			if (player.nickname.length > 20) {
