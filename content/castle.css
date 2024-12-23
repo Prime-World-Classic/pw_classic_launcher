@@ -22,6 +22,7 @@
 
 .castle-settings div{
 	opacity: 50%;
+	margin: 0 1vh;
 }
 
 .castle-settings div:hover{ 
@@ -152,17 +153,25 @@
 }
 
 .castle-party-middle-item-ready-notready{
-	margin-top: 0.1vw;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 0.2vh;
 	text-align:center;
-	font:1.8vh / 1 Verdana;
-	padding: 0.5vh 0.4vh;
+	font:1.4vh / 1 Verdana;
 	text-shadow:rgba(0,0,0,0.3) 0 0 1vh;
 	font-weight:600;
 	font-style:italic;
 	cursor:pointer;
+}
+
+.castle-party-middle-item-ready-notready div{
+	width: 70%;
 	background:#244;
 	border:0.1vh solid orange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
+	padding: 0.3vh 0.1vh;
 }
 
 .castle-party-middle-item-ready{
@@ -364,13 +373,13 @@
 
 .castle-hero-name{
 	overflow: scroll;
-	height: 0.9vw;
+	height: 1.5vh;
 	background: #244;
 	border: 0.1vh solid darkorange;
 	border-radius: 150px 150px 154px 154px / 131px 131px 125px 125px;
 	color: #fdd;
-	font: 0.9vw / 1 Arial;
-	padding:0.1vw 0.5vw;
+	font: 1.5vh / 1 Arial;
+	padding:0.2vh 0.5vh;
 	white-space:nowrap;
 }
 
