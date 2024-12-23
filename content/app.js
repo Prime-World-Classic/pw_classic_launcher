@@ -1134,7 +1134,7 @@ class View {
 						
 					}
 					
-					status.innerText = 'Подтвердить';
+					status.firstChild.innerText = 'Подтвердить';
 					
 				}
 
