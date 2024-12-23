@@ -2422,7 +2422,7 @@ cursor:pointer;
 /* Zoom 50% (4k) */
 @media (width >= 3840px) {
 	.build-buttons--wrapper {
-		margin-left: 36vw;
+		margin-left: 39vw;
 		width: 17vw;
 	}
 }
