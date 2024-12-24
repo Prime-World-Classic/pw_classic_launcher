@@ -939,8 +939,16 @@ class View {
 		DOM({tag:'option',value:1},'Адорнийцы'),
 		DOM({tag:'option',value:2},'Докты')
 		);
+
+		let tgBotUrl = 'https://t.me/primeworldclassic_bot';
+
+		let telegramBotLink = DOM({style: 'telegram-bot', event:['click',() => {
+			window.open(tgBotUrl);
+		}]});
 		
 		let invite = DOM({tag:'input',placeholder:'Инвайт'});
+
+		let inviteContainer = DOM({style: 'invite-input'}, invite, telegramBotLink)
 		
 		let login = DOM({tag:'input',placeholder:'Никнейм'});
 		
@@ -952,7 +960,7 @@ class View {
 		
 		DOM({style:'login-box-forma-inputs'},
 		fraction,
-		invite,
+		inviteContainer,
 		login,
 		password,
 		password2,

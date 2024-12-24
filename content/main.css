@@ -50,6 +50,21 @@ outline: none;
 appearance: none;
 border: none;
 }
+.telegram-bot {
+	background-image: url('icons/tg.svg');
+	background-repeat: no-repeat;
+	position: relative;
+	width: 6vh;
+	margin-left: -7vh;
+	bottom: 0.8vh;
+	height: 6vh;
+	cursor: pointer;
+}
+
+.invite-input {
+	display: flex;
+	align-items: center;
+}
 
 rz{
 	color: yellowgreen;
@@ -117,7 +132,7 @@ height: 100vh;
 .login-box-forma{
 
 display: flex;
-height:50vh;
+height:80vh;
 flex-flow:row nowrap;
 align-items:center;
 justify-content: center;
@@ -134,7 +149,8 @@ justify-content: center;
 
 }
 .login-box-forma-inputs{
-	
+	display: flex;
+	flex-direction: column;
 	width:20vw;
 
 }
@@ -921,13 +937,13 @@ text-align:center;
 }
 
 .author{
-	
-
+	height: 0vh;
 	position:absolute;
+	bottom: 0;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
-	bottom:0;
-	margin-bottom:200px;
+	bottom: -10vh;
 	text-align:center;
+	margin-bottom:20vh;
 	color:rgba(255,255,255,0.5);
 	
 }
