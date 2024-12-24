@@ -1,4 +1,4 @@
-APP_VERSION = '3 (TEST)';
+APP_VERSION = '0';
 
 PW_VERSION = '2.0.0';
 
@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded',() => {
 	NativeAPI.init();
 	
 	NativeAPI.update((data) => {
-			
+		
 		if(View.updateProgress){
 			
 			Splash.hide();
@@ -19,7 +19,7 @@ window.addEventListener('DOMContentLoaded',() => {
 		if(data.update){
 			
 			View.updateProgress = View.progress();
-				
+			
 			View.updateProgress.firstChild.style.width = data.total+'%';
 			
 			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
@@ -5571,7 +5571,7 @@ class NativeAPI {
 		NativeAPI.window.setPosition('center');
 		
 		NativeAPI.window.enterFullscreen();
-
+		
 	}
 	
 	static init(){
@@ -5592,12 +5592,12 @@ class NativeAPI {
 		}
 		
 		NativeAPI.status = true;
-				
-		NativeAPI.app = nw.App;
 		
 		NativeAPI.window = nw.Window.get();
 		
 		NativeAPI.setDefaultWindow();
+		
+		NativeAPI.app = nw.App;
 		
 		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
 		
@@ -5694,7 +5694,7 @@ class NativeAPI {
 	}
 	
 	static exit(){
-		App.error('exit');
+		
 		if(!NativeAPI.status){
 			
 			return false;
@@ -5716,6 +5716,7 @@ class NativeAPI {
 		}
 		
 		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
+		
 		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false, curLabel;
 
 		App.notify('Проверка обновлений');
@@ -7317,7 +7318,16 @@ class MM {
 			}
 			*/
 			
-			Splash.show(DOM({tag:'div'},`Поиск боя возможен с Windows версии лаунчера!`));
+			let download = DOM({tag:'p'});
+			
+			download.innerHTML = 'Загрузите и установите последнюю Windows версию лаунчера всего один раз <a href="https://github.com/Prime-World-Classic/Prime-World/releases/download/2.0/install_2_0.exe">install_2_0.exe</a>, теперь вам не нужно будет делать лишних действий по обновлению игры, лаунчер все сделает автоматически.';
+			
+			Splash.show(DOM({style:'splash-text'},
+			DOM({tag:'h1'},`Необходима Windows версия лаунчера!`),
+			DOM({tag:'p'},`Мы отказались от поиска боя и запуска игры Prime World через браузер, так как у игроков регулярно возникали с этим проблемы.`),
+			DOM({tag:'p'},`Мы полностью перенесли браузерный лаунчер в полцноценное Windows приложение с автоматическим обновлением клиентской части Prime World.`),
+			download
+			),false);
 			
 			return;
 			
