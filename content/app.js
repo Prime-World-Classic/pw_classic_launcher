@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded',() => {
 			View.updateProgress.firstChild.style.width = data.total+'%';
 			
 			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
-
+			
 		}
 		
 	});
