@@ -2330,7 +2330,16 @@ cursor:pointer;
 	.build-buttons--wrapper {
 		margin-left: 21vw;
 	}
-
+}
+@media (width >= 1500px) {
+	.build-buttons--wrapper {
+		margin-left: 24vw;
+	}
+}
+@media (width >= 1600px) {
+	.build-buttons--wrapper {
+		margin-left: 26vw;
+	}
 }
 
 @media (height <= 1000px) {
