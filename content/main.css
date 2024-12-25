@@ -2326,6 +2326,22 @@ cursor:pointer;
 	}
 }
 
+@media (width >= 1366px) {
+	.build-buttons--wrapper {
+		margin-left: 21vw;
+	}
+
+}
+
+@media (height <= 1000px) {
+	#STAT,
+	.build-field-bottom::after
+	{
+		display: none;
+	}
+
+}
+
 @media (width > 1900px) {
 	.build-buttons--wrapper {
 		margin-left: 32.2vw;
@@ -2599,7 +2615,6 @@ cursor:pointer;
 	
 	.build-buttons--wrapper {
 		width: 470px;
-		margin-left: 23vw;
 	}
 
 	button.skins {
