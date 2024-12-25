@@ -1014,7 +1014,7 @@ class View {
 			
 		}
 		
-		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),View.castleHeroes(), View.castleSettings());
+		body.append(backgroundImage,Castle.canvas,await View.castlePlay(),View.castleChat(),await View.castleHeroes(), View.castleSettings());
 		
 		setTimeout(() => {
 			
@@ -1375,7 +1375,7 @@ class View {
 		
 	}
 	
-	static castleHeroes(){
+	static async castleHeroes(){
 		
 		let body = DOM({style:'castle-hero'}), preload = new PreloadImages(body);
 		
@@ -1431,7 +1431,7 @@ class View {
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
-				hero.addEventListener('click',() => View.show('build',item.id));
+				hero.addEventListener('click',async ()  => Splash.show(await View.build(item.id, 0, true), false));
 				
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
@@ -2202,11 +2202,11 @@ class View {
 		
 	}
 	
-	static async build(heroId,targetId = 0){
+	static async build(heroId,targetId = 0,isSplash = false){
 		
 		const body = DOM({style:'main-vertical'});
 		
-		await Build.init(heroId,targetId);
+		await Build.init(heroId,targetId,isSplash);
 		
 		// build-field-top ->    play,DOM({event:['click',() => View.show('main')]},'Закрыть окно билда [X]')
 		body.append(
@@ -2675,7 +2675,7 @@ class Build{
 		
 	}
 	
-	static async init(heroId,targetId){
+	static async init(heroId,targetId,isSplash){
 		
 		Build.talents = new Object();
 
@@ -2794,7 +2794,7 @@ class Build{
 		Build.applyStak = true;
 		Build.applyBuffs = true;
 		
-		Build.list(request.build);
+		Build.list(request.build, isSplash);
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -2872,7 +2872,7 @@ class Build{
 		
 	}
 	
-	static list(builds){
+	static list(builds, isSplash){
 
 		const newRandomSkinsButtons = DOM({tag: 'div', style: 'new-random-skins-buttons--wrapper'});
 
@@ -2956,8 +2956,12 @@ class Build{
 		Build.listView.append(buildButtonsWrapper);
 
 		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
-			View.show('builds'); 
 			Build.CleanInvalidDescriptions();
+			if (isSplash) {
+				Splash.hide();
+			} else {
+				View.show('builds'); 
+			}
 		}]},'[X]'));
 	}
 
