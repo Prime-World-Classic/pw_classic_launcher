@@ -2640,6 +2640,9 @@ cursor:pointer;
 	.build-hero {
 		width: 240px;
 	}
+	.build-hero .avatar {
+		margin-top: -20px;
+	}
 
 	.build-level {
 		height: 410px;
