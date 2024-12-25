@@ -2684,4 +2684,8 @@ cursor:pointer;
 		margin-top: -70px;
 	}
 
+	.build-active-bar-item:not(:empty)::after {
+		bottom: 11px;
+	}
+
 }
