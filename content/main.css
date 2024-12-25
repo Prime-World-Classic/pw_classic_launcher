@@ -324,7 +324,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero .name {
-	
+	margin-top: 10px;
 	text-align: center;
 	color: #fff;
 	font-family: Arial;
@@ -333,7 +333,7 @@ background-color:rgba(15,15,15,0.7);
 
 .build-hero .avatar{
 	width:200px;
-	
+	margin: auto;
 }
 
 .avatar {
@@ -2447,6 +2447,10 @@ cursor:pointer;
 	}
 }
 @media (height >= 1700px) {
+	.main-vertical {
+		margin-top: -7vh;
+	}
+
 	.build-buttons--wrapper {
 		margin-top: 6vh;
 	}
