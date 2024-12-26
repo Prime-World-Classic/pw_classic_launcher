@@ -5300,26 +5300,32 @@ class Chat {
 	static to = 0;
 	
 	static init(){
+
+		let scrollBtn = DOM({style: 'scroll-btn', event:['click',() => {
+			Chat.scroll(true);
+		}]}, '🡳');
 		
-		Chat.input = DOM({tag:'input',style:'chat-input',placeholder:'Введите текст и нажмите Enter'});
+		let input = DOM({tag:'input',style:'chat-input',placeholder:'Введите текст и нажмите Enter'});
+
+		Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn)
 		
 		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),Chat.input);
 		
-		Chat.input.addEventListener('input',() => {
+		input.addEventListener('keyup', async (event) => {
 			
-			if(!Chat.input.value){
+			if(event.code === 'Enter' || event.code === 'NumpadEnter'){
 				
-				Chat.to = 0;
+				Chat.sendMessage();
 				
 			}
 			
 		});
 		
-		Chat.input.addEventListener('keyup', async () => {
+		input.addEventListener('input',() => {
 			
-			if(event.code === 'Enter'){
+			if(!Chat.input.firstChild.value){
 				
-				Chat.sendMessage();
+				Chat.to = 0;
 				
 			}
 			
@@ -5420,7 +5426,7 @@ class Chat {
 			
 			Chat.body.lastChild.value = `@${data.nickname}, `;
 			
-			Chat.input.focus();
+			Chat.input.firstChild.focus();
 			
 		}]},nickname,message);
 		
@@ -5447,30 +5453,30 @@ class Chat {
 		});
 		
 		Chat.body.firstChild.prepend(item);
-		
-		item.scrollIntoView({block:'end',behavior:'smooth'});
+
+		Chat.scroll();
 		
 	}
 	
 	static async sendMessage(){
 		
-		if(Chat.input.value.length > 128){
+		if(Chat.input.firstChild.value.length > 128){
 			
 			return;
 			
 		}
 		
-		await App.api.request('user','chat',{message:Chat.input.value,to:Chat.to});
+		await App.api.request('user','chat',{message:Chat.input.firstChild.value,to:Chat.to});
 		
-		Chat.input.value = '';
+		Chat.input.firstChild.value = '';
 		
 	}
 	
-	static scroll(){
+	static scroll(forceScroll = false){
 		
-		if(Chat.body.firstChild.children.length){
+		if(Chat.body.firstChild.children.length && (forceScroll || Chat.body.firstChild.firstChild.offsetTop == Chat.body.firstChild.firstChild.offsetHeight)){
 			
-			Chat.body.firstChild.lastChild.scrollIntoView({block:'end',behavior:'smooth'});
+			Chat.body.firstChild.firstChild.scrollIntoView({block:'end',behavior:'smooth'});
 			
 		}
 		
