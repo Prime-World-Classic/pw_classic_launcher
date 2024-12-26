@@ -5842,7 +5842,7 @@ class NativeAPI {
 						
 					}
 					else if(json.type == 'error'){
-						App.error('Ошибка обновления: ' + json.data);
+						App.error('Ошибка обновления! Обратитесь в поддержку! ' + json.data);
 					}
 					
 				}
@@ -5851,7 +5851,7 @@ class NativeAPI {
 			
 		});
 		
-		spawn.on('close', (code) => {
+		spawn.on('close', async (code) => {
 			
 			callback({update:false,title:'',total:0});
 			
@@ -5859,7 +5859,7 @@ class NativeAPI {
 			
 			if( (code == 0) ){
 				try {
-					NativeAPI.testHashes();
+					await NativeAPI.testHashes();
 					PWGame.isUpToDate = true;
 					App.notify('Обновление завершено');
 				}
