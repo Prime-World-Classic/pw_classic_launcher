@@ -5376,6 +5376,12 @@ class Chat {
 			
 		}
 		
+		if(App.isAdmin(data.id)){
+			if((String(data.message).slice(0,5) == 'https') && (String(data.message).indexOf('.gif') == -1)){	
+				message.innerHTML = '<a target="_blank" href=' + data.message + '>' + data.message + '</a>';
+			}
+		}
+		
 		if(data.to == -1){
 			
 			message.style.color = 'rgb(255,50,0)';
