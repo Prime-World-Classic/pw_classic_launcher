@@ -871,7 +871,7 @@ class View {
 		
 	}
 	
-	static async show(method,value,value2){
+	static async show(method,value,value2,value3){
 		
 		if( !(method in View) ){
 			
@@ -881,7 +881,7 @@ class View {
 
 		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, method == 'castle');
 		
-		let template = await View[method](value,value2);
+		let template = await View[method](value,value2,value3);
 		
 		if(View.active){
 			
@@ -1431,7 +1431,7 @@ class View {
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
-				hero.addEventListener('click',async ()  => Splash.show(await View.build(item.id, 0, true), false));
+				hero.addEventListener('click',async ()  => View.show('build', item.id, 0, true));
 				
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
@@ -2991,7 +2991,7 @@ class Build{
 		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
 			Build.CleanInvalidDescriptions();
 			if (isSplash) {
-				Splash.hide();
+				View.show('castle'); 
 			} else {
 				View.show('builds'); 
 			}
