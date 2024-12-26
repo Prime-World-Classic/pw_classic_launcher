@@ -1353,6 +1353,20 @@ class View {
 		
 		let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]});
 		
+		let settings = DOM({style:['castle-settings-btn','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => {
+			let wrapper = DOM({style:['castle-settings-window']})
+			settings.append(wrapper);
+		}]});
+
+		
+		let input = DOM({style:'castle-input', tag:'input'});
+
+		input.type = 'range';
+
+		input.min='0';
+		input.max='1';
+		input.step='0.01';
+		
 		let body = DOM({style:['castle-settings']}, close, render, music, builds);
 		
 		return body; 
@@ -5424,7 +5438,7 @@ class Chat {
 			
 			Chat.to = data.id;
 			
-			Chat.body.lastChild.value = `@${data.nickname}, `;
+			Chat.body.lastChild.firstChild.value = `@${data.nickname}, `;
 			
 			Chat.input.firstChild.focus();
 			

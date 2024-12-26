@@ -21,6 +21,8 @@
 }
 
 .castle-settings div{
+	position: relative;
+	top: 1vh;
 	opacity: 50%;
 	margin: 0 1vh;
 }
@@ -66,9 +68,28 @@
 	cursor: pointer;
 }
 
+.castle-settings-btn{
+    width: 7vh;
+	height: 7vh;
+	background-image: url('htalents/8.webp');
+	background-size: cover;
+    object-fit: cover;
+	cursor: pointer;
+}
+.castle-settings-window{
+    width: 7vh;
+	height: 7vh;
+	background-color: #000;
+}
+
+.castle-input{
+	width: 7vh;
+    height: 0.1vh;
+}
+
 .button-outline:hover{
-	filter: drop-shadow(-0.1vh 0.1vh 0vh rgb(221, 255, 0))
-			drop-shadow(0.1vh -0.1vh 0vh rgb(221, 255, 0));
+	filter: drop-shadow(-0.1vh 0.1vh 0vh rgba(221, 255, 0, 0.5))
+			drop-shadow(0.1vh -0.1vh 0vh rgba(221, 255, 0, 0.5));
 	transition: 300ms;
 }
 .button-outline:not(:hover){
@@ -427,7 +448,7 @@
 	flex-flow:column nowrap;
 	margin-top:19vh;
 	height:62vh;
-	width:25vw;
+	width:50vh;
 	
 }
 
