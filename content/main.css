@@ -2305,14 +2305,14 @@ cursor:pointer;
 
 
 .chat-body-item{
-	margin-top: 1.2vh;
+	margin-top: 0.8vh;
 
 }
 
 .chat-body-item div{
 	
 	display:inline;
-	font:1.0vw / 1 Verdana;
+	font:2.0vh / 1 Verdana;
 	text-shadow:rgba(0, 0, 0, 0.3) 0 0 0.2vw;
 	transition: all 0.3s ease-out;
 	
