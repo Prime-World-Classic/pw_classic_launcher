@@ -2317,8 +2317,41 @@ class View {
 			}
 		}]}, 'Filter only banned');
 
+		let userMute = DOM({tag:'input', placeholder:'mute', event:['contextmenu', (e) => {
+			e.preventDefault();
+			if(App.isAdmin()){
+
+				let userId = parseInt(userMute.value);
+
+				if (!userId) {
+					return;
+				}
+
+				let users = document.getElementsByClassName('user-item');
+				
+				let userTag = Array.from(users).findIndex(x => x.firstChild.innerText ==='id' + userId);
+
+				let userNickname = users[userTag].children[3].value;
+				
+				let body = document.createDocumentFragment();
+				
+				body.append(DOM(`Выдать мут чата ${userNickname}?`),DOM({style:'splash-content-button',event:['click', async () => {
+					
+					await App.api.request('user','mute',{id:userId});
+					
+					App.notify('Выдан мут игроку ' + userNickname + '; id: ' + userId);
+					
+					Splash.hide();
+					
+				}]},'Да'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()]},'Нет'));
+				
+				Splash.show(body);
+				
+			}
+		}]}, '');
+
 		
-		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'), filter);
+		let body = DOM({style:'main'}), adm = DOM({style:'adm'},DOM({event:['click',() => View.show('castle')]},'[X]'), filter, userMute);
 		
 		let result = await App.api.request('user','all');
 		
