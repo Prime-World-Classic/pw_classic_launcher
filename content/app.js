@@ -5275,7 +5275,7 @@ class App {
 		
 		setTimeout(() => {
 			
-			let body = DOM({style:'error-message'},DOM({tag:'div'},`${message}`));
+			let body = DOM({style:'notify-message'},DOM({tag:'div'},`${message}`));
 			
 			setTimeout(() => {
 				
@@ -5536,6 +5536,10 @@ class PWGame {
 
 	static isValidated = false;
 
+	static isUpdateFailed = false;
+
+	static isTestHashesFailed = false;
+
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
 	
 	static async start(id, callback){
@@ -5784,21 +5788,20 @@ class NativeAPI {
 		
 	}
 
-	static async testHashes(){
-		await NativeAPI.fileSystem.promises.access(PWGame.PATH_TEST_HASHES);
-		
+	static testHashes() {
+		NativeAPI.fileSystem.promises.access(PWGame.PATH_TEST_HASHES);
+
 		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_TEST_HASHES);
-		
-		spawn.on('close', async (code) => {
-			
-			if( (code == 0) ){
+
+		spawn.on('close', (code) => {
+			if ((code == 0)) {
 				PWGame.isValidated = true;
-				App.notify('Проверка обновлений завершена');
+				App.notify('Проверка обновлений и файлов игры завершена');
 			} else {
-				throw code;
+				PWGame.isTestHashesFailed = true;
+				App.error('Проверка файлов не выполнена: ' + code);
 			}
-			
-		});
+	});
 	}
 	
 	static async update(callback){
@@ -5813,7 +5816,7 @@ class NativeAPI {
 		
 		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false, curLabel;
 
-		App.notify('Проверка обновлений');
+		App.notify('Проверка обновлений и файлов игры... Подождите');
 
 		spawn.stdout.on('data',(data) => {
 			
@@ -5858,9 +5861,6 @@ class NativeAPI {
 						}
 						
 					}
-					else if(json.type == 'error'){
-						App.error('Ошибка обновления! Обратитесь в поддержку! ' + json.data);
-					}
 					
 				}
 				
@@ -5875,14 +5875,15 @@ class NativeAPI {
 			NativeAPI.progress(-1);
 			
 			if( (code == 0) ){
+				PWGame.isUpToDate = true;
 				try {
-					PWGame.isUpToDate = true;
-					await NativeAPI.testHashes();
-				}
+					NativeAPI.testHashes();
+				} 
 				catch (e) {
-					App.error('Проверка файлов не выполнена: ' + e);
+					App.error('Неисправна проверка файлов: ' + e);
 				}
 			} else {
+				PWGame.isUpdateFailed = true;
 				App.error('Ошибка обновления: ' + code);
 
 			}
