@@ -915,10 +915,14 @@ class View {
 	}
 	
 	static authorization(){
+		let numEnterEvent = ['keyup', async (event) => {
+			if(event.code === 'Enter' || event.code === 'NumpadEnter') {
+				App.authorization(login,password);
+			}}];
 		
-		let login = DOM({tag:'input',placeholder:'Никнейм'}), password = DOM({tag:'input',placeholder:'Пароль',type:'password'});
+		let login = DOM({tag:'input',placeholder:'Никнейм',event: numEnterEvent}), password = DOM({tag:'input',placeholder:'Пароль',type:'password',event: numEnterEvent});
 		
-		return DOM({style:'login_box'},DOM({style:'login-box-forma'},DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.webp'})),
+		let authorizationForm = DOM({style:'login_box'},DOM({style:'login-box-forma'},DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.webp'})),
 		
 		DOM({style:'login-box-forma-inputs'},
 		login,
@@ -929,10 +933,15 @@ class View {
 			
 		}]},'Регистрация'))
 		)),DOM({style:'author'},`Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
-		
+
+		return authorizationForm;
 	}
 	
 	static registration(){
+		let numEnterEvent = ['keyup', async (event) => {
+			if(event.code === 'Enter' || event.code === 'NumpadEnter') {
+				App.registration(fraction,invite,login,password,password2);
+			}}];
 		
 		let fraction = DOM({tag:'select'},
 		DOM({tag:'option',value:0,disabled:true,selected:true},'Сторона'),
@@ -946,15 +955,15 @@ class View {
 			window.open(tgBotUrl);
 		}]});
 		
-		let invite = DOM({tag:'input',placeholder:'Инвайт'});
+		let invite = DOM({tag:'input',placeholder:'Инвайт', event: numEnterEvent});
 
 		let inviteContainer = DOM({style: 'invite-input'}, invite, telegramBotLink)
 		
-		let login = DOM({tag:'input',placeholder:'Никнейм'});
+		let login = DOM({tag:'input',placeholder:'Никнейм', event: numEnterEvent});
 		
-		let password = DOM({tag:'input',placeholder:'Пароль',type:'password'});
+		let password = DOM({tag:'input',placeholder:'Пароль',type:'password', event: numEnterEvent});
 		
-		let password2 = DOM({tag:'input',placeholder:'Еще раз пароль',type:'password'});
+		let password2 = DOM({tag:'input',placeholder:'Еще раз пароль',type:'password', event: numEnterEvent});
 		
 		return DOM({style:'login_box'},DOM({style:'login-box-forma'},
 		
@@ -965,7 +974,7 @@ class View {
 		password,
 		password2,
 		DOM({style:'login-box-forma-buttons'},
-		DOM({style:'login-box-forma-button',event:['click',() => App.registration(fraction,invite,login,password,password2)]},'Регистрация'),
+		DOM({style:'login-box-forma-button',event:['click',() => App.registration(fraction,invite,login,password,password2)]},'Зарегистрироваться'),
 		DOM({style:'login-box-forma-button',event:['click',() => View.show('authorization')]},'Назад')
 		)
 		),
