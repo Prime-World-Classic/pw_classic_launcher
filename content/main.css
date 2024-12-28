@@ -1056,11 +1056,11 @@ text-align:center;
 	
 }
 
-.error-message{
+.error-message, .notify-message{
 	
 	position:fixed;
 	width:94%;
-	margin:15px 3%;
+	margin:10vh 3%;
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:center;
@@ -1070,15 +1070,24 @@ text-align:center;
 	
 }
 
-.error-message div{
-	
-	background:rgba(255,0,0,0.8);
+.error-message div, .notify-message div{
 	padding: 1vmin 2vmin;
 	border-radius:15px;
 	font:1rem / 1 Verdana;
 	font-weight:800;
 	color:rgba(255,255,255,0.9);
 	text-align:center;
+}
+
+.error-message div{
+	
+	background:rgba(255,0,0,0.8);
+	
+}
+
+.notify-message div{
+	
+	background:#008cffcc;
 	
 }
 
@@ -2305,14 +2314,14 @@ cursor:pointer;
 
 
 .chat-body-item{
-	margin-top: 0.8vh;
+	margin-top: 1.2vh;
 
 }
 
 .chat-body-item div{
 	
 	display:inline;
-	font:2.0vh / 1 Verdana;
+	font:1.0vw / 1 Verdana;
 	text-shadow:rgba(0, 0, 0, 0.3) 0 0 0.2vw;
 	transition: all 0.3s ease-out;
 	
