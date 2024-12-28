@@ -5526,22 +5526,15 @@ class PWGame {
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
 	
-	static GAME_DATA_FILES_AND_HASHES = [
-		{hash: "c54566b54876aa390d58611211342b690b5d85f1565345bdaf61ae0d73e7b8d7", file: "..\\Game\\Packs\\data01.pile"},
-		{hash: "7871e941ea71e6608fba3ba6293fd3df35dddb38a8a8059edb3d90359182af7f", file: "..\\Game\\Packs\\data02.pile"},
-		{hash: "7f3627fd93a08f68e80adba55a4b0dc4d2bf948b22eb65fab298f40aa3300f7b", file: "..\\Game\\Packs\\data03.pile"},
-		{hash: "7c4661c3bf4381ca1791b3ac87ccdba09365d244358de0c43b9190adabba4b3e", file: "..\\Game\\Packs\\data04.pile"},
-		{hash: "d22125f365d01515cbc3dbc51d25bedf136fa66db9626aa95931bc5f7652ff72", file: "..\\Game\\Packs\\data05.pile"},
-		{hash: "1ce8b3feef92f5ccf9cf0788c84b482d31c02ada7cdfe9d38b4beded8648a88f", file: "..\\Game\\Packs\\data06.pile"},
-		{hash: "b9833eabe40d9a07366a96357777444e283b5ec91e350876a4962cf358bef9fb", file: "..\\Game\\Data\\Audio\\Asks_RU.fsb"},
-		{hash: "8a828a4873cb14d4384f4b4375e982fa528d22e2746617319a6465ba3f4654f8", file: "..\\Game\\Data\\Audio\\Music.fsb"},
-	];
+	static PATH_TEST_HASHES = './content/PW_HashTest.exe';
 
 	static gameServerHasConnection = false;
 
 	static gameConnectionTestIsActive = false;
 
 	static isUpToDate = false;
+
+	static isValidated = false;
 
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
 	
@@ -5574,8 +5567,17 @@ class PWGame {
 	}
 
 	static async checkUpdates() {
+		if (PWGame.isUpdateFailed) {
+			throw 'Не удалось обновить игру! Обратитесь в поддержку PWClassic';
+		}
+		if (PWGame.isTestHashesFailed) {
+			throw 'Файлы игры повреждены! Обратитесь в поддержку PWClassic';
+		}
 		if (!PWGame.isUpToDate) {
 			throw 'Проверка обновления не завершена! Подождите';
+		}
+		if (!PWGame.isValidated) {
+			throw 'Проверка файлов не завершена! Подождите';
 		}
 	}
 	
@@ -5781,27 +5783,22 @@ class NativeAPI {
 		return true;
 		
 	}
-	
-	static async checksumFile(algorithm, path) {
-		const getHash = path => new Promise((resolve, reject) => {
-			const hash = NativeAPI.crypto.createHash(algorithm);
-			const rs = NativeAPI.fileSystem.createReadStream(path);
-			rs.on('error', reject);
-			rs.on('data', chunk => hash.update(chunk));
-			rs.on('end', () => resolve(hash.digest('hex')));
-		   })
-		
-		return await getHash(path);
-	}
 
 	static async testHashes(){
-		for (let fileHash of PWGame.GAME_DATA_FILES_AND_HASHES) {
-			var trueHash = fileHash.hash;
-			const hashValue = await NativeAPI.checksumFile('sha256', fileHash.file);
-			if (hashValue != trueHash) {
-				throw 'Файл повреждён ' + fileHash.file;
+		await NativeAPI.fileSystem.promises.access(PWGame.PATH_TEST_HASHES);
+		
+		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_TEST_HASHES);
+		
+		spawn.on('close', async (code) => {
+			
+			if( (code == 0) ){
+				PWGame.isValidated = true;
+				App.notify('Проверка обновлений завершена');
+			} else {
+				throw code;
 			}
-		}
+			
+		});
 	}
 	
 	static async update(callback){
@@ -5879,12 +5876,11 @@ class NativeAPI {
 			
 			if( (code == 0) ){
 				try {
-					await NativeAPI.testHashes();
 					PWGame.isUpToDate = true;
-					App.notify('Обновление завершено');
+					await NativeAPI.testHashes();
 				}
 				catch (e) {
-					App.error('Ошибка обновления: ' + e);
+					App.error('Проверка файлов не выполнена: ' + e);
 				}
 			} else {
 				App.error('Ошибка обновления: ' + code);
@@ -7372,7 +7368,7 @@ class MM {
 			if (PWGame.gameConnectionTestIsActive) {
 				return;
 			}
-			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate) {
+			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) {
 				MM.button.innerText = 'Проверка';
 			}
 			
@@ -7394,7 +7390,7 @@ class MM {
 			catch(error){
 				PWGame.gameConnectionTestIsActive = false;
 				
-				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate) { // Неудача
+				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) { // Неудача
 					MM.button.innerText = 'В бой!';
 				}
 				
