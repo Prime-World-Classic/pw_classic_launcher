@@ -1686,19 +1686,47 @@ cursor:pointer;
 	
 	background: linear-gradient(90deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
 	background-size: 400% 400%;
-	animation: gradient 10s ease infinite;
 	transform: translate3d(0, 0, 0);
 	
 }
 
 .animation-text{
-	
-	background-image: linear-gradient(90deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background: linear-gradient(90deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
 	background-clip:text;
 	background-size: 400% 400%;
-	animation: gradient 10s ease infinite;
 	transform: translate3d(0, 0, 0);
 	
+}
+
+.owner-text {
+	background-color: rgb(255, 50, 0);
+	background-clip:text;
+	background-size: 400% 400%;
+	transform: translate3d(0, 0, 0);
+}
+
+.administration-text {
+	background-color: rgb(255, 136, 0);
+	background-clip:text;
+	background-size: 400% 400%;
+	transform: translate3d(0, 0, 0);
+}
+
+.administration-text:before, .owner-text:before {
+    content: '';
+	background-image: url('icons/2497.webp');
+	background-size:contain;
+	background-repeat: no-repeat;
+	display: inline-block;
+	height: 2vh;
+	width: 2vh;
+	margin-right: 0.2vh;
+	margin-left: 0.2vh;
+	margin-bottom: -0.2vh;
+}
+
+.gradient-animation-render-heavy {
+	animation: gradient 10s ease infinite;
 }
 
 .top{
@@ -2321,7 +2349,7 @@ cursor:pointer;
 .chat-body-item div{
 	
 	display:inline;
-	font:1.0vw / 1 Verdana;
+	font:2vh / 1 Verdana;
 	text-shadow:rgba(0, 0, 0, 0.3) 0 0 0.2vw;
 	transition: all 0.3s ease-out;
 	
@@ -2346,7 +2374,7 @@ cursor:pointer;
 
 .chat-body-item div:last-child{
 	
-	color:rgba(255,255,255,0.9);
+	color:rgba(255, 255, 255, 0.9);
 	
 }
 

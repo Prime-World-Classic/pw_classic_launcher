@@ -5427,19 +5427,21 @@ class Chat {
 		}
 		
 		if(data.id == 1){
+
+			nickname.style.color = 'transparent';
+
+			nickname.style.fontWeight = 600;
 			
-			message.style.color = 'rgb(255,50,0)';
-			
-			message.style.fontWeight = 600;
+			nickname.classList.add('owner-text');
 			
 		}
 		else if(App.isAdmin(data.id)){
+
+			nickname.style.color = 'transparent';
+
+			nickname.style.fontWeight = 600;
 			
-			message.style.color = 'transparent';
-			
-			message.style.fontWeight = 600;
-			
-			message.classList.add('animation-text');
+			nickname.classList.add('administration-text');
 			
 		}
 		
@@ -5490,6 +5492,8 @@ class Chat {
 		}
 		
 		await App.api.request('user','chat',{message:Chat.input.firstChild.value,to:Chat.to});
+
+		Chat.to = 0;
 		
 		Chat.input.firstChild.value = '';
 		
