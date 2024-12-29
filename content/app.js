@@ -890,8 +890,6 @@ class View {
 			View.activeAnimation.addEventListener('finish',() => {
 				
 				View.active.remove();
-
-				Castle.isStaticSMCached = false;
 				
 				View.active = template;
 				
@@ -1454,7 +1452,7 @@ class View {
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
-				hero.addEventListener('click',async ()  => View.show('build', item.id, 0, true));
+				hero.addEventListener('click',async ()  => Window.show('main', 'build', item.id, 0, true));
 				
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
@@ -2227,16 +2225,27 @@ class View {
 	
 	static async build(heroId,targetId = 0,isSplash = false){
 		
-		const body = DOM({style:'main-vertical'});
+		const body = DOM({style:'build-horizontal'});
 		
 		await Build.init(heroId,targetId,isSplash);
 		
 		// build-field-top ->    play,DOM({event:['click',() => View.show('main')]},'Закрыть окно билда [X]')
 		body.append(
-		DOM({style:'build-field-top'},Build.listView),
-		DOM({style:'build'},Build.heroView,Build.levelView,Build.fieldView,Build.inventoryView,Build.rarityView),
-		DOM({style:'build-field-bottom'},Build.activeBarView)
+		DOM({style:'build-left'},Build.heroView),
+		DOM({style:'build-center'}, DOM({style:'build-field-with-tabs'}, Build.listView, DOM({style:'build-field-container'}, Build.levelView,Build.fieldView)), Build.activeBarView),
+		DOM({style:'build-right'},DOM({style:'build-library-container'}, Build.inventoryView,Build.rarityView, Build.buildActionsView))
 		);
+
+		if (!isSplash) {
+			body.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
+				Build.CleanInvalidDescriptions();
+				if (isSplash) {
+					View.show('castle'); 
+				} else {
+					View.show('builds'); 
+				}
+			}]},'[X]'));
+		}
 		
 		return body;
 		
@@ -2436,6 +2445,36 @@ class View {
 		
 	}
 	
+}
+
+class Window {
+	static windows = {}
+	
+	static async show(category,method,value,value2,value3) {
+		
+		if( !(method in Window) ){
+			
+			return;
+			
+		}
+		
+		let template = await Window[method](value,value2,value3);
+
+		if(category in Window.windows){
+
+			Window.windows[category].remove();
+			
+		}
+		
+		Window.windows[category] = template;
+			
+		View.active.append(template);
+	}
+	
+	static async build(heroId,targetId = 0,isSplash = false) {
+		let viewBuild = await View.build(heroId, targetId, isSplash);
+		return DOM({id: 'wbuild'}, viewBuild);
+	}
 }
 
 class Rank {
@@ -2750,21 +2789,21 @@ class Build{
 		}
 		
 		document.body.append(Build.descriptionView);
-		
-		Build.listView = document.createElement('div');
-		Build.listView.classList.add('build-list');
 	
 		Build.heroView = document.createElement('div');
-		
 		Build.heroView.classList.add('build-hero');
 		
 		Build.levelView = document.createElement('div');
-		
 		Build.levelView.classList.add('build-level');
 		
 		Build.fieldView = document.createElement('div');
-		
 		Build.fieldView.classList.add('build-field');
+		
+		Build.listView = document.createElement('div');
+		Build.listView.classList.add('build-list');
+
+		Build.buildActionsView = document.createElement('div');
+		Build.buildActionsView.classList.add('build-actions-view');
 		
 		Build.fieldConflict = new Object();
 	
@@ -2851,6 +2890,7 @@ class Build{
 		Build.applyBuffs = true;
 		
 		Build.list(request.build, isSplash);
+		Build.inventoryView.append(Build.buildActions(request.build));
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -2927,9 +2967,8 @@ class Build{
 		Splash.show(bodyHero,false);
 		
 	}
-	
-	static list(builds, isSplash){
 
+	static buildActions(builds){
 		const newRandomSkinsButtons = DOM({tag: 'div', style: 'new-random-skins-buttons--wrapper'});
 
 		if(builds.length < 6){
@@ -2976,8 +3015,12 @@ class Build{
 		}]});
 		newRandomSkinsButtons.append(random);
 
-		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
-		buildButtonsWrapper.append(newRandomSkinsButtons)
+		return newRandomSkinsButtons;
+	}
+	
+	static list(builds, isSplash){
+
+		const buildButtonsWrapper = DOM({style: 'build-list'});
 
 		for(let build of builds){
 			
@@ -3000,7 +3043,7 @@ class Build{
 				View.show('build',Build.heroId,build.id);
 			}
 
-			buildButtonsWrapper.append(div);
+			Build.listView.append(div);
 
 		}
 		setTimeout(_ => {
@@ -3008,17 +3051,6 @@ class Build{
 				document.querySelector('.button-build--wrapper').classList.add('highlight');
 			}
 		}, 300);
-
-		Build.listView.append(buildButtonsWrapper);
-
-		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
-			Build.CleanInvalidDescriptions();
-			if (isSplash) {
-				View.show('castle'); 
-			} else {
-				View.show('builds'); 
-			}
-		}]},'[X]'));
 	}
 
 	static totalStat(stat){
@@ -5105,7 +5137,8 @@ class App {
 			
 			try{
 				
-				View.show('castle');
+				//View.show('castle');
+				View.show('build', 1);
 				
 			}
 			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
@@ -9106,7 +9139,6 @@ class Game {
 	
 }
 
-
 class Splash{
 	
 	static init(){
@@ -9161,7 +9193,6 @@ class Splash{
 	}
 	
 }
-
 
 function DOM(properties){
 	
@@ -9236,6 +9267,8 @@ function DOM(properties){
 	
 }
 
+// Castle
+{
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -14791,3 +14824,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
+}
