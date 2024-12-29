@@ -2233,7 +2233,12 @@ class View {
 		body.append(
 		DOM({style:'build-left'},Build.heroView),
 		DOM({style:'build-center'}, DOM({style:'build-field-with-tabs'}, Build.listView, DOM({style:'build-field-container'}, Build.levelView,Build.fieldView)), Build.activeBarView),
-		DOM({style:'build-right'},DOM({style:'build-library-container'}, Build.inventoryView,Build.rarityView, Build.buildActionsView))
+		DOM({style:'build-right'}, 
+			Build.skinView, 
+			Build.rarityView, 
+			Build.inventoryView, 
+			Build.buildActionsView
+				)
 		);
 
 		if (!isSplash) {
@@ -2837,16 +2842,16 @@ class Build{
 		Build.inventoryView = document.createElement('div');
 		Build.inventoryView.classList.add('build-talent');
 
-		const newSkin = DOM({
+		Build.skinView = DOM({
 				tag: 'button',
-				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
+				style: ['btn-skins', 'btn-hover', 'color-3'],
 				title: 'Образы на героя',
 				event:['click', async () => Build.skinChange()]
 			},
 			'Скины'
 		)
 
-		Build.inventoryView.append(newSkin, buttonsTalentsAndSets, buildTalents);
+		Build.inventoryView.append(buttonsTalentsAndSets, buildTalents);
 
 
 		// ================================================
@@ -2890,7 +2895,7 @@ class Build{
 		Build.applyBuffs = true;
 		
 		Build.list(request.build, isSplash);
-		Build.inventoryView.append(Build.buildActions(request.build));
+		Build.buildActions(request.build);
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -2969,13 +2974,14 @@ class Build{
 	}
 
 	static buildActions(builds){
-		const newRandomSkinsButtons = DOM({tag: 'div', style: 'new-random-skins-buttons--wrapper'});
-
 		if(builds.length < 6){
 			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 				Splash.hide();
 			}]}, '[x]');
-			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'], title: 'Создать новую вкладку билда',  event:['click', () => {
+			const create = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
+				title: 'Создать новую вкладку билда',  
+				src: 'content/icons/plus.svg',
+				event:['click', () => {
 					
 				let template = document.createDocumentFragment();
 				
@@ -3003,19 +3009,37 @@ class Build{
 				
 			}]});
 
-			newRandomSkinsButtons.append(create);
+			Build.buildActionsView.append(create);
 		}
 
-		const random = DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], title: 'Сгенерировать случайный билд', event:['click', async () => {
+		const random = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
+			title: 'Сгенерировать случайный билд', 
+			src: 'content/icons/dice.svg',
+			event:['click', async () => {
 			
 			await App.api.request('build','random',{id:Build.id});
 			
 			View.show('build',Build.heroId);
 			
 		}]});
-		newRandomSkinsButtons.append(random);
+		Build.buildActionsView.append(random);
 
-		return newRandomSkinsButtons;
+
+		const resetBuild = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
+			title: 'Сбросить таланты в этом билде', 
+			src: 'content/icons/trash.svg',
+			event:['click', async () => {
+				const reset = DOM({event:['click', async () => {
+					await App.api.request('build','clear',{id:Build.id});
+					View.show('build',Build.heroId);
+					Splash.hide();
+				}]}, 'Сбросить')
+				const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
+				const wrap = DOM({style: 'wrap'}, reset, close);
+				const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
+				Splash.show(dom)
+			}]});
+		Build.buildActionsView.append(resetBuild);
 	}
 	
 	static list(builds, isSplash){
@@ -3025,7 +3049,7 @@ class Build{
 		for(let build of builds){
 			
 			const item = DOM(
-				{tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']},
+				{tag: 'button', style: ['build-tab-item', 'btn-hover', 'color-2']},
 				`${build.name}`,
 			);
 
@@ -3463,7 +3487,7 @@ class Build{
 			
 		}
 		
-		Build.heroName = DOM({tag: 'p', style: 'name'});
+		Build.heroName = DOM({tag: 'div', style: 'name'});
 		
 		if(MM.hero){
 			
@@ -3511,7 +3535,7 @@ class Build{
 		
 		Build.heroImg.append(rank);
 		
-		const wrapper = DOM({tag: 'div'},Build.heroImg,Build.heroName);
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg,Build.heroName);
 		
 		Build.heroView.append(
 			wrapper,
@@ -3851,7 +3875,7 @@ class Build{
 				
 				item.dataset.position = index;
 				
-				item.classList.add('build-field-item');
+				item.classList.add('build-hero-grid-item');
 				
 				if(data[index]){
 					
@@ -3863,49 +3887,6 @@ class Build{
 				
 				row.append(item);
 				
-				if(index == 0){
-					
-					item.style.borderRadius = '18px 0 18px 0';
-					
-				}
-				else if([1,2,3,4].includes(index)){
-					
-					item.style.borderRadius = '0 0 18px 18px';
-					
-				}
-				else if(index == 5){
-					
-					item.style.borderRadius = '0 18px 0 18px';
-					
-				}
-				else if([11,17,23,29].includes(index)){
-					
-					item.style.borderRadius = '18px 0 0 18px';
-					
-				}
-				else if(index == 35){
-					
-					item.style.borderRadius = '18px 0 18px 0';
-					
-				}
-				else if([31,32,33,34].includes(index)){
-					
-					item.style.borderRadius = '18px 18px 0 0';
-					
-				}
-				else if(index == 30){
-					
-					item.style.borderRadius = '0 18px 0 18px';
-					
-				}else if([6,12,18,24].includes(index)){
-					
-					item.style.borderRadius = '0 18px 18px 0';
-					
-				}else{
-					
-					item.style.borderRadius = '18px';
-					
-				}
 
 				Build.installedTalents[index] = data[index];
 
@@ -4089,22 +4070,6 @@ class Build{
 			
 		}
 		
-		const reset = document.createElement('img');
-		reset.title = 'Сбросить таланты в этом билде';
-		reset.src = 'content/icons/trash.svg';
-		reset.classList.add('reset');
-		reset.addEventListener('click', async () => {
-			const reset = DOM({event:['click', async () => {
-				await App.api.request('build','clear',{id:Build.id});
-				View.show('build',Build.heroId);
-				Splash.hide();
-			}]}, 'Сбросить')
-			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
-			const wrap = DOM({style: 'wrap'}, reset, close);
-			const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
-			Splash.show(dom)
-		});
-		Build.rarityView.append(reset);
 	}
 	
 	static activeBar(data){
