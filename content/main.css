@@ -454,63 +454,45 @@ background-color:rgba(15,15,15,0.7);
 	padding-right: 20px;
 }
 
-.new-random-skins-buttons--wrapper {
-	display: flex;
-	flex-direction: row;
-}
-
-
-button.skins
-{
-	margin-top: -100px;
-	font-weight: bold;
-	font-size: 20px;
-}
-button.new-build {
-	color: #eee;
-	font-size: 70px;
-	background-image: url(icons/plus.svg) !important;
+button.build-action-item {
 	background-color: #279aac !important;
-	background-size: 77px;
-	background-position-x: -8px;
-	background-position-y: -7px;
+	background-size: 15cqw;
 	background-repeat: no-repeat;
-	line-height: 0;
-	width: 62px;
-	height: 62px;
-	margin-right: 5px;
-}
-button.new-build:hover {
-	transform: rotate(20deg);
-}
-button.random-build {
-	background: transparent;
-	border: 0;
-	background-image: url(icons/dice.svg) !important;
-	background-color: #279aac;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-size: 45px;
-	background-position: 9px;
-	width: 63px;
-	height: 63px;
 	box-shadow: none !important;
+	width: 15cqw;
+	height: 15cqw;
+}
+button.build-action-item:hover {
+	transform: scale(1.1);
+}
+
+.reset-build {
+	height: 30px;
+	left: 40vw;
+	bottom: 20px;
+	color: #bbb;
+	font-size: 18px;
+	user-select: none;
+	padding: 10px;
+	border-radius: 50%;
+	margin-top: 40px;
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	cursor: pointer;
-	opacity: .8;
+}
+.reset-build:hover {
+	background: #a224;
+	color: #fdd;
+	font-size: 19px;
+}
+.reset-build:active {
+	background: #c225;
 }
 
-button.skins {
-	position: absolute;
-	margin-top: -60px;
-	margin-left: 228px;
-	animation: glowing 4000ms infinite;
-}
-
-button.skins,
+button.btn-skins,
 button.talents,
 button.sets {
 	font-weight: bold;
-	font-size: 21px;
+	font-size: 5cqw;
 }
 
 .build-list {
@@ -522,18 +504,37 @@ button.sets {
 	overflow-x: scroll;
 }
 
-.build-list .build-list-item:not(.new-build, .random-build) {
-	border-top-left-radius: 13px !important;
-	border-top-right-radius: 13px !important;
+.build-tab-item {
+	border-top-left-radius: 1cqh !important;
+	border-top-right-radius: 1cqh !important;
 	border-bottom-left-radius: 0 !important;
 	border-bottom-right-radius: 0 !important;
 	margin: 0;
-	padding: 0 10px 0 10px;
+	padding: 0 1cqh 0 1cqh;
 	width: auto;
-	height: 40px;
-	font-size: 17px;
+	height: 4cqh;
+	font-size: 2cqh;
 	overflow: hidden;
+	position: relative;
+	bottom: -1cqh;
+    color: #fff;
+    cursor: pointer;
+    text-align:center;
 }
+
+
+
+.btn-skins {
+    width: 25cqmax;
+    margin: 1cqh;
+    height: 55px;
+    background-size: 300% 100%;
+    color: #fff;
+
+    border-radius: 50px;
+	opacity: .8;
+}
+
 .build-list::-webkit-scrollbar {
 	background-color: rgba(0, 51, 0, 0.479);
 	height: 0.5vh;
@@ -542,17 +543,17 @@ button.sets {
 	background-color: #030;
 }
 
-.button-build--wrapper:not(.highlight) .build-list-item {
+.button-build--wrapper:not(.highlight) .build-action-item {
 	background-image: linear-gradient(to top, #244, #163) !important;
 }
-.button-build--wrapper.highlight .build-list-item {
+.button-build--wrapper.highlight .build-action-item {
 	border: 1px solid darkorange !important;
 }
-.button-build--wrapper .build-list-item {
+.button-build--wrapper .build-action-item {
 	width: 160px !important;
 }
 
-.build-list-item{
+.build-action-item{
 	font-family: Arial;
     border-radius: 15px;
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
@@ -560,7 +561,7 @@ button.sets {
 .button-build--wrapper {
 	height: 40px;
 }
-.button-build--wrapper.highlight .build-list-item {
+.button-build--wrapper.highlight .build-action-item {
 	border-bottom-width: 0 !important;
 }
 
@@ -620,7 +621,7 @@ button.sets {
 .build-field-row{
 	width: 100cqw;
 	height: calc(100cqw / 6);
-	container-type: inline-size;
+	container-type: size;
 	display:flex;
 	flex-flow:row nowrap;
 	align-items: center;
@@ -631,12 +632,21 @@ button.sets {
 .build-field-row.highlight {
 	background: #4789;
 }
+.build-hero-grid-item {
+	width: 100cqh;
+	height: 100cqh;
+	container-type: size;
+}
+.build-hero-grid-item .build-talent-item{
+	background-size: 80cqw;
+}
 
 .build-field-item{
 	width: calc(80cqw / 6);
 	height: calc(80cqw / 6);
 	margin: calc(10cqw / 6);
-	container-type: inline-size;
+	container-type: size;
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -715,27 +725,28 @@ button.sets {
 	cursor:pointer;
 }
 
-.build .build-talent-item[data-active='1']:after {
+.build-field-item .build-talent-item[data-active='1']:after {
 	content: '';
-	background-image: url('icons/activeBorder.webp');
+	position: absolute;
+	width: 110cqh;
+	height: 110cqh;
+	background-image: url('icons/activeBorder.svg');
+	background-size: 110cqh;
+	margin: -5cqh -5cqh;
 	display: block;
 	background-repeat: no-repeat;
-	margin-left: 1cqh;
 }
 
 .build-rarity{
-	margin: 0px 0 0 18px;
-	min-width:48px;
-	width:48px;
 	display:flex;
-	flex-flow:column nowrap;
+	flex-flow:row nowrap;
 }
 
 .build-rarity div{
-	width: 38px;
-	height: 38px;
+	width: 8cqw;
+	height: 8cqw;
 	border-radius:50%;
-	margin:5px 0;
+	margin:0 1cqw;
 	cursor:pointer;
 }
 
@@ -745,36 +756,14 @@ button.sets {
 	line-height: 39px;
 	color:rgba(255,255,255,0.8);
 }
-.build-rarity .reset {
-	height: 30px;
-	left: 40vw;
-	bottom: 20px;
-	color: #bbb;
-	font-size: 18px;
-	user-select: none;
-	padding: 10px;
-	border-radius: 50%;
-	margin-top: 40px;
-	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-	cursor: pointer;
-}
-.build-rarity .reset:hover {
-	background: #a224;
-	color: #fdd;
-	font-size: 19px;
-}
-.build-rarity .reset:active {
-	background: #c225;
-}
 
 .build-description{
-	
-	width:300px;
+	width: 30vh;
 	font:0.8rem / 1.3 Tahoma;
 	background:rgba(15,15,15,0.9);
 	color:rgba(255,255,255,0.8);
-	padding:10px 15px;
-	border-radius:15px;
+	padding:1vh 0 1vh 2vh;
+	border-radius:2vh;
 	
 }
 
@@ -2042,99 +2031,6 @@ cursor:pointer;
   
 }
 
-/*
-от  - до
-1200 - и больше
-992 - 1199
-768 - 991
-576 - 767
-480 - 575
-414 - 479
-375 - 413
-320 - 374
-*/
-
-/* для экранов с шириной 768 - 991 */
-@media screen and (max-width: 991px) {
-    /* главное меню */
-
-    /* кнопки делает блочными и растягивает */
-    .main-header {
-        display: inline-block;
-        width: 94%;
-    }
-
-    /* отступ между кнопками*/
-    .main-header-item,
-    .game-button {
-        margin-bottom: 1vmin;
-    }
-
-    /* отступ, чтобы было видно самые нижние таланты, 
-    а то мешала загрузка или уходило за экран */
-    .rating {
-        height: 55vh;
-    }
-
-    /* из-за длинных ников, становились криво ник и очки,
-    теперь они будут записываться в 2 ряда и по центру */
-    .rating-item-score {
-        flex-direction: column;
-    }
-
-    /* Просто чтобы таланты были чуть ровнее */
-    .rating-item-inventory {
-        justify-content: space-around;
-    }
-
-    /* Отступ, чтобы было видно количество осколков */
-    .rating-item-inventory div {
-        margin: 0px 10px 40px 10px;
-    }
-
-    /* выравнивает дискорд */
-    .main-body-item-social {
-        width: 100%;
-        height: 53vh;
-        margin-top: 24px;
-    }
-
-
-    /* инвентарь */
-
-    /* центрирует таланты
-    + делает, чтобы было видно нижние таланты */
-    .inventory {
-        justify-content: space-around;
-        margin-bottom: 80px;
-    }
-
-
-    /* фарм */
-
-    /* позволит увидеть весь текст и кнопки */
-    .game-description {
-        width: 90%;
-    }
-
-    /* в игре фарм, когда начал */
-    .game {
-        width: 100%;
-        height: 100%;
-    }
-
-    /* позволит увидеть все поле с талантами */
-    element.style {
-        height: 600px;
-        width: 768px;
-        transform: scale(0.65);
-    }
-
-}
-
-
-
-
 
 .buttons {
     margin: 10%;
@@ -2142,28 +2038,11 @@ cursor:pointer;
 }
 
 .btn-hover {
-    width: 200px;
-    font-size: 19px;
-    color: #fff;
-    cursor: pointer;
-    margin: 20px;
-    height: 55px;
-    text-align:center;
-    border: none;
-    background-size: 300% 100%;
-
-    border-radius: 50px;
     transition: all .4s ease-in-out;
-	opacity: .8;
 }
-
 .btn-hover:hover {
-    background-position: 100% 0;
-    transition: all .4s ease-in-out;
-}
-
-.btn-hover:focus {
-    outline: none;
+	transform: scale(1.1);
+	z-index: 1;
 }
 
 .btn-hover.color-1 {
@@ -2382,8 +2261,7 @@ cursor:pointer;
 	container-type: inline-size;
 	width: 25cqw;
 	display: flex;
-	flex-direction:row-reverse;
-
+	flex-direction:column;
 }
 
 .build-hero{
@@ -2395,7 +2273,12 @@ cursor:pointer;
 	align-items:center;
 }
 
-.build-hero .name {
+.build-hero-avatar-and-name {
+	display: flex;
+	flex-direction: column;
+}
+
+.build-hero-avatar-and-name .name {
 	text-align: center;
 	color: #fff;
 	font-family: Arial;
@@ -2426,4 +2309,16 @@ cursor:pointer;
 
 .build-right {
 	width: 25cqmax;
+	height: 100cqh;
+	container-type: inline-size;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.build-actions-view {
+	width: 100cqw;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
 }
