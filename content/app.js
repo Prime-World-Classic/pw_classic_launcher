@@ -2235,6 +2235,7 @@ class View {
 		DOM({style:'build-center'}, DOM({style:'build-field-with-tabs'}, Build.listView, DOM({style:'build-field-container'}, Build.levelView,Build.fieldView)), Build.activeBarView),
 		DOM({style:'build-right'}, 
 			Build.skinView, 
+			Build.talentsAndSetsView,
 			Build.rarityView, 
 			Build.inventoryView, 
 			Build.buildActionsView
@@ -2817,30 +2818,30 @@ class Build{
 		const buttonTalents = document.createElement('button');
 		buttonTalents.innerText = 'Таланты';
 		buttonTalents.title = 'TODO еще не готово - команда PW Classic работает над этим';
-		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
+		buttonTalents.classList.add('btn-talents', 'btn-hover', 'color-1');
 		buttonTalents.title = 'Библиотека талантов';
 
 		const separator = document.createElement('div');
 		separator.innerText = '|';
-		separator.classList.add('separator');
+		separator.classList.add('btn-separator');
 
 
 		const buttonSets = document.createElement('button');
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO еще не готово - команда PW Classic работает над этим';
-		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
+		buttonSets.classList.add('btn-sets', 'btn-hover', 'color-1');
 		
 		buttonSets.addEventListener('click',() => Build.sets());
 
-		const buttonsTalentsAndSets = document.createElement('div');
-		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
-		buttonsTalentsAndSets.append(buttonTalents, separator, buttonSets);
+		Build.talentsAndSetsView = document.createElement('div');
+		Build.talentsAndSetsView.classList.add('buttons-talents-and-sets');
+		Build.talentsAndSetsView.append(buttonTalents, separator, buttonSets);
 
 		const buildTalents = document.createElement('div');
 		buildTalents.classList.add('build-talents');
 
 		Build.inventoryView = document.createElement('div');
-		Build.inventoryView.classList.add('build-talent');
+		Build.inventoryView.classList.add('build-talent-view');
 
 		Build.skinView = DOM({
 				tag: 'button',
@@ -2851,7 +2852,7 @@ class Build{
 			'Скины'
 		)
 
-		Build.inventoryView.append(buttonsTalentsAndSets, buildTalents);
+		Build.inventoryView.append(buildTalents);
 
 
 		// ================================================
@@ -2980,7 +2981,6 @@ class Build{
 			}]}, '[x]');
 			const create = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
 				title: 'Создать новую вкладку билда',  
-				src: 'content/icons/plus.svg',
 				event:['click', () => {
 					
 				let template = document.createDocumentFragment();
@@ -3009,37 +3009,60 @@ class Build{
 				
 			}]});
 
+			let backgroundImg = DOM({style: ['btn-create', 'build-action-item-background']});
+			backgroundImg.style.backgroundImage = `url('content/icons/plus.svg')`;
+			create.append(backgroundImg);
+
+
 			Build.buildActionsView.append(create);
 		}
 
-		const random = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
-			title: 'Сгенерировать случайный билд', 
-			src: 'content/icons/dice.svg',
-			event:['click', async () => {
-			
-			await App.api.request('build','random',{id:Build.id});
-			
-			View.show('build',Build.heroId);
-			
-		}]});
-		Build.buildActionsView.append(random);
+		{
+			const random = DOM({
+				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
+				title: 'Сгенерировать случайный билд',
+				event: ['click', async () => {
+
+					await App.api.request('build', 'random', { id: Build.id });
+
+					View.show('build', Build.heroId);
+
+				}]
+			});
+
+			let backgroundImg = DOM({ style: ['btn-random', 'build-action-item-background'] });
+			backgroundImg.style.backgroundImage = `url('content/icons/dice.svg')`;
+			random.append(backgroundImg);
+
+			Build.buildActionsView.append(random);
+		}
 
 
-		const resetBuild = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
-			title: 'Сбросить таланты в этом билде', 
-			src: 'content/icons/trash.svg',
-			event:['click', async () => {
-				const reset = DOM({event:['click', async () => {
-					await App.api.request('build','clear',{id:Build.id});
-					View.show('build',Build.heroId);
-					Splash.hide();
-				}]}, 'Сбросить')
-				const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
-				const wrap = DOM({style: 'wrap'}, reset, close);
-				const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
-				Splash.show(dom)
-			}]});
-		Build.buildActionsView.append(resetBuild);
+		{
+			const resetBuild = DOM({
+				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
+				title: 'Сбросить таланты в этом билде',
+				event: ['click', async () => {
+					const reset = DOM({
+						event: ['click', async () => {
+							await App.api.request('build', 'clear', { id: Build.id });
+							View.show('build', Build.heroId);
+							Splash.hide();
+						}]
+					}, 'Сбросить')
+					const close = DOM({ event: ['click', () => Splash.hide()] }, 'Отмена')
+					const wrap = DOM({ style: 'wrap' }, reset, close);
+					const dom = DOM({ style: 'div' }, 'Сбросить таланты в этом билде?', wrap);
+					Splash.show(dom)
+				}]
+			});
+
+			let backgroundImg = DOM({ style: ['btn-trash', 'build-action-item-background'] });
+			backgroundImg.style.backgroundImage = `url('content/icons/trash.svg')`;
+			resetBuild.append(backgroundImg);
+
+			Build.buildActionsView.append(resetBuild);
+		}
 	}
 	
 	static list(builds, isSplash){
