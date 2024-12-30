@@ -431,18 +431,11 @@ background-color:rgba(15,15,15,0.7);
 .build-list-close {
 	color: #fff;
 	position: absolute;
-	top: 10px;
-	right: 90px;
+	top: 1cqh;
+	right: 1cqw;
 	cursor: pointer;
 }
-.build-field-top {
-	width: 97vw;
-	height: 180px;
-}
 
-.build-field-bottom {
-	margin: 44px 0 34px 166px;
-}
 .build-field-bottom:after {
 	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст\a(автоматическое применение)';
 	font-size: .75rem;
@@ -456,44 +449,66 @@ background-color:rgba(15,15,15,0.7);
 
 button.build-action-item {
 	background-color: #279aac !important;
-	background-size: 15cqw;
+	background-size: 30cqmin;
 	background-repeat: no-repeat;
 	box-shadow: none !important;
-	width: 15cqw;
-	height: 15cqw;
+	width: 15cqmin;
+	height: 15cqmin;
+	border-width: 0;
+	margin: 1cqmin;
+	cursor: pointer;
+	box-shadow: 0 0 2cqmin rgba(0, 0, 0, 0.3);
+	container-type: size;
 }
+
 button.build-action-item:hover {
 	transform: scale(1.1);
 }
 
-.reset-build {
-	height: 30px;
-	left: 40vw;
-	bottom: 20px;
-	color: #bbb;
-	font-size: 18px;
-	user-select: none;
-	padding: 10px;
-	border-radius: 50%;
-	margin-top: 40px;
-	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-	cursor: pointer;
+.build-action-item-background {
+	width: 90cqh;
+	height: 90cqh;
+	background-repeat: no-repeat;
+	background-position: center;
 }
-.reset-build:hover {
-	background: #a224;
-	color: #fdd;
-	font-size: 19px;
+.btn-create {
+	background-position: -3cqw 0;
 }
-.reset-build:active {
-	background: #c225;
+.btn-random {
+	background-position: 2cqw 0;
+}
+.btn-trash {
+	background-position: -3cqw 0;
 }
 
-button.btn-skins,
-button.talents,
-button.sets {
-	font-weight: bold;
-	font-size: 5cqw;
+
+.buttons-talents-and-sets {
+	display: flex;
+	justify-content: center;
 }
+
+.btn-separator {
+	color: #dfdfdf;
+	font-size: 6cqmax;
+	line-height: 7cqmax;
+	cursor: default;
+}
+
+.btn-skins,
+.btn-talents,
+.btn-sets {
+    width: 30cqmin;
+    height: 8cqmin;
+	font-weight: bold;
+	font-size: 4cqmin;
+	color:white;
+    margin: 1cqh;
+    border-radius: 4cqmin;
+    background-size: 300% 100%;
+	cursor: pointer;
+	border-width: 0;
+}
+
 
 .build-list {
 	display: flex;
@@ -523,18 +538,6 @@ button.sets {
 }
 
 
-
-.btn-skins {
-    width: 25cqmax;
-    margin: 1cqh;
-    height: 55px;
-    background-size: 300% 100%;
-    color: #fff;
-
-    border-radius: 50px;
-	opacity: .8;
-}
-
 .build-list::-webkit-scrollbar {
 	background-color: rgba(0, 51, 0, 0.479);
 	height: 0.5vh;
@@ -543,23 +546,13 @@ button.sets {
 	background-color: #030;
 }
 
-.button-build--wrapper:not(.highlight) .build-action-item {
-	background-image: linear-gradient(to top, #244, #163) !important;
-}
-.button-build--wrapper.highlight .build-action-item {
-	border: 1px solid darkorange !important;
-}
-.button-build--wrapper .build-action-item {
-	width: 160px !important;
-}
-
 .build-action-item{
 	font-family: Arial;
-    border-radius: 15px;
+    border-radius: 3cqh;
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 }
 .button-build--wrapper {
-	height: 40px;
+	height: 4.5cqh;
 }
 .button-build--wrapper.highlight .build-action-item {
 	border-bottom-width: 0 !important;
@@ -661,28 +654,26 @@ button.sets {
 	cursor:pointer;
 }
 
-.build-talent{
+.build-talent-view{
 	overflow: hidden;
+	container-type: inline-size;
+	width: 95cqw;
+	border-radius: 2cqh;
+	height: 60cqh;
+	margin: 1cqh 0;
 }
+
 .build-talents {
 	display: flex;
 	flex-flow: row wrap;
-	height: 660px;
 	overflow: auto;
+	height: 100cqh;
 	background: #33333352;
-	border-radius: 4%;
-	width: 97%;
 }
 
-.buttons-talents-and-sets {
-	display: flex;
-	justify-content: center;
-}
-.buttons-talents-and-sets .separator {
-	color: #fff;
-	font-size: 50px;
-	cursor: default;
-	opacity: .7;
+.build-talents .build-talent-item {
+	width: calc(80cqw / 5);
+	height: calc(80cqw / 5);
 }
 
 
@@ -2262,6 +2253,7 @@ cursor:pointer;
 	width: 25cqw;
 	display: flex;
 	flex-direction:column;
+	justify-content: center;
 }
 
 .build-hero{
@@ -2271,6 +2263,7 @@ cursor:pointer;
 	display:flex;
 	flex-flow:column nowrap;
 	align-items:center;
+	justify-content: center;
 }
 
 .build-hero-avatar-and-name {
@@ -2314,10 +2307,12 @@ cursor:pointer;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 }
 
 .build-actions-view {
 	width: 100cqw;
+	container-type: inline-size;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
