@@ -315,7 +315,8 @@ background-color:rgba(15,15,15,0.7);
 	width:30cqmin;
 	height:30cqmin;
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-position: center;
+	background-size: contain;
 	justify-self: center;
 	
 }
@@ -324,11 +325,11 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats{
 	display:flex;
 	flex-flow:column nowrap;
-	width: 60cqw;
 	font: 4cqw / 1 Tahoma;
 	
 	container-type: inline-size;
 	width: 100cqmin;
+	height: 80cqh;
 	align-items: center;
 }
 
@@ -340,22 +341,20 @@ background-color:rgba(15,15,15,0.7);
 	
 	container-type: inline-size;
 	width: 60cqw;
-	height: 8cqw;
+	height: 4cqh;
+	font-size: 2cqh;
 }
 .build-hero-stats-line:nth-child(n+10) {
 	border-bottom: 1px solid #777;
 }
 .build-hero-stats-line:nth-last-child(-n+3) {
-	box-shadow: 0 0 25px rgba(200,200,200,0.2);
-	border-radius: 15px;
+	box-shadow: 0 0 2cqmin rgba(200,200,200,0.2);
+	border-radius: 1cqmin;
 	cursor: pointer;
 }
 .build-hero-stats-line .wrapper {
 	position: absolute;
-	border: 1px solid #000;
-	padding: 5px;
-	left: 27vw;
-	bottom: 6vh;
+	border: 0.5cqmin solid #000;
 	color: #fff;
 	background: #333b;
 	cursor: pointer;
@@ -397,8 +396,8 @@ background-color:rgba(15,15,15,0.7);
 
 
 .build-hero-stats-daw {
-	width:10cqw;
-	height:10cqw;
+	width:4cqh;
+	height:4cqh;
 	padding: 3px;
 	border-radius:50%;
 	margin-right:5px;
@@ -661,6 +660,7 @@ button.build-action-item:hover {
 	border-radius: 2cqh;
 	height: 60cqh;
 	margin: 1cqh 0;
+	
 }
 
 .build-talents {
@@ -669,11 +669,12 @@ button.build-action-item:hover {
 	overflow: auto;
 	height: 100cqh;
 	background: #33333352;
+	justify-content: center;
 }
 
 .build-talents .build-talent-item {
-	width: calc(80cqw / 5);
-	height: calc(80cqw / 5);
+	width: 9cqh;
+	height: 9cqh;
 }
 
 
@@ -744,7 +745,8 @@ button.build-action-item:hover {
 .build-rarity-other {
 	background:rgba(255,255,255,0.1);
 	text-align:center;
-	line-height: 39px;
+	font-size: 5cqw;
+	line-height: auto;
 	color:rgba(255,255,255,0.8);
 }
 
@@ -2269,6 +2271,10 @@ cursor:pointer;
 .build-hero-avatar-and-name {
 	display: flex;
 	flex-direction: column;
+	width: 100cqw;
+	height: 20cqh;
+	container-type: inline-size;
+	align-items: center;
 }
 
 .build-hero-avatar-and-name .name {
