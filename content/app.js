@@ -2224,7 +2224,7 @@ class View {
 	}
 	
 	static async build(heroId,targetId = 0,isSplash = false){
-		
+
 		const body = DOM({style:'build-horizontal'});
 		
 		await Build.init(heroId,targetId,isSplash);
@@ -2466,6 +2466,10 @@ class Window {
 		
 		let template = await Window[method](value,value2,value3);
 
+		let closeButton = DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
+			Window.windows[category].remove();
+		}]},'[X]');
+
 		if(category in Window.windows){
 
 			Window.windows[category].remove();
@@ -2474,7 +2478,7 @@ class Window {
 		
 		Window.windows[category] = template;
 			
-		View.active.append(template);
+		View.active.append(template, closeButton);
 	}
 	
 	static async build(heroId,targetId = 0,isSplash = false) {
