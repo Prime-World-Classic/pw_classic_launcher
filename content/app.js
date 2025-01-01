@@ -2469,7 +2469,7 @@ class Window {
 		let closeButton = DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
 			Window.windows[category].remove();
 		}]},'[X]');
-
+		template.append(closeButton);
 		if(category in Window.windows){
 
 			Window.windows[category].remove();
@@ -2478,7 +2478,7 @@ class Window {
 		
 		Window.windows[category] = template;
 			
-		View.active.append(template, closeButton);
+		View.active.append(template);
 	}
 	
 	static async build(heroId,targetId = 0,isSplash = false) {
