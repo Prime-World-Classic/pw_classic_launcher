@@ -1888,20 +1888,6 @@ class View {
 		}
 		
 		body.append(View.header(),DOM({style:'main-body-column'},top,party));
-		// setTimeout(() => {
-		// 	MM.lobby({id:1,users:{
-		// 	1:{nickname:'ifst',hero:4,ready:1,rating:1100,select:false,team:1},
-		// 	10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
-		// 	1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
-		// 	2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
-		// 	4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
-		// 	5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
-		// 	6:{nickname:'Stagven_YouTube',hero:2,ready:1,rating:1100,select:false,team:2},
-		// 	7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
-		// 	8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
-		// 	9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-		// 	},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
-		// }, 5000);
 		
 		return body;
 		
@@ -5096,7 +5082,44 @@ class App {
 		await Protect.init();
 		
 		await MM.init();
-		
+		/*
+		setTimeout(() => {
+			
+		 	MM.lobby({id:1,users:{
+		 	1:{nickname:'ifst',hero:3,ready:1,rating:1100,select:false,team:1},
+		 	10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+		 	1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
+		 	2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
+		 	4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
+		 	5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+		 	6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2},
+		 	7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
+		 	8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
+		 	9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
+		 	},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+			
+		 }, 1000);
+		 
+		setTimeout(() => {
+			
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			MM.chat({id:2,message:'тестовое сообщение'});
+			
+			
+			
+		},2000);
+		*/
 		Chat.init();
 		
 		await App.api.init();
@@ -7807,7 +7830,7 @@ class MM {
 		
 		MM.chatBody = DOM({style:'mm-lobby-middle-chat-body'});
 		
-		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите сообщение и нажмите <Enter>'})
+		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите текст и нажмите <Enter>'})
 		
 		chatInput.addEventListener('keyup', async (event) => {
 			
@@ -7833,7 +7856,7 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},MM.renderMap()),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
 		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume:0.50,loop:true});
 		
@@ -7862,6 +7885,22 @@ class MM {
 			}
 			
 		}
+		
+	}
+	
+	static renderMap(){
+		
+		let body = DOM({style:'map'}), container = DOM({tag:'div'},body);
+		
+		container.setAttribute('style','width:37vh;height:37vh');
+		
+		for(let number of [1,2,3,4,5,6]){
+			
+			body.append(DOM({style:`map-item-${number}`}));
+			
+		}
+		
+		return container;
 		
 	}
 	
@@ -8026,11 +8065,11 @@ class MM {
 		
 		if(data.id == 1){
 			
-			message.style.color = 'red';
+			message.style.color = 'rgba(255, 50, 0, 0.9)';
 			
 		}
 		
-		let item = DOM({style:'mm-lobby-middle-chat-body-item'},DOM(`${MM.lobbyUsers[data.id].nickname}`),message);
+		let item = DOM({style:'mm-lobby-middle-chat-body-item'},DOM(`${MM.lobbyUsers[data.id].nickname}:`),message);
 		
 		MM.chatBody.append(item);
 		
