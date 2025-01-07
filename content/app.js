@@ -4943,6 +4943,54 @@ class Events {
 		
 	}
 	
+	static MMPosition(data){
+		
+		if(!NativeAPI.status){
+			
+			return;
+			
+		}
+		
+		if(MM.renderBody){
+			
+			for(let item of MM.renderBody.children){
+				
+				if(item.dataset.player == data.id){
+					
+					item.dataset.player = 0;
+					
+					item.style.backgroundImage = 'none';
+					
+					item.style.transform = 'scale(1)';
+					
+				}
+				
+				if(data.position != 0){
+					
+					if(item.dataset.position == data.position){
+						
+						let findPlayer = document.getElementById(`PLAYER${data.id}`);
+						
+						if(findPlayer){
+							
+							item.dataset.player = data.id;
+							
+							item.style.backgroundImage = (findPlayer.dataset.hero != 0) ? `url(content/hero/${findPlayer.dataset.hero}/1.webp)` : `url(content/hero/empty.webp)`;
+							
+							item.style.transform = 'scale(1.5)';
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
 	static MMHero(data){
 		
 		if(!NativeAPI.status){
@@ -5069,7 +5117,7 @@ class Events {
 
 class App {
 	
-	static async init(){
+	static async init(){ // ws://192.168.3.16:3737
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
 		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
@@ -7273,6 +7321,8 @@ class MM {
 	
 	static button = document.createElement('div');
 	
+	static renderBody = false;
+	
 	static active = false;
 	
 	static targetPlayerAnimate = false;
@@ -7890,13 +7940,21 @@ class MM {
 	
 	static renderMap(){
 		
-		let body = DOM({style:'map'}), container = DOM({tag:'div'},body);
+		MM.renderBody = DOM({style:'map'});
+		
+		let container = DOM({tag:'div'},MM.renderBody);
 		
 		container.setAttribute('style','width:37vh;height:37vh');
 		
 		for(let number of [1,2,3,4,5,6]){
 			
-			body.append(DOM({style:`map-item-${number}`}));
+			let item = DOM({style:`map-item-${number}`,data:{player:0,position:number},event:['click', async () => {
+				
+				await App.api.request('mm','position',{id:MM.id,position:(item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position});
+				
+			}]})
+			
+			MM.renderBody.append(item);
 			
 		}
 		
@@ -8003,17 +8061,36 @@ class MM {
 		
 		let findPlayer = document.getElementById(`PLAYER${data.id}`);
 		
+		let url = `url(content/hero/${data.heroId}/1.webp)`;
+		
 		if(findPlayer){
 			
 			findPlayer.dataset.hero = data.heroId;
 			
-			findPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.webp)`;
+			findPlayer.firstChild.style.backgroundImage = url;
 			
 			findPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 			
 			findPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
+		
+		if(MM.renderBody){
+			
+			for(let item of MM.renderBody.children){
+				
+				if(item.dataset.player == data.id){
+					
+					item.style.backgroundImage = url;
+					
+					break;
+					
+				}
+				
+			}
+			
+		}
+		
 		/*
 		let oldHero = MM.lobbyUsers[data.id].hero, countHero = 0;
 		
