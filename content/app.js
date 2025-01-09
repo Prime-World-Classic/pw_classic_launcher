@@ -2426,6 +2426,8 @@ class View {
 
 class Rank {
 	
+	static name = ['','Рекрут','Наёмник','Рядовой','Капрал','Сержант','Лейтенант','Капитан','Майор','Подполковник','Полковник','Генерал','Маршал','Бог'];
+	
 	static icon(rating){
 		
 		if(rating <= 1199){
@@ -2488,6 +2490,12 @@ class Rank {
 			return 12;
 			
 		}
+		
+	}
+	
+	static getName(rating){
+		
+		return Rank.name[Rank.icon(rating)];
 		
 	}
 	
@@ -7829,13 +7837,33 @@ class MM {
 		
 		MM.lobbyHeroes = DOM({style:'mm-lobby-middle-hero'});
 		
-		let preload = new PreloadImages(MM.lobbyHeroes);
+		//let preload = new PreloadImages(MM.lobbyHeroes);
+		
+		let activeRankName = '';
 		
 		for(let item of MM.hero){
 			
-			let hero = DOM({id:`HERO${item.id}`,data:{ban:0}});
+			let getRankName = Rank.getName(item.rating);
+			
+			if(getRankName != activeRankName){
+				
+				let rankIcon = DOM({style:'mm-lobby-middle-hero-line-icon'});
+				
+				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+				
+				let rankIcon2 = DOM({style:'mm-lobby-middle-hero-line-icon'});
+				
+				rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+				
+				MM.lobbyHeroes.append(DOM({style:'mm-lobby-middle-hero-line'},rankIcon,DOM(`${getRankName}`),rankIcon2));
+				
+				activeRankName = getRankName;
+				
+			}
+			
+			let hero = DOM({id:`HERO${item.id}`,data:{ban:0},style:'mm-lobby-middle-hero-item'});
 
-			hero.dataset.url = `content/hero/${item.id}/1.webp`;
+			hero.style.backgroundImage = `url("content/hero/${item.id}/1.webp")`;
 			
 			hero.onclick = async () => {
 				
@@ -7847,15 +7875,13 @@ class MM {
 				
 			}
 			
-			let rankIcon = DOM({style:'rank-icon'});
-			
-			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-			
-			let rank = DOM({style:'rank'},rankIcon);
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating));
 			
 			hero.append(rank);
 			
-			preload.add(hero);
+			MM.lobbyHeroes.append(hero);
+			
+			//preload.add(hero);
 			
 		}
 		
