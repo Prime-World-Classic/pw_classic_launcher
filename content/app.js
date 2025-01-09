@@ -5085,7 +5085,7 @@ class Events {
 
 	static stat(data) {
 		
-		document.getElementById('STAT').innerText = `Онлайн: ${data.online}, Матчмейкинг (очередь): ${data.player}, Пати: ${data.party} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
+		document.getElementById('STAT').innerText = `В сети: ${data.online}, Матчмейкинг: ${data.player} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
 		
 	}
 	
