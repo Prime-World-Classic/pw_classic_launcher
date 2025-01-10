@@ -1395,7 +1395,7 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	height:20vh;
 	overflow-y:scroll;
 	border-radius:0 1vw 0 0;
-	background:rgba(255,255,255,0.1);
+	background:linear-gradient(rgba(255,255,255,0.1),rgba(255,255,255,0.3));
 	
 }
 
@@ -1505,12 +1505,24 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	justify-content:center;
 	align-items:center;
 	width:33.33vw;
-	margin:2vw 0;
-	font: 1.8vw / 1 Verdana;
+	margin:1vw 0;
+	font: 1.5vw / 1 Verdana;
     color: rgba(255,255,255,0.8);
     text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
-	background-color: rgba(34, 68, 68, 0.9);
-	margin:auto;
+	
+	
+	
+}
+
+.mm-lobby-middle-hero-line div:first-child{
+	
+	border-radius:50% 0 0 50%;
+	
+}
+
+.mm-lobby-middle-hero-line div:last-child{
+	
+	border-radius:0 50% 50% 0;
 	
 }
 
@@ -1520,9 +1532,17 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
     height: 3vw;
     background-position: center;
     background-repeat: no-repeat;
-	background-size: cover;
-	margin:0 1vw;
+	background-size: 70%;
+	background-color: rgba(34, 68, 68, 0.9);
     
+	
+}
+
+.mm-lobby-middle-hero-line-name{
+	height: 3vw;
+	line-height: 3vw;
+	padding:0 1vw;
+	background-color: rgba(34, 68, 68, 0.9);
 	
 }
 
@@ -1941,6 +1961,7 @@ cursor:pointer;
 	background-size:90%;
 	background-position:center;
 	background-repeat:no-repeat;
+	
 	
 }
 
@@ -2421,14 +2442,13 @@ cursor:pointer;
 	
 	width:100%;
 	height:100%;
+	position:relative;
+	box-shadow: 0 0 0.5vw rgba(0,0,0, 0.9);
 	background-image:url('img/map.png');
 	background-position:center;
 	background-repeat:no-repeat;
 	background-size:107%;
 	border-radius:50%;
-	position:relative;
-	border: 0.1vw solid rgba(0,0,0, 0.5);
-	box-shadow: 0 0 2vw rgba(0,0,0, 0.8);
 	
 }
 
