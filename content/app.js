@@ -7729,9 +7729,9 @@ class MM {
 		
 		MM.lobbyBuildField.style.margin = '0.5vw 0';
 		
-		MM.lobbyBuildField.style.width = '25vw';
+		MM.lobbyBuildField.style.width = '28vw';
 		
-		MM.lobbyBuildField.style.height = '25vw';
+		MM.lobbyBuildField.style.height = '28vw';
 		
 		MM.lobbyBuildTab = DOM({style:'lobby-build-tab'});
 		
@@ -7819,15 +7819,15 @@ class MM {
 			}
 			else{
 				
-				name.innerText = 'Анонимус';
+				name.innerText = 'ifst';
 				
 				name.style.opacity = 0;
 				
-				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(1100)}.webp)`;
+				rankIcon.style.backgroundImage = 'none';
 				
 				rank.firstChild.innerText = 1100;
 				
-				rank.style.opacity = 0;
+				rank.firstChild.style.opacity = 0;
 				
 				rightTeam.append(player);
 				
@@ -7855,7 +7855,7 @@ class MM {
 				
 				rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
-				MM.lobbyHeroes.append(DOM({style:'mm-lobby-middle-hero-line'},rankIcon,DOM(`${getRankName}`),rankIcon2));
+				MM.lobbyHeroes.append(DOM({style:'mm-lobby-middle-hero-line'},rankIcon,DOM({style:'mm-lobby-middle-hero-line-name'},getRankName),rankIcon2));
 				
 				activeRankName = getRankName;
 				
@@ -8012,7 +8012,7 @@ class MM {
 			
 			findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 			
-			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/99.png)`;
 			
 		}
 		
