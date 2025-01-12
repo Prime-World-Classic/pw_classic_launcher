@@ -109,23 +109,28 @@
 	
 }
 
-.castle-button-play{
-	width: auto;
-	height: 5vh;
-	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
-	text-align:center;
-	padding:0.8vh 1vh;
-	cursor:pointer;
-	border-radius:5px;
-	box-shadow:0 0 25px rgba(0,0,0,0.3);
+.castle-button-play {
+    width: auto;
+    height: 5vh;
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+    text-align: center;
+    padding: 0.8vh 1vh;
+    cursor: pointer;
+    border-radius: 20px;/* Закругленные углы */
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+    position: absolute;
+    top: 1vh;
+    background: linear-gradient(to top, rgb(100, 30, 0), rgba(255, 70, 0, 0.9)); /* Увеличенный тон градиента */
+    font: 4.5vh / 1 Verdana;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgb(158, 155, 104); /* Окантовка */
+    transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход */
+}
 
-	position: absolute;
-	top: 1vh;
-
-	background:rgba(255,50,0,0.9);
-	font: 5vh / 1 Verdana;
-	overflow: hidden;
-	color:rgba(255,255,255,0.9);	
+.castle-button-play:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+    box-shadow: 0 0 35px rgba(255, 70, 0, 0.9); /* Увеличенный эффект тени при наведении */
 }
 
 .castle-play-lobby{
