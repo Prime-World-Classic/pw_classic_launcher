@@ -2223,39 +2223,43 @@ class View {
 		
 	}
 	
-	static async build(heroId,targetId = 0,isSplash = false){
+	static async build(heroId, targetId = 0, isSplash = false) {
 
-		const body = DOM({style:'build-horizontal'});
-		
-		await Build.init(heroId,targetId,isSplash);
-		
-		// build-field-top ->    play,DOM({event:['click',() => View.show('main')]},'Закрыть окно билда [X]')
-		body.append(
-		DOM({style:'build-left'},Build.heroView),
-		DOM({style:'build-center'}, DOM({style:'build-field-with-tabs'}, Build.listView, DOM({style:'build-field-container'}, Build.levelView,Build.fieldView)), Build.activeBarView),
-		DOM({style:'build-right'}, 
-			Build.skinView, 
-			Build.talentsAndSetsView,
-			Build.rarityView, 
-			Build.inventoryView, 
-			Build.buildActionsView
-				)
-		);
+    const body = DOM({style: 'build-horizontal'});
 
-		if (!isSplash) {
-			body.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
-				Build.CleanInvalidDescriptions();
-				if (isSplash) {
-					View.show('castle'); 
-				} else {
-					View.show('builds'); 
-				}
-			}]},'[X]'));
-		}
-		
-		return body;
-		
-	}
+    await Build.init(heroId, targetId, isSplash);
+
+    body.append(
+        DOM({style: 'build-left'}, Build.heroView),
+        DOM({style: 'build-center'}, DOM({style: 'build-field-with-tabs'}, Build.listView, DOM({style: 'build-field-container'}, Build.levelView, Build.fieldView)), Build.activeBarView),
+        DOM({style: 'build-right'},
+            Build.skinView,
+            Build.talentsAndSetsView,
+            Build.rarityView,
+            Build.inventoryView,
+            Build.buildActionsView
+        )
+    );
+
+    if (!isSplash) {
+        body.append(DOM({
+            style: 'build-list-close',
+            title: 'Закрыть',
+            event: ['click', () => {
+                Build.CleanInvalidDescriptions();
+                if (isSplash) {
+                    View.show('castle');
+                } else {
+                    View.show('builds');
+                }
+            }]
+        }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}))); // Замените путь к изображению
+    }
+
+    return body;
+
+    }
+
 	
 	static async talents(){
 		
@@ -2456,30 +2460,34 @@ class View {
 class Window {
 	static windows = {}
 	
-	static async show(category,method,value,value2,value3) {
-		
-		if( !(method in Window) ){
-			
-			return;
-			
-		}
-		
-		let template = await Window[method](value,value2,value3);
+	static async show(category, method, value, value2, value3) {
+    
+    if (!(method in Window)) {
+        return;
+    }
+    
+    let template = await Window[method](value, value2, value3);
 
-		let closeButton = DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
-			Window.windows[category].remove();
-		}]},'[X]');
-		template.append(closeButton);
-		if(category in Window.windows){
+    // Создаем кнопку закрытия с изображением вместо текста
+    let closeButton = DOM({
+        style: 'build-list-close',
+        title: 'Закрыть',
+        event: ['click', () => {
+            Window.windows[category].remove();
+        }]
+    }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'})); // Замените путь к изображению
 
-			Window.windows[category].remove();
-			
-		}
-		
-		Window.windows[category] = template;
-			
-		View.active.append(template);
+    template.append(closeButton);
+    
+    if (category in Window.windows) {
+        Window.windows[category].remove();
+    }
+    
+    Window.windows[category] = template;
+        
+    View.active.append(template);
 	}
+
 	
 	static async build(heroId,targetId = 0,isSplash = false) {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
@@ -5339,7 +5347,7 @@ class App {
 	
 }
 
-class Chat {
+	class Chat {
 	
 	static body;
 	
@@ -5347,27 +5355,31 @@ class Chat {
 	
 	static to = 0;
 	
-	static init(){
+	static init() {
+	let scrollBtn = DOM({
+		style: 'scroll-btn',
+		event: ['click', () => {
+		Chat.scroll(true);
+	}],
+	title: 'Прокрутить чат вниз' // Добавляем описание при наведении
+	}, '▼'); // Замените '▼' на нужный вам текст или символ для кнопки прокрутки
 
-		let scrollBtn = DOM({style: 'scroll-btn', event:['click',() => {
-			Chat.scroll(true);
-		}]}, '🡳');
-		
-		let input = DOM({tag:'input',style:'chat-input',placeholder:'Введите текст и нажмите Enter'});
+	let input = DOM({
+		tag: 'input',
+		style: 'chat-input',
+		placeholder: 'Введите текст и нажмите Enter'
+	});
 
-		Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn)
-		
-		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),Chat.input);
-		
-		input.addEventListener('keyup', async (event) => {
-			
-			if(event.code === 'Enter' || event.code === 'NumpadEnter'){
-				
-				Chat.sendMessage();
-				
-			}
-			
-		});
+	Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn);
+    
+	Chat.body = DOM({style: 'chat'}, DOM({style: 'chat-body'}), Chat.input);
+    
+	input.addEventListener('keyup', async (event) => {
+		if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+			Chat.sendMessage();
+		}
+	});
+
 		
 		input.addEventListener('input',() => {
 			
