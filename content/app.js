@@ -1366,7 +1366,8 @@ class View {
 			let wrapper = DOM({style:['castle-settings-window']})
 			settings.append(wrapper);
 		}]});
-
+		
+		let clan = DOM({style:['castle-builds','button-outline'], title: 'Кланы',event:['click',() => Frame.open('clan')]});
 		
 		let input = DOM({style:'castle-input', tag:'input'});
 
@@ -1376,7 +1377,7 @@ class View {
 		input.max='1';
 		input.step='0.01';
 		
-		let body = DOM({style:['castle-settings']}, close, render, music, builds);
+		let body = DOM({style:['castle-settings']}, close, render, music, builds, clan);
 		
 		return body; 
 		
@@ -2421,6 +2422,48 @@ class View {
 		return body;
 		
 	}
+	
+}
+
+class Frame {
+	
+	static body = false;
+	
+	static open(method){
+		
+		if(!Frame.body){
+			
+			Frame.inject();
+			
+		}
+		
+		if(method in Frame){
+			
+			Frame[method]();
+			
+		}
+		
+	}
+	
+	static inject(){
+		
+		Frame.body = DOM({style:'frame-body'});
+		
+		document.body.prepend(DOM({style:'frame'},Frame.body));
+		let test = DOM({tag:'div'},'width:100%');
+		
+		test.setAttribute('style','width:100%;background:green;text-align:center;font-size:5vw');
+		Frame.body.append(test);
+		
+	}
+	
+	static clan(){
+		
+		
+		
+	}
+	
+	
 	
 }
 
@@ -5125,7 +5168,7 @@ class Events {
 
 class App {
 	
-	static async init(){ // ws://192.168.3.16:3737
+	static async init(){ // ws://192.168.31.29:3737
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
 		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
 		
