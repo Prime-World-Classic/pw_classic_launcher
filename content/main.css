@@ -345,7 +345,7 @@ background-color:rgba(15,15,15,0.7);
 	font-size: 2cqh;
 }
 .build-hero-stats-line:nth-child(n+10) {
-	border-bottom: 1px solid #777;
+	border-bottom: 0.2cqh solid #777;
 }
 .build-hero-stats-line:nth-last-child(-n+3) {
 	box-shadow: 0 0 2cqmin rgba(200,200,200,0.2);
@@ -398,9 +398,9 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-daw {
 	width:4cqh;
 	height:4cqh;
-	padding: 3px;
+	padding: 0.1cqh;
 	border-radius:50%;
-	margin-right:5px;
+	margin-right:0.1cqh;
 	cursor:pointer;
 	
 }
@@ -413,7 +413,7 @@ background-color:rgba(15,15,15,0.7);
 
 .build-hero-stats-item div:first-child{
 	color: #fff;
-	letter-spacing: 2px;
+	letter-spacing: 0.1rem;
 	font-family: "PT Sans", sans-serif;
 	font-optical-sizing: auto;
 	font-weight: 400;
@@ -428,6 +428,8 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-list-close {
+	width: 2.5cqw;
+	height: 2.5cqw;
 	color: transparent; /* Прозрачный текст */
 	background-image: url('icons/close-cropped.svg');
 	background-size: cover;
@@ -457,9 +459,12 @@ button.build-action-item {
 	height: 15cqmin;
 	border-width: 0;
 	margin: 1cqmin;
+	padding: 1cqmin;
 	cursor: pointer;
 	box-shadow: 0 0 2cqmin rgba(0, 0, 0, 0.3);
-	container-type: size;
+	container-type: inline-size;
+	display: flex;
+	align-items: center;
 }
 
 button.build-action-item:hover {
@@ -467,19 +472,20 @@ button.build-action-item:hover {
 }
 
 .build-action-item-background {
-	width: 90cqh;
-	height: 90cqh;
+	width: 100cqw;
+	height: 100cqw;
 	background-repeat: no-repeat;
 	background-position: center;
+	background-size: contain;
 }
 .btn-create {
-	background-position: -3cqw 0;
+	background-position: 0cqw 0;
 }
 .btn-random {
-	background-position: 2cqw 0;
+	background-position: 8cqw 0;
 }
 .btn-trash {
-	background-position: -3cqw 0;
+	background-position: 0cqw 0;
 }
 
 
@@ -525,14 +531,14 @@ button.build-action-item:hover {
 	border-top-right-radius: 1cqh !important;
 	border-bottom-left-radius: 0 !important;
 	border-bottom-right-radius: 0 !important;
-	margin: 0;
-	padding: 0 1cqh 0 1cqh;
+	border: 0;
+	padding: 0 2cqh;
 	width: auto;
 	height: 4cqh;
 	font-size: 2cqh;
 	overflow: hidden;
 	position: relative;
-	bottom: -1cqh;
+	bottom: 0cqh;
     color: #fff;
     cursor: pointer;
     text-align:center;
@@ -550,7 +556,7 @@ button.build-action-item:hover {
 .build-action-item{
 	font-family: Arial;
     border-radius: 3cqh;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 1cqh rgba(0, 0, 0, 0.3);
 }
 .button-build--wrapper {
 	height: 4.5cqh;
@@ -2026,17 +2032,17 @@ cursor:pointer;
   
 }
 
-
 .buttons {
     margin: 10%;
     text-align: center;
 }
 
 .btn-hover {
+	transform: scale(0.95);
     transition: all .4s ease-in-out;
 }
 .btn-hover:hover {
-	transform: scale(1.1);
+	transform: scale(1.0);
 	z-index: 1;
 }
 
@@ -2250,7 +2256,7 @@ cursor:pointer;
 	display: flex;
 	flex-direction: row;
 	align-items:center;
-	border-radius: 20px; /* Закругленные углы */
+	border-radius: 2cqmin; /* Закругленные углы */
 	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
 }
 
