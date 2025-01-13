@@ -1129,6 +1129,27 @@ text-align:center;
 	
 }
 
+.frame{
+	
+	position:fixed;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:center;
+	align-items:center;
+	width:100vw;
+	height:100vh;
+	z-index:9999;
+	
+}
+
+.frame-body{
+	
+	width:80vw;
+	height:80vh;
+	background:rgba(255,0,0,0.5);
+	
+}
+
 .splash-text{
 	
 	margin:0 15vw;
