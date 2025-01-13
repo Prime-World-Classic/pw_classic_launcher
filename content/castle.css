@@ -116,21 +116,21 @@
     text-align: center;
     padding: 0.8vh 1vh;
     cursor: pointer;
-    border-radius: 20px;/* Закругленные углы */
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+    border-radius: 1.5cqh;/* Закругленные углы */
+    box-shadow: 0 0 1cqh rgba(0, 0, 0, 0.3);
     position: absolute;
     top: 1vh;
     background: linear-gradient(to top, rgb(100, 30, 0), rgba(255, 70, 0, 0.9)); /* Увеличенный тон градиента */
     font: 4.5vh / 1 Verdana;
     overflow: hidden;
     color: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgb(158, 155, 104); /* Окантовка */
+    border: 0.1cqh solid rgb(158, 155, 104); /* Окантовка */
     transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход */
 }
 
 .castle-button-play:hover {
     transform: scale(1.05); /* Увеличение при наведении */
-    box-shadow: 0 0 35px rgba(255, 70, 0, 0.9); /* Увеличенный эффект тени при наведении */
+    box-shadow: 0 0 1cqh rgba(255, 70, 0, 0.9); /* Увеличенный эффект тени при наведении */
 }
 
 .castle-play-lobby{
