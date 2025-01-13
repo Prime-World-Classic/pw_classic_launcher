@@ -376,11 +376,11 @@ background-color:rgba(15,15,15,0.7);
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:space-between;
-	text-shadow:0 0 5px rgba(25,25,25,0.9);
+	text-shadow:0 0 0.1cqh rgba(25,25,25,0.9);
 	cursor:pointer;
-	padding: 0.66vh 0.5vw;
-	border-radius:15px;
-	box-shadow:0 0 25px rgba(0,0,0,0.3);
+	padding: 1cqh;
+	border-radius:2cqh;
+	box-shadow:0 0 2cqh rgba(0,0,0,0.3);
 	flex-grow:1;
 }
 .build-hero-stats-item.passive {
@@ -496,8 +496,9 @@ button.build-action-item:hover {
 
 .btn-separator {
 	color: #dfdfdf;
-	font-size: 6cqmax;
-	line-height: 7cqmax;
+	font-size: 8cqmin;
+	line-height: 8cqmin;
+	align-self: center;
 	cursor: default;
 }
 
@@ -602,7 +603,7 @@ button.build-action-item:hover {
 	border-radius:50%;
 	cursor:pointer;
 	transform:scale(0.7);
-	box-shadow:0 0 50px rgba(25,25,25,0.5);
+	box-shadow:0 0 2cqh rgba(25,25,25,0.5);
 }
 
 .build-level, .build-field {
@@ -706,7 +707,7 @@ button.build-action-item:hover {
 	background:rgba(255,255,255,0.2);
 	border-radius:1cqh;
 	border: 0.5cqh solid transparent;
-	box-shadow:0 0 50px rgba(25,25,25,0.8);
+	box-shadow:0 0 1cqh rgba(25,25,25,0.8);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -2048,17 +2049,17 @@ cursor:pointer;
 
 .btn-hover.color-1 {
     background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
 }
 
 .btn-hover.color-2 {
     background-image: linear-gradient(to right, rgb(57, 166, 166), rgb(85, 175, 200), #82d9a8, rgb(131, 216, 249));
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
 }
 
 .btn-hover.color-3 {
     background-image: linear-gradient(to right, rgb(45, 146, 166), rgb(135, 12, 219), #82d9a8, rgb(131, 16, 249));
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
 }
 
 .btn-hover.color-4 {
