@@ -1238,7 +1238,7 @@ class View {
 					
 					let request = await App.api.request('build','heroAll');
 
-					request.sort((a, b) => b.rating - a.rating);
+					// request.sort((a, b) => b.rating - a.rating);
 					
 					MM.hero = request;
 					
@@ -1432,7 +1432,7 @@ class View {
 		
 		App.api.silent((result) => {
 
-			result.sort((a, b) => b.rating - a.rating)
+			// result.sort((a, b) => b.rating - a.rating);
 			
 			MM.hero = result;
 			
