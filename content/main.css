@@ -43,6 +43,12 @@ height: 100vh;
 overflow: hidden;
 container-type: inline-size;
 }
+
+input,button {
+	padding: 0;
+	margin: 0;
+}
+
 .noselect {
 	user-select: none;
 }
@@ -2173,7 +2179,6 @@ cursor:pointer;
 	font:2.0vh / 1 Verdana;
 	color:rgba(255,255,255,0.9);
 	word-wrap:normal;
-	
 }
 .scroll-btn {
 	position: relative;
