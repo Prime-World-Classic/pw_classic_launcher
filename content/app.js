@@ -4386,6 +4386,11 @@ class Build{
 	}
 	
 	static move(element){
+
+		let elementFromPoint = (x, y) => {
+			let elems = document.elementsFromPoint(x, y);
+			return elems[0].className == 'build-level' ? elems[1] : elems[0];
+		};
 		
 		element.onmousedown = (event) => {
 
@@ -4417,7 +4422,7 @@ class Build{
 			element.style.top = event.pageY - shiftY - 5 + 'px';
 
 			element.style.display = 'none';
-			let startingElementBelow = document.elementFromPoint(event.clientX, event.clientY);
+			let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
 			element.style.display = 'block';
 			
 			document.onmousemove = (e) => {
@@ -4457,7 +4462,7 @@ class Build{
 
 				if (isClick && isFieldTarget) {
 					element.style.display = 'none';
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					element.style.display = 'block';
 					isClick = elemBelow == startingElementBelow;
 				}
@@ -4499,7 +4504,7 @@ class Build{
 					
 					element.style.display = 'none';
 
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 
 					if (elemBelow.childNodes[0] && elemBelow.childNodes[0].className == 'build-talent-item') {
 						// Select 'build-talent-item' if selected its parent
@@ -4510,7 +4515,7 @@ class Build{
 					let performSwap = false;
 					let performSwapFromLibrary = false;
 
-					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-field-item') {
+					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-hero-grid-item') {
 						elemBelow = elemBelow.parentElement;
 						performSwap = swapParentNode.dataset.position ? true : false;
 						performSwapFromLibrary = !performSwap;
@@ -4528,7 +4533,7 @@ class Build{
 					
 					element.style.display = 'block';
 					
-					if(elemBelow && (elemBelow.className == 'build-field-item') ){
+					if(elemBelow && (elemBelow.className == 'build-hero-grid-item') ){
 						
 						if( (data.level) && (elemBelow.parentNode.dataset.level == data.level) ){
 
@@ -4625,7 +4630,7 @@ class Build{
 					
 					element.style.display = 'none';
 					
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					
 					if (isClick) {
 						elemBelow = document.getElementsByClassName('build-talents')[0].firstChild;
@@ -4675,7 +4680,7 @@ class Build{
 					
 					element.style.display = 'none';
 					
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					
 					element.style.display = 'block';
 					
