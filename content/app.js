@@ -5751,8 +5751,10 @@ class NativeAPI {
 		NativeAPI.setDefaultWindow();
 		
 		NativeAPI.app = nw.App;
+
+		NativeAPI.altEnterShortcut = new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()});
 		
-		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 		
 		NativeAPI.loadModules();
 		
@@ -7320,6 +7322,8 @@ class MM {
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
 		document.body.style.display = 'none';
 		NativeAPI.window.hide();
+		
+		NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
 	}
 
 	static gameStopEvent(){
@@ -7328,6 +7332,10 @@ class MM {
 		document.body.style.display = 'block';
 		NativeAPI.window.show();
 		NativeAPI.setDefaultWindow();
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
+
+		View.show('castle');
 	}
 	
 	static async init(){
