@@ -1667,14 +1667,14 @@ class View {
 					
 					status.firstChild.innerText = 'Готов';
 					
-					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == item.id){
 					
 					status.firstChild.innerText = 'Готов';
 					
-					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 					
 				}
@@ -5089,7 +5089,9 @@ class Events {
 			
 			find.children[2].firstChild.innerText = 'Готов';
 			
-			find.children[2].firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+			find.children[2].classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+			
+			find.children[2].classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 			
 		}
 		
