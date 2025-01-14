@@ -669,17 +669,6 @@ button.build-action-item:hover {
 	background-size: 80cqw;
 }
 
-.build-field-item{
-	width: calc(80cqw / 6);
-	height: calc(80cqw / 6);
-	margin: calc(10cqw / 6);
-	container-type: size;
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
 .build-talent-item{
 	width: 100cqw;
 	height: 100cqw;
@@ -752,18 +741,6 @@ button.build-action-item:hover {
 	bottom: -1cqh;
 	border: 0.2cqh solid #000;
 	cursor:pointer;
-}
-
-.build-field-item .build-talent-item[data-active='1']:after {
-	content: '';
-	position: absolute;
-	width: 110cqh;
-	height: 110cqh;
-	background-image: url('icons/activeBorder.svg');
-	background-size: 110cqh;
-	margin: -5cqh -5cqh;
-	display: block;
-	background-repeat: no-repeat;
 }
 
 .build-rarity{
