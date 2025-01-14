@@ -44,7 +44,7 @@
 .castle-builds{
     width: 7vh;
 	height: 7vh;
-	background-image: url('talents/65.webp');
+	background-image: url('talents/268.webp');
 	background-size: cover;
     object-fit: cover;
 	cursor: pointer;
@@ -433,12 +433,6 @@
 	flex-flow:column nowrap;
 	height:100vh;
 	width:3vw;
-	
-}
-
-.castle-menu-item{
-	
-	
 	
 }
 
