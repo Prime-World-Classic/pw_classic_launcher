@@ -4112,7 +4112,7 @@ class Build{
 				}
 				else{
 					
-					button.style.border = 'solid 7px rgb(153,255,51)';
+					button.style.border = 'solid calc(min(0.5cqh, 1cqw)) rgb(153,255,51)';
 
 					Build.setSortInventory('rarity',item.id);
 					
@@ -4133,6 +4133,18 @@ class Build{
 		}
 		
 	}
+
+	static async removeTalentFromActive(activeId){
+		let container = Build.activeBarView.childNodes[activeId];
+
+		container.classList.remove('smartcast');
+		container.dataset.active = 0;
+		container.title = 'Смарткаст выключён';
+		container.firstChild.remove();
+
+		Build.activeBarItems[activeId] = 0;
+		await App.api.request('build','setZeroActive',{buildId:Build.id,index:activeId});
+	}
 	
 	static activeBar(data){
 		
@@ -4144,6 +4156,10 @@ class Build{
 		for(let item of data){
 			
 			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['click', async () => {
+
+				if (!element.firstChild) {
+					return;
+				}
 				
 				if(element.dataset.active == 1){
 					
@@ -4217,10 +4233,7 @@ class Build{
 					
 					try{
 						
-						App.api.request('build','setZeroActive',{buildId:Build.id,index:element.dataset.index});
-						Build.activeBarItems[element.dataset.index] = 0;
-						
-						clone.remove();
+						Build.removeTalentFromActive(element.dataset.index);
 						
 						return false;
 						
@@ -4519,9 +4532,7 @@ class Build{
 					for (let i = 0; i < Build.activeBarItems.length; i++) {
 						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
 						if (talPos == position) {
-							Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
-							Build.activeBarItems[i] = 0;
-							await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
+							Build.removeTalentFromActive(i);
 						}
 					}
 				}
@@ -4709,7 +4720,7 @@ class Build{
 							element.dataset.state = 2;
 							
 							oldParentNode.append(element);
-							
+
 							elementSetDisplay(element, 'block');
 
 							containedTalent.remove();
@@ -4753,13 +4764,8 @@ class Build{
 							clone.oncontextmenu = () => {
 								
 								try{
-									
-									App.api.request('build','setZeroActive',{buildId:Build.id,index:index});
-									Build.activeBarItems[index] = null;
-									
-									clone.remove();
-									
-									return false;
+
+									Build.removeTalentFromActive(index);
 									
 								}
 								catch(e){

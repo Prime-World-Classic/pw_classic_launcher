@@ -707,7 +707,9 @@ button.build-action-item:hover {
 }
 
 
-.build-talent-item[data-active='1']:after {
+.build-talent-item-container .build-talent-item[data-active='1']:after,
+
+.build-hero-grid-item .build-talent-item[data-active='1']:after {
 	content: '';
 	display: block;
 	width: 100cqw;
@@ -733,6 +735,7 @@ button.build-action-item:hover {
 	height: 100cqh;
 	background: #33333352;
 	justify-content: center;
+	align-items: start;
 }
 
 .build-active-bar-container {
