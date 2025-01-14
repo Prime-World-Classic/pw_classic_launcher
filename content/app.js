@@ -3102,7 +3102,7 @@ class Build{
 			if (build.target) {
 				item.classList.add('list-highlight');
 			} else {
-				item.classList.add('color-2');
+				item.classList.add('list-not-highlight');
 			}
 
 			item.onclick = () => {/*
@@ -4735,7 +4735,7 @@ class Build{
 							
 							clone.style.opacity = 1;
 							
-							clone.style.position = 'inherit';
+							clone.style.position = 'static';
 							
 						}
 						catch(e){
@@ -4753,7 +4753,7 @@ class Build{
 			
 				fieldRow.style.background = '';
 
-				element.style.position = 'inherit';
+				element.style.position = 'static';
 				
 				element.style.zIndex = 'auto';
 				
