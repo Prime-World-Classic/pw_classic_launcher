@@ -155,6 +155,8 @@
 	background-size:100%;
 	background-position:center;
 	background-repeat:no-repeat;
+
+	container-type: size;
 }
 
 .castle-play-lobby-empty{
@@ -192,6 +194,7 @@
 	font-weight:600;
 	font-style:italic;
 	cursor:pointer;
+	container-type: size;
 }
 
 .castle-party-middle-item-ready-notready div{
@@ -397,6 +400,7 @@
 	background-size:100%;
 	background-position:center;
 	background-repeat:no-repeat;
+	container-type: size;
 }
 
 .castle-hero-name{
