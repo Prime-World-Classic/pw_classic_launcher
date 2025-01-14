@@ -2240,7 +2240,10 @@ class View {
 					Build.levelView, 
 					Build.fieldView)
 				), 
-				Build.activeBarView,
+				DOM({style: 'build-active-bar-container'}, 
+					Build.activeBarView, 
+					DOM({style:'build-active-bar-hint'}, 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
+				),
 				Build.buildActionsView
 			),
         DOM({style: 'build-right'},
@@ -2858,8 +2861,7 @@ class Build{
 		Build.talentsAndSetsView.classList.add('buttons-talents-and-sets');
 		Build.talentsAndSetsView.append(buttonTalents, separator, buttonSets);
 
-		const buildTalents = document.createElement('div');
-		buildTalents.classList.add('build-talents');
+		const buildTalents = DOM({style:'build-talents'});
 
 		Build.inventoryView = document.createElement('div');
 		Build.inventoryView.classList.add('build-talent-view');
@@ -2878,13 +2880,9 @@ class Build{
 
 		// ================================================
 
-		Build.rarityView = document.createElement('div');
+		Build.rarityView = DOM({style:'build-rarity'});
 		
-		Build.rarityView.classList.add('build-rarity');
-		
-		Build.activeBarView = document.createElement('div');
-		
-		Build.activeBarView.classList.add('build-active-bar');
+		Build.activeBarView = DOM({style:'build-active-bar'});
 		
 		let request = await App.api.request('build','data',{heroId:heroId,target:targetId});
 		
@@ -3152,7 +3150,7 @@ class Build{
 			Build.calculationStats[stat] = 0.0;
 		}
 		
-		let stats = DOM({style:'build-hero-stats'});
+		let stats = DOM({style:'build-hero-stats-view'});
 		
 		let template = {
 			
@@ -3171,9 +3169,6 @@ class Build{
 			punching: 'Пробивание',
 			protectionBody: 'Защита тела',
 			protectionSpirit: 'Защита духа',
-			considerStacks: 'Учитывать стаки',
-			considerBuff: 'Учитывать бафф',
-			groundType: 'Учитывать землю',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
@@ -3534,6 +3529,23 @@ class Build{
 			i++;
 			
 		}
+
+		let landTypeSetting = DOM({
+			style:['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'], 
+			title: 'Тип земли', 
+			event:['click', async ()=>{
+				Build.applyRz = !Build.applyRz;
+				Build.applyVz = !Build.applyVz;
+				Build.updateHeroStats();
+				if (Build.applyRz) {
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz','build-hero-stats-setting-land-type-rz');
+				} else {
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz','build-hero-stats-setting-land-type-vz');
+				}
+			}
+		]});
+
+		stats.append(DOM({style:'build-hero-stats-settings'}, landTypeSetting));
 		
 		Build.heroName = DOM({tag: 'div', style: 'name'});
 		
@@ -3961,9 +3973,7 @@ class Build{
 	
 	static templateViewTalent(data){
 		
-		const talent = document.createElement('div');
-		
-		talent.classList.add('build-talent-item');
+		const talent = DOM({style:'build-talent-item'});
 
 		if (data.txtNum) {
 			let params = data.txtNum.split(';');
@@ -4012,11 +4022,15 @@ class Build{
 	
 	static inventory(){
 		
-		let preload = new PreloadImages(Build.inventoryView.querySelector('.build-talents'));
-		
 		App.api.silent((data) => {
 			
 			for(let item of data){
+
+				let talentContainer = DOM({style:'build-talent-item-container'});
+		
+				Build.inventoryView.querySelector('.build-talents').append(talentContainer);
+				
+				let preload = new PreloadImages(talentContainer);
 				
 				item.state = 1;
 				
@@ -4291,21 +4305,33 @@ class Build{
 		}
 		
 	}
-	
-	static sortInventory(){
-		
-		for(let item of Build.inventoryView.querySelectorAll('.build-talent-item')){
-			
-			let data = Build.talents[item.dataset.id], flag = true;
 
-			if (data.level == 0) {
-				item.style.display = 'none';
-				continue;
+	static applySorting(itemContainer) {
+		
+		let item = itemContainer.firstChild;
+			
+		let data = Build.talents[item.dataset.id], flag = true;
+
+		if (data.level == 0) {
+			itemContainer.style.display = 'none';
+			return;
+		}
+		
+		for(let key in Build.ruleSortInventory){
+			
+			if( !(key in data) ){
+				
+				flag = false;
+				
+				break;
+				
 			}
 			
-			for(let key in Build.ruleSortInventory){
+			if(key == 'stats'){
 				
-				if( !(key in data) ){
+				let foundStat = false;
+				
+				if(!data.stats){
 					
 					flag = false;
 					
@@ -4313,62 +4339,55 @@ class Build{
 					
 				}
 				
-				if(key == 'stats'){
+				for(let stat of Build.ruleSortInventory.stats){
 					
-					let foundStat = false;
-					
-					if(!data.stats){
+					if( (stat in data.stats) ){
 						
-						flag = false;
-						
-						break;
-						
-					}
-					
-					for(let stat of Build.ruleSortInventory.stats){
-						
-						if( (stat in data.stats) ){
-							
-							foundStat = true;
-							
-						}
-						
-					}
-					
-					if(!foundStat){
-						
-						flag = false;
-						
-						break;
-						
-					}
-					
-				}
-				else{
-					
-					if(!Build.ruleSortInventory[key].includes(`${data[key]}`)){
-						
-						flag = false;
-						
-						break;
+						foundStat = true;
 						
 					}
 					
 				}
 				
-			}
-			
-			if(flag){
-				
-				item.style.display = 'block';
+				if(!foundStat){
+					
+					flag = false;
+					
+					break;
+					
+				}
 				
 			}
 			else{
 				
-				item.style.display = 'none';
+				if(!Build.ruleSortInventory[key].includes(`${data[key]}`)){
+					
+					flag = false;
+					
+					break;
+					
+				}
 				
 			}
 			
+		}
+		
+		if(flag){
+			
+			itemContainer.style.display = 'block';
+			
+		}
+		else{
+			
+			itemContainer.style.display = 'none';
+			
+		}
+	}
+	
+	static sortInventory(){
+		
+		for(let itemContainer of Build.inventoryView.querySelectorAll('.build-talent-item-container')){
+			Build.applySorting(itemContainer);
 		}
 		
 	}
@@ -4391,6 +4410,13 @@ class Build{
 			let elems = document.elementsFromPoint(x, y);
 			return elems[0].className == 'build-level' ? elems[1] : elems[0];
 		};
+
+		let elementSetDisplay = (element, display) => {
+			if (element.parentElement.classList == 'build-talent-item-container') {
+				element.parentElement.style.display = display;
+			}
+			element.style.display = display;
+		}
 		
 		element.onmousedown = (event) => {
 
@@ -4421,9 +4447,9 @@ class Build{
 			// "mouseup event is released while the pointer is located inside" - from https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
 			element.style.top = event.pageY - shiftY - 5 + 'px';
 
-			element.style.display = 'none';
+			elementSetDisplay(element, 'none');
 			let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
-			element.style.display = 'block';
+			elementSetDisplay(element, 'block');
 			
 			document.onmousemove = (e) => {
 				
@@ -4461,9 +4487,9 @@ class Build{
 				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) );
 
 				if (isClick && isFieldTarget) {
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					isClick = elemBelow == startingElementBelow;
 				}
 
@@ -4502,7 +4528,7 @@ class Build{
 				
 				if( isFieldTarget ){
 					
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 
@@ -4531,7 +4557,7 @@ class Build{
 						}
 					}
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
 					if(elemBelow && (elemBelow.className == 'build-hero-grid-item') ){
 						
@@ -4560,6 +4586,7 @@ class Build{
 								element.dataset.state = 2;
 								
 								let swappingTal = null;
+								let removeContainerAfterMove = false;
 								if (performSwap) {
 									swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 									let swappedTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
@@ -4575,10 +4602,14 @@ class Build{
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
 									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = null;
 
+									elemBelow.append(element);
 									if (performSwapFromLibrary) {
 										swapParentNode.prepend(elemBelow.firstChild);
+									} else {
+										if (swapParentNode.classList == 'build-talent-item-container') {
+											removeContainerAfterMove = true;
+										}
 									}
-									elemBelow.append(element);
 								}
 								
 								try{
@@ -4619,6 +4650,10 @@ class Build{
 									
 								}
 
+								if (removeContainerAfterMove) {
+									swapParentNode.remove();
+								}
+
 							}
 							
 						}
@@ -4628,7 +4663,7 @@ class Build{
 				}
 				else if( isInventoryTarget ){
 					
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 					
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					
@@ -4636,15 +4671,19 @@ class Build{
 						elemBelow = document.getElementsByClassName('build-talents')[0].firstChild;
 					}
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
 					if(elemBelow && (elemBelow.parentNode.className == 'build-talents') && (element.dataset.state != 1) ){
 						
 						let oldParentNode = element.parentNode;
 						
 						element.dataset.state = 1;
+
+						let containedTalent = DOM({style:'build-talent-item-container'}, element);
+
+						Build.applySorting(containedTalent);
 						
-						elemBelow.parentNode.prepend(element);
+						elemBelow.parentNode.prepend(containedTalent);
 						
 						
 						try{
@@ -4671,6 +4710,10 @@ class Build{
 							
 							oldParentNode.append(element);
 							
+							elementSetDisplay(element, 'block');
+
+							containedTalent.remove();
+							
 						}
 						
 					}
@@ -4678,11 +4721,11 @@ class Build{
 				}
 				else if( isActiveBarTarget ){
 					
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 					
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
 					if( (elemBelow) && (element.dataset.state == 2) && (elemBelow.className == 'build-active-bar-item') && (data.active == 1) ){
 						

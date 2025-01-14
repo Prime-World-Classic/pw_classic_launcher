@@ -329,7 +329,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 
-.build-hero-stats{
+.build-hero-stats-view{
 	display:flex;
 	flex-flow:column nowrap;
 	font: 4cqw / 1 Tahoma;
@@ -362,6 +362,25 @@ background-color:rgba(15,15,15,0.7);
 	height: calc(min(5cqh, 10cqw));
 	font-size: calc(min(3cqh,6cqw));
 }
+
+.build-hero-stats-settings {
+	margin-top: 1cqh;
+	display: flex;
+	flex-direction: row nowrap;
+}
+
+.build-hero-stats-setting-land-type {
+	width: calc(min(10cqh, 20cqw));
+	height: calc(min(10cqh, 20cqw));
+	background-size: contain;
+}
+.build-hero-stats-setting-land-type-rz {
+	background-image: url('talents/22.webp');
+}
+.build-hero-stats-setting-land-type-vz {
+	background-image: url('talents/21.webp');
+}
+/*
 .build-hero-stats-line:nth-child(n+10) {
 }
 .build-hero-stats-line:nth-last-child(-n+3) {
@@ -388,6 +407,7 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-line .noNumber div:last-child {
 	display: none;
 }
+	*/
 
 .build-hero-stats-item{
 	display:flex;
@@ -470,15 +490,13 @@ background-color:rgba(15,15,15,0.7);
 	height: 12cqh;
 }
 
-.build-field-bottom:after {
-	content: 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст\a(автоматическое применение)';
-	font-size: .75rem;
-	white-space: pre;
+.build-active-bar-hint {
+	width: 150cqw;
+	font-size: 1.6cqh;
 	color: rgb(255 255 255 / 50%);
-	display: flex;
-	justify-content: end;
-	text-align: center;
-	padding-right: 20px;
+	position: absolute;
+	bottom: -4cqh;
+	left: -25cqw;
 }
 
 button.build-action-item {
@@ -670,6 +688,14 @@ button.build-action-item:hover {
 	background-size: 80cqw;
 }
 
+.build-talent-item-container {
+	background-size: calc(max(12cqw, 4cqh));
+	width: calc(max(15cqw, 5cqh));
+	height: calc(max(15cqw, 5cqh));
+	container-type: size;
+}
+
+
 .build-talent-item{
 	width: 100cqw;
 	height: 100cqw;
@@ -678,6 +704,16 @@ button.build-action-item:hover {
 	background-repeat:no-repeat;
 	cursor:pointer;
 	position: static;
+}
+
+
+.build-talent-item[data-active='1']:after {
+	content: '';
+	display: block;
+	width: 100cqw;
+	height: 100cqw;
+	background-size: contain;
+	background-image: url('icons/activeBorder.webp');
 }
 
 .build-talent-view{
@@ -699,10 +735,15 @@ button.build-action-item:hover {
 	justify-content: center;
 }
 
-.build-talents .build-talent-item {
-	background-size: calc(max(12cqw, 4cqh));
-	width: calc(max(15cqw, 5cqh));
-	height: calc(max(15cqw, 5cqh));
+.build-active-bar-container {
+	container-type: inline-size;
+	width: 100cqmin;
+	display:flex;
+	justify-content: center;
+	flex-flow:column;
+
+	position: absolute;
+	bottom: 5cqh;
 }
 
 
@@ -712,9 +753,6 @@ button.build-action-item:hover {
 	display:flex;
 	justify-content: center;
 	flex-flow:row nowrap;
-
-	position: absolute;
-	bottom: 5cqh;
 }
 
 
