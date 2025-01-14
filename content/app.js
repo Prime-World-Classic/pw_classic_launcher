@@ -1354,7 +1354,7 @@ class View {
 		
 		let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта",event:['click',() => View.exitOrLogout()]});
 		
-		let builds = DOM({style:['castle-builds','button-outline'], title: "Билды",event:['click',() => View.show('builds')]});
+		let builds = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => View.show('top')]});
 		
 		let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка",event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
 		
@@ -1546,7 +1546,7 @@ class View {
 		
 		menu.append(
 		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},Castle.gl ? 'Замок' : 'Лобби' ),
-		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
+		//DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
@@ -2225,25 +2225,34 @@ class View {
 	
 	static async build(heroId, targetId = 0, isSplash = false) {
 
-    const body = DOM({style: 'build-horizontal'});
+    const body = DOM({style: isSplash ? 'build-horizontal' : 'build-horizontal-view'});
 
     await Build.init(heroId, targetId, isSplash);
 
     body.append(
-        DOM({style: 'build-left'}, Build.heroView),
-        DOM({style: 'build-center'}, DOM({style: 'build-field-with-tabs'}, Build.listView, DOM({style: 'build-field-container'}, Build.levelView, Build.fieldView)), Build.activeBarView),
+        DOM({style: 'build-left'}, 
+			Build.heroView
+		),
+        DOM({style: 'build-center'}, 
+			DOM({style: 'build-field-with-tabs'}, 
+				Build.listView, 
+				DOM({style: 'build-field-container'}, 
+					Build.levelView, 
+					Build.fieldView)
+				), 
+				Build.activeBarView,
+				Build.buildActionsView
+			),
         DOM({style: 'build-right'},
-            Build.skinView,
             Build.talentsAndSetsView,
             Build.rarityView,
-            Build.inventoryView,
-            Build.buildActionsView
+            Build.inventoryView
         )
     );
 
     if (!isSplash) {
         body.append(DOM({
-            style: 'build-list-close',
+            style: ['build-list-close', 'close-button'],
             title: 'Закрыть',
             event: ['click', () => {
                 Build.CleanInvalidDescriptions();
@@ -2470,7 +2479,7 @@ class Window {
 
     // Создаем кнопку закрытия с изображением вместо текста
     let closeButton = DOM({
-        style: 'build-list-close',
+        style: 'close-button',
         title: 'Закрыть',
         event: ['click', () => {
             Window.windows[category].remove();
@@ -2908,7 +2917,7 @@ class Build{
 		Build.applyBuffs = true;
 		
 		Build.list(request.build, isSplash);
-		Build.buildActions(request.build);
+		Build.buildActions(request.build, isSplash);
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -2986,7 +2995,7 @@ class Build{
 		
 	}
 
-	static buildActions(builds){
+	static buildActions(builds, isSplash){
 		if(builds.length < 6){
 			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 				Splash.hide();
@@ -3011,7 +3020,7 @@ class Build{
 					
 					Splash.hide();
 					
-					View.show('build',Build.heroId);
+				 isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
 					
 				}]},'Создать билд');
 				
@@ -3037,7 +3046,7 @@ class Build{
 
 					await App.api.request('build', 'random', { id: Build.id });
 
-					View.show('build', Build.heroId);
+					isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 
 				}]
 			});
@@ -3058,7 +3067,7 @@ class Build{
 					const reset = DOM({
 						event: ['click', async () => {
 							await App.api.request('build', 'clear', { id: Build.id });
-							View.show('build', Build.heroId);
+						 	isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 							Splash.hide();
 						}]
 					}, 'Сбросить')
@@ -3084,32 +3093,36 @@ class Build{
 		for(let build of builds){
 			
 			const item = DOM(
-				{tag: 'button', style: ['build-tab-item', 'btn-hover', 'color-2']},
+				{tag: 'button', style: ['build-tab-item', 'btn-hover']},
 				`${build.name}`,
 			);
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
 
 			if (build.target) {
-				div.classList.add('highlight');
+				item.classList.add('list-highlight');
+			} else {
+				item.classList.add('color-2');
 			}
 
-			item.onclick = () => {
+			item.onclick = () => {/*
 				setTimeout(_ => {
 					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
-					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('highlight');
-				}, 300);
-				View.show('build',Build.heroId,build.id);
+					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('list-highlight');
+				}, 300);*/
+				isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
 			}
 
 			Build.listView.append(div);
 
 		}
+		/*
 		setTimeout(_ => {
-			if (!document.querySelector('.button-build--wrapper.highlight')) {
-				document.querySelector('.button-build--wrapper').classList.add('highlight');
+			if (!document.querySelector('.build-list.list-highlight')) {
+				document.querySelector('.build-list').classList.add('list-highlight');
 			}
 		}, 300);
+		*/
 	}
 
 	static totalStat(stat){
@@ -3570,7 +3583,7 @@ class Build{
 		
 		Build.heroImg.append(rank);
 		
-		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg,Build.heroName);
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView);
 		
 		Build.heroView.append(
 			wrapper,
@@ -4387,10 +4400,12 @@ class Build{
 			fieldRow.style.background = 'rgba(255,255,255,0.5)';
 			
 			fieldRow.style.borderRadius = '15px';
+
+			let rect = element.getBoundingClientRect();
 			
-			let shiftX = event.pageX - element.getBoundingClientRect().left;
+			let shiftX = event.pageX - rect.left + element.offsetParent.offsetLeft;
 			
-			let shiftY = event.pageY - element.getBoundingClientRect().top;
+			let shiftY = event.pageY - rect.top + element.offsetParent.offsetTop;
 			
 			element.style.zIndex = 9999;
 			
@@ -4430,9 +4445,9 @@ class Build{
 				
 				let target = element.getBoundingClientRect();
 				
-				let left = parseInt(element.style.left) + (target.width / 2);
+				let left = parseInt(element.style.left) + element.offsetParent.offsetLeft + (target.width / 2);
 				
-				let top = parseInt(element.style.top) + (target.height / 2);
+				let top = parseInt(element.style.top) + element.offsetParent.offsetTop + (target.height / 2);
 
 				let isFieldTarget = (left > field.x) && (left < (field.x + field.width) ) && (top > field.y) && (top < (field.y + field.height) );
 
@@ -4715,7 +4730,7 @@ class Build{
 							
 							clone.style.opacity = 1;
 							
-							clone.style.position = 'static';
+							clone.style.position = 'inherit';
 							
 						}
 						catch(e){
@@ -4733,7 +4748,7 @@ class Build{
 			
 				fieldRow.style.background = '';
 
-				element.style.position = 'static';
+				element.style.position = 'inherit';
 				
 				element.style.zIndex = 'auto';
 				
@@ -5047,9 +5062,9 @@ class Events {
 			
 			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 			
-			find.children[1].firstChild.firstChild.children[0].innerText = data.rating;
+			find.children[1].firstChild.firstChild.innerText = data.rating;
 			
-			find.children[1].firstChild.firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+			find.children[1].firstChild.firstChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		
@@ -5137,8 +5152,8 @@ class App {
 			
 			try{
 				
-				//View.show('castle');
-				View.show('build', 1);
+				View.show('castle');
+				//View.show('build', 1);
 				
 			}
 			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.

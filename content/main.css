@@ -44,7 +44,7 @@ overflow: hidden;
 container-type: inline-size;
 }
 
-input,button {
+input,button,img {
 	padding: 0;
 	margin: 0;
 }
@@ -332,11 +332,15 @@ background-color:rgba(15,15,15,0.7);
 	display:flex;
 	flex-flow:column nowrap;
 	font: 4cqw / 1 Tahoma;
+
 	
 	container-type: inline-size;
 	width: 100cqmin;
-	height: 80cqh;
+	height: 100cqh;
 	align-items: center;
+	justify-content: center;
+	position: relative;
+	top: 5cqh;
 }
 
 .build-hero-stats-line{
@@ -345,18 +349,24 @@ background-color:rgba(15,15,15,0.7);
 	justify-content:space-between;
 	align-items:center;
 	
+	border-radius: 2cqh;
+	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.3), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.3));
+
+	border: 0.01cqh solid rgba(104, 158, 154, 0.4);
+	margin-top: 0.2cqh;
+	font-weight: 600;
+	
 	container-type: inline-size;
-	width: 60cqw;
-	height: 4cqh;
-	font-size: 2cqh;
+	width: 90cqw;
+	height: calc(min(5cqh, 10cqw));
+	font-size: calc(min(3cqh,6cqw));
 }
 .build-hero-stats-line:nth-child(n+10) {
-	border-bottom: 0.2cqh solid #777;
 }
 .build-hero-stats-line:nth-last-child(-n+3) {
 	box-shadow: 0 0 2cqmin rgba(200,200,200,0.2);
-	border-radius: 1cqmin;
 	cursor: pointer;
+	border: 0;
 }
 .build-hero-stats-line .wrapper {
 	position: absolute;
@@ -384,7 +394,7 @@ background-color:rgba(15,15,15,0.7);
 	justify-content:space-between;
 	text-shadow:0 0 0.1cqh rgba(25,25,25,0.9);
 	cursor:pointer;
-	padding: 1cqh;
+	padding: calc(min(1cqh,2cqw));
 	border-radius:2cqh;
 	box-shadow:0 0 2cqh rgba(0,0,0,0.3);
 	flex-grow:1;
@@ -402,8 +412,8 @@ background-color:rgba(15,15,15,0.7);
 
 
 .build-hero-stats-daw {
-	width:4cqh;
-	height:4cqh;
+	width:calc(min(4cqh,8cqw));
+	height:calc(min(4cqh,8cqw));
 	padding: 0.1cqh;
 	border-radius:50%;
 	margin-right:0.1cqh;
@@ -418,11 +428,12 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .build-hero-stats-item div:first-child{
+	margin-left: 1cqw;
 	color: #fff;
-	letter-spacing: 0.1rem;
+	letter-spacing: 0.05rem;
 	font-family: "PT Sans", sans-serif;
 	font-optical-sizing: auto;
-	font-weight: 400;
+	font-weight: 600;
 	font-style: normal;
 	font-variation-settings: "wdth" 100;
 }
@@ -430,21 +441,32 @@ background-color:rgba(15,15,15,0.7);
 .build-hero-stats-item div:last-child{
 	font-family: "PT Sans", sans-serif;
 	color: #ffe9c1;
+	margin-right: 1cqw;
 	
 }
 
-.build-list-close {
+.close-button {
+    top: -5cqh;
+    right: -5cqh;
     background-size: cover;
     position: absolute;
-    top: -2.5cqh;
-    right: -1cqw;
     cursor: pointer;
     transform: scale(0.5);
     transition: transform 0.2s ease; /* Добавляем плавный переход */
 }
 
-.build-list-close:hover {
+.build-list-close {
+    top: -2.5cqh;
+    right: -1cqw;
+}
+
+.close-button:hover {
     transform: scale(0.6); /* Увеличиваем масштаб при наведении */
+}
+
+.close-image-style {
+	width: 12cqh;
+	height: 12cqh;
 }
 
 .build-field-bottom:after {
@@ -498,7 +520,7 @@ button.build-action-item:hover {
 
 
 .buttons-talents-and-sets {
-	display: flex;
+	display: none;
 	justify-content: center;
 }
 
@@ -569,9 +591,6 @@ button.build-action-item:hover {
 }
 .button-build--wrapper {
 	height: 4.5cqh;
-}
-.button-build--wrapper.highlight .build-action-item {
-	border-bottom-width: 0 !important;
 }
 
 .build-play{
@@ -673,10 +692,10 @@ button.build-action-item:hover {
 .build-talent-view{
 	overflow: hidden;
 	container-type: inline-size;
-	width: 95cqw;
+	width: 120cqw;
 	border-radius: 2cqh;
-	height: 60cqh;
-	margin: 1cqh 0;
+	height: 71cqh;
+	align-self: end;
 	
 }
 
@@ -690,19 +709,20 @@ button.build-action-item:hover {
 }
 
 .build-talents .build-talent-item {
-	width: 9cqh;
-	height: 9cqh;
+	width: calc(max(15cqw, 5cqh));
+	height: calc(max(15cqw, 5cqh));
 }
 
 
 .build-active-bar{
 	container-type: inline-size;
 	width: 100cqmin;
-	position: relative;
-	margin-top: 2cqh;
 	display:flex;
 	justify-content: center;
 	flex-flow:row nowrap;
+
+	position: absolute;
+	bottom: 5cqh;
 }
 
 
@@ -749,6 +769,12 @@ button.build-action-item:hover {
 .build-rarity{
 	display:flex;
 	flex-flow:row nowrap;
+
+	justify-content: center;
+	position: absolute;
+	width: 120cqw;
+	top: 8cqh;
+	right: 0;
 }
 
 .build-rarity div{
@@ -1166,6 +1192,7 @@ text-align:center;
 	flex-flow:column nowrap;
 	font: 2rem / 1 Verdana;
 	color:rgba(255,255,255,0.8);
+	container-type: inline-size;
 	
 }
 
@@ -1220,9 +1247,9 @@ background:rgba(255,255,255,0.5);
 }
 
 .splash-content .close {
-	position: relative;
-	top: -290px;
-	right: -520px;
+	position: absolute;
+	top: 1cqh;
+	right: 2cqw;
 	cursor: pointer;
 }
 
@@ -1615,25 +1642,30 @@ cursor:pointer;
 }
 
 .party-hero, .skin-change {
-	
 	display:flex;
 	flex-flow:row wrap;
-	margin:0 12vw;
+	overflow:scroll;
+	width: calc(max(90cqh, 90cqw));
+	height: 80cqmin;
+	justify-content: center;
+	align-items: center;
+	margin:0 2cqh;
+	container-type: size;
 	
 }
 
 .party-hero div{
 	
-	width:6vw;
-	height:6vw;
+	width:15cqh;
+	height:15cqh;
 	
 	
 }
 
 .skin-change div {
 	
-	width:12vw;
-	height:12vw;
+	width:25cqh;
+	height:25cqh;
 	
 }
 
@@ -2074,6 +2106,11 @@ cursor:pointer;
 	background: #000;
 	box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
 }
+.list-highlight {
+	background-size: 30cqw;
+    background-image: linear-gradient(to right, rgb(45, 146, 166), rgb(135, 12, 219), #82d9a8, rgb(131, 16, 249));
+    box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
+}
 
 /* Smartcast animation, adapted from https://codepen.io/michellebarker/pen/gOMBPQj */
 
@@ -2139,7 +2176,7 @@ cursor:pointer;
 	padding:5%;
 	transition: all 0.3s ease-out;
 	opacity: 70%;
-	border: 2px solid rgb(158, 155, 104); /* Окантовка */
+	border: 0.1cqh solid rgb(158, 155, 104);
 	background-image:linear-gradient(1.0turn,rgba(38, 109, 103, 0.8),rgba(18, 69, 73, 0.9),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
 	box-shadow: -2vh 10vh 5vh #0c1f2220;
 	
@@ -2249,33 +2286,69 @@ cursor:pointer;
 #wbuild {
 	container-type: size;
 	position: absolute;
-	margin-top: 10vh;
+	margin-top: 12vh;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;
 	right: 0;
 	text-align: center;
-	width: 70vw;
+	width: calc(min(130vh, 95vw));
 	height: 70vh;
 	/*background-color: #8d8b8b;*/
+	border-radius: 2cqh; /* Закругленные углы */
+	border: 0.1cqh solid rgb(158, 155, 104); /* Окантовка */
+	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
+
+	display: flex;
+	align-items: center;
 }
 
 .build-horizontal {
 	width: 100cqw;
-	height: 100cqh;
+	height: 80cqh;
 	display: flex;
 	flex-direction: row;
 	align-items:center;
-	border-radius: 20px; /* Закругленные углы */
-	border: 2px solid rgb(158, 155, 104); /* Окантовка */
-	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
 }
 
-.build-left{
-	container-type: inline-size;
-	width: 25cqw;
+.build-horizontal-view {
+	width: 100cqw;
+	height: 80cqh;
+	margin-top: 10cqh;
+	
 	display: flex;
-	flex-direction:column;
+	flex-direction: row;
+	align-items:end;
+
+	align-self: center;
+	container-type: size;
+}
+
+
+.build-left{
+	width: 20.6cqw;
+	height: 100cqh;
+	container-type: size;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.build-center {
+	width: 50.4cqw;
+	container-type: inline-size;
+	display: flex;
+	flex-direction: column;
+	align-items:center;
+}
+
+.build-right {
+	width: 29cqw;
+	height: 100cqh;
+	container-type: inline-size;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	justify-content: center;
 }
 
@@ -2292,10 +2365,11 @@ cursor:pointer;
 .build-hero-avatar-and-name {
 	display: flex;
 	flex-direction: column;
-	width: 100cqw;
-	height: 20cqh;
+	width: 60cqh;
 	container-type: inline-size;
 	align-items: center;
+	position: absolute;
+	top: -12cqh;
 }
 
 .build-hero-avatar-and-name .name {
@@ -2305,14 +2379,6 @@ cursor:pointer;
 	font-size: 4cqmin;
 	height: 4cqmin;
 	line-height: 4cqmin;
-}
-
-.build-center {
-	width: 50cqw;
-	container-type: inline-size;
-	display: flex;
-	flex-direction: column;
-	align-items:center;
 }
 
 .build-field-with-tabs {
@@ -2327,20 +2393,13 @@ cursor:pointer;
 	flex-direction: column;
 }
 
-.build-right {
-	width: 25cqmax;
-	height: 100cqh;
-	container-type: inline-size;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
 .build-actions-view {
-	width: 100cqw;
+	width: 40cqh;
 	container-type: inline-size;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
+
+	position: absolute;
+	top: 2cqh;
 }
