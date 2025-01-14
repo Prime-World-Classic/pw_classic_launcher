@@ -1076,12 +1076,12 @@ class View {
 			
 			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
 
-			const rankIcon = DOM({style:'castle-play-rank-icon'});
+			const rankIcon = DOM({style:'rank-icon'});
 			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 			
 			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : '';
 			
-			let rank = DOM({style:'castle-play-rank'},DOM({style:'castle-play-rank-lvl'}, player.rating),rankIcon);
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'}, player.rating),rankIcon);
 
 			if (player.rating) {
 				item.append(rank);
@@ -1444,11 +1444,11 @@ class View {
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
-				let rankIcon = DOM({style:'castle-rank-icon'});
+				let rankIcon = DOM({style:'rank-icon'});
 				
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
-				let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'},item.rating),rankIcon);
+				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
@@ -1546,7 +1546,7 @@ class View {
 		
 		menu.append(
 		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},Castle.gl ? 'Замок' : 'Лобби' ),
-		//DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
+		DOM({style:'main-header-item',event:['click',() => View.show('builds')]},'Билды'),
 		DOM({style:'main-header-item',event:['click',() => View.show('history')]},'История'),
 		DOM({style:'main-header-item',event:['click',() => View.show('top')]},'Рейтинг'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
@@ -2225,7 +2225,7 @@ class View {
 	
 	static async build(heroId, targetId = 0, isSplash = false) {
 
-    const body = DOM({style: isSplash ? 'build-horizontal' : 'build-horizontal-view'});
+    const body = DOM({style: 'build-horizontal'});
 
     await Build.init(heroId, targetId, isSplash);
 
@@ -2265,7 +2265,7 @@ class View {
         }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}))); // Замените путь к изображению
     }
 
-    return body;
+    return isSplash ? body : DOM({id:'viewbuild'}, body);
 
     }
 
