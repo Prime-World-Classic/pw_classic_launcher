@@ -4210,9 +4210,9 @@ class Build{
 			
 			if(Math.abs(item)){
 				
-				let poistion = (Math.abs(item) - 1);
+				let position = (Math.abs(item) - 1);
 				
-				let findTalent = Build.fieldView.querySelector(`[data-position = "${poistion}"]`);
+				let findTalent = Build.fieldView.querySelector(`[data-position = "${position}"]`);
 				
 				if( (findTalent) && (findTalent.firstChild) ){
 					
@@ -4228,7 +4228,7 @@ class Build{
 				
 				clone.style.backgroundImage = `url("${clone.dataset.url}")`;
 				
-				clone.dataset.position = poistion;
+				clone.dataset.position = position;
 				
 				Build.move(clone, true);
 					
@@ -4531,13 +4531,67 @@ class Build{
 					}
 				}
 
-				let removeFromActive = async (position) => {
+				let removeFromActive = async (position, skipActiveId) => {
 					for (let i = 0; i < Build.activeBarItems.length; i++) {
 						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
-						if (talPos == position) {
+						if (talPos == position && i != skipActiveId) {
 							await Build.removeTalentFromActive(i);
 						}
 					}
+				}
+
+				let addToActive = async (index, position, datasetPosition, targetElem, clone, smartCast) => {
+					await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+					Build.activeBarItems[index] = position;
+					targetElem.append(clone);
+					clone.style.position = 'static';
+					clone.style.zIndex = 1;
+
+					clone.dataset.position = datasetPosition;
+					clone.dataset.state = 3;
+					clone.style.opacity = 1;
+					clone.style.zIndex = 1;
+					clone.style.position = 'static';
+
+					
+					Build.move(clone, true);
+					if (smartCast) {
+						await Build.enableSmartCast(targetElem, true);
+					}
+				}
+
+				let editActive = async (position, newPosition, clone, skipActiveId) => {
+					if (position == newPosition) {
+						clone.remove();
+						return null;
+					}
+
+					let activeBarPosition = -1;
+					for (let i = 0; i < Build.activeBarItems.length; i++) {
+						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
+						if (talPos == position && i != skipActiveId) {
+							activeBarPosition = i;
+							break;
+						}
+					}
+					if (activeBarPosition == -1) {
+						clone.remove();
+						return null;
+					}
+					
+					let container = Build.activeBarView.childNodes[activeBarPosition];
+
+					let isSmartCast = Number(container.dataset.active);
+
+					let activePosition = Number(newPosition) + 1;
+
+					let glone = container.firstChild.cloneNode(true);
+
+					await removeFromActive(position, skipActiveId);
+
+					await addToActive(activeBarPosition, activePosition, newPosition, container, clone, isSmartCast);
+
+					return activeBarPosition;
 				}
 				
 				if( isFieldTarget && !fromActiveBar ){
@@ -4627,14 +4681,15 @@ class Build{
 								}
 								
 								try{
+									let activeBarPosition = null;
 									if (data.active && swapParentNode.dataset.position) {
-										await removeFromActive(swapParentNode.dataset.position);
+										activeBarPosition = await editActive(swapParentNode.dataset.position, elemBelow.dataset.position, element.cloneNode(true));
 									}
 									if (performSwap) {
 										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 										
 										if (swappedTalent.active) {
-											await removeFromActive(elemBelow.dataset.position);
+											await editActive(elemBelow.dataset.position, swapParentNode.dataset.position, swapParentNode.firstChild.cloneNode(true), activeBarPosition);
 										}
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
@@ -4644,6 +4699,7 @@ class Build{
 										if (performSwapFromLibrary) {
 											if (swappingTal.active) {
 												await removeFromActive(elemBelow.dataset.position);
+												// TODO: add to active
 											}
 											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
 										}
@@ -4786,26 +4842,10 @@ class Build{
 										await removeFromActive(swapPositionRaw);
 									}
 									
-									await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
-									Build.activeBarItems[index] = position;
-									targetElem.append(clone);
-									clone.style.position = 'static';
-									clone.style.zIndex = 1;
-									Build.move(clone, true);
-									if (smartCast) {
-										await Build.enableSmartCast(targetElem, true);
-									}
+									await addToActive(index, position, positionRaw, targetElem, clone, smartCast);
 
 									if (swapClone) {
-										await App.api.request('build','setActive',{buildId:Build.id,index:startingIndex,position:swapPosition});
-										Build.activeBarItems[startingIndex] = swapPosition;
-										swapElemParent.append(swapClone);
-										swapClone.style.position = 'static';
-										swapClone.style.zIndex = 1;
-										Build.move(swapClone, true);
-										if (swapSmartCast) {
-											await Build.enableSmartCast(swapElemParent, true);
-										}
+										await addToActive(startingIndex, swapPosition, swapPositionRaw, swapElemParent, swapClone, swapSmartCast);
 									}
 								}
 							} else {
