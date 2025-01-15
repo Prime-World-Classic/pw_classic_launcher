@@ -4746,7 +4746,17 @@ class Build{
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
 
 									if (data.active) {
-										
+										let index = -1;
+										for (let i = 0; i < Build.activeBarItems.length; i++) {
+											if (Build.activeBarItems[i] == 0) {
+												index = i;
+												break;
+											}
+										}
+										if (index != -1) {
+											let targetActiveContainer = Build.activeBarView.childNodes[index];
+											await addToActive(index, Number(elemBelow.dataset.position) + 1, elemBelow.dataset.position, targetActiveContainer, element.cloneNode(true));
+										}
 									}
 
 							
