@@ -689,10 +689,11 @@ button.build-action-item:hover {
 }
 
 .build-talent-item-container {
-	background-size: calc(max(12cqw, 4cqh));
-	width: calc(max(15cqw, 5cqh));
-	height: calc(max(15cqw, 5cqh));
+	background-size: calc(max(12cqw, 3cqh));
+	width: calc(max(12cqw, 3cqh));
+	height: calc(max(12cqw, 3cqh));
 	container-type: size;
+	margin: calc(max(0.9cqw, 0.3cqh));
 }
 
 
