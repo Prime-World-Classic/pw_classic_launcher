@@ -4687,7 +4687,8 @@ class Build{
 								if ('conflict' in data) {
 									Build.fieldConflict[Math.abs(data.id)] = true;
 								}
-
+								
+								let prevState = element.dataset.state;
 								element.dataset.state = 2;
 								
 								let swappingTal = null;
@@ -4745,7 +4746,7 @@ class Build{
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
 
-									if (data.active) {
+									if (data.active && prevState != element.dataset.state) {
 										let index = -1;
 										for (let i = 0; i < Build.activeBarItems.length; i++) {
 											if (Build.activeBarItems[i] == 0) {
