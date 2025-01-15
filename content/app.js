@@ -890,8 +890,6 @@ class View {
 			View.activeAnimation.addEventListener('finish',() => {
 				
 				View.active.remove();
-
-				Castle.isStaticSMCached = false;
 				
 				View.active = template;
 				
@@ -1078,12 +1076,12 @@ class View {
 			
 			let item = DOM({style:'castle-play-lobby-player',data:{id:player.id}});
 
-			const rankIcon = DOM({style:'castle-play-rank-icon'});
+			const rankIcon = DOM({style:'rank-icon'});
 			rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
 			
 			item.style.backgroundImage = (player.hero) ? `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)` : '';
 			
-			let rank = DOM({style:'castle-play-rank'},DOM({style:'castle-play-rank-lvl'}, player.rating),rankIcon);
+			let rank = DOM({style:'rank'},DOM({style:'rank-lvl'}, player.rating),rankIcon);
 
 			if (player.rating) {
 				item.append(rank);
@@ -1356,7 +1354,7 @@ class View {
 		
 		let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта",event:['click',() => View.exitOrLogout()]});
 		
-		let builds = DOM({style:['castle-builds','button-outline'], title: "Билды",event:['click',() => View.show('builds')]});
+		let builds = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => View.show('top')]});
 		
 		let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка",event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
 		
@@ -1447,15 +1445,15 @@ class View {
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
-				let rankIcon = DOM({style:'castle-rank-icon'});
+				let rankIcon = DOM({style:'rank-icon'});
 				
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 				
-				let rank = DOM({style:'castle-rank'},DOM({style:'castle-rank-lvl'},item.rating),rankIcon);
+				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
 				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
-				hero.addEventListener('click',async ()  => View.show('build', item.id, 0, true));
+				hero.addEventListener('click',async ()  => Window.show('main', 'build', item.id, 0, true));
 				
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 				
@@ -1670,14 +1668,14 @@ class View {
 					
 					status.firstChild.innerText = 'Готов';
 					
-					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == item.id){
 					
 					status.firstChild.innerText = 'Готов';
 					
-					status.firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 					
 				}
@@ -2212,22 +2210,55 @@ class View {
 		
 	}
 	
-	static async build(heroId,targetId = 0,isSplash = false){
-		
-		const body = DOM({style:'main-vertical'});
-		
-		await Build.init(heroId,targetId,isSplash);
-		
-		// build-field-top ->    play,DOM({event:['click',() => View.show('main')]},'Закрыть окно билда [X]')
-		body.append(
-		DOM({style:'build-field-top'},Build.listView),
-		DOM({style:'build'},Build.heroView,Build.levelView,Build.fieldView,Build.inventoryView,Build.rarityView),
-		DOM({style:'build-field-bottom'},Build.activeBarView)
-		);
-		
-		return body;
-		
-	}
+	static async build(heroId, targetId = 0, isSplash = false) {
+
+    const body = DOM({style: 'build-horizontal'});
+
+    await Build.init(heroId, targetId, isSplash);
+
+    body.append(
+        DOM({style: 'build-left'}, 
+			Build.heroView
+		),
+        DOM({style: 'build-center'}, 
+			DOM({style: 'build-field-with-tabs'}, 
+				Build.listView, 
+				DOM({style: 'build-field-container'}, 
+					Build.levelView, 
+					Build.fieldView)
+				), 
+				DOM({style: 'build-active-bar-container'}, 
+					Build.activeBarView, 
+					DOM({style:'build-active-bar-hint'}, 'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
+				),
+				Build.buildActionsView
+			),
+        DOM({style: 'build-right'},
+            Build.talentsAndSetsView,
+            Build.rarityView,
+            Build.inventoryView
+        )
+    );
+
+    if (!isSplash) {
+        body.append(DOM({
+            style: ['build-list-close', 'close-button'],
+            title: 'Закрыть',
+            event: ['click', () => {
+                Build.CleanInvalidDescriptions();
+                if (isSplash) {
+                    View.show('castle');
+                } else {
+                    View.show('builds');
+                }
+            }]
+        }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}))); // Замените путь к изображению
+    }
+
+    return isSplash ? body : DOM({id:'viewbuild'}, body);
+
+    }
+
 	
 	static async talents(){
 		
@@ -2423,6 +2454,44 @@ class View {
 		
 	}
 	
+}
+
+class Window {
+	static windows = {}
+	
+	static async show(category, method, value, value2, value3) {
+    
+    if (!(method in Window)) {
+        return;
+    }
+    
+    let template = await Window[method](value, value2, value3);
+
+    // Создаем кнопку закрытия с изображением вместо текста
+    let closeButton = DOM({
+        style: 'close-button',
+        title: 'Закрыть',
+        event: ['click', () => {
+            Window.windows[category].remove();
+        }]
+    }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'})); // Замените путь к изображению
+
+    template.append(closeButton);
+    
+    if (category in Window.windows) {
+        Window.windows[category].remove();
+    }
+    
+    Window.windows[category] = template;
+        
+    View.active.append(template);
+	}
+
+	
+	static async build(heroId,targetId = 0,isSplash = false) {
+		let viewBuild = await View.build(heroId, targetId, isSplash);
+		return DOM({id: 'wbuild'}, viewBuild);
+	}
 }
 
 class Frame {
@@ -2787,21 +2856,21 @@ class Build{
 		}
 		
 		document.body.append(Build.descriptionView);
-		
-		Build.listView = document.createElement('div');
-		Build.listView.classList.add('build-list');
 	
 		Build.heroView = document.createElement('div');
-		
 		Build.heroView.classList.add('build-hero');
 		
 		Build.levelView = document.createElement('div');
-		
 		Build.levelView.classList.add('build-level');
 		
 		Build.fieldView = document.createElement('div');
-		
 		Build.fieldView.classList.add('build-field');
+		
+		Build.listView = document.createElement('div');
+		Build.listView.classList.add('build-list');
+
+		Build.buildActionsView = document.createElement('div');
+		Build.buildActionsView.classList.add('build-actions-view');
 		
 		Build.fieldConflict = new Object();
 	
@@ -2810,52 +2879,47 @@ class Build{
 		const buttonTalents = document.createElement('button');
 		buttonTalents.innerText = 'Таланты';
 		buttonTalents.title = 'TODO еще не готово - команда PW Classic работает над этим';
-		buttonTalents.classList.add('talents', 'btn-hover', 'color-1');
+		buttonTalents.classList.add('btn-talents', 'btn-hover', 'color-1');
 		buttonTalents.title = 'Библиотека талантов';
 
 		const separator = document.createElement('div');
 		separator.innerText = '|';
-		separator.classList.add('separator');
+		separator.classList.add('btn-separator');
 
 
 		const buttonSets = document.createElement('button');
 		buttonSets.innerText = 'Сеты';
 		buttonSets.title = 'TODO еще не готово - команда PW Classic работает над этим';
-		buttonSets.classList.add('sets', 'btn-hover', 'color-1');
+		buttonSets.classList.add('btn-sets', 'btn-hover', 'color-1');
 		
 		buttonSets.addEventListener('click',() => Build.sets());
 
-		const buttonsTalentsAndSets = document.createElement('div');
-		buttonsTalentsAndSets.classList.add('buttons-talents-and-sets');
-		buttonsTalentsAndSets.append(buttonTalents, separator, buttonSets);
+		Build.talentsAndSetsView = document.createElement('div');
+		Build.talentsAndSetsView.classList.add('buttons-talents-and-sets');
+		Build.talentsAndSetsView.append(buttonTalents, separator, buttonSets);
 
-		const buildTalents = document.createElement('div');
-		buildTalents.classList.add('build-talents');
+		const buildTalents = DOM({style:'build-talents'});
 
 		Build.inventoryView = document.createElement('div');
-		Build.inventoryView.classList.add('build-talent');
+		Build.inventoryView.classList.add('build-talent-view');
 
-		const newSkin = DOM({
+		Build.skinView = DOM({
 				tag: 'button',
-				style: ['build-list-item', 'skins', 'btn-hover', 'color-3'],
+				style: ['btn-skins', 'btn-hover', 'color-3'],
 				title: 'Образы на героя',
 				event:['click', async () => Build.skinChange()]
 			},
 			'Скины'
 		)
 
-		Build.inventoryView.append(newSkin, buttonsTalentsAndSets, buildTalents);
+		Build.inventoryView.append(buildTalents);
 
 
 		// ================================================
 
-		Build.rarityView = document.createElement('div');
+		Build.rarityView = DOM({style:'build-rarity'});
 		
-		Build.rarityView.classList.add('build-rarity');
-		
-		Build.activeBarView = document.createElement('div');
-		
-		Build.activeBarView.classList.add('build-active-bar');
+		Build.activeBarView = DOM({style:'build-active-bar'});
 		
 		let request = await App.api.request('build','data',{heroId:heroId,target:targetId});
 		
@@ -2888,6 +2952,7 @@ class Build{
 		Build.applyBuffs = true;
 		
 		Build.list(request.build, isSplash);
+		Build.buildActions(request.build, isSplash);
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -2964,16 +3029,15 @@ class Build{
 		Splash.show(bodyHero,false);
 		
 	}
-	
-	static list(builds, isSplash){
 
-		const newRandomSkinsButtons = DOM({tag: 'div', style: 'new-random-skins-buttons--wrapper'});
-
+	static buildActions(builds, isSplash){
 		if(builds.length < 6){
 			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 				Splash.hide();
 			}]}, '[x]');
-			const create = DOM({tag: 'button', style: ['build-list-item', 'new-build', 'btn-hover', 'color-1'], title: 'Создать новую вкладку билда',  event:['click', () => {
+			const create = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
+				title: 'Создать новую вкладку билда',  
+				event:['click', () => {
 					
 				let template = document.createDocumentFragment();
 				
@@ -2991,7 +3055,7 @@ class Build{
 					
 					Splash.hide();
 					
-					View.show('build',Build.heroId);
+				 isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
 					
 				}]},'Создать билд');
 				
@@ -3001,61 +3065,99 @@ class Build{
 				
 			}]});
 
-			newRandomSkinsButtons.append(create);
+			let backgroundImg = DOM({style: ['btn-create', 'build-action-item-background']});
+			backgroundImg.style.backgroundImage = `url('content/icons/plus.svg')`;
+			create.append(backgroundImg);
+
+
+			Build.buildActionsView.append(create);
 		}
 
-		const random = DOM({tag: 'button', style: ['build-list-item', 'random-build', 'btn-hover', 'color-1'], title: 'Сгенерировать случайный билд', event:['click', async () => {
-			
-			await App.api.request('build','random',{id:Build.id});
-			
-			View.show('build',Build.heroId);
-			
-		}]});
-		newRandomSkinsButtons.append(random);
+		{
+			const random = DOM({
+				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
+				title: 'Сгенерировать случайный билд',
+				event: ['click', async () => {
 
-		const buildButtonsWrapper = DOM({style: 'build-buttons--wrapper'});
-		buildButtonsWrapper.append(newRandomSkinsButtons)
+					await App.api.request('build', 'random', { id: Build.id });
+
+					isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+
+				}]
+			});
+
+			let backgroundImg = DOM({ style: ['btn-random', 'build-action-item-background'] });
+			backgroundImg.style.backgroundImage = `url('content/icons/dice.svg')`;
+			random.append(backgroundImg);
+
+			Build.buildActionsView.append(random);
+		}
+
+
+		{
+			const resetBuild = DOM({
+				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
+				title: 'Сбросить таланты в этом билде',
+				event: ['click', async () => {
+					const reset = DOM({
+						event: ['click', async () => {
+							await App.api.request('build', 'clear', { id: Build.id });
+						 	isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+							Splash.hide();
+						}]
+					}, 'Сбросить')
+					const close = DOM({ event: ['click', () => Splash.hide()] }, 'Отмена')
+					const wrap = DOM({ style: 'wrap' }, reset, close);
+					const dom = DOM({ style: 'div' }, 'Сбросить таланты в этом билде?', wrap);
+					Splash.show(dom)
+				}]
+			});
+
+			let backgroundImg = DOM({ style: ['btn-trash', 'build-action-item-background'] });
+			backgroundImg.style.backgroundImage = `url('content/icons/trash.svg')`;
+			resetBuild.append(backgroundImg);
+
+			Build.buildActionsView.append(resetBuild);
+		}
+	}
+	
+	static list(builds, isSplash){
+
+		const buildButtonsWrapper = DOM({style: 'build-list'});
 
 		for(let build of builds){
 			
 			const item = DOM(
-				{tag: 'button', style: ['build-list-item', 'btn-hover', 'color-2']},
+				{tag: 'button', style: ['build-tab-item', 'btn-hover']},
 				`${build.name}`,
 			);
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
 
 			if (build.target) {
-				div.classList.add('highlight');
+				item.classList.add('list-highlight');
+			} else {
+				item.classList.add('list-not-highlight');
 			}
 
-			item.onclick = () => {
+			item.onclick = () => {/*
 				setTimeout(_ => {
 					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
-					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('highlight');
-				}, 300);
-				View.show('build',Build.heroId,build.id);
+					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('list-highlight');
+				}, 300);*/
+				isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
 			}
 
-			buildButtonsWrapper.append(div);
+			Build.listView.append(div);
 
 		}
+		/*
 		setTimeout(_ => {
-			if (!document.querySelector('.button-build--wrapper.highlight')) {
-				document.querySelector('.button-build--wrapper').classList.add('highlight');
+			if (!document.querySelector('.build-list.list-highlight')) {
+				document.querySelector('.build-list').classList.add('list-highlight');
 			}
 		}, 300);
-
-		Build.listView.append(buildButtonsWrapper);
-
-		Build.listView.append(DOM({style:'build-list-close', title: 'Закрыть', event:['click',() => {
-			Build.CleanInvalidDescriptions();
-			if (isSplash) {
-				View.show('castle'); 
-			} else {
-				View.show('builds'); 
-			}
-		}]},'[X]'));
+		*/
 	}
 
 	static totalStat(stat){
@@ -3085,7 +3187,7 @@ class Build{
 			Build.calculationStats[stat] = 0.0;
 		}
 		
-		let stats = DOM({style:'build-hero-stats'});
+		let stats = DOM({style:'build-hero-stats-view'});
 		
 		let template = {
 			
@@ -3104,9 +3206,6 @@ class Build{
 			punching: 'Пробивание',
 			protectionBody: 'Защита тела',
 			protectionSpirit: 'Защита духа',
-			considerStacks: 'Учитывать стаки',
-			considerBuff: 'Учитывать бафф',
-			groundType: 'Учитывать землю',
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
@@ -3467,8 +3566,25 @@ class Build{
 			i++;
 			
 		}
+
+		let landTypeSetting = DOM({
+			style:['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'], 
+			title: 'Тип земли', 
+			event:['click', async ()=>{
+				Build.applyRz = !Build.applyRz;
+				Build.applyVz = !Build.applyVz;
+				Build.updateHeroStats();
+				if (Build.applyRz) {
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz','build-hero-stats-setting-land-type-rz');
+				} else {
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz','build-hero-stats-setting-land-type-vz');
+				}
+			}
+		]});
+
+		stats.append(DOM({style:'build-hero-stats-settings'}, landTypeSetting));
 		
-		Build.heroName = DOM({tag: 'p', style: 'name'});
+		Build.heroName = DOM({tag: 'div', style: 'name'});
 		
 		if(MM.hero){
 			
@@ -3516,7 +3632,7 @@ class Build{
 		
 		Build.heroImg.append(rank);
 		
-		const wrapper = DOM({tag: 'div'},Build.heroImg,Build.heroName);
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView);
 		
 		Build.heroView.append(
 			wrapper,
@@ -3856,7 +3972,7 @@ class Build{
 				
 				item.dataset.position = index;
 				
-				item.classList.add('build-field-item');
+				item.classList.add('build-hero-grid-item');
 				
 				if(data[index]){
 					
@@ -3868,49 +3984,6 @@ class Build{
 				
 				row.append(item);
 				
-				if(index == 0){
-					
-					item.style.borderRadius = '18px 0 18px 0';
-					
-				}
-				else if([1,2,3,4].includes(index)){
-					
-					item.style.borderRadius = '0 0 18px 18px';
-					
-				}
-				else if(index == 5){
-					
-					item.style.borderRadius = '0 18px 0 18px';
-					
-				}
-				else if([11,17,23,29].includes(index)){
-					
-					item.style.borderRadius = '18px 0 0 18px';
-					
-				}
-				else if(index == 35){
-					
-					item.style.borderRadius = '18px 0 18px 0';
-					
-				}
-				else if([31,32,33,34].includes(index)){
-					
-					item.style.borderRadius = '18px 18px 0 0';
-					
-				}
-				else if(index == 30){
-					
-					item.style.borderRadius = '0 18px 0 18px';
-					
-				}else if([6,12,18,24].includes(index)){
-					
-					item.style.borderRadius = '0 18px 18px 0';
-					
-				}else{
-					
-					item.style.borderRadius = '18px';
-					
-				}
 
 				Build.installedTalents[index] = data[index];
 
@@ -3937,9 +4010,7 @@ class Build{
 	
 	static templateViewTalent(data){
 		
-		const talent = document.createElement('div');
-		
-		talent.classList.add('build-talent-item');
+		const talent = DOM({style:'build-talent-item'});
 
 		if (data.txtNum) {
 			let params = data.txtNum.split(';');
@@ -3988,11 +4059,15 @@ class Build{
 	
 	static inventory(){
 		
-		let preload = new PreloadImages(Build.inventoryView.querySelector('.build-talents'));
-		
 		App.api.silent((data) => {
 			
 			for(let item of data){
+
+				let talentContainer = DOM({style:'build-talent-item-container'});
+		
+				Build.inventoryView.querySelector('.build-talents').append(talentContainer);
+				
+				let preload = new PreloadImages(talentContainer);
 				
 				item.state = 1;
 				
@@ -4074,7 +4149,7 @@ class Build{
 				}
 				else{
 					
-					button.style.border = 'solid 7px rgb(153,255,51)';
+					button.style.border = 'solid calc(min(0.5cqh, 1cqw)) rgb(153,255,51)';
 
 					Build.setSortInventory('rarity',item.id);
 					
@@ -4094,22 +4169,45 @@ class Build{
 			
 		}
 		
-		const reset = document.createElement('img');
-		reset.title = 'Сбросить таланты в этом билде';
-		reset.src = 'content/icons/trash.svg';
-		reset.classList.add('reset');
-		reset.addEventListener('click', async () => {
-			const reset = DOM({event:['click', async () => {
-				await App.api.request('build','clear',{id:Build.id});
-				View.show('build',Build.heroId);
-				Splash.hide();
-			}]}, 'Сбросить')
-			const close = DOM({event:['click',() => Splash.hide()]},'Отмена')
-			const wrap = DOM({style: 'wrap'}, reset, close);
-			const dom = DOM({style: 'div'}, 'Сбросить таланты в этом билде?', wrap);
-			Splash.show(dom)
-		});
-		Build.rarityView.append(reset);
+	}
+
+	static async removeTalentFromActive(activeId){
+		let container = Build.activeBarView.childNodes[activeId];
+
+		Build.disableSmartCast(container);
+		container.firstChild.remove();
+
+		Build.activeBarItems[activeId] = 0;
+		await App.api.request('build','setZeroActive',{buildId:Build.id,index:activeId});
+	}
+
+	static async requestSmartcast(element) {
+		if(element.firstChild){
+			let position = Number(element.firstChild.dataset.position) + 1;
+			if(element.dataset.active == 1){
+				position = -position;
+			}
+			
+			await App.api.request('build','setActive',{buildId:Build.id,index:element.dataset.index,position:position});
+		}
+	}
+
+	static async enableSmartCast(element, sendRequest) {
+		element.classList.add('smartcast');
+		element.dataset.active = 1;
+		element.title = 'Смарткаст включён';
+		if (sendRequest) {
+			await Build.requestSmartcast(element);
+		}
+	}
+
+	static async disableSmartCast(element, sendRequest) {
+		element.classList.remove('smartcast');
+		element.dataset.active = 0;
+		element.title = 'Смарткаст выключён';
+		if (sendRequest) {
+			await Build.requestSmartcast(element);
+		}
 	}
 	
 	static activeBar(data){
@@ -4121,37 +4219,17 @@ class Build{
 		
 		for(let item of data){
 			
-			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['click', async () => {
+			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['contextmenu', async (e) => {
+				e.preventDefault();
+				if (!element.firstChild) {
+					return;
+				}
 				
 				if(element.dataset.active == 1){
-					
-					element.classList.remove('smartcast');
-					
-					element.dataset.active = 0;
-
-					element.title = 'Смарткаст выключён';
+					await Build.disableSmartCast(element, true);
 				}
 				else{
-					
-					element.classList.add('smartcast');
-					
-					element.dataset.active = 1;
-
-					element.title = 'Смарткаст включён';
-				}
-				
-				if(element.firstChild){
-					
-					let position = Number(element.firstChild.dataset.position) + 1;
-					
-					if(element.dataset.active == 1){
-						
-						position = -position;
-						
-					}
-					
-					await App.api.request('build','setActive',{buildId:Build.id,index:element.dataset.index,position:position});
-					
+					await Build.enableSmartCast(element, true);
 				}
 				
 			}]});
@@ -4163,17 +4241,15 @@ class Build{
 			}
 			else{
 				
-				element.classList.add('smartcast');
-
-				element.dataset.active = 1;
+				Build.enableSmartCast(element);
 				
 			}
 			
 			if(Math.abs(item)){
 				
-				let poistion = (Math.abs(item) - 1);
+				let position = (Math.abs(item) - 1);
 				
-				let findTalent = Build.fieldView.querySelector(`[data-position = "${poistion}"]`);
+				let findTalent = Build.fieldView.querySelector(`[data-position = "${position}"]`);
 				
 				if( (findTalent) && (findTalent.firstChild) ){
 					
@@ -4189,29 +4265,9 @@ class Build{
 				
 				clone.style.backgroundImage = `url("${clone.dataset.url}")`;
 				
-				clone.dataset.position = poistion;
+				clone.dataset.position = position;
 				
-				clone.oncontextmenu = () => {
-					
-					try{
-						
-						App.api.request('build','setZeroActive',{buildId:Build.id,index:element.dataset.index});
-						Build.activeBarItems[element.dataset.index] = 0;
-						
-						clone.remove();
-						
-						return false;
-						
-					}
-					catch(e){
-						
-						
-						
-					}
-					
-					return false;
-					
-				}
+				Build.move(clone, true);
 					
 					
 				}
@@ -4283,21 +4339,33 @@ class Build{
 		}
 		
 	}
-	
-	static sortInventory(){
-		
-		for(let item of Build.inventoryView.querySelectorAll('.build-talent-item')){
-			
-			let data = Build.talents[item.dataset.id], flag = true;
 
-			if (data.level == 0) {
-				item.style.display = 'none';
-				continue;
+	static applySorting(itemContainer) {
+		
+		let item = itemContainer.firstChild;
+			
+		let data = Build.talents[item.dataset.id], flag = true;
+
+		if (data.level == 0) {
+			itemContainer.style.display = 'none';
+			return;
+		}
+		
+		for(let key in Build.ruleSortInventory){
+			
+			if( !(key in data) ){
+				
+				flag = false;
+				
+				break;
+				
 			}
 			
-			for(let key in Build.ruleSortInventory){
+			if(key == 'stats'){
 				
-				if( !(key in data) ){
+				let foundStat = false;
+				
+				if(!data.stats){
 					
 					flag = false;
 					
@@ -4305,62 +4373,55 @@ class Build{
 					
 				}
 				
-				if(key == 'stats'){
+				for(let stat of Build.ruleSortInventory.stats){
 					
-					let foundStat = false;
-					
-					if(!data.stats){
+					if( (stat in data.stats) ){
 						
-						flag = false;
-						
-						break;
-						
-					}
-					
-					for(let stat of Build.ruleSortInventory.stats){
-						
-						if( (stat in data.stats) ){
-							
-							foundStat = true;
-							
-						}
-						
-					}
-					
-					if(!foundStat){
-						
-						flag = false;
-						
-						break;
-						
-					}
-					
-				}
-				else{
-					
-					if(!Build.ruleSortInventory[key].includes(`${data[key]}`)){
-						
-						flag = false;
-						
-						break;
+						foundStat = true;
 						
 					}
 					
 				}
 				
-			}
-			
-			if(flag){
-				
-				item.style.display = 'block';
+				if(!foundStat){
+					
+					flag = false;
+					
+					break;
+					
+				}
 				
 			}
 			else{
 				
-				item.style.display = 'none';
+				if(!Build.ruleSortInventory[key].includes(`${data[key]}`)){
+					
+					flag = false;
+					
+					break;
+					
+				}
 				
 			}
 			
+		}
+		
+		if(flag){
+			
+			itemContainer.style.display = 'block';
+			
+		}
+		else{
+			
+			itemContainer.style.display = 'none';
+			
+		}
+	}
+	
+	static sortInventory(){
+		
+		for(let itemContainer of Build.inventoryView.querySelectorAll('.build-talent-item-container')){
+			Build.applySorting(itemContainer);
 		}
 		
 	}
@@ -4377,9 +4438,25 @@ class Build{
 		
 	}
 	
-	static move(element){
+	static move(element, fromActiveBar){
+
+		let elementFromPoint = (x, y) => {
+			let elems = document.elementsFromPoint(x, y);
+			return elems[0].className == 'build-level' ? elems[1] : elems[0];
+		};
+
+		let elementSetDisplay = (element, display) => {
+			if (element.parentElement.classList == 'build-talent-item-container') {
+				element.parentElement.style.display = display;
+			}
+			element.style.display = display;
+		}
 		
 		element.onmousedown = (event) => {
+
+			if (event.button != 0) {
+				return;
+			}
 
 			let moveStart = Date.now();
 			
@@ -4389,13 +4466,23 @@ class Build{
 			
 			let fieldRow = document.getElementById(`bfr${data.level}`);
 			
-			fieldRow.style.background = 'rgba(255,255,255,0.5)';
+			if (!fromActiveBar) {
+				fieldRow.style.background = 'rgba(255,255,255,0.5)';
 			
-			fieldRow.style.borderRadius = '15px';
+				fieldRow.style.borderRadius = '1cqh';
+			}
+
+			let rect = element.getBoundingClientRect();
 			
-			let shiftX = event.pageX - element.getBoundingClientRect().left;
-			
-			let shiftY = event.pageY - element.getBoundingClientRect().top;
+			let shiftX = event.pageX - rect.left;
+			let shiftY = event.pageY - rect.top;
+
+			let offsetParent = element;
+			do {
+				shiftX += offsetParent.offsetParent.offsetLeft;
+				shiftY += offsetParent.offsetParent.offsetTop;
+				offsetParent = offsetParent.offsetParent;
+			} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
 			
 			element.style.zIndex = 9999;
 			
@@ -4406,9 +4493,9 @@ class Build{
 			// "mouseup event is released while the pointer is located inside" - from https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
 			element.style.top = event.pageY - shiftY - 5 + 'px';
 
-			element.style.display = 'none';
-			let startingElementBelow = document.elementFromPoint(event.clientX, event.clientY);
-			element.style.display = 'block';
+			elementSetDisplay(element, 'none');
+			let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
+			elementSetDisplay(element, 'block');
 			
 			document.onmousemove = (e) => {
 				
@@ -4439,16 +4526,23 @@ class Build{
 				
 				let top = parseInt(element.style.top) + (target.height / 2);
 
+				let offsetParent = element;
+				do {
+					left += offsetParent.offsetParent.offsetLeft;
+					top += offsetParent.offsetParent.offsetTop;
+					offsetParent = offsetParent.offsetParent;
+				} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
+
 				let isFieldTarget = (left > field.x) && (left < (field.x + field.width) ) && (top > field.y) && (top < (field.y + field.height) );
 
 				let isInventoryTarget = (left > inventory.x) && (left < (inventory.x + inventory.width) ) && (top > inventory.y) && (top < (inventory.y + inventory.height) );
 
 				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) );
 
-				if (isClick && isFieldTarget) {
-					element.style.display = 'none';
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-					element.style.display = 'block';
+				if (isClick && (isFieldTarget || isActiveBarTarget && fromActiveBar)) {
+					elementSetDisplay(element, 'none');
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
+					elementSetDisplay(element, 'block');
 					isClick = elemBelow == startingElementBelow;
 				}
 
@@ -4474,22 +4568,74 @@ class Build{
 					}
 				}
 
-				let removeFromActive = async (position) => {
+				let removeFromActive = async (position, skipActiveId) => {
 					for (let i = 0; i < Build.activeBarItems.length; i++) {
 						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
-						if (talPos == position) {
-							Build.activeBarView.childNodes[i].firstChild.remove(); //.querySelector('build-talents')
-							Build.activeBarItems[i] = 0;
-							await App.api.request('build','setZeroActive',{buildId:Build.id,index:i});
+						if (talPos == position && i != skipActiveId) {
+							await Build.removeTalentFromActive(i);
 						}
 					}
 				}
-				
-				if( isFieldTarget ){
-					
-					element.style.display = 'none';
 
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+				let addToActive = async (index, position, datasetPosition, targetElem, clone, smartCast) => {
+					await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+					Build.activeBarItems[index] = position;
+					targetElem.append(clone);
+					clone.style.position = 'static';
+					clone.style.zIndex = 1;
+
+					clone.dataset.position = datasetPosition;
+					clone.dataset.state = 3;
+					clone.style.opacity = 1;
+					clone.style.zIndex = 1;
+					clone.style.position = 'static';
+
+					
+					Build.move(clone, true);
+					if (smartCast) {
+						await Build.enableSmartCast(targetElem, true);
+					}
+				}
+
+				let editActive = async (position, newPosition, clone, skipActiveId) => {
+					if (position == newPosition) {
+						clone.remove();
+						return null;
+					}
+
+					let activeBarPosition = -1;
+					for (let i = 0; i < Build.activeBarItems.length; i++) {
+						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
+						if (talPos == position && i != skipActiveId) {
+							activeBarPosition = i;
+							break;
+						}
+					}
+					if (activeBarPosition == -1) {
+						clone.remove();
+						return null;
+					}
+					
+					let container = Build.activeBarView.childNodes[activeBarPosition];
+
+					let isSmartCast = Number(container.dataset.active);
+
+					let activePosition = Number(newPosition) + 1;
+
+					let glone = container.firstChild.cloneNode(true);
+
+					await removeFromActive(position, skipActiveId);
+
+					await addToActive(activeBarPosition, activePosition, newPosition, container, clone, isSmartCast);
+
+					return activeBarPosition;
+				}
+				
+				if( isFieldTarget && !fromActiveBar ){
+					
+					elementSetDisplay(element, 'none');
+
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 
 					if (elemBelow.childNodes[0] && elemBelow.childNodes[0].className == 'build-talent-item') {
 						// Select 'build-talent-item' if selected its parent
@@ -4500,7 +4646,7 @@ class Build{
 					let performSwap = false;
 					let performSwapFromLibrary = false;
 
-					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-field-item') {
+					if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-hero-grid-item') {
 						elemBelow = elemBelow.parentElement;
 						performSwap = swapParentNode.dataset.position ? true : false;
 						performSwapFromLibrary = !performSwap;
@@ -4516,9 +4662,9 @@ class Build{
 						}
 					}
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
-					if(elemBelow && (elemBelow.className == 'build-field-item') ){
+					if(elemBelow && (elemBelow.className == 'build-hero-grid-item') ){
 						
 						if( (data.level) && (elemBelow.parentNode.dataset.level == data.level) ){
 
@@ -4545,6 +4691,7 @@ class Build{
 								element.dataset.state = 2;
 								
 								let swappingTal = null;
+								let removeContainerAfterMove = false;
 								if (performSwap) {
 									swappingTal = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 									let swappedTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
@@ -4560,21 +4707,26 @@ class Build{
 									Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
 									Build.installedTalents[parseInt(swapParentNode.dataset.position)] = null;
 
+									elemBelow.append(element);
 									if (performSwapFromLibrary) {
 										swapParentNode.prepend(elemBelow.firstChild);
+									} else {
+										if (swapParentNode.classList == 'build-talent-item-container') {
+											removeContainerAfterMove = true;
+										}
 									}
-									elemBelow.append(element);
 								}
 								
 								try{
+									let activeBarPosition = null;
 									if (data.active && swapParentNode.dataset.position) {
-										await removeFromActive(swapParentNode.dataset.position);
+										activeBarPosition = await editActive(swapParentNode.dataset.position, elemBelow.dataset.position, element.cloneNode(true));
 									}
 									if (performSwap) {
 										let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
 										
 										if (swappedTalent.active) {
-											await removeFromActive(elemBelow.dataset.position);
+											await editActive(elemBelow.dataset.position, swapParentNode.dataset.position, swapParentNode.firstChild.cloneNode(true), activeBarPosition);
 										}
 										await App.api.request('build','setZero',{buildId:Build.id, index:swapParentNode.dataset.position});
 										await App.api.request('build','set',{buildId:Build.id, talentId:swappedTalent.id, index:swapParentNode.dataset.position});
@@ -4584,6 +4736,7 @@ class Build{
 										if (performSwapFromLibrary) {
 											if (swappingTal.active) {
 												await removeFromActive(elemBelow.dataset.position);
+												// TODO: add to active
 											}
 											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
 										}
@@ -4604,6 +4757,10 @@ class Build{
 									
 								}
 
+								if (removeContainerAfterMove) {
+									swapParentNode.remove();
+								}
+
 							}
 							
 						}
@@ -4611,25 +4768,29 @@ class Build{
 					}
 					
 				}
-				else if( isInventoryTarget ){
+				else if( isInventoryTarget && !fromActiveBar){
 					
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 					
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					
 					if (isClick) {
 						elemBelow = document.getElementsByClassName('build-talents')[0].firstChild;
 					}
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
 					if(elemBelow && (elemBelow.parentNode.className == 'build-talents') && (element.dataset.state != 1) ){
 						
 						let oldParentNode = element.parentNode;
 						
 						element.dataset.state = 1;
+
+						let containedTalent = DOM({style:'build-talent-item-container'}, element);
+
+						Build.applySorting(containedTalent);
 						
-						elemBelow.parentNode.prepend(element);
+						elemBelow.parentNode.prepend(containedTalent);
 						
 						
 						try{
@@ -4655,6 +4816,10 @@ class Build{
 							element.dataset.state = 2;
 							
 							oldParentNode.append(element);
+
+							elementSetDisplay(element, 'block');
+
+							containedTalent.remove();
 							
 						}
 						
@@ -4663,74 +4828,95 @@ class Build{
 				}
 				else if( isActiveBarTarget ){
 					
-					element.style.display = 'none';
+					elementSetDisplay(element, 'none');
 					
-					let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+					let elemBelow = elementFromPoint(event.clientX, event.clientY);
+
+					let isSwap = elemBelow.parentNode.classList.contains('build-active-bar-item');
 					
-					element.style.display = 'block';
+					elementSetDisplay(element, 'block');
 					
-					if( (elemBelow) && (element.dataset.state == 2) && (elemBelow.className == 'build-active-bar-item') && (data.active == 1) ){
+					if( 
+						(elemBelow) && 
+						(element.dataset.state == 2 || element.dataset.state == 3) && 
+						(elemBelow.classList.contains('build-active-bar-item') || isSwap) && 
+						(data.active == 1) 
+					){
 						
 						let index = elemBelow.dataset.index;
-						
-						let active = elemBelow.dataset.active;
-						
-						let position = Number(element.parentNode.dataset.position) + 1;
-						
-						if(active == 1){
-							
-							position = -position;
-							
+						let smartCast = Number(element.parentNode.dataset.active);
+						let positionRaw = element.dataset.position;
+
+						if (!positionRaw) {
+							positionRaw = element.parentNode.dataset.position;
 						}
+
+						if (isSwap) {
+							index = elemBelow.parentNode.dataset.index;
+						}
+						
+						let position = Number(positionRaw) + 1;
+						
 	
 						try{
 							
-							await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
-							Build.activeBarItems[index] = position;
-							
-							let clone = element.cloneNode(true);
-							
-							clone.dataset.position = element.parentNode.dataset.position;
-							
-							clone.oncontextmenu = () => {
-								
-								try{
+
+							if (fromActiveBar) {
+								let startingIndex = element.parentNode.dataset.index;
+								if (isClick) {
+									await removeFromActive(positionRaw);
+								} else if (index != startingIndex) { // moved to other position
+									let swapElemParent = element.parentNode;
+									let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
+									let swapPositionRaw = isSwap ? elemBelow.dataset.position : 0;
+									let swapPosition = Number(swapPositionRaw) + 1;
+									let swapSmartCast = Number(targetElem.dataset.active);
+
+									let clone = element.cloneNode(true);
+									let swapClone = isSwap ? elemBelow.cloneNode(true) : null;
+									await removeFromActive(positionRaw);
+									if (swapClone) {
+										await removeFromActive(swapPositionRaw);
+									}
 									
-									App.api.request('build','setZeroActive',{buildId:Build.id,index:index});
-									Build.activeBarItems[index] = null;
-									
-									clone.remove();
-									
-									return false;
-									
+									await addToActive(index, position, positionRaw, targetElem, clone, smartCast);
+
+									if (swapClone) {
+										await addToActive(startingIndex, swapPosition, swapPositionRaw, swapElemParent, swapClone, swapSmartCast);
+									}
 								}
-								catch(e){
-									
-									
-									
+							} else {
+								let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
+								let clone = element.cloneNode(true);
+								clone.dataset.position = element.parentNode.dataset.position;
+								clone.dataset.state = 3;
+								clone.style.opacity = 1;
+								clone.style.zIndex = 1;
+								clone.style.position = 'static';
+
+								if (isSwap) {
+									await removeFromActive(elemBelow.dataset.position);
 								}
+								await removeFromActive(positionRaw);
+								await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+								Build.activeBarItems[index] = position;
 								
-								return false;
+								Build.move(clone, true);
 								
+								targetElem.append(clone);
 							}
-							
-							clone.dataset.state = 3;
-							
-							elemBelow.append(clone);
-							
-							clone.style.opacity = 1;
-							
-							clone.style.position = 'static';
 							
 						}
 						catch(e){
 							
-							
+							App.error('Failed to swap activebar')
 							
 						}
 						
 					}
 					
+				} else if (fromActiveBar) {
+					await removeFromActive(element.dataset.position);
 				}
 				
 
@@ -5100,9 +5286,9 @@ class Events {
 			
 			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 			
-			find.children[1].firstChild.firstChild.children[0].innerText = data.rating;
+			find.children[1].firstChild.firstChild.innerText = data.rating;
 			
-			find.children[1].firstChild.firstChild.children[1].style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+			find.children[1].firstChild.firstChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 			
 		}
 		
@@ -5122,7 +5308,9 @@ class Events {
 			
 			find.children[2].firstChild.innerText = 'Готов';
 			
-			find.children[2].firstChild.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+			find.children[2].classList.replace('party-middle-item-not-ready','party-middle-item-ready');
+			
+			find.children[2].classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 			
 		}
 		
@@ -5228,6 +5416,7 @@ class App {
 			try{
 				
 				View.show('castle');
+				//View.show('build', 1);
 				
 			}
 			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
@@ -5436,7 +5625,7 @@ class App {
 	
 }
 
-class Chat {
+	class Chat {
 	
 	static body;
 	
@@ -5444,27 +5633,31 @@ class Chat {
 	
 	static to = 0;
 	
-	static init(){
+	static init() {
+	let scrollBtn = DOM({
+		style: 'scroll-btn',
+		event: ['click', () => {
+		Chat.scroll(true);
+	}],
+	title: 'Прокрутить чат вниз' // Добавляем описание при наведении
+	}, '▼'); // Замените '▼' на нужный вам текст или символ для кнопки прокрутки
 
-		let scrollBtn = DOM({style: 'scroll-btn', event:['click',() => {
-			Chat.scroll(true);
-		}]}, '🡳');
-		
-		let input = DOM({tag:'input',style:'chat-input',placeholder:'Введите текст и нажмите Enter'});
+	let input = DOM({
+		tag: 'input',
+		style: 'chat-input',
+		placeholder: 'Введите текст и нажмите Enter'
+	});
 
-		Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn)
-		
-		Chat.body = DOM({style:'chat'},DOM({style:'chat-body'}),Chat.input);
-		
-		input.addEventListener('keyup', async (event) => {
-			
-			if(event.code === 'Enter' || event.code === 'NumpadEnter'){
-				
-				Chat.sendMessage();
-				
-			}
-			
-		});
+	Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn);
+    
+	Chat.body = DOM({style: 'chat'}, DOM({style: 'chat-body'}), Chat.input);
+    
+	input.addEventListener('keyup', async (event) => {
+		if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+			Chat.sendMessage();
+		}
+	});
+
 		
 		input.addEventListener('input',() => {
 			
@@ -5814,8 +6007,10 @@ class NativeAPI {
 		NativeAPI.setDefaultWindow();
 		
 		NativeAPI.app = nw.App;
+
+		NativeAPI.altEnterShortcut = new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()});
 		
-		NativeAPI.app.registerGlobalHotKey(new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()}));
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 		
 		NativeAPI.loadModules();
 		
@@ -7385,6 +7580,8 @@ class MM {
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
 		document.body.style.display = 'none';
 		NativeAPI.window.hide();
+		
+		NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
 	}
 
 	static gameStopEvent(){
@@ -7393,6 +7590,10 @@ class MM {
 		document.body.style.display = 'block';
 		NativeAPI.window.show();
 		NativeAPI.setDefaultWindow();
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
+
+		View.show('castle');
 	}
 	
 	static async init(){
@@ -9291,7 +9492,6 @@ class Game {
 	
 }
 
-
 class Splash{
 	
 	static init(){
@@ -9346,7 +9546,6 @@ class Splash{
 	}
 	
 }
-
 
 function DOM(properties){
 	
@@ -9421,6 +9620,8 @@ function DOM(properties){
 	
 }
 
+// Castle
+{
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -14976,3 +15177,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
+}
