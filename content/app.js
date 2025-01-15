@@ -2242,7 +2242,7 @@ class View {
 				), 
 				DOM({style: 'build-active-bar-container'}, 
 					Build.activeBarView, 
-					DOM({style:'build-active-bar-hint'}, 'Нажмите левой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
+					DOM({style:'build-active-bar-hint'}, 'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
 				),
 				Build.buildActionsView
 			),
@@ -4137,13 +4137,40 @@ class Build{
 	static async removeTalentFromActive(activeId){
 		let container = Build.activeBarView.childNodes[activeId];
 
-		container.classList.remove('smartcast');
-		container.dataset.active = 0;
-		container.title = 'Смарткаст выключён';
+		Build.disableSmartCast(container);
 		container.firstChild.remove();
 
 		Build.activeBarItems[activeId] = 0;
 		await App.api.request('build','setZeroActive',{buildId:Build.id,index:activeId});
+	}
+
+	static async requestSmartcast(element) {
+		if(element.firstChild){
+			let position = Number(element.firstChild.dataset.position) + 1;
+			if(element.dataset.active == 1){
+				position = -position;
+			}
+			
+			await App.api.request('build','setActive',{buildId:Build.id,index:element.dataset.index,position:position});
+		}
+	}
+
+	static async enableSmartCast(element, sendRequest) {
+		element.classList.add('smartcast');
+		element.dataset.active = 1;
+		element.title = 'Смарткаст включён';
+		if (sendRequest) {
+			await Build.requestSmartcast(element);
+		}
+	}
+
+	static async disableSmartCast(element, sendRequest) {
+		element.classList.remove('smartcast');
+		element.dataset.active = 0;
+		element.title = 'Смарткаст выключён';
+		if (sendRequest) {
+			await Build.requestSmartcast(element);
+		}
 	}
 	
 	static activeBar(data){
@@ -4155,41 +4182,17 @@ class Build{
 		
 		for(let item of data){
 			
-			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['click', async () => {
-
+			const element = DOM({data:{index:index},style:'build-active-bar-item',event:['contextmenu', async (e) => {
+				e.preventDefault();
 				if (!element.firstChild) {
 					return;
 				}
 				
 				if(element.dataset.active == 1){
-					
-					element.classList.remove('smartcast');
-					
-					element.dataset.active = 0;
-
-					element.title = 'Смарткаст выключён';
+					await Build.disableSmartCast(element, true);
 				}
 				else{
-					
-					element.classList.add('smartcast');
-					
-					element.dataset.active = 1;
-
-					element.title = 'Смарткаст включён';
-				}
-				
-				if(element.firstChild){
-					
-					let position = Number(element.firstChild.dataset.position) + 1;
-					
-					if(element.dataset.active == 1){
-						
-						position = -position;
-						
-					}
-					
-					await App.api.request('build','setActive',{buildId:Build.id,index:element.dataset.index,position:position});
-					
+					await Build.enableSmartCast(element, true);
 				}
 				
 			}]});
@@ -4201,9 +4204,7 @@ class Build{
 			}
 			else{
 				
-				element.classList.add('smartcast');
-
-				element.dataset.active = 1;
+				Build.enableSmartCast(element);
 				
 			}
 			
@@ -4229,24 +4230,7 @@ class Build{
 				
 				clone.dataset.position = poistion;
 				
-				clone.oncontextmenu = () => {
-					
-					try{
-						
-						Build.removeTalentFromActive(element.dataset.index);
-						
-						return false;
-						
-					}
-					catch(e){
-						
-						
-						
-					}
-					
-					return false;
-					
-				}
+				Build.move(clone, true);
 					
 					
 				}
@@ -4417,7 +4401,7 @@ class Build{
 		
 	}
 	
-	static move(element){
+	static move(element, fromActiveBar){
 
 		let elementFromPoint = (x, y) => {
 			let elems = document.elementsFromPoint(x, y);
@@ -4433,6 +4417,10 @@ class Build{
 		
 		element.onmousedown = (event) => {
 
+			if (event.button != 0) {
+				return;
+			}
+
 			let moveStart = Date.now();
 			
 			Build.descriptionView.style.display = 'none';
@@ -4441,15 +4429,23 @@ class Build{
 			
 			let fieldRow = document.getElementById(`bfr${data.level}`);
 			
-			fieldRow.style.background = 'rgba(255,255,255,0.5)';
+			if (!fromActiveBar) {
+				fieldRow.style.background = 'rgba(255,255,255,0.5)';
 			
-			fieldRow.style.borderRadius = '15px';
+				fieldRow.style.borderRadius = '1cqh';
+			}
 
 			let rect = element.getBoundingClientRect();
 			
-			let shiftX = event.pageX - rect.left + element.offsetParent.offsetLeft;
-			
-			let shiftY = event.pageY - rect.top + element.offsetParent.offsetTop;
+			let shiftX = event.pageX - rect.left;
+			let shiftY = event.pageY - rect.top;
+
+			let offsetParent = element;
+			do {
+				shiftX += offsetParent.offsetParent.offsetLeft;
+				shiftY += offsetParent.offsetParent.offsetTop;
+				offsetParent = offsetParent.offsetParent;
+			} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
 			
 			element.style.zIndex = 9999;
 			
@@ -4489,9 +4485,16 @@ class Build{
 				
 				let target = element.getBoundingClientRect();
 				
-				let left = parseInt(element.style.left) + element.offsetParent.offsetLeft + (target.width / 2);
+				let left = parseInt(element.style.left) + (target.width / 2);
 				
-				let top = parseInt(element.style.top) + element.offsetParent.offsetTop + (target.height / 2);
+				let top = parseInt(element.style.top) + (target.height / 2);
+
+				let offsetParent = element;
+				do {
+					left += offsetParent.offsetParent.offsetLeft;
+					top += offsetParent.offsetParent.offsetTop;
+					offsetParent = offsetParent.offsetParent;
+				} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
 
 				let isFieldTarget = (left > field.x) && (left < (field.x + field.width) ) && (top > field.y) && (top < (field.y + field.height) );
 
@@ -4499,7 +4502,7 @@ class Build{
 
 				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width) ) && (top > bar.y) && (top < (bar.y + bar.height) );
 
-				if (isClick && isFieldTarget) {
+				if (isClick && (isFieldTarget || isActiveBarTarget && fromActiveBar)) {
 					elementSetDisplay(element, 'none');
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
 					elementSetDisplay(element, 'block');
@@ -4532,12 +4535,12 @@ class Build{
 					for (let i = 0; i < Build.activeBarItems.length; i++) {
 						const talPos = Math.abs(Build.activeBarItems[i]) - 1;
 						if (talPos == position) {
-							Build.removeTalentFromActive(i);
+							await Build.removeTalentFromActive(i);
 						}
 					}
 				}
 				
-				if( isFieldTarget ){
+				if( isFieldTarget && !fromActiveBar ){
 					
 					elementSetDisplay(element, 'none');
 
@@ -4672,7 +4675,7 @@ class Build{
 					}
 					
 				}
-				else if( isInventoryTarget ){
+				else if( isInventoryTarget && !fromActiveBar){
 					
 					elementSetDisplay(element, 'none');
 					
@@ -4735,66 +4738,108 @@ class Build{
 					elementSetDisplay(element, 'none');
 					
 					let elemBelow = elementFromPoint(event.clientX, event.clientY);
+
+					let isSwap = elemBelow.parentNode.classList.contains('build-active-bar-item');
 					
 					elementSetDisplay(element, 'block');
 					
-					if( (elemBelow) && (element.dataset.state == 2) && (elemBelow.className == 'build-active-bar-item') && (data.active == 1) ){
+					if( 
+						(elemBelow) && 
+						(element.dataset.state == 2 || element.dataset.state == 3) && 
+						(elemBelow.classList.contains('build-active-bar-item') || isSwap) && 
+						(data.active == 1) 
+					){
 						
 						let index = elemBelow.dataset.index;
-						
-						let active = elemBelow.dataset.active;
-						
-						let position = Number(element.parentNode.dataset.position) + 1;
-						
-						if(active == 1){
-							
-							position = -position;
-							
+						let smartCast = Number(element.parentNode.dataset.active);
+						let positionRaw = element.dataset.position;
+
+						if (!positionRaw) {
+							positionRaw = element.parentNode.dataset.position;
 						}
+
+						if (isSwap) {
+							index = elemBelow.parentNode.dataset.index;
+						}
+						
+						let position = Number(positionRaw) + 1;
+						
 	
 						try{
 							
-							await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
-							Build.activeBarItems[index] = position;
-							
-							let clone = element.cloneNode(true);
-							
-							clone.dataset.position = element.parentNode.dataset.position;
-							
-							clone.oncontextmenu = () => {
-								
-								try{
 
-									Build.removeTalentFromActive(index);
+							if (fromActiveBar) {
+								let startingIndex = element.parentNode.dataset.index;
+								if (isClick) {
+									removeFromActive(positionRaw);
+								} else if (index != startingIndex) { // moved to other position
+									let swapElemParent = element.parentNode;
+									let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
+									let swapPositionRaw = isSwap ? elemBelow.dataset.position : 0;
+									let swapPosition = Number(swapPositionRaw) + 1;
+									let swapSmartCast = Number(targetElem.dataset.active);
+
+									let clone = element.cloneNode(true);
+									let swapClone = isSwap ? elemBelow.cloneNode(true) : null;
+									await removeFromActive(positionRaw);
+									if (swapClone) {
+										await removeFromActive(swapPositionRaw);
+									}
 									
+									await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+									Build.activeBarItems[index] = position;
+									targetElem.append(clone);
+									clone.style.position = 'static';
+									clone.style.zIndex = 1;
+									Build.move(clone, true);
+									if (smartCast) {
+										await Build.enableSmartCast(targetElem, true);
+									}
+
+									if (swapClone) {
+										await App.api.request('build','setActive',{buildId:Build.id,index:startingIndex,position:swapPosition});
+										Build.activeBarItems[startingIndex] = swapPosition;
+										swapElemParent.append(swapClone);
+										swapClone.style.position = 'static';
+										swapClone.style.zIndex = 1;
+										Build.move(swapClone, true);
+										if (swapSmartCast) {
+											await Build.enableSmartCast(swapElemParent, true);
+										}
+									}
 								}
-								catch(e){
-									
-									
-									
+							} else {
+								let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
+								let clone = element.cloneNode(true);
+								clone.dataset.position = element.parentNode.dataset.position;
+								clone.dataset.state = 3;
+								clone.style.opacity = 1;
+								clone.style.zIndex = 1;
+								clone.style.position = 'static';
+
+								if (isSwap) {
+									await removeFromActive(elemBelow.dataset.position);
 								}
+								await removeFromActive(positionRaw);
+								await App.api.request('build','setActive',{buildId:Build.id,index:index,position:position});
+								Build.activeBarItems[index] = position;
 								
-								return false;
+								Build.move(clone, true);
 								
+								targetElem.append(clone);
 							}
-							
-							clone.dataset.state = 3;
-							
-							elemBelow.append(clone);
-							
-							clone.style.opacity = 1;
-							
-							clone.style.position = 'static';
 							
 						}
 						catch(e){
 							
-							
+							App.error('Failed to swap activebar')
 							
 						}
 						
 					}
 					
+				} else if (fromActiveBar) {
+					await removeFromActive(element.dataset.position);
 				}
 				
 
