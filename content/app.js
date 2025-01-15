@@ -4771,7 +4771,7 @@ class Build{
 							if (fromActiveBar) {
 								let startingIndex = element.parentNode.dataset.index;
 								if (isClick) {
-									removeFromActive(positionRaw);
+									await removeFromActive(positionRaw);
 								} else if (index != startingIndex) { // moved to other position
 									let swapElemParent = element.parentNode;
 									let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
