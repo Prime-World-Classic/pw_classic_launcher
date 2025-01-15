@@ -4779,8 +4779,14 @@ class Build{
 					}
 					
 					elementSetDisplay(element, 'block');
+
+					let targetElement = elemBelow.parentNode;
+
+					if (targetElement.className == 'build-talent-item-container') {
+						targetElement = targetElement.parentNode;
+					}
 					
-					if(elemBelow && (elemBelow.parentNode.className == 'build-talents') && (element.dataset.state != 1) ){
+					if(elemBelow && (targetElement.className == 'build-talents') && (element.dataset.state != 1) ){
 						
 						let oldParentNode = element.parentNode;
 						
@@ -4790,7 +4796,7 @@ class Build{
 
 						Build.applySorting(containedTalent);
 						
-						elemBelow.parentNode.prepend(containedTalent);
+						targetElement.prepend(containedTalent);
 						
 						
 						try{
