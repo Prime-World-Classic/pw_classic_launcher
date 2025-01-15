@@ -1132,6 +1132,18 @@ text-align:center;
 
 
 
+.splash,.mm{
+	
+	position:fixed;
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:center;
+	align-items:center;
+	width:100vw;
+	height:100vh;
+	backdrop-filter:blur(1vmax);
+	
+}
 
 .splash{
 	
