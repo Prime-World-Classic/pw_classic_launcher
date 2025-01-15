@@ -4736,14 +4736,18 @@ class Build{
 										if (performSwapFromLibrary) {
 											if (swappingTal.active) {
 												await removeFromActive(elemBelow.dataset.position);
-												// TODO: add to active
 											}
+											swapParentNode.firstChild.dataset.state = 1;
 											await App.api.request('build','setZero',{buildId:Build.id, index:elemBelow.dataset.position});
 										}
 										Build.setStat(data, true);
 									}
 									
 									await App.api.request('build','set',{buildId:Build.id,talentId:data.id,index:elemBelow.dataset.position});
+
+									if (data.active) {
+										
+									}
 
 							
 									
