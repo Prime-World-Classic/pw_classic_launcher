@@ -2675,7 +2675,8 @@ class Build{
 		
 		container.style.height = '30vw';
 		
-		let state = false, get = DOM({event:['click', async () => {
+		let state = false;
+		let get = DOM({event:['click', async () => {
 			
 			if(!state){
 				
@@ -2699,15 +2700,11 @@ class Build{
 		
 		if(animate){
 			
-			bottom.style.opacity = 0;
+			bottom.style.opacity = 1;
 			
 		}
 		
-		container.append(Build.viewModel(request,() => {
-			
-			bottom.animate({opacity:[0,1]},{duration:500,fill:'both',easing:'ease-out'});
-			
-		},animate));
+		container.append(Build.viewModel(request,() => {},animate));
 		
 		Splash.show(DOM({style:'div'},DOM({style:'build-top'},nickname),container,bottom),false);
 		
@@ -2785,7 +2782,7 @@ class Build{
 		
 		for(let element of elements1){
 			
-			delay += 350;
+			delay += 150;
 			
 			let animate = element.animate({opacity:[0,1],transform:['scale(3)','scale(1)']},{delay:delay,duration:350,fill:'both',easing:'ease-out'});
 			
@@ -2823,7 +2820,7 @@ class Build{
 							
 						}
 						
-					},500);
+					},100);
 					
 				}
 				
