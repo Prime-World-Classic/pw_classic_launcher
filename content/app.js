@@ -1352,20 +1352,16 @@ class View {
 	
 	static castleSettings(){
 		
-		let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта",event:['click',() => View.exitOrLogout()]});
-		
 		let builds = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => View.show('top')]});
-		
-		let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка",event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]});
-		
-		let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]});
 		
 		let settings = DOM({style:['castle-settings-btn','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => {
 			let wrapper = DOM({style:['castle-settings-window']})
 			settings.append(wrapper);
 		}]});
 		
-		let clan = DOM({style:['castle-builds','button-outline'], title: 'Кланы',event:['click',() => Frame.open('clan')]});
+		let clan = DOM({style:['castle-clans','button-outline'], title: 'Кланы',event:['click',() => Frame.open('clan')]});
+		
+		let menu = DOM({style:['castle-menu','button-outline'], title: 'Меню',event:['click',() => Window.show('main', 'menu')]});
 		
 		let input = DOM({style:'castle-input', tag:'input'});
 
@@ -1375,17 +1371,9 @@ class View {
 		input.max='1';
 		input.step='0.01';
 		
-		let body = DOM({style:['castle-settings']}, close, render, music, builds, clan);
+		let body = DOM({style:['castle-settings']}, menu, builds, clan);
 		
 		return body; 
-		
-	}
-	
-	static castleMenu(){
-		
-		let body = DOM({style:'castle-menu'});
-		
-		return body;
 		
 	}
 	
@@ -2491,6 +2479,22 @@ class Window {
 	static async build(heroId,targetId = 0,isSplash = false) {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
 		return DOM({id: 'wbuild'}, viewBuild);
+	}
+
+	static async menu() {
+		//let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка"});
+		
+		//let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка"});
+		
+		//let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта"});
+
+		return DOM({id: 'wcastle-menu'}, DOM({style:'castle-menu-title'}, 'Меню'), 
+			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]}, 'Выключить рендер замка'), 
+			//DOM({style:'castle-menu-item',event:['click',() => App.error('Запрограммируй меня полностью')]}, 'Общая громкость'), 
+			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]}, 'Громкость музыки'), 
+			//DOM({style:'castle-menu-item',event:['click',() => App.error('Запрограммируй меня полностью')]}, 'Громкость звуков'),
+			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
+		)
 	}
 }
 

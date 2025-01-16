@@ -41,6 +41,24 @@
 	cursor: pointer;
 }
 
+.castle-menu{
+    width: 7vh;
+	height: 7vh;
+	background-image: url('htalents/8.webp');
+	background-size: cover;
+    object-fit: cover;
+	cursor: pointer;
+}
+
+.castle-clans{
+    width: 7vh;
+	height: 7vh;
+	background-image: url('htalents/32.webp');
+	background-size: cover;
+    object-fit: cover;
+	cursor: pointer;
+}
+
 .castle-builds{
     width: 7vh;
 	height: 7vh;
@@ -426,19 +444,6 @@
 	align-items:center;
 	position:absolute;
 	top:0;	
-	
-}
-
-.castle-menu {
-	
-	position:absolute;
-	left:0;
-	display:flex;
-	justify-content:center;
-	align-items:center;
-	flex-flow:column nowrap;
-	height:100vh;
-	width:3vw;
 	
 }
 
