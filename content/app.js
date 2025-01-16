@@ -9640,12 +9640,6 @@ function DOM(properties){
 					parent[property] = properties[property];
 					
 					break;
-
-					case 'value':
-
-					parent.value = properties[property];
-
-					break;
 					
 				}
 				
