@@ -2490,9 +2490,19 @@ class Window {
 
 		return DOM({id: 'wcastle-menu'}, DOM({style:'castle-menu-title'}, 'Меню'), 
 			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]}, 'Выключить рендер замка'), 
-			//DOM({style:'castle-menu-item',event:['click',() => App.error('Запрограммируй меня полностью')]}, 'Общая громкость'), 
-			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleMusic(Castle.MUSIC_LAYER_PLAYER)]}, 'Громкость музыки'), 
-			//DOM({style:'castle-menu-item',event:['click',() => App.error('Запрограммируй меня полностью')]}, 'Громкость звуков'),
+			DOM({style:'castle-menu-label'}, 'Общая громкость', DOM({tag:'input', type: 'range', value: Castle.globalVolume * 100, min:'0', max:'100', step:'1', 
+				style:'castle-menu-slider', event:['input',(e) => {
+				Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+			}]})), 
+			DOM({style:'castle-menu-label'}, 'Громкость музыки', DOM({tag:'input', type: 'range', value: Castle.musicVolume * 100, min:'0', max:'100', step:'1', 
+				style:'castle-menu-slider', event:['input',(e) => {
+				Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+			}]})), 
+			DOM({style:'castle-menu-label'}, 'Громкость звуков', DOM({tag:'input', type: 'range', value: Castle.soundsVolume * 100, min:'0', max:'100', step:'1', 
+				style:'castle-menu-slider', event:['input',(e) => {
+				Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+			}]})), 
 			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
 		)
 	}
@@ -6299,10 +6309,10 @@ class Castle {
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
 	static GetVolume(type) {
-		if (type == AUDIO_MUSIC) {
+		if (type == Castle.AUDIO_MUSIC) {
 			return Castle.globalVolume * Castle.musicVolume;
 		}
-		if (type == AUDIO_SOUNDS) {
+		if (type == Castle.AUDIO_SOUNDS) {
 			return Castle.globalVolume * Castle.soundsVolume;
 		}
 	}
@@ -6791,7 +6801,7 @@ class Castle {
 			let playCastleMusic = function() {
 				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
 				Sound.stop('castle');
-				Sound.play(musicName, {id:'castle',volume:Castle.GetVolume(AUDIO_MUSIC)}, playCastleMusic)
+				Sound.play(musicName, {id:'castle',volume:Castle.GetVolume(Castle.AUDIO_MUSIC)}, playCastleMusic)
 			}
 			playCastleMusic();
 		}
@@ -8213,7 +8223,7 @@ class MM {
 		
 		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},MM.renderMap()),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
-		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(AUDIO_MUSIC), loop:true});
+		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop:true});
 		
 		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, false);
 		
@@ -8269,7 +8279,7 @@ class MM {
 	
 	static async select(data){
 		
-		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`,{volume:Castle.GetVolume(AUDIO_SOUNDS)});
+		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`,{volume:Castle.GetVolume(Castle.AUDIO_SOUNDS)});
 		
 		MM.lobbyPlayerAnimate.cancel();
 		
@@ -9629,6 +9639,12 @@ function DOM(properties){
 					
 					parent[property] = properties[property];
 					
+					break;
+
+					case 'value':
+
+					parent.value = properties[property];
+
 					break;
 					
 				}
