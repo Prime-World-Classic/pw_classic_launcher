@@ -6292,7 +6292,20 @@ class Castle {
 	
 	static gl;
 
+	static globalVolume = 1.0;
 	static musicVolume = 0.5;
+	static soundsVolume = 0.75;
+
+	static AUDIO_MUSIC = 0;
+	static AUDIO_SOUNDS = 1;
+	static GetVolume(type) {
+		if (type == AUDIO_MUSIC) {
+			return Castle.globalVolume * Castle.musicVolume;
+		}
+		if (type == AUDIO_SOUNDS) {
+			return Castle.globalVolume * Castle.soundsVolume;
+		}
+	}
 
 	static RENDER_LAYER_LAUNCHER = 0;
 	static RENDER_LAYER_GAME = 1;
@@ -6778,7 +6791,7 @@ class Castle {
 			let playCastleMusic = function() {
 				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
 				Sound.stop('castle');
-				Sound.play(musicName, {id:'castle',volume:Castle.musicVolume}, playCastleMusic)
+				Sound.play(musicName, {id:'castle',volume:Castle.GetVolume(AUDIO_MUSIC)}, playCastleMusic)
 			}
 			playCastleMusic();
 		}
@@ -8200,7 +8213,7 @@ class MM {
 		
 		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},MM.renderMap()),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
-		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume:0.50,loop:true});
+		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(AUDIO_MUSIC), loop:true});
 		
 		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, false);
 		
@@ -8256,7 +8269,7 @@ class MM {
 	
 	static async select(data){
 		
-		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`,{volume:0.75});
+		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`,{volume:Castle.GetVolume(AUDIO_SOUNDS)});
 		
 		MM.lobbyPlayerAnimate.cancel();
 		
