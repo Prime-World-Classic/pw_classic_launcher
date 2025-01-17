@@ -395,18 +395,48 @@
 	flex-flow:row nowrap;
 }
 
-.castle-hero{
+.castle-bottom{
 	
 	position:absolute;
 	bottom:0;
 	display:flex;
 	align-items:center;
 	flex-flow:row nowrap;
-	background:rgba(255,0,0,0.0);
-	height:18vh;
 	width:100vw;
-	overflow-x:scroll;
+	height:15vh;
 	background-image:linear-gradient(rgba(38, 109, 103, 0),rgba(18, 69, 73, 0.596),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
+	
+}
+
+.castle-bottom-menu{
+	
+	width:3vw;
+	height:15vh;
+	display:flex;
+	flex-flow:column nowrap;
+	justify-content:center;
+	align-items:center;
+	
+}
+
+.castle-bottom-menu div{
+	
+	width:2vw;
+	height:2vw;
+	margin:0.2vw 0;
+	border-radius:50%;
+	background:rgba(255,255,255,0.3);
+	
+}
+
+.castle-hero{
+	
+	display:flex;
+	align-items:center;
+	flex-flow:row nowrap;
+	height:15vh;
+	width:97vw;
+	overflow-x:scroll;
 	
 }
 
