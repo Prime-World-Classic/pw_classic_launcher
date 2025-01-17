@@ -1398,9 +1398,9 @@ class View {
 	
 	static async castleHeroes(){
 		
-		let body = DOM({style:'castle-hero'}), preload = new PreloadImages(body);
+		let body = DOM({style:'castle-bottom'}), heroBody = DOM({style:'castle-hero'}), preload = new PreloadImages(heroBody);
 		
-		body.addEventListener('wheel',function(event){
+		heroBody.addEventListener('wheel',function(event){
 			
 			let modifier = 0;
 			
@@ -1461,6 +1461,8 @@ class View {
 			}
 			
 		},'build','heroAll');
+		
+		body.append(DOM({style:'castle-bottom-menu'},DOM(),DOM()),heroBody);
 		
 		return body;
 		
@@ -5469,7 +5471,7 @@ class App {
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
-		document.body.append(DOM({id:'STAT'}));
+		//document.body.append(DOM({id:'STAT'}));
 		
 	}
 	
