@@ -881,7 +881,18 @@ class View {
 
 		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, method == 'castle');
 		
-		let template = await View[method](value,value2,value3);
+		try{
+			
+			var template = await View[method](value,value2,value3);
+			
+		}
+		catch(error){ // session is not valid (когда выдали бан), при любой ошибке рендера выкидываем с учетки
+			
+			App.error(error);
+			
+			App.exit();
+			
+		}
 		
 		if(View.active){
 			
@@ -5445,17 +5456,9 @@ class App {
 		
 		if(App.storage.data.login){
 			
-			try{
-				
-				View.show('castle');
-				//View.show('build', 1);
-				
-			}
-			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
-				
-				App.exit();
-				
-			}
+			View.show('castle');
+			
+			//View.show('build', 1);
 			
 		}
 		else{
