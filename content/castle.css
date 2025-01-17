@@ -426,10 +426,11 @@
 	margin:0.2vw 0;
 	border-radius:50%;
 	background:rgba(255,255,255,0.3);
+	cursor:pointer;
 	
 }
 
-.castle-hero{
+.castle-bottom-content{
 	
 	display:flex;
 	align-items:center;
@@ -440,7 +441,7 @@
 	
 }
 
-.castle-hero-item{
+.castle-hero-item,.castle-friend-item{
 	
 	width:12vh;
 	min-width:12vh;
@@ -451,6 +452,7 @@
 	background-position:center;
 	background-repeat:no-repeat;
 	container-type: size;
+	
 }
 
 .castle-hero-name{
