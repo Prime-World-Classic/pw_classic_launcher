@@ -881,7 +881,18 @@ class View {
 
 		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, method == 'castle');
 		
-		let template = await View[method](value,value2,value3);
+		try{
+			
+			var template = await View[method](value,value2,value3);
+			
+		}
+		catch(error){ // session is not valid (когда выдали бан), при любой ошибке рендера выкидываем с учетки
+			
+			App.error(error);
+			
+			App.exit();
+			
+		}
 		
 		if(View.active){
 			
@@ -1387,9 +1398,11 @@ class View {
 	
 	static async castleHeroes(){
 		
-		let body = DOM({style:'castle-hero'}), preload = new PreloadImages(body);
+		let tab = 1;
 		
-		body.addEventListener('wheel',function(event){
+		let body = DOM({style:'castle-bottom'}), content = DOM({style:'castle-bottom-content'});
+		
+		content.addEventListener('wheel',function(event){
 			
 			let modifier = 0;
 			
@@ -1417,13 +1430,37 @@ class View {
 			
 		});
 		
+		View.bodyCastleHeroes(content);
+		
+		body.append(DOM({style:'castle-bottom-menu'},DOM({event:['click',() => {
+			
+			View.bodyCastleHeroes(content);
+			
+		}]}),DOM({event:['click',() => {
+			
+			View.bodyCastleFriends(content);
+			
+		}]})),content);
+		
+		return body;
+		
+	}
+	
+	static bodyCastleHeroes(target){
+		
+		let preload = new PreloadImages(target);
+		
 		App.api.silent((result) => {
-
-			// result.sort((a, b) => b.rating - a.rating);
 			
 			MM.hero = result;
 			
-			for(const item of result){
+			while(target.firstChild){
+				
+				target.firstChild.remove();
+				
+			}
+			
+			for(let item of result){
 
 				const heroName = DOM({style:'castle-hero-name'}, DOM({}, item.name));
 
@@ -1439,7 +1476,7 @@ class View {
 				
 				let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},item.rating),rankIcon);
 				
-				const hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
+				let hero = DOM({style:'castle-hero-item'},rank, heroNameBase);
 				
 				hero.addEventListener('click',async ()  => Window.show('main', 'build', item.id, 0, true));
 				
@@ -1451,7 +1488,68 @@ class View {
 			
 		},'build','heroAll');
 		
-		return body;
+	}
+	
+	static bodyCastleFriends(target){
+		
+		let preload = new PreloadImages(target);
+		
+		App.api.silent((result) => {
+			
+			while(target.firstChild){
+				
+				target.firstChild.remove();
+				
+			}
+			
+			let demo = [
+			
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()},
+			{id:1,nickname:'ifst',status:1,online:Date.now()}
+			
+			];
+			// status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
+			console.log('ДРУЗЬЯ',result);
+			
+			for(let item of demo){
+				
+				let isOnline = (item.online ? ( ( ( Date.now() - item.online ) / 1000 / 60 < 5 ) ? true : false ) : false);
+				
+				const heroName = DOM({style:'castle-hero-name'}, DOM({}, item.nickname));
+
+				if (item.nickname.length > 10) {
+					heroName.firstChild.classList.add('castle-name-autoscroll');
+				}
+
+				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
+				
+				let friend = DOM({style:'castle-friend-item'},heroNameBase);
+				
+				friend.dataset.url = `content/hero/empty.webp`;
+				
+				preload.add(friend);
+				
+			}
+			
+		},'friend','list');
 		
 	}
 
@@ -5445,17 +5543,9 @@ class App {
 		
 		if(App.storage.data.login){
 			
-			try{
-				
-				View.show('castle');
-				//View.show('build', 1);
-				
-			}
-			catch(e){ // если ошибка, то вероятнее всего это session not valid для игрока, который получил бан. Поэтому надо заставить его заново пройти авторизацию, чтобы он увидел в лоб причину бана.
-				
-				App.exit();
-				
-			}
+			View.show('castle');
+			
+			//View.show('build', 1);
 			
 		}
 		else{
@@ -5466,7 +5556,7 @@ class App {
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
-		document.body.append(DOM({id:'STAT'}));
+		//document.body.append(DOM({id:'STAT'}));
 		
 	}
 	
