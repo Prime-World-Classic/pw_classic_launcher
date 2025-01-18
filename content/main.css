@@ -709,14 +709,21 @@ button.build-action-item:hover {
 
 
 .build-talent-item-container .build-talent-item[data-active='1']:after,
-
+.build-rarity-other:after,
 .build-hero-grid-item .build-talent-item[data-active='1']:after {
 	content: '';
 	display: block;
-	width: 100cqw;
-	height: 100cqw;
+	width: 100cqh;
+	height: 100cqh;
 	background-size: contain;
 	background-image: url('icons/activeBorder.webp');
+}
+
+
+.build-rarity-other:after {
+	position: absolute;
+	top: 0;
+	transform: scale(1.15);
 }
 
 .build-talent-view{
@@ -806,6 +813,7 @@ button.build-action-item:hover {
 	border-radius:50%;
 	margin:0 1cqw;
 	cursor:pointer;
+	container-type: size;
 }
 
 .build-rarity-other {
