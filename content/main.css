@@ -721,7 +721,7 @@ button.build-action-item:hover {
 
 .build-talent-view{
 	overflow: hidden;
-	container-type: inline-size;
+	container-type: size;
 	width: 120cqw;
 	border-radius: 2cqh;
 	height: 71cqh;
@@ -732,11 +732,12 @@ button.build-action-item:hover {
 .build-talents {
 	display: flex;
 	flex-flow: row wrap;
-	overflow: auto;
+	overflow:auto;
+	width: 100cqw;
 	height: 100cqh;
 	background: #33333352;
-	justify-content: center;
-	align-items: start;
+	justify-content: start;
+	align-content: flex-start;
 }
 
 .build-active-bar-container {
