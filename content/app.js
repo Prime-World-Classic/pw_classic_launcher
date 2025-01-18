@@ -2307,6 +2307,7 @@ class View {
 			Build.heroView
 		),
         DOM({style: 'build-center'}, 
+			Build.buildActionsView,
 			DOM({style: 'build-field-with-tabs'}, 
 				Build.listView, 
 				DOM({style: 'build-field-container'}, 
@@ -2316,8 +2317,7 @@ class View {
 				DOM({style: 'build-active-bar-container'}, 
 					Build.activeBarView, 
 					DOM({style:'build-active-bar-hint'}, 'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
-				),
-				Build.buildActionsView
+				)
 			),
         DOM({style: 'build-right'},
             Build.talentsAndSetsView,
@@ -4206,7 +4206,7 @@ class Build{
 		
 		a.dataset.active = 0;
 		
-		a.onclick = () => {
+		a.addEventListener('click', e => {
 			
 			if(a.dataset.active == 1){
 				
@@ -4231,7 +4231,29 @@ class Build{
 				
 			}
 			
-		}
+		});
+
+		a.addEventListener('contextmenu', e => {
+			e.preventDefault();
+			
+			for(let itemEl of element){
+				Build.removeSortInventory('rarity',itemEl.id);
+			}
+			
+			for (let l = 0; l < a.parentElement.childNodes.length; l++) {
+				a.parentElement.childNodes[l].dataset.active = 0;
+				a.parentElement.childNodes[l].style.border = 'none';
+			}
+			a.style.background = 'rgba(255,255,255,0.1)';
+
+			Build.setSortInventory('active','1');
+				
+			Build.sortInventory();
+				
+			a.dataset.active = 1;
+
+			a.style.background = 'rgba(153,255,51,0.7)';
+		});
 		
 		Build.rarityView.append(a);
 		
@@ -4243,7 +4265,7 @@ class Build{
 			
 			button.style.boxSizing = 'border-box'; 
 			
-			button.onclick = () => {
+			button.addEventListener('click', e => {
 				
 				if(button.dataset.active == 1){
 					
@@ -4268,7 +4290,31 @@ class Build{
 					
 				}
 				
-			}
+			});
+			
+
+			button.addEventListener('contextmenu', e => {
+				e.preventDefault();
+				
+				for(let itemEl of element){
+					Build.removeSortInventory('rarity',itemEl.id);
+				}
+				Build.removeSortInventory('active','1');
+
+				for (let l = 0; l < button.parentElement.childNodes.length; l++) {
+					button.parentElement.childNodes[l].dataset.active = 0;
+					button.parentElement.childNodes[l].style.border = 'none';
+				}
+				a.style.background = 'rgba(255,255,255,0.1)';
+
+				Build.setSortInventory('rarity',item.id);
+					
+				Build.sortInventory();
+					
+				button.dataset.active = 1;
+
+				button.style.border = 'solid calc(min(0.5cqh, 1cqw)) rgb(153,255,51)';
+			});
 			
 			button.style.background = `rgba(${item.color},0.6)`;
 
