@@ -492,7 +492,7 @@ background-color:rgba(15,15,15,0.7);
 
 .build-active-bar-hint {
 	width: 150cqw;
-	font-size: 1.6cqh;
+	font-size: 2.2cqmin;
 	color: rgb(255 255 255 / 50%);
 	position: absolute;
 	bottom: -4cqh;
@@ -749,7 +749,8 @@ button.build-action-item:hover {
 
 .build-active-bar-container {
 	container-type: inline-size;
-	width: 100cqmin;
+	width: 120cqw;
+	height: 10cqw;
 	display:flex;
 	justify-content: center;
 	flex-flow:column;
@@ -761,17 +762,19 @@ button.build-action-item:hover {
 
 .build-active-bar{
 	container-type: inline-size;
-	width: 100cqmin;
+	width: 100cqw;
+	height: 10cqw;
 	display:flex;
 	justify-content: center;
+	align-items: end;
 	flex-flow:row nowrap;
 }
 
 
 .build-active-bar-item{
 	container-type: inline-size;
-	width: calc(80cqw / 10);
-	height: calc(80cqw / 10);
+	width: calc(60cqw / 10);
+	height: calc(60cqw / 10);
 	margin-left: 0.5cqw;
 	margin-right: 0.5cqw;
 	background:rgba(255,255,255,0.2);
