@@ -2251,9 +2251,10 @@ cursor:pointer;
 .list-highlight {
 	text-shadow: #000 0 0 0.4cqh;
 	font-weight: 600;
-    background-image: linear-gradient(to left, #25aae1, #40e495, #30dd8a, #2bb673);
-    box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
+	background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.8), rgba(18, 69, 73, 0.8), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.8), rgba(66, 71, 73, 0.8));
+	box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
 }
+
 .list-not-highlight {
 	text-shadow: #000 0 0 0.2cqh;
 	background: transparent;
@@ -2261,6 +2262,7 @@ cursor:pointer;
     background-image: linear-gradient(to right, rgba(136, 12, 219, 0.7), rgba(132, 16, 249, 0.7));
     box-shadow: 0 0.1cqh 1cqh 0 rgba(49, 196, 190, 0.75);
 }
+
 .list-not-highlight:hover {
     transition: all 0.4s ease-in-out;
 	color: rgba(255, 255, 255, 1);
@@ -2548,11 +2550,9 @@ cursor:pointer;
 	padding:1cqw 1cqw;
 	margin: 4cqw 1cqw;
 	cursor:pointer;
-
 	border-radius: 2cqw; /* Закругленные углы */
 	border: 0.1cqw solid rgb(158, 155, 104); /* Окантовка */
 	box-shadow:0 0 3cqw rgba(0,0,0,0.3);
-	
 	background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.8), rgba(18, 69, 73, 0.8), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.8), rgba(66, 71, 73, 0.8));
 }
 
@@ -2566,9 +2566,8 @@ cursor:pointer;
 	margin: 4cqw 1cqw;
 }
 
-
 .castle-menu-slider {
-	
+	border-radius: 3cqh; /* Закругленные углы */
 }
 
 #viewbuild {
