@@ -2592,6 +2592,9 @@ class Window {
 			DOM({style:'castle-menu-label'}, 'Общая громкость', DOM({tag:'input', type: 'range', value: Castle.globalVolume * 100, min:'0', max:'100', step:'1', 
 				style:'castle-menu-slider', event:['input',(e) => {
 				Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+				
+				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 			}]})), 
 			DOM({style:'castle-menu-label'}, 'Громкость музыки', DOM({tag:'input', type: 'range', value: Castle.musicVolume * 100, min:'0', max:'100', step:'1', 
 				style:'castle-menu-slider', event:['input',(e) => {
@@ -2605,7 +2608,7 @@ class Window {
 					Castle.testSoundIsPlaying = true;
 					Sound.play('content/sounds/found.ogg',{id:soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
 				}
-				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS))
+				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 			}]})), 
 			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
 		)
