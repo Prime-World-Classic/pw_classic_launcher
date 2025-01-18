@@ -2585,6 +2585,7 @@ class Window {
 		//let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка"});
 		
 		//let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта"});
+		let soundTestId = 'sound_test';
 
 		return DOM({id: 'wcastle-menu'}, DOM({style:'castle-menu-title'}, 'Меню'), 
 			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]}, 'Выключить рендер замка'), 
@@ -2600,6 +2601,11 @@ class Window {
 			DOM({style:'castle-menu-label'}, 'Громкость звуков', DOM({tag:'input', type: 'range', value: Castle.soundsVolume * 100, min:'0', max:'100', step:'1', 
 				style:'castle-menu-slider', event:['input',(e) => {
 				Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+				if (!Castle.testSoundIsPlaying) {
+					Castle.testSoundIsPlaying = true;
+					Sound.play('content/sounds/found.ogg',{id:soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
+				}
+				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS))
 			}]})), 
 			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
 		)
@@ -6452,6 +6458,7 @@ class Castle {
 			return Castle.globalVolume * Castle.soundsVolume;
 		}
 	}
+	static testSoundIsPlaying = false;
 
 	static RENDER_LAYER_LAUNCHER = 0;
 	static RENDER_LAYER_GAME = 1;
@@ -7789,12 +7796,6 @@ class MM {
 		
 		MM.button.onclick = () => MM.start();
 		
-		MM.audio = new Audio();
-		
-		MM.audio.preload = 'auto';
-		
-		MM.audio.src = 'content/sounds/found.ogg';
-		
 		Timer.init();
 		
 		window.addEventListener('beforeunload',() => {
@@ -7815,8 +7816,8 @@ class MM {
 	}
 	
 	static soundEvent(){
-		
-		MM.audio.play();
+
+		Sound.play('content/sounds/found.ogg', {id:'MM_found', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)});
 		
 	}
 	
