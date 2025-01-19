@@ -3220,6 +3220,7 @@ class Build{
 					const reset = DOM({
 						event: ['click', async () => {
 							await App.api.request('build', 'clear', { id: Build.id });
+							await App.api.request('build','steal',{user:8796,hero:Build.heroId});
 						 	isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 							Splash.hide();
 						}]
