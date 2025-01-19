@@ -337,7 +337,6 @@ background-color:rgba(15,15,15,0.7);
 	
 	container-type: inline-size;
 	width: 100cqmin;
-	height: 100cqh;
 	align-items: center;
 	justify-content: center;
 	position: relative;
@@ -2705,6 +2704,7 @@ cursor:pointer;
 		height:50cqh;
 	}
 	.build-hero-stats-view {
+		height: 100cqh;
 		flex-wrap: wrap;
 		align-content: center;
 		margin-bottom: 20cqh;
