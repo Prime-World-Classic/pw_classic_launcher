@@ -5126,8 +5126,7 @@ class Build{
 	}
 	
 	static description(element){
-		
-		element.onmouseover = () => {
+		let descEvent = () => {
 			
 			let positionElement = element.getBoundingClientRect();
 			
@@ -5270,12 +5269,26 @@ class Build{
 			Build.descriptionView.style.display = 'block';
 			
 		}
-		
-		element.onmouseout = () => {
+
+		let descEventEnd = () => {
 			
 			Build.descriptionView.style.display = 'none';
 			
 		}
+		
+		element.ontouchstart = (e) => { 
+			//e.preventDefault();
+			descEvent();
+		};
+		
+		element.onmouseover = () => {descEvent()};
+		
+		element.onmouseout = () => {descEventEnd()};
+
+		element.ontouchend = () => { 
+			//e.preventDefault();
+			descEventEnd();
+		};
 		
 	}
 	
