@@ -2501,11 +2501,9 @@ cursor:pointer;
 	border-radius: 2cqh;
 	border: 0.1cqh solid rgb(158, 155, 104);
 	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
-
 	display: flex;
 	align-items: center;
 }
-
 
 #wcastle-menu {
 	container-type: size;
@@ -2543,24 +2541,19 @@ cursor:pointer;
 	color:rgba(255,255,255,0.9);
 	text-shadow:rgba(0,0,0,0.3) 0 0 1cqw;
 	font: 8cqw / 1 Verdana;
-	text-align:center;
+	left: -12cqw;
 	padding:1cqw 1cqw;
 	margin: 4cqw 1cqw;
-	cursor:pointer;
-	border-radius: 2cqw;
-	border: 0.1cqw solid rgb(158, 155, 104);
-	box-shadow:0 0 3cqw rgba(0,0,0,0.3);
-	background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.8), rgba(18, 69, 73, 0.8), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.8), rgba(66, 71, 73, 0.8));
 	position: relative;
 }
 
 .castle-menu-item input[type="checkbox"] {
 	appearance: none;
-	width: 7cqw;
-	height: 7cqw;
+	width: 10cqw;
+	height: 10cqw;
 	background-color: transparent;
 	position: absolute;
-	right: 5cqw;
+	right: -8cqw;
 	top: 50%;
 	transform: translateY(-50%);
 	cursor: pointer;
@@ -2582,6 +2575,22 @@ cursor:pointer;
 	background-image: url('icons/checkbox.webp');
 }
 
+.castle-menu-item-v {
+	width: 90cqw;
+	color:rgba(255,255,255,0.9);
+	text-shadow:rgba(0,0,0,0.3) 0 0 1cqw;
+	font: 8cqw / 1 Verdana;
+	text-align:center;
+	padding:1cqw 1cqw;
+	margin: 4cqw 1cqw;
+	cursor:pointer;
+	border-radius: 2cqw;
+	border: 0.1cqw solid rgb(158, 155, 104);
+	box-shadow:0 0 3cqw rgba(0,0,0,0.3);
+	background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.8), rgba(18, 69, 73, 0.8), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.8), rgba(66, 71, 73, 0.8));
+	position: relative;
+}
+
 .castle-menu-label {
 	width: 90cqw;
 	color:rgba(255,255,255,0.9);
@@ -2596,21 +2605,23 @@ cursor:pointer;
 	width: 90%;
 	height: 5cqw;
 	border-radius: 3cqh;
+	border: 0.1cqh solid rgb(158, 155, 104);
 	background-image: linear-gradient(to bottom, rgba(216, 216, 216, 0.8), rgba(18, 69, 73, 0.8), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.8), rgba(66, 71, 73, 0.8));
 }
 
 .castle-menu-slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
-	width: 5cqw;
-	height: 5cqw;
+	width: 6cqw;
+	height: 6cqw;
 	border-radius: 50%;
-	background: yellow;
+	border: 0.1cqw solid rgb(158, 155, 104);
+	background: rgba(4, 32, 42, 0.8);
 	cursor: pointer;
 }
 
 .castle-menu-slider::-webkit-slider-thumb:hover {
-	transform: scale(1.4);
+	transform: scale(1.6);
 }
 
 #viewbuild {
