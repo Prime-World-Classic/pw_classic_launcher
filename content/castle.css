@@ -498,3 +498,8 @@
 	position: absolute;
 	bottom: 0;
 }
+@media (max-aspect-ratio: 1/1) {
+	.castle-settings {
+		flex-direction: column;
+	}
+}
