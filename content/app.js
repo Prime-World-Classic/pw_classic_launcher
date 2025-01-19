@@ -2573,44 +2573,58 @@ class Window {
     View.active.append(template);
 	}
 
-	
 	static async build(heroId,targetId = 0,isSplash = false) {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
 		return DOM({id: 'wbuild'}, viewBuild);
 	}
 
 	static async menu() {
-		//let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка"});
-		
-		//let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка"});
-		
-		//let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта"});
 		let soundTestId = 'sound_test';
 
-		return DOM({id: 'wcastle-menu'}, DOM({style:'castle-menu-title'}, 'Меню'), 
-			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]}, 'Выключить рендер замка'), 
-			DOM({style:'castle-menu-label'}, 'Общая громкость', DOM({tag:'input', type: 'range', value: Castle.globalVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
-				
-				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-			}]})), 
-			DOM({style:'castle-menu-label'}, 'Громкость музыки', DOM({tag:'input', type: 'range', value: Castle.musicVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
-				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-			}]})), 
-			DOM({style:'castle-menu-label'}, 'Громкость звуков', DOM({tag:'input', type: 'range', value: Castle.soundsVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
-				if (!Castle.testSoundIsPlaying) {
-					Castle.testSoundIsPlaying = true;
-					Sound.play('content/sounds/found.ogg',{id:soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
-				}
-				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-			}]})), 
-			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
+		return DOM({id: 'wcastle-menu'}, 
+			DOM({style:'castle-menu-title'}, 'Меню'), 
+			DOM({style:'castle-menu-item'}, 
+				DOM({tag: 'input', type: 'checkbox', id: 'render-toggle', checked: true, event: ['change', () => {
+					Castle.toggleRender(Castle.RENDER_LAYER_PLAYER);
+				}]}), 
+				DOM({tag: 'label', for: 'render-toggle'}, '3D графика')
+			), 
+			DOM({style:'castle-menu-label'}, 'Общая громкость', 
+				DOM({tag:'input', type: 'range', value: Castle.globalVolume * 100, min:'0', max:'100', step:'1', 
+					style:'castle-menu-slider', event:['input',(e) => {
+						Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+						// Обновляем отображение процентов
+						document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
+					}]}), 
+				DOM({tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.globalVolume * 100)}%`)
+			), 
+			DOM({style:'castle-menu-label'}, 'Громкость музыки', 
+				DOM({tag:'input', type: 'range', value: Castle.musicVolume * 100, min:'0', max:'100', step:'1', 
+					style:'castle-menu-slider', event:['input',(e) => {
+						Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+						// Обновляем отображение процентов
+						document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
+					}]}), 
+				DOM({tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.musicVolume * 100)}%`)
+			), 
+			DOM({style:'castle-menu-label'}, 'Громкость звуков', 
+				DOM({tag:'input', type: 'range', value: Castle.soundsVolume * 100, min:'0', max:'100', step:'1', 
+					style:'castle-menu-slider', event:['input',(e) => {
+						Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+						if (!Castle.testSoundIsPlaying) {
+							Castle.testSoundIsPlaying = true;
+							Sound.play('content/sounds/found.ogg',{id:soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
+						}
+						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+						// Обновляем отображение процентов
+						document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
+					}]}), 
+				DOM({tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.soundsVolume * 100)}%`)
+			), 
+			DOM({style:'castle-menu-item', event:['click',() => View.exitOrLogout()]}, 'Выход'),
 		)
 	}
 }
