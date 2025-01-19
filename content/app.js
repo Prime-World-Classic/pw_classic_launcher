@@ -2624,7 +2624,7 @@ class Window {
 					}]}), 
 				DOM({tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.soundsVolume * 100)}%`)
 			), 
-			DOM({style:'castle-menu-item', event:['click',() => View.exitOrLogout()]}, 'Выход'),
+			DOM({style:'castle-menu-item-v', event:['click',() => View.exitOrLogout()]}, 'Выход'),
 		)
 	}
 }
