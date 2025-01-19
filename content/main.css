@@ -2677,3 +2677,105 @@ cursor:pointer;
 	position: absolute;
 	top: 2cqh;
 }
+@media (max-aspect-ratio: 1/1) {
+
+	.build-horizontal {
+	  flex-direction: column;
+	  height: 100cqh;
+	  justify-content: center;
+	}
+	
+	.build-left{
+		width: 100cqw;
+		height: 20cqh;
+	}
+	.build-hero-avatar-and-name {
+		position: absolute;
+		left: 0;
+		top: -30cqh;
+	}
+	.btn-skins {
+		font-size: 10cqw;
+		width: 80cqw;
+		height: 15cqw;
+		line-height: 10cqw;
+	}
+	.avatar {
+		width:50cqh;
+		height:50cqh;
+	}
+	.build-hero-stats-view {
+		flex-wrap: wrap;
+		align-content: center;
+		margin-bottom: 20cqh;
+		margin: 0;
+	}
+	.build-hero-stats-line {
+		height: 18cqh;
+		font-size: 8cqh;
+	}
+	.build-hero-stats-daw {
+		width:15cqw;
+		height:15cqw;
+	}
+	.build-hero-stats-settings {
+		position: relative;
+	}
+	.build-hero-stats-setting-land-type {
+		width: 25cqw;
+		height: 25cqw;
+	}
+
+	.build-center {
+		width: 100cqw;
+		height: 55cqh;
+		container-type: size;
+	}
+	.build-actions-view{
+		position: relative;
+		top: 5cqh;
+		width: 40cqw;
+	}
+	.build-tab-item {
+		height: 2cqh;
+		font-size: 1.4cqh;
+		bottom: -1cqh;
+	}
+	.build-active-bar-container{
+		position: relative;
+		bottom: auto;
+
+	}
+	.build-active-bar-hint{
+		display: none;
+	}
+	
+	.build-right {
+		width: 100cqw;
+		height: 15cqh;
+		container-type: size;
+	}
+	.build-rarity {
+		position: relative;
+		width: 50cqw;
+		height: auto;
+		top: auto;
+		container-type: inline-size;
+	}
+	.build-talent-view {
+		width: 100cqw;
+		height: 100cqh;
+		align-self: center;
+	}
+	.build-talent-item-container {
+		background-size: 12cqh;
+		width: 40cqh;
+		height: 40cqh;
+		container-type: size;
+		margin: 1cqh;
+	}
+		
+	.chat{
+		right: 0;
+	}
+}
