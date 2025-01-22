@@ -3701,19 +3701,21 @@ class Build{
 		}
 
 		let landTypeSetting = DOM({
-			style:['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'], 
-			title: 'Тип земли', 
-			event:['click', async ()=>{
-				Build.applyRz = !Build.applyRz;
-				Build.applyVz = !Build.applyVz;
-				Build.updateHeroStats();
+		style: ['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'],
+		title: 'Тип земли - с учетом родной земли', 
+		event: ['click', async () => {
+			Build.applyRz = !Build.applyRz;
+			Build.applyVz = !Build.applyVz;
+			Build.updateHeroStats();
 				if (Build.applyRz) {
-					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz','build-hero-stats-setting-land-type-rz');
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz', 'build-hero-stats-setting-land-type-rz');
+					landTypeSetting.title = 'Тип земли - с учетом родной земли';
 				} else {
-					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz','build-hero-stats-setting-land-type-vz');
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz', 'build-hero-stats-setting-land-type-vz');
+					landTypeSetting.title = 'Тип земли - с учетом нейтральной/вражеской земли';
 				}
-			}
-		]});
+			}]
+		});
 
 		stats.append(DOM({style:'build-hero-stats-settings'}, landTypeSetting));
 		
