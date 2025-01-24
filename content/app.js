@@ -2545,77 +2545,109 @@ class View {
 }
 
 class Window {
-	static windows = {}
-	
-	static async show(category, method, value, value2, value3) {
-    
-    if (!(method in Window)) {
-        return;
-    }
-    
-    let template = await Window[method](value, value2, value3);
+    static windows = {}
 
-    // Создаем кнопку закрытия с изображением вместо текста
-    let closeButton = DOM({
-        style: 'close-button',
-        title: 'Закрыть',
-        event: ['click', () => {
-            Window.windows[category].remove();
-        }]
-    }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'})); // Замените путь к изображению
-
-    template.append(closeButton);
-    
-    if (category in Window.windows) {
-        Window.windows[category].remove();
-    }
-    
-    Window.windows[category] = template;
+    static async show(category, method, value, value2, value3) {
+        if (!(method in Window)) {
+            return;
+        }
+        let template = await Window[method](value, value2, value3);
         
-    View.active.append(template);
-	}
+        // Создаем кнопку закрытия с изображением вместо текста
+        let closeButton = DOM({
+            style: 'close-button',
+            title: 'Закрыть',
+            event: ['click', () => {
+                Window.windows[category].remove();
+            }]
+        }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'})); // Замените путь к изображению
+        
+        template.append(closeButton);
+        
+        if (category in Window.windows) {
+            Window.windows[category].remove();
+        }
+        
+        Window.windows[category] = template;
+        View.active.append(template);
+    }
 
-	
-	static async build(heroId,targetId = 0,isSplash = false) {
-		let viewBuild = await View.build(heroId, targetId, isSplash);
-		return DOM({id: 'wbuild'}, viewBuild);
-	}
+    static async build(heroId, targetId = 0, isSplash = false) {
+        let viewBuild = await View.build(heroId, targetId, isSplash);
+        return DOM({id: 'wbuild'}, viewBuild);
+    }
 
-	static async menu() {
-		//let music = DOM({style:['castle-music','button-outline'], title: "Вкл/Выкл музыки замка"});
-		
-		//let render = DOM({style:['castle-render','button-outline'], title: "Вкл/Выкл графики замка"});
-		
-		//let close = DOM({style:['castle-close','button-outline'], title: "Выйти из аккаунта"});
-		let soundTestId = 'sound_test';
-
-		return DOM({id: 'wcastle-menu'}, DOM({style:'castle-menu-title'}, 'Меню'), 
-			DOM({style:'castle-menu-item',event:['click',() => Castle.toggleRender(Castle.RENDER_LAYER_PLAYER)]}, 'Выключить рендер замка'), 
-			DOM({style:'castle-menu-label'}, 'Общая громкость', DOM({tag:'input', type: 'range', value: Castle.globalVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
-				
-				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-			}]})), 
-			DOM({style:'castle-menu-label'}, 'Громкость музыки', DOM({tag:'input', type: 'range', value: Castle.musicVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
-				Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-			}]})), 
-			DOM({style:'castle-menu-label'}, 'Громкость звуков', DOM({tag:'input', type: 'range', value: Castle.soundsVolume * 100, min:'0', max:'100', step:'1', 
-				style:'castle-menu-slider', event:['input',(e) => {
-				Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
-				if (!Castle.testSoundIsPlaying) {
-					Castle.testSoundIsPlaying = true;
-					Sound.play('content/sounds/found.ogg',{id:soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
-				}
-				Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-			}]})), 
-			DOM({style:'castle-menu-item',event:['click',() => View.exitOrLogout()]}, 'Выход'),
-		)
-	}
+    static async menu() {
+        let soundTestId = 'sound_test';
+        return DOM({id: 'wcastle-menu'}, 
+            DOM({style: 'castle-menu-title'}, 'Меню'),
+            DOM({style: 'castle-menu-item'}, 
+                DOM({tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', event: ['change', (e) => {
+                    if (e.target.checked) {
+                        NativeAPI.window.restore(); // Переход в оконный режим
+                    } else {
+                        NativeAPI.window.toggleFullscreen(); // Вернуться в полноэкранный режим
+                    }
+                }]}, 
+                {checked: false}), // Начальное состояние: не в оконном режиме
+                DOM({tag: 'label', for: 'fullscreen-toggle'}, 'Оконный режим')
+            ),
+            DOM({style: 'castle-menu-item'}, 
+                DOM({tag: 'input', type: 'checkbox', id: 'render-toggle', checked: true, event: ['change', () => {
+                    Castle.toggleRender(Castle.RENDER_LAYER_PLAYER);
+                }]}), 
+                DOM({tag: 'label', for: 'render-toggle'}, '3D графика')
+            ),
+            DOM({style: 'castle-menu-label'}, 'Общая громкость', 
+                DOM({tag: 'input', type: 'range', value: Castle.globalVolume * 100, min: '0', max: '100', step: '1', 
+                    style: 'castle-menu-slider', event: ['input', (e) => {
+                        Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+                        Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+                        Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+                        // Обновляем отображение процентов
+                        document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
+                    }]}), 
+                DOM({tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.globalVolume * 100)}%`)
+            ), 
+            DOM({style: 'castle-menu-label'}, 'Громкость музыки', 
+                DOM({tag: 'input', type: 'range', value: Castle.musicVolume * 100, min: '0', max: '100', step: '1', 
+                    style: 'castle-menu-slider', event: ['input', (e) => {
+                        Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+                        Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+                        // Обновляем отображение процентов
+                        document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
+                    }]}), 
+                DOM({tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.musicVolume * 100)}%`)
+            ), 
+            DOM({style: 'castle-menu-label'}, 'Громкость звуков', 
+                DOM({tag: 'input', type: 'range', value: Castle.soundsVolume * 100, min: '0', max: '100', step: '1', 
+                    style: 'castle-menu-slider', event: ['input', (e) => {
+                        Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+                        if (!Castle.testSoundIsPlaying) {
+                            Castle.testSoundIsPlaying = true;
+                            Sound.play('content/sounds/found.ogg', {id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
+                        }
+                        Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+                        // Обновляем отображение процентов
+                        document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
+                    }]}), 
+                DOM({tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.soundsVolume * 100)}%`)
+            ), 
+            DOM({style: 'castle-menu-item-v', event: ['click', () => View.exitOrLogout()]}, 'Выход'),
+        )
+    }
 }
+
+// Функция для обработки нажатия клавиш
+function handleKeyPress(event) {
+    if (event.key === "Escape") {
+        // Вызываем метод show для открытия меню
+        Window.show('menu', 'menu', null, null, null);
+    }
+}
+
+// Добавляем обработчик события нажатия клавиш
+document.addEventListener('keydown', handleKeyPress);
 
 class Frame {
 	
@@ -3689,19 +3721,21 @@ class Build{
 		}
 
 		let landTypeSetting = DOM({
-			style:['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'], 
-			title: 'Тип земли', 
-			event:['click', async ()=>{
-				Build.applyRz = !Build.applyRz;
-				Build.applyVz = !Build.applyVz;
-				Build.updateHeroStats();
+		style: ['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'],
+		title: 'Тип земли - с учетом родной земли', 
+		event: ['click', async () => {
+			Build.applyRz = !Build.applyRz;
+			Build.applyVz = !Build.applyVz;
+			Build.updateHeroStats();
 				if (Build.applyRz) {
-					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz','build-hero-stats-setting-land-type-rz');
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz', 'build-hero-stats-setting-land-type-rz');
+					landTypeSetting.title = 'Тип земли - с учетом родной земли';
 				} else {
-					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz','build-hero-stats-setting-land-type-vz');
+					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz', 'build-hero-stats-setting-land-type-vz');
+					landTypeSetting.title = 'Тип земли - с учетом нейтральной/вражеской земли';
 				}
-			}
-		]});
+			}]
+		});
 
 		stats.append(DOM({style:'build-hero-stats-settings'}, landTypeSetting));
 		
