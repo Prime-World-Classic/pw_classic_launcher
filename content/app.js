@@ -2,6 +2,8 @@ APP_VERSION = '0';
 
 PW_VERSION = '2.0.0';
 
+CURRENT_MM = 'mmtest'
+
 window.addEventListener('DOMContentLoaded',() => {
 	
 	Splash.init();
@@ -1058,7 +1060,7 @@ class View {
 		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
-		let data = await App.api.request('mm','loadParty'), players = new Array();
+		let data = await App.api.request(CURRENT_MM,'loadParty'), players = new Array();
 		
 		MM.partyId = data.id;
 		
@@ -1154,7 +1156,7 @@ class View {
 							
 						}
 						
-						await App.api.request('mm','readyParty',{id:MM.partyId});
+						await App.api.request(CURRENT_MM,'readyParty',{id:MM.partyId});
 						
 						status.onclick = false;
 						
@@ -1207,7 +1209,7 @@ class View {
 			if( (MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0) ){
 				removeButton.addEventListener('click', async () => {
 					
-					await App.api.request('mm','leaderKickParty',{id:playerX.dataset.id});
+					await App.api.request(CURRENT_MM,'leaderKickParty',{id:playerX.dataset.id});
 					
 				})
 
@@ -1221,7 +1223,7 @@ class View {
 			if( (MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id) ){
 				removeButton.addEventListener('click', async () => {
 					
-					await App.api.request('mm','leaveParty',{id:MM.partyId});
+					await App.api.request(CURRENT_MM,'leaveParty',{id:MM.partyId});
 					
 					View.show('castle');
 					
@@ -1265,7 +1267,7 @@ class View {
 							
 							try{
 								
-								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item2.id});
+								await App.api.request(CURRENT_MM,'heroParty',{id:MM.partyId,hero:item2.id});
 								
 							}
 							catch(error){
@@ -1315,7 +1317,7 @@ class View {
 					
 					input.addEventListener('input', async () => {
 						
-						let request = await App.api.request('mm','findUser',{name:input.value});
+						let request = await App.api.request(CURRENT_MM,'findUser',{name:input.value});
 						
 						if(body.firstChild){
 							
@@ -1331,7 +1333,7 @@ class View {
 							
 							body.append(DOM({event:['click', async () => {
 								
-								await App.api.request('mm','inviteParty',{id:item.id});
+								await App.api.request(CURRENT_MM,'inviteParty',{id:item.id});
 								
 								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
 								
@@ -1704,13 +1706,13 @@ class View {
 				
 			}
 			
-		},'mm','top');
+		},CURRENT_MM,'top');
 		
 		let party = DOM({style:'party'},middle);
 		
 		let players = new Array();
 		
-		data = (data) ? data : await App.api.request('mm','loadParty');
+		data = (data) ? data : await App.api.request(CURRENT_MM,'loadParty');
 		
 		MM.partyId = data.id;
 		
@@ -1802,7 +1804,7 @@ class View {
 							
 						}
 						
-						await App.api.request('mm','readyParty',{id:MM.partyId});
+						await App.api.request(CURRENT_MM,'readyParty',{id:MM.partyId});
 						
 						status.onclick = false;
 						
@@ -1838,7 +1840,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mm','leaderKickParty',{id:player.dataset.id});
+					await App.api.request(CURRENT_MM,'leaderKickParty',{id:player.dataset.id});
 					
 				}]},'[X]'));
 				
@@ -1848,7 +1850,7 @@ class View {
 				
 				nickname.append(DOM({tag:'span',event:['click', async () => {
 					
-					await App.api.request('mm','leaveParty',{id:MM.partyId});
+					await App.api.request(CURRENT_MM,'leaveParty',{id:MM.partyId});
 					
 					View.show('castle');
 					
@@ -1884,7 +1886,7 @@ class View {
 							
 							try{
 								
-								await App.api.request('mm','heroParty',{id:MM.partyId,hero:item.id});
+								await App.api.request(CURRENT_MM,'heroParty',{id:MM.partyId,hero:item.id});
 								
 							}
 							catch(error){
@@ -1932,7 +1934,7 @@ class View {
 					
 					input.addEventListener('input', async () => {
 						
-						let request = await App.api.request('mm','findUser',{name:input.value});
+						let request = await App.api.request(CURRENT_MM,'findUser',{name:input.value});
 						
 						if(body.firstChild){
 							
@@ -1948,7 +1950,7 @@ class View {
 							
 							body.append(DOM({event:['click', async () => {
 								
-								await App.api.request('mm','inviteParty',{id:item.id});
+								await App.api.request(CURRENT_MM,'inviteParty',{id:item.id});
 								
 								App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
 								
@@ -1982,7 +1984,7 @@ class View {
 		
 		let body = DOM({style:'main'}), history = DOM({style:'history'});
 		
-		let result = await App.api.request('mm','history');
+		let result = await App.api.request(CURRENT_MM,'history');
 		
 		for(let item of result){
 			
@@ -2012,7 +2014,7 @@ class View {
 		
 		let body = DOM({style:'main'});
 		
-		let result = await App.api.request('mm','top',{limit:100,hero:hero});
+		let result = await App.api.request(CURRENT_MM,'top',{limit:100,hero:hero});
 		
 		if(!result){
 			
@@ -5457,7 +5459,7 @@ class Events {
 		
 		let b1 = DOM({style:'splash-content-button',event:['click', async () => {
 			
-			await App.api.request('mm','joinParty',{code:data.code,version:PW_VERSION});
+			await App.api.request(CURRENT_MM,'joinParty',{code:data.code,version:PW_VERSION});
 			
 			Splash.hide();
 			
@@ -7715,7 +7717,7 @@ class Protect {
 			
 			if(Protect.storage.data.c){
 				
-				let request = await App.api.request('mm','check',{id:Protect.storage.data.c});
+				let request = await App.api.request(CURRENT_MM,'check',{id:Protect.storage.data.c});
 				
 				if(request){
 					
@@ -7736,7 +7738,7 @@ class Protect {
 				
 				await Protect.storage.set({c:c});
 				
-				await App.api.request('mm','check',{id:c});
+				await App.api.request(CURRENT_MM,'check',{id:c});
 				
 			}
 			
@@ -7979,7 +7981,7 @@ class MM {
 			
 			try{
 				
-				MM.id = await App.api.request('mm','cancel');
+				MM.id = await App.api.request(CURRENT_MM,'cancel');
 				
 			}
 			catch(error){
@@ -7997,7 +7999,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request('mm','start',{hero:MM.activeSelectHero,version:PW_VERSION});
+				let request = await App.api.request(CURRENT_MM,'start',{hero:MM.activeSelectHero,version:PW_VERSION});
 				
 				MM.id = request.id;
 				
@@ -8028,7 +8030,7 @@ class MM {
 	
 	static async cancel(){
 		
-		await App.api.request('mm','start');
+		await App.api.request(CURRENT_MM,'start');
 		
 		MM.id = '';
 		
@@ -8056,7 +8058,7 @@ class MM {
 			
 			try{
 				
-				await App.api.request('mm','ready',{id:MM.id});
+				await App.api.request(CURRENT_MM,'ready',{id:MM.id});
 				
 			}
 			catch(error){
@@ -8182,7 +8184,7 @@ class MM {
 			
 			try{
 				
-				await App.api.request('mm','hero',{id:MM.id,heroId:MM.targetHeroId});
+				await App.api.request(CURRENT_MM,'hero',{id:MM.id,heroId:MM.targetHeroId});
 				
 			}
 			catch(error){
@@ -8312,7 +8314,7 @@ class MM {
 				
 				MM.targetHeroId = item.id;
 				
-				await App.api.request('mm','eventChangeHero',{id:MM.id,heroId:item.id});
+				await App.api.request(CURRENT_MM,'eventChangeHero',{id:MM.id,heroId:item.id});
 				
 				MM.lobbyBuildView(MM.targetHeroId);
 				
@@ -8367,7 +8369,7 @@ class MM {
 					
 				}
 				
-				await App.api.request('mm','chat',{id:MM.id,message:chatInput.value});
+				await App.api.request(CURRENT_MM,'chat',{id:MM.id,message:chatInput.value});
 				
 				chatInput.value = '';
 				
@@ -8419,7 +8421,7 @@ class MM {
 			
 			let item = DOM({style:`map-item-${number}`,data:{player:0,position:number},event:['click', async () => {
 				
-				await App.api.request('mm','position',{id:MM.id,position:(item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position});
+				await App.api.request(CURRENT_MM,'position',{id:MM.id,position:(item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position});
 				
 			}]})
 			
@@ -8726,7 +8728,7 @@ class Timer {
 		
 		Timer.message = name;
 
-		Timer.timeFinish = await App.api.request('mm','getTimer',{id:id,time:Date.now()});
+		Timer.timeFinish = await App.api.request(CURRENT_MM,'getTimer',{id:id,time:Date.now()});
 		
 		if(Timer.end()){
 			
