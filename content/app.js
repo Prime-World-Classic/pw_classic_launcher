@@ -5619,11 +5619,11 @@ class App {
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 				},target:1,map:[App.storage.data.id,2,4,5,6,7,8,9,10,1858]};
 
-			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:1,rating:1100,select:false,team:1};
+			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:0,rating:1100,select:true,team:1};
 				
 		 	MM.lobby(obj);
 			
-		 }, 1000);
+		 }, 10000);
 		setTimeout(() => {
 			
 			MM.chat({id:2,message:'тестовое сообщение'});
@@ -8701,7 +8701,7 @@ class Sound {
 				
 			}
 		
-			if( ('volume' in object) && (object.volume) ){
+			if( 'volume' in object ){
 				Sound.setVolume(object.id, object.volume);
 			}
 			
