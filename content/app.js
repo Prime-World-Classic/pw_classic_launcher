@@ -894,6 +894,8 @@ class View {
 			
 			App.exit();
 			
+			return;
+			
 		}
 		
 		if(View.active){
