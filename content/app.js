@@ -1013,7 +1013,6 @@ class View {
 	
 	static async castle(){
 		
-
 		document.body.classList.add('noselect');
 		
 		View.setCss('content/castle.css');
@@ -1028,15 +1027,13 @@ class View {
 		try{
 			
 			if (!Castle.gl) {
-				Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
+				await Castle.initDemo(App.storage.data.fraction == 1 ? 'ad' : 'doct',Castle.canvas);
 			}
 			
 		}
 		catch(error){ // если замок не работает на устройстве, тогда рендерим старую версию главной страницы
 			
 			App.error(error);
-			
-			return await View.main();
 			
 		}
 		
