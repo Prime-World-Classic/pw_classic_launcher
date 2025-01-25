@@ -5593,7 +5593,7 @@ class App {
 	
 	static async init(){ // ws://192.168.31.29:3737
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
-		App.api = new Api(['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/'], Events);
+		App.api = new Api(['wss://pw.26rus-game.ru:8443/','wss://playpw.fun:443/api/v1/'], Events);
 		
 		await Store.init();
 		
@@ -5604,24 +5604,26 @@ class App {
 		await Protect.init();
 		
 		await MM.init();
-		/*
+		
+		 /*
 		setTimeout(() => {
-			
-		 	MM.lobby({id:1,users:{
-		 	1:{nickname:'ifst',hero:3,ready:1,rating:1100,select:false,team:1},
-		 	10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
-		 	1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
-		 	2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
-		 	4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
-		 	5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
-		 	6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2},
-		 	7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
-		 	8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
-		 	9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-		 	},target:1,map:[1,2,4,5,6,7,8,9,10,1858]});
+			let obj = {id:1, users:{
+				10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+				1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
+				2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
+				4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
+				5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+				6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2},
+				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
+				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
+				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
+				},target:1,map:[App.storage.data.id,2,4,5,6,7,8,9,10,1858]};
+
+			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:1,rating:1100,select:false,team:1};
+				
+		 	MM.lobby(obj);
 			
 		 }, 1000);
-		 
 		setTimeout(() => {
 			
 			MM.chat({id:2,message:'тестовое сообщение'});
@@ -8669,15 +8671,10 @@ class Sound {
 		
 		let audio = new Audio();
 		
-		if( ('volume' in object) && (object.volume) ){
-			
-			audio.volume = object.volume;
-			
-		}
 		
 		if('loop' in object){
 			
-			audio.loop = true;
+			audio.loop = object.loop ? true : false;
 			
 		}
 		
@@ -8702,6 +8699,10 @@ class Sound {
 				
 				Sound.all[object.id] = audio;
 				
+			}
+		
+			if( ('volume' in object) && (object.volume) ){
+				Sound.setVolume(object.id, object.volume);
 			}
 			
 		}
