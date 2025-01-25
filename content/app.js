@@ -892,7 +892,11 @@ class View {
 			
 			App.error(error);
 			
-			App.exit();
+			if(String(error).search(new RegExp(`session is not valid`,'i')) != -1){
+				
+				App.exit();
+				
+			}
 			
 			return;
 			
