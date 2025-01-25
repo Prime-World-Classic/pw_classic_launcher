@@ -2548,104 +2548,198 @@ class View {
 }
 
 class Window {
-    static windows = {}
+	static windows = {}
+	static async show(category, method, value, value2, value3) {
+		if (!(method in Window)) {
+			return;
+		}
+		let template = await Window[method](value, value2, value3);
+		let closeButton = DOM({
+			style: 'close-button',
+			title: 'Закрыть',
+			event: ['click', () => {
+				Window.windows[category].remove();
+			}]
+		},
+		DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}));
+		template.append(closeButton);
+			if (category in Window.windows) {
+				Window.windows[category].remove();
+			}
+		Window.windows[category] = template;
+		View.active.append(template);
+	}
+	static async build(heroId, targetId = 0, isSplash = false) {
+		let viewBuild = await View.build(heroId, targetId, isSplash);
+		return DOM({id: 'wbuild'}, viewBuild);
+	}
+	static async menu() {
+		return DOM({id: 'wcastle-menu'},
+			DOM({style: 'castle-menu-title'}, 'Меню'),
+			DOM({style: 'castle-menu-item-v'}, 
+				DOM({event: ['click', () => Window.show('main', 'settings')]}, 'Настройки')
+			),
+			DOM({style: 'castle-menu-item-v'}, 
+				DOM({event: ['click', () => Window.show('main', 'support')]}, 'Поддержка')
+			),
+			App.isAdmin() ? DOM({style: 'castle-menu-item-v'}, 
+				DOM({event: ['click', () => Window.show('main', 'adminPanel')]}, 'Админ')) : null,
+			DOM({style: 'castle-menu-item-v', event: ['click', async () => {
+				App.exit();
+				Splash.hide();
+			}]}, 'Сменить аккаунт'),
+			DOM({style: 'castle-menu-item-v', event: ['click', () => {
+				if (NativeAPI.status) {
+				NativeAPI.exit();}
+			}]}, 'Выйти из игры'),
+			DOM({style: 'castle-menu-label'}, `Версия игры: v.${PW_VERSION}`),
+			DOM({style: 'menu-icons'},
+				DOM({tag: 'a', href: 'https://vk.com/primeworldclassic', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'menu-icons'})
+				),
+				DOM({tag: 'a', href: 'https://t.me/primeworldclassic', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/telegram.webp', alt: 'Telegram', style: 'menu-icons'})
+				),
+				DOM({tag: 'a', href: 'https://discord.gg/MueeP3aAzh', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'menu-icons'})
+				)
+			),
+		);
+	}
+	static async settings() {
+	let soundTestId = 'sound_test';
+	const settingsFilePath = `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/settings.txt`;
+	// Функция для чтения настроек из файла
+	async function readSettings() {
+		try {
+			const data = await NativeAPI.fileSystem.promises.readFile(settingsFilePath, 'utf-8');
+			const settings = JSON.parse(data);
+			return settings;
+		} catch (error) {
+			console.error('Не удалось прочитать настройки:', error);
+			return {}; // Возвращаем пустой объект в случае ошибки
+		}
+	}
+	// Функция для записи настроек в файл
+	async function writeSettings(settings) {
+		try {
+			await NativeAPI.fileSystem.promises.writeFile(settingsFilePath, JSON.stringify(settings), 'utf-8');
+		} catch (error) {
+			console.error('Не удалось записать настройки:', error);
+		}
+	}
+	// Считываем текущие настройки из файла
+	const currentSettings = await readSettings();
+	return DOM({id: 'wcastle-menu'},
+		DOM({style: 'castle-menu-title'}, 'Настройки'),
+		DOM({style: 'castle-menu-item'}, 
+			DOM({tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', event: ['change', (e) => {
+				if (e.target.checked) {
+					NativeAPI.window.restore();
+				} else {
+					NativeAPI.window.toggleFullscreen();
+				}
+				// Записываем состояние в файл
+				currentSettings.fullscreen = e.target.checked;
+				writeSettings(currentSettings);
+			}]}, 
+			{checked: currentSettings.fullscreen || false}),
+			DOM({tag: 'label', for: 'fullscreen-toggle'}, 'Оконный режим')
+		),
+		DOM({style: 'castle-menu-item'}, 
+			DOM({tag: 'input', type: 'checkbox', id: 'render-toggle', checked: currentSettings.render || true, event: ['change', () => {
+				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER);
+				// Записываем состояние в файл
+				currentSettings.render = !currentSettings.render;
+				writeSettings(currentSettings);
+			}]}), 
+			DOM({tag: 'label', for: 'render-toggle'}, '3D графика')
+		),
+		DOM({style: 'castle-menu-label'}, 'Общая громкость', 
+			DOM({tag: 'input', type: 'range', value: (currentSettings.globalVolume || Castle.globalVolume) * 100, min: '0', max: '100', step: '1', 
+				style: 'castle-menu-slider', event: ['input', (e) => {
+					Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+					document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
+					// Записываем состояние в файл
+					currentSettings.globalVolume = Castle.globalVolume;
+					writeSettings(currentSettings);
+				}]}), 
+		DOM({tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage'}, `${Math.round((currentSettings.globalVolume || Castle.globalVolume) * 100)}%`)
+		), 
+		DOM({style: 'castle-menu-label'}, 'Громкость музыки', 
+			DOM({tag: 'input', type: 'range', value: (currentSettings.musicVolume || Castle.musicVolume) * 100, min: '0', max: '100', step: '1', 
+				style: 'castle-menu-slider', event: ['input', (e) => {
+					Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+					document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
+					// Записываем состояние в файл
+					currentSettings.musicVolume = Castle.musicVolume;
+					writeSettings(currentSettings);
+				}]}), 
+		DOM({tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage'}, `${Math.round((currentSettings.musicVolume || Castle.musicVolume) * 100)}%`)
+		), 
+		DOM({style: 'castle-menu-label'}, 'Громкость звуков', 
+			DOM({tag: 'input', type: 'range', value: (currentSettings.soundsVolume || Castle.soundsVolume) * 100, min: '0', max: '100', step: '1', 
+				style: 'castle-menu-slider', event: ['input', (e) => {
+					Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+					if (!Castle.testSoundIsPlaying) {
+						Castle.testSoundIsPlaying = true;
+						Sound.play('content/sounds/found.ogg', {id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
+					}
+					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
+					document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
+					// Записываем состояние в файл
+					currentSettings.soundsVolume = Castle.soundsVolume;
+					writeSettings(currentSettings);
+			}]}), 
+		DOM({tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage'}, `${Math.round((currentSettings.soundsVolume || Castle.soundsVolume) * 100)}%`)
+		),
+		DOM({style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')]}, 'Назад')
+		);
+	}
 
-    static async show(category, method, value, value2, value3) {
-        if (!(method in Window)) {
-            return;
-        }
-        let template = await Window[method](value, value2, value3);
-        
-        // Создаем кнопку закрытия с изображением вместо текста
-        let closeButton = DOM({
-            style: 'close-button',
-            title: 'Закрыть',
-            event: ['click', () => {
-                Window.windows[category].remove();
-            }]
-        }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'})); // Замените путь к изображению
-        
-        template.append(closeButton);
-        
-        if (category in Window.windows) {
-            Window.windows[category].remove();
-        }
-        
-        Window.windows[category] = template;
-        View.active.append(template);
-    }
-
-    static async build(heroId, targetId = 0, isSplash = false) {
-        let viewBuild = await View.build(heroId, targetId, isSplash);
-        return DOM({id: 'wbuild'}, viewBuild);
-    }
-
-    static async menu() {
-        let soundTestId = 'sound_test';
-        return DOM({id: 'wcastle-menu'}, 
-            DOM({style: 'castle-menu-title'}, 'Меню'),
-            DOM({style: 'castle-menu-item'}, 
-                DOM({tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', event: ['change', (e) => {
-                    if (e.target.checked) {
-                        NativeAPI.window.restore(); // Переход в оконный режим
-                    } else {
-                        NativeAPI.window.toggleFullscreen(); // Вернуться в полноэкранный режим
-                    }
-                }]}, 
-                {checked: false}), // Начальное состояние: не в оконном режиме
-                DOM({tag: 'label', for: 'fullscreen-toggle'}, 'Оконный режим')
-            ),
-            DOM({style: 'castle-menu-item'}, 
-                DOM({tag: 'input', type: 'checkbox', id: 'render-toggle', checked: true, event: ['change', () => {
-                    Castle.toggleRender(Castle.RENDER_LAYER_PLAYER);
-                }]}), 
-                DOM({tag: 'label', for: 'render-toggle'}, '3D графика')
-            ),
-            DOM({style: 'castle-menu-label'}, 'Общая громкость', 
-                DOM({tag: 'input', type: 'range', value: Castle.globalVolume * 100, min: '0', max: '100', step: '1', 
-                    style: 'castle-menu-slider', event: ['input', (e) => {
-                        Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
-                        Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-                        Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-                        // Обновляем отображение процентов
-                        document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
-                    }]}), 
-                DOM({tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.globalVolume * 100)}%`)
-            ), 
-            DOM({style: 'castle-menu-label'}, 'Громкость музыки', 
-                DOM({tag: 'input', type: 'range', value: Castle.musicVolume * 100, min: '0', max: '100', step: '1', 
-                    style: 'castle-menu-slider', event: ['input', (e) => {
-                        Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
-                        Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-                        // Обновляем отображение процентов
-                        document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
-                    }]}), 
-                DOM({tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.musicVolume * 100)}%`)
-            ), 
-            DOM({style: 'castle-menu-label'}, 'Громкость звуков', 
-                DOM({tag: 'input', type: 'range', value: Castle.soundsVolume * 100, min: '0', max: '100', step: '1', 
-                    style: 'castle-menu-slider', event: ['input', (e) => {
-                        Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
-                        if (!Castle.testSoundIsPlaying) {
-                            Castle.testSoundIsPlaying = true;
-                            Sound.play('content/sounds/found.ogg', {id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)}, () => {Castle.testSoundIsPlaying = false});
-                        }
-                        Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-                        // Обновляем отображение процентов
-                        document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
-                    }]}), 
-                DOM({tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage'}, `${Math.round(Castle.soundsVolume * 100)}%`)
-            ), 
-            DOM({style: 'castle-menu-item-v', event: ['click', () => View.exitOrLogout()]}, 'Выход'),
-        )
-    }
+	static async support() {
+		return DOM({id: 'wcastle-support'},
+			DOM({style: 'castle-menu-title'}, 'Поддержка'),
+			DOM({style: 'support-text'}, 'Если у Вас есть вопросы, Вы можете связаться с нами через:'),
+			DOM({style: 'support-icons'},
+				DOM({tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon'})
+				),
+				DOM({tag: 'a', href: 'https://t.me/primeworldclassic/8232', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/telegram.webp', alt: 'Telegram', style: 'support-icon'})
+				),
+				DOM({tag: 'a', href: 'https://discord.com/channels/1252164250265325598/1298407885876891691', target: '_blank'}, 
+					DOM({tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'support-icon'})
+				)
+			),
+			DOM({style: 'castle-menu-item-s', event: ['click', () => Window.show('main', 'menu')]}, 'Назад')
+		);
+	}
+	static async adminPanel() {
+		return DOM({id: 'wcastle-menu'},
+			DOM({style: 'castle-menu-title'}, 'Админ Панель'),
+			DOM({style: 'castle-menu-item-v', event: ['click', () => {
+				View.show('talents'); // Логика для отображения обычных талантов
+			}]}, 'Таланты (обычные)'),
+			DOM({style: 'castle-menu-item-v', event: ['click', () => {
+				View.show('talents2'); // Логика для отображения классовых талантов
+			}]}, 'Таланты (классовые)'),
+			DOM({style: 'castle-menu-item-v', event: ['click', () => {
+				View.show('users'); // Логика для управления пользователями
+			}]}, 'Пользователи'),
+			DOM({style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')]}, 'Назад')
+		);
+	}
 }
 
 // Функция для обработки нажатия клавиш
 function handleKeyPress(event) {
     if (event.key === "Escape") {
         // Вызываем метод show для открытия меню
-        Window.show('menu', 'menu', null, null, null);
+        Window.show('main', 'menu');
     }
 }
 
