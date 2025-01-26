@@ -1405,9 +1405,11 @@ class View {
 		
 		let tab = 1;
 		
-		let body = DOM({style:'castle-bottom'}), content = DOM({style:'castle-bottom-content'});
+		let body = DOM({style:'castle-bottom'});
 		
-		content.addEventListener('wheel',function(event){
+		View.castleBottom = DOM({style:'castle-bottom-content'});
+		
+		View.castleBottom.addEventListener('wheel',function(event){
 			
 			let modifier = 0;
 			
@@ -1435,33 +1437,33 @@ class View {
 			
 		});
 		
-		View.bodyCastleHeroes(content);
+		View.bodyCastleHeroes();
 		
 		body.append(DOM({style:'castle-bottom-menu'},DOM({event:['click',() => {
 			
-			View.bodyCastleHeroes(content);
+			View.bodyCastleHeroes();
 			
 		}]}),DOM({event:['click',() => {
 			
-			View.bodyCastleFriends(content);
+			View.bodyCastleFriends();
 			
-		}]})),content);
+		}]})),View.castleBottom);
 		
 		return body;
 		
 	}
 	
-	static bodyCastleHeroes(target){
+	static bodyCastleHeroes(){
 		
-		let preload = new PreloadImages(target);
+		let preload = new PreloadImages(View.castleBottom);
 		
 		App.api.silent((result) => {
 			
 			MM.hero = result;
 			
-			while(target.firstChild){
+			while(View.castleBottom.firstChild){
 				
-				target.firstChild.remove();
+				View.castleBottom.firstChild.remove();
 				
 			}
 			
@@ -1495,15 +1497,15 @@ class View {
 		
 	}
 	
-	static bodyCastleFriends(target){
+	static bodyCastleFriends(){
 		
-		let preload = new PreloadImages(target);
+		let preload = new PreloadImages(View.castleBottom);
 		
 		App.api.silent((result) => {
 			
-			while(target.firstChild){
+			while(View.castleBottom.firstChild){
 				
-				target.firstChild.remove();
+				View.castleBottom.firstChild.remove();
 				
 			}
 			// status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
@@ -1538,9 +1540,10 @@ class View {
 					for(let item of request){
 						
 						let template = DOM({event:['click', async () => {
-							alert(1);
-							return;
+							
 							await App.api.request('friend','request',{id:item.id});
+							
+							View.bodyCastleFriends();
 							
 							App.notify(`Заявка в друзья ${item.nickname} отправлена`,1000);
 							
@@ -1637,7 +1640,36 @@ class View {
 					
 				}
 				
-				let friend = DOM({style:'castle-friend-item'},heroNameBase,bottom);
+				let friend = DOM({style:'castle-friend-item',oncontextmenu: () => {
+					
+					App.api.request('friend','remove',{id:item.id});
+					
+					friend.remove();
+					
+					return false;
+					
+				}},heroNameBase,bottom);
+				
+				if(item.status == 2){
+					
+					let accept = DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request',onclick: async () => {
+						
+						await App.api.request('friend','accept',{id:item.id});
+						
+						accept.remove();
+						
+					}},'Принять'));
+					
+					friend.append(accept);
+					
+				}
+				else if(item.status == 3){
+					
+					friend.append(DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request'},'Ожидание')));
+					
+					friend.style.filter = 'grayscale(1)';
+					
+				}
 				
 				friend.dataset.url = `content/hero/empty.webp`;
 				
