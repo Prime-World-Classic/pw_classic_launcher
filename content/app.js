@@ -1506,35 +1506,80 @@ class View {
 				target.firstChild.remove();
 				
 			}
-			
-			let demo = [
-			
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()},
-			{id:1,nickname:'ifst',status:1,online:Date.now()}
-			
-			];
 			// status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
 			console.log('ДРУЗЬЯ',result);
 			
-			for(let item of demo){
+			let buttonAdd = DOM({style:'castle-friend-item',onclick:() => {
+				
+				let input = DOM({tag:'input',style:'search-input'});
+				
+				let body = DOM({style:'search-body'});
+				
+				let search = DOM({style:'search'},input,body,DOM({style:'search-bottom',event:['click',() => {
+					
+					Splash.hide();
+					
+				}]},`[Отменить]`));
+				
+				input.addEventListener('input', async () => {
+					
+					let request = await App.api.request('user','find',{nickname:input.value});
+					
+					if(body.firstChild){
+						
+						while(body.firstChild){
+							
+							body.firstChild.remove();
+							
+						}
+						
+					}
+					
+					for(let item of request){
+						
+						let template = DOM({event:['click', async () => {
+							
+							await App.api.request('friend','request',{id:item.id});
+							
+							App.notify(`Заявка в друзья ${item.nickname} отправлена`,1000);
+							
+							Splash.hide();
+							
+						}]},item.nickname);
+						
+						if('blocked' in item){
+							
+							if(item.mute){
+								
+								template.style.color = 'yellow';
+								
+							}
+							
+							if(item.blocked){
+								
+								template.style.color = 'red';
+								
+							}
+							
+						}
+						
+						body.append(template);
+						
+					}
+					
+				});
+				
+				Splash.show(search,false);
+				
+				input.focus();
+				
+			}},DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request'},'Добавить друга')));
+			
+			preload.add(buttonAdd);
+			
+			buttonAdd.dataset.url = `content/hero/empty.webp`;
+			
+			for(let item of result){
 				
 				let isOnline = (item.online ? ( ( ( Date.now() - item.online ) / 1000 / 60 < 5 ) ? true : false ) : false);
 				
@@ -1546,7 +1591,15 @@ class View {
 
 				let heroNameBase = DOM({style:'castle-item-hero-name'}, heroName);
 				
-				let friend = DOM({style:'castle-friend-item'},heroNameBase);
+				let bottom = DOM({style:'castle-friend-item-bottom'});
+				
+				if(isOnline){
+					
+					bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
+					
+				}
+				
+				let friend = DOM({style:'castle-friend-item'},heroNameBase,bottom);
 				
 				friend.dataset.url = `content/hero/empty.webp`;
 				
