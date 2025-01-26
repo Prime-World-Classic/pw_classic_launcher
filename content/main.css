@@ -1013,15 +1013,11 @@ text-align:center;
 	
 }
 
-.hero-item{
-	margin: 3vh 0.3vw;
-	container-type: size;
-}
-
 .hero-item {
-	width:166px;
-	min-width:166px;
-	height:166px;
+	margin: 3cqh 0.3cqw;
+	container-type: size;
+	width:14cqh;
+	height:14cqh;
 	cursor:pointer;
 	background-size:cover;
 	background-position:center;
@@ -1030,12 +1026,12 @@ text-align:center;
 
 .hero-item .name {
 	position:absolute;
-	top:-20px;
-	width: 169px;
+	top:-10cqh;
+	width: 100cqw;
 	text-align:center;
 	font: .9rem / 1 Arial;
 	color: #fffd;
-	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
+	text-shadow:rgba(0,0,0,1.0) 0 0 5cqh;
 	
 }
 
