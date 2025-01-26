@@ -3012,7 +3012,13 @@ class Build{
 		
 		let request = await App.api.request('build','get',{user:user,hero:hero});
 		
-		let container = DOM();
+		let container = DOM({event:['click', async () => {
+			
+			if (animate) {
+				Build.view(user,hero,nickname,false);
+			}
+			
+		}]});
 		
 		container.style.width = '30vw';
 		
