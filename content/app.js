@@ -1538,7 +1538,8 @@ class View {
 					for(let item of request){
 						
 						let template = DOM({event:['click', async () => {
-							
+							alert(1);
+							return;
 							await App.api.request('friend','request',{id:item.id});
 							
 							App.notify(`Заявка в друзья ${item.nickname} отправлена`,1000);
@@ -1548,6 +1549,43 @@ class View {
 						}]},item.nickname);
 						
 						if('blocked' in item){
+							
+							template.oncontextmenu = () => {
+								
+								let body = document.createDocumentFragment();
+								
+								body.append(DOM({style:'splash-content-button',event:['click', async () => {
+									
+									await App.api.request('user','blocked',{id:item.id});
+									
+									Splash.hide();
+									
+								}]},(item.blocked ? 'Разблокировать' : 'Заблокировать')),
+								DOM({style:'splash-content-button',event:['click', async () => {
+									
+									await App.api.request('user','mute',{id:item.id});
+									
+									Splash.hide();
+									
+								}]},(item.mute ? 'Убрать мут' : 'Мут чата')),
+								DOM({style:'splash-content-button',event:['click', async () => {
+									
+									let password = await App.api.request('user','restore',{id:item.id});
+									
+									body.append(`Пароль: ${password}`);
+									
+								}]},'Cброс пароля'),
+								DOM({style:'splash-content-button',event:['click', () => {
+									
+									Splash.hide();
+									
+								}]},'Назад'));
+								
+								Splash.show(body);
+								
+								return false;
+								
+							}
 							
 							if(item.mute){
 								
