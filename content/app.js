@@ -2697,7 +2697,7 @@ class Window {
 		return DOM({id: 'wbuild'}, viewBuild);
 	}
 	static async menu() {
-		return DOM({id: 'wcastle-menu'},
+		const menuItems = [
 			DOM({style: 'castle-menu-title'}, 'Меню'),
 			DOM({style: 'castle-menu-item-v'}, 
 				DOM({event: ['click', () => Window.show('main', 'settings')]}, 'Настройки')
@@ -2713,7 +2713,8 @@ class Window {
 			}]}, 'Сменить аккаунт'),
 			DOM({style: 'castle-menu-item-v', event: ['click', () => {
 				if (NativeAPI.status) {
-				NativeAPI.exit();}
+					NativeAPI.exit();
+				}
 			}]}, 'Выйти из игры'),
 			DOM({style: 'castle-menu-label'}, `Версия игры: v.${PW_VERSION}`),
 			DOM({style: 'menu-icons'},
@@ -2727,7 +2728,8 @@ class Window {
 					DOM({tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'menu-icons'})
 				)
 			),
-		);
+		];
+		return DOM({id: 'wcastle-menu'}, ...menuItems.filter(item => item !== null));
 	}
 	static async settings() {
 	let soundTestId = 'sound_test';
