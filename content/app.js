@@ -1622,8 +1622,6 @@ class View {
 			
 			for(let item of result){
 				
-				let isOnline = (item.online ? ( ( ( Date.now() - item.online ) / 1000 / 60 < 5 ) ? true : false ) : false);
-				
 				const heroName = DOM({style:'castle-hero-name'}, DOM({}, item.nickname));
 
 				if (item.nickname.length > 10) {
@@ -1634,7 +1632,7 @@ class View {
 				
 				let bottom = DOM({style:'castle-friend-item-bottom'});
 				
-				if(isOnline){
+				if(item.online){
 					
 					bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
 					
