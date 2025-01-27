@@ -859,7 +859,7 @@ class View {
 	
 	static activeAnimation = false;
 	
-	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(1vh)']};
+	static defaultAnimation = {transform:['scale(1.1)','scale(1)'],opacity:[0,1],backdropFilter:['blur(0)','blur(1cqh)']};
 	
 	static defaultOptionAnimation = {duration:150,fill:'both',easing:'ease-out'};
 
@@ -1370,6 +1370,8 @@ class View {
 		
 		let builds = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => View.show('top')]});
 		
+		let ratings = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => Window.show('main', 'top')]});
+		
 		let settings = DOM({style:['castle-settings-btn','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => {
 			let wrapper = DOM({style:['castle-settings-window']})
 			settings.append(wrapper);
@@ -1387,7 +1389,7 @@ class View {
 		input.max='1';
 		input.step='0.01';
 		
-		let body = DOM({style:['castle-settings']}, menu, builds, clan);
+		let body = DOM({style:['castle-settings']}, menu, ratings, clan);
 		
 		return body; 
 		
@@ -2134,7 +2136,7 @@ class View {
 		
 	}
 	
-	static async top(hero = 0){
+	static async top(hero = 0, isSplah = false){
 		
 		let body = DOM({style:'main'});
 		
@@ -2173,7 +2175,11 @@ class View {
 				
 				hero.addEventListener('click', async () => {
 					
-					View.show('top',item.id);
+					if (isSplah) {
+						Window.show('main', 'top', item.id);
+					} else {
+						View.show('top',item.id);
+					}
 					
 					Splash.hide();
 					
@@ -2213,7 +2219,9 @@ class View {
 			
 		}
 		
-		body.append(View.header(),top);
+		if (isSplah) {
+			body.append(View.header(),top);
+		}
 		
 		return body;
 		
@@ -2704,6 +2712,10 @@ class Window {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
 		return DOM({id: 'wbuild'}, viewBuild);
 	}
+	static async top(hero = 0) {
+		let viewTop = await View.top(hero, true);
+		return DOM({id: 'wtop'}, viewTop);
+	}
 	static async menu() {
 		return DOM({id: 'wcastle-menu'},
 			DOM({style: 'castle-menu-title'}, 'Меню'),
@@ -2906,7 +2918,7 @@ class Frame {
 		document.body.prepend(DOM({style:'frame'},Frame.body));
 		let test = DOM({tag:'div'},'width:100%');
 		
-		test.setAttribute('style','width:100%;background:green;text-align:center;font-size:5vw');
+		test.setAttribute('style','width:100%;background:green;text-align:center;font-size:5cqw');
 		Frame.body.append(test);
 		
 	}
@@ -3062,9 +3074,9 @@ class Build{
 			
 		}]});
 		
-		container.style.width = '30vw';
+		container.style.width = '30cqw';
 		
-		container.style.height = '30vw';
+		container.style.height = '30cqw';
 		
 		let state = false;
 		let get = DOM({event:['click', async () => {
@@ -8350,7 +8362,7 @@ class MM {
 		}]},'Готов!');
 		
 		
-		button.style.fontSize = '2vw';
+		button.style.fontSize = '2cqw';
 		
 		button.animate({transform:['scale(1)','scale(0.8)','scale(1.2)','scale(1)']},{duration:500,iterations:Infinity,easing:'ease-in-out'});
 		
@@ -8444,11 +8456,11 @@ class MM {
 		
 		MM.lobbyBuildField = DOM();
 		
-		MM.lobbyBuildField.style.margin = '0.5vw 0';
+		MM.lobbyBuildField.style.margin = '0.5cqw 0';
 		
-		MM.lobbyBuildField.style.width = '28vw';
+		MM.lobbyBuildField.style.width = '28cqw';
 		
-		MM.lobbyBuildField.style.height = '28vw';
+		MM.lobbyBuildField.style.height = '28cqw';
 		
 		MM.lobbyBuildTab = DOM({style:'lobby-build-tab'});
 		
@@ -8687,7 +8699,7 @@ class MM {
 		
 		let container = DOM({tag:'div'},MM.renderBody);
 		
-		container.setAttribute('style','width:37vh;height:37vh');
+		container.setAttribute('style','width:37cqh;height:37cqh');
 		
 		for(let number of [1,2,3,4,5,6]){
 			
