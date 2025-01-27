@@ -6345,7 +6345,7 @@ class PWGame {
 		
 		if(!NativeAPI.status){
 			
-			throw 'Необходима Windows версия лаунчера';
+			//throw 'Необходима Windows версия лаунчера';
 			
 		}
 		
@@ -9011,9 +9011,9 @@ class Timer {
 			
 		}
 		
-		let seconds = Math.abs(Date.now() - Timer.timeFinish) / 1000;
+		let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
 		
-		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds.toFixed(2)}`;
+		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds}`;
 		
 	}
 	
