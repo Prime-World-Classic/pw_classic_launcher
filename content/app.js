@@ -557,7 +557,7 @@ class Api {
 	
 	async connect(){
 		
-		this.WebSocket = new WebSocket(`${this.MAIN_HOST}`); // + ${App.storage.data.token}		
+		this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`); // + ${App.storage.data.token}		
 		
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data) );
 
@@ -1622,8 +1622,6 @@ class View {
 			
 			for(let item of result){
 				
-				let isOnline = (item.online ? ( ( ( Date.now() - item.online ) / 1000 / 60 < 5 ) ? true : false ) : false);
-				
 				const heroName = DOM({style:'castle-hero-name'}, DOM({}, item.nickname));
 
 				if (item.nickname.length > 10) {
@@ -1634,7 +1632,7 @@ class View {
 				
 				let bottom = DOM({style:'castle-friend-item-bottom'});
 				
-				if(isOnline){
+				if(item.online){
 					
 					bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
 					
@@ -2686,12 +2684,22 @@ class Window {
 		},
 		DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}));
 		template.append(closeButton);
-			if (category in Window.windows) {
-				Window.windows[category].remove();
-			}
+		if (category in Window.windows) {
+			Window.windows[category].remove();
+		}
 		Window.windows[category] = template;
 		View.active.append(template);
 	}
+
+	static close(category) {
+		if (category in Window.windows) {
+			Window.windows[category].remove();
+			delete Window.windows[category];
+			return true;
+		}
+		return false;
+	}
+
 	static async build(heroId, targetId = 0, isSplash = false) {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
 		return DOM({id: 'wbuild'}, viewBuild);
@@ -2733,7 +2741,7 @@ class Window {
 	}
 	static async settings() {
 	let soundTestId = 'sound_test';
-	const settingsFilePath = `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/settings.txt`;
+	const settingsFilePath = NativeAPI.status ? `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/settings.txt` : '';
 	// Функция для чтения настроек из файла
 	async function readSettings() {
 		try {
@@ -2864,7 +2872,9 @@ class Window {
 function handleKeyPress(event) {
     if (event.key === "Escape") {
         // Вызываем метод show для открытия меню
-        Window.show('main', 'menu');
+		if (!Window.close('main')) {
+			Window.show('main', 'menu');
+		}
     }
 }
 
@@ -5821,7 +5831,7 @@ class App {
 	
 	static async init(){ // ws://192.168.31.29:3737
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
-		App.api = new Api(['wss://relay.26rus-game.ru:8442/','wss://pw.26rus-game.ru:8443/'], Events);
+		App.api = new Api(['wss://playpw.fun:443/api/v1','wss://relay.26rus-game.ru:8442','wss://pw.26rus-game.ru:8443'], Events);
 		
 		await Store.init();
 		
@@ -6347,7 +6357,7 @@ class PWGame {
 		
 		if(!NativeAPI.status){
 			
-			throw 'Необходима Windows версия лаунчера';
+			//throw 'Необходима Windows версия лаунчера';
 			
 		}
 		
@@ -9013,9 +9023,9 @@ class Timer {
 			
 		}
 		
-		let seconds = Math.abs(Date.now() - Timer.timeFinish) / 1000;
+		let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
 		
-		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds.toFixed(2)}`;
+		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0': '')}${seconds}`;
 		
 	}
 	
