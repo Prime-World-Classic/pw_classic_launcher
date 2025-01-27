@@ -2684,12 +2684,22 @@ class Window {
 		},
 		DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}));
 		template.append(closeButton);
-			if (category in Window.windows) {
-				Window.windows[category].remove();
-			}
+		if (category in Window.windows) {
+			Window.windows[category].remove();
+		}
 		Window.windows[category] = template;
 		View.active.append(template);
 	}
+
+	static close(category) {
+		if (category in Window.windows) {
+			Window.windows[category].remove();
+			delete Window.windows[category];
+			return true;
+		}
+		return false;
+	}
+
 	static async build(heroId, targetId = 0, isSplash = false) {
 		let viewBuild = await View.build(heroId, targetId, isSplash);
 		return DOM({id: 'wbuild'}, viewBuild);
@@ -2729,7 +2739,7 @@ class Window {
 	}
 	static async settings() {
 	let soundTestId = 'sound_test';
-	const settingsFilePath = `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/settings.txt`;
+	const settingsFilePath = NativeAPI.status ? `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/settings.txt` : '';
 	// Функция для чтения настроек из файла
 	async function readSettings() {
 		try {
@@ -2860,7 +2870,9 @@ class Window {
 function handleKeyPress(event) {
     if (event.key === "Escape") {
         // Вызываем метод show для открытия меню
-        Window.show('main', 'menu');
+		if (!Window.close('main')) {
+			Window.show('main', 'menu');
+		}
     }
 }
 
