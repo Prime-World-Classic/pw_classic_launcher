@@ -142,7 +142,7 @@
     font: 4.5cqh / 1 Verdana;
     overflow: hidden;
     color: rgba(255, 255, 255, 0.9);
-    border: 0.1cqh solid rgb(158, 155, 104); /* Окантовка */
+    border: 0.3cqh solid rgb(158, 155, 104); /* Окантовка */
     transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход */
 }
 
