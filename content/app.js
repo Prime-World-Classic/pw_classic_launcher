@@ -5806,7 +5806,8 @@ class App {
 	
 	static async init(){ // ws://192.168.31.29:3737
 		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
-		App.api = new Api(['wss://playpw.fun:443/api/v1','wss://relay.26rus-game.ru:8442','wss://pw.26rus-game.ru:8443'], Events);
+		// ['wss://playpw.fun:443/api/v1','wss://relay.26rus-game.ru:8442','wss://pw.26rus-game.ru:8443']
+		App.api = new Api(['wss://playpw.fun:443/api/v1','wss://pw.26rus-game.ru:8443'], Events);
 		
 		await Store.init();
 		
@@ -7993,7 +7994,6 @@ class Settings {
 	static async ReadSettings() {
 		if (!NativeAPI.status) { 
 			Settings.settings = Settings.defaultSettings;
-			App.error(1);
 			return;
 		}
 
