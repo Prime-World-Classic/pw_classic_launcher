@@ -471,7 +471,7 @@ background-color:rgba(15,15,15,0.7);
     background-size: contain;
     position: absolute;
     cursor: pointer;
-    transform: scale(0.5);
+    transform: scale(0.8);
     transition: transform 0.2s ease; /* Добавляем плавный переход */
 }
 
@@ -481,7 +481,7 @@ background-color:rgba(15,15,15,0.7);
 }
 
 .close-button:hover {
-    transform: scale(0.6); /* Увеличиваем масштаб при наведении */
+    transform: scale(0.9); /* Увеличиваем масштаб при наведении */
 }
 
 .close-image-style {
@@ -2515,7 +2515,7 @@ cursor:pointer;
 
 
 
-#wtop, #wgame, #whistory {
+#wtop, #whistory {
 	container-type: size;
 	position: absolute;
 	margin-top: 10cqh;
@@ -2534,7 +2534,7 @@ cursor:pointer;
 	align-items: center;
 }
 
-#wbuild {
+#wbuild, #wgame {
 	container-type: size;
 	position: absolute;
 	margin-top: 12cqh;
