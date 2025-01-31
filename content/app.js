@@ -6393,7 +6393,7 @@ class PWGame {
 			return;
 		}
 
-		for (let ip of gameServerIps) {
+		for (let ip of PWGame.gameServerIps) {
 			if (testServerConnection(ip)) {
 				PWGame.gameServerHasConnection = true;
 
