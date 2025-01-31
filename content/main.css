@@ -1882,7 +1882,15 @@ cursor:pointer;
 	
 }
 
-.top, .top-scroll{
+.wtop-scroll{
+	
+	width:100cqw;
+	height: 100cqh;
+	overflow:scroll;
+	
+}
+
+.top, .top-scroll, .wtop-scroll{
 	
 	display:flex;
 	flex-flow:row wrap;
@@ -1985,11 +1993,13 @@ cursor:pointer;
 
 .top-item-player{
 	
+	width: 100cqw;
 	margin-right:auto;
 	padding:0 1cqw;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	text-align: left;
 	
 }
 
@@ -2139,6 +2149,25 @@ cursor:pointer;
     color:rgba(255, 255, 255, 0.7);
     text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 	
+}
+
+.whistory {
+	
+	display:flex;
+	flex-flow:column nowrap;
+	overflow:scroll;
+	height:100cqh;
+	font:2cqw / 1 Arial;
+    color:rgba(255, 255, 255, 0.7);
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+	
+}
+.whistory::-webkit-scrollbar {
+	background-color: rgba(0, 51, 0, 0.479);
+	width: 1.0cqw;
+}
+.whistory::-webkit-scrollbar-thumb {
+	background-color: rgb(187, 202, 187);
 }
 
 .history-item {
@@ -2485,7 +2514,27 @@ cursor:pointer;
 
 
 
-#wbuild, #wtop {
+
+#wtop, #wgame, #whistory {
+	container-type: size;
+	position: absolute;
+	margin-top: 10cqh;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	text-align: center;
+	width: calc(min(150cqh, 95cqw));
+	height: 80cqh;
+	/*background-color: #8d8b8b;*/
+	border-radius: 2cqh;
+	border: 0.1cqh solid rgb(158, 155, 104);
+	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
+	display: flex;
+	align-items: center;
+}
+
+#wbuild {
 	container-type: size;
 	position: absolute;
 	margin-top: 12cqh;
