@@ -32,6 +32,8 @@ window.addEventListener('DOMContentLoaded',() => {
 	
 	App.init();
 
+	Settings.init();
+
 	let testRadminConnection = async () => { 
 		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
 		if (hasConnection) {
@@ -2739,23 +2741,23 @@ class Window {
 			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', event: ['change', (e) => {
-				if (e.target.checked) {
-					NativeAPI.window.restore();
-				} else {
-					NativeAPI.window.toggleFullscreen();
-				}
-				// Записываем состояние в файл
+						if (NativeAPI.status) {
+							if (e.target.checked) {
+								NativeAPI.window.restore();
+							} else {
+								NativeAPI.window.toggleFullscreen();
+							}
+						}
 						Settings.settings.fullscreen = e.target.checked;
 					}]
 				},
-					{ checked: currentSettings.fullscreen || false }),
+					{ checked: Settings.settings.fullscreen }),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, 'Оконный режим')
 		),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: currentSettings.render || true, event: ['change', () => {
+					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: Settings.settings.render || true, event: ['change', (e) => {
 						Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, e.target.checked);
-				// Записываем состояние в файл
 						Settings.settings.render = e.target.checked;;
 					}]
 				}),
@@ -2763,34 +2765,32 @@ class Window {
 		),
 			DOM({ style: 'castle-menu-label' }, 'Общая громкость',
 				DOM({
-					tag: 'input', type: 'range', value: (currentSettings.globalVolume || Castle.globalVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.globalVolume || Castle.globalVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
 					Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
 					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 					document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
-					// Записываем состояние в файл
 						Settings.settings.globalVolume = Castle.globalVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((currentSettings.globalVolume || Castle.globalVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume || Castle.globalVolume) * 100)}%`)
 		), 
 			DOM({ style: 'castle-menu-label' }, 'Громкость музыки',
 				DOM({
-					tag: 'input', type: 'range', value: (currentSettings.musicVolume || Castle.musicVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.musicVolume || Castle.musicVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
 					Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
 					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 					document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
-					// Записываем состояние в файл
 						Settings.settings.musicVolume = Castle.musicVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((currentSettings.musicVolume || Castle.musicVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.musicVolume || Castle.musicVolume) * 100)}%`)
 		), 
 			DOM({ style: 'castle-menu-label' }, 'Громкость звуков',
 				DOM({
-					tag: 'input', type: 'range', value: (currentSettings.soundsVolume || Castle.soundsVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.soundsVolume || Castle.soundsVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
 					Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
 					if (!Castle.testSoundIsPlaying) {
@@ -2799,11 +2799,10 @@ class Window {
 					}
 					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 					document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
-					// Записываем состояние в файл
 						Settings.settings.soundsVolume = Castle.soundsVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((currentSettings.soundsVolume || Castle.soundsVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume || Castle.soundsVolume) * 100)}%`)
 		),
 			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад')
 		);
@@ -6475,7 +6474,7 @@ class NativeAPI {
 		
 		window.addEventListener('error', (event) => NativeAPI.write('error.txt',event.error.toString()));
 		
-		window.addEventListener('unhandledrejection', (event) => NativeAPI.write('unhandledrejection.txt',event.reason.message));
+		window.addEventListener('unhandledrejection', (event) => NativeAPI.write('unhandledrejection.txt',event.reason.stack));
 		
 	}
 	
@@ -7988,26 +7987,29 @@ class Settings {
 	}
 	static settings;
 
-	static settingsFilePath = `/Documents/My Games/Prime World Classic/settings.cfg`;
+	static settingsFilePath = `/primeworldclassic_settings.cfg`; // TODO: ACTUAL DOCUMENTS FOLDER INCLUDING ONEDRIVE!
 
 	// Функция для чтения настроек из файла
 	static async ReadSettings() {
 		if (!NativeAPI.status) { 
-			return;
-		}
-
-		fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
-
-		if (!NativeAPI.path.existsSync(fullSettingsFilePath)) {
-			Settings.WriteSettings(Settings.defaultSettings);
 			Settings.settings = Settings.defaultSettings;
+			App.error(1);
 			return;
 		}
 
 		try {
-			const data = await NativeAPI.fileSystem.promises.readFile(fullSettingsFilePath, 'utf-8');
+			const fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
+
+			if (!NativeAPI.fileSystem.existsSync(fullSettingsFilePath)) {
+				Settings.settings = Settings.defaultSettings;
+				Settings.WriteSettings();
+				return;
+			}
+
+			const data = await NativeAPI.fileSystem.promises.readFile(fullSettingsFilePath);
 			Settings.settings = JSON.parse(data);
 		} catch (error) {
+			App.error(error);
 			Settings.settings = Settings.defaultSettings;
 		}
 	}
@@ -8017,18 +8019,18 @@ class Settings {
 			return;
 		}
 
-		fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
+		const fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
 
 		try {
-			await NativeAPI.fileSystem.promises.writeFile(fullSettingsFilePath, JSON.stringify(Settings.settings), 'utf-8');
+			await NativeAPI.write(fullSettingsFilePath, JSON.stringify(Settings.settings));
 		} catch (error) {
-			App.error(`Не удалось сохранить файл настроек ${fullSettingsFilePath}`)
+			App.error(error);
 		}
 	}
 	
 	static async init(){
 
-		Settings.ReadSettings();
+		await Settings.ReadSettings();
 		
 		window.addEventListener('beforeunload',() => {
 			
