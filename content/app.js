@@ -6394,7 +6394,7 @@ class PWGame {
 		}
 
 		for (let ip of PWGame.gameServerIps) {
-			if (testServerConnection(ip)) {
+			if (PWGame.testServerConnection(ip)) {
 				PWGame.gameServerHasConnection = true;
 
 				setTimeout(_ => {
