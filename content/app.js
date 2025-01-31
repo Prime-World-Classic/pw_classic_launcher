@@ -6331,13 +6331,15 @@ class PWGame {
 
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 100; // 100 minutes
 
-	static playPwProtocol = `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
+	static GetPlayPwProtocol(id) {
+		return `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
+	} 
 	
 	static async start(id, callback){
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', playPwProtocol], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.GetPlayPwProtocol(id)], callback);
 		
 	}
 	
@@ -6345,7 +6347,7 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',playPwProtocol], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.GetPlayPwProtocol(id)], callback);
 		
 	}
 	
