@@ -2770,15 +2770,9 @@ class Window {
 			DOM({ style: 'castle-menu-title' }, 'Настройки'),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', event: ['change', (e) => {
-						if (NativeAPI.status) {
-							if (e.target.checked) {
-								NativeAPI.window.restore();
-							} else {
-								NativeAPI.window.toggleFullscreen();
-							}
-						}
-						Settings.settings.fullscreen = e.target.checked;
+					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
+						Settings.settings.fullscreen = !e.target.checked;
+						Settings.ApplySettings();
 					}]
 				},
 					{ checked: Settings.settings.fullscreen }),
@@ -2786,53 +2780,53 @@ class Window {
 		),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: Settings.settings.render || true, event: ['change', (e) => {
-						Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, e.target.checked);
-						Settings.settings.render = e.target.checked;;
+					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: Settings.settings.render, event: ['change', (e) => {
+						Settings.settings.render = e.target.checked;
+						Settings.ApplySettings();
 					}]
 				}),
 				DOM({ tag: 'label', for: 'render-toggle' }, '3D графика')
 		),
 			DOM({ style: 'castle-menu-label' }, 'Общая громкость',
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.globalVolume || Castle.globalVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.globalVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
-					Castle.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.settings.globalVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.ApplySettings();
 					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 					document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
-						Settings.settings.globalVolume = Castle.globalVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume || Castle.globalVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume) * 100)}%`)
 		), 
 			DOM({ style: 'castle-menu-label' }, 'Громкость музыки',
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.musicVolume || Castle.musicVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.musicVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
-					Castle.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.settings.musicVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.ApplySettings();
 					Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 					document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
-						Settings.settings.musicVolume = Castle.musicVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.musicVolume || Castle.musicVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.musicVolume) * 100)}%`)
 		), 
 			DOM({ style: 'castle-menu-label' }, 'Громкость звуков',
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.soundsVolume || Castle.soundsVolume) * 100, min: '0', max: '100', step: '1',
+					tag: 'input', type: 'range', value: (Settings.settings.soundsVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
-					Castle.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.settings.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
+					Settings.ApplySettings();
 					if (!Castle.testSoundIsPlaying) {
 						Castle.testSoundIsPlaying = true;
 							Sound.play('content/sounds/found.ogg', { id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) }, () => { Castle.testSoundIsPlaying = false });
 					}
 					Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
 					document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
-						Settings.settings.soundsVolume = Castle.soundsVolume;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume || Castle.soundsVolume) * 100)}%`)
+				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 		),
 			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад')
 		);
@@ -6497,7 +6491,10 @@ class NativeAPI {
 		
 		NativeAPI.app = nw.App;
 
-		NativeAPI.altEnterShortcut = new nw.Shortcut({key:'Alt+Enter',active:() => NativeAPI.window.toggleFullscreen()});
+		NativeAPI.altEnterShortcut = new nw.Shortcut({key:'Alt+Enter',active:() => {
+			Settings.settings.fullscreen = !Settings.settings.fullscreen;
+			Settings.ApplySettings();
+		}});
 		
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 		
@@ -8057,10 +8054,28 @@ class Settings {
 			App.error(error);
 		}
 	}
+
+	static async ApplySettings() {
+		Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, Settings.settings.render);
+		if (NativeAPI.status) {
+			if (Settings.settings.fullscreen) {
+				NativeAPI.window.enterFullscreen();
+			} else {
+				NativeAPI.window.leaveFullscreen();
+			}
+		}
+		Castle.globalVolume = Settings.settings.globalVolume;
+		Castle.musicVolume = Settings.settings.musicVolume;
+		Castle.soundsVolume = Settings.settings.soundsVolume;
+	}
 	
 	static async init(){
 
 		await Settings.ReadSettings();
+
+		await Settings.ApplySettings();
+
+		Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 		
 		window.addEventListener('beforeunload',() => {
 			
