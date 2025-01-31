@@ -1370,7 +1370,7 @@ class View {
 		
 		let builds = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => View.show('top')]});
 		
-		let ratings = DOM({style:['castle-builds','button-outline'], title: "Рейтинг",event:['click',() => Window.show('main', 'top')]});
+		let ratings = DOM({style:['castle-top','button-outline'], title: "Рейтинг",event:['click',() => Window.show('main', 'top')]});
 		
 		let settings = DOM({style:['castle-settings-btn','button-outline'], title: "Вкл/Выкл графики замка",event:['click',() => {
 			let wrapper = DOM({style:['castle-settings-window']})
@@ -1381,6 +1381,11 @@ class View {
 		
 		let menu = DOM({style:['castle-menu','button-outline'], title: 'Меню',event:['click',() => Window.show('main', 'menu')]});
 		
+		let history = DOM({style:['castle-history','button-outline'], title: 'История',event:['click',() => Window.show('main', 'history')]});
+		
+		let farm = DOM({style:['castle-farm','button-outline'], title: 'Фарм',event:['click',() => Window.show('main', 'farm')]});
+		
+		
 		let input = DOM({style:'castle-input', tag:'input'});
 
 		input.type = 'range';
@@ -1389,7 +1394,7 @@ class View {
 		input.max='1';
 		input.step='0.01';
 		
-		let body = DOM({style:['castle-settings']}, menu, ratings, clan);
+		let body = DOM({style:['castle-settings']}, menu, ratings, history, farm);
 		
 		return body; 
 		
@@ -1445,11 +1450,11 @@ class View {
 			
 			View.bodyCastleHeroes();
 			
-		}]}),DOM({event:['click',() => {
+		}], title:'Герои'}),DOM({event:['click',() => {
 			
 			View.bodyCastleFriends();
 			
-		}]})),View.castleBottom);
+		}], title:'Друзья'})),View.castleBottom);
 		
 		return body;
 		
@@ -2106,9 +2111,9 @@ class View {
 		
 	}
 
-	static async history(){
+	static async history(isSplash){
 		
-		let body = DOM({style:'main'}), history = DOM({style:'history'});
+		let body = DOM({style:'main'}), history = DOM({style:isSplash ? 'whistory' : 'history'});
 		
 		let result = await App.api.request(CURRENT_MM,'history');
 		
@@ -2130,7 +2135,10 @@ class View {
 			
 		}
 		
-		body.append(View.header(),history);
+		if (!isSplash) {
+			body.append(View.header());
+		}
+		body.append(history);
 		
 		return body;
 		
@@ -2148,7 +2156,8 @@ class View {
 			
 		}
 		
-		let top = DOM({style:'top-scroll'},DOM({style:'top-filter',title:'Выберите героя, чтобы отсортировать игроков зала славы',event:['click', async () => {
+		let top = DOM({style: isSplah ? 'wtop-scroll' : 'top-scroll'},
+			DOM({style:'top-filter',title:'Выберите героя, чтобы отсортировать игроков зала славы',event:['click', async () => {
 			
 			let request = await App.api.request('build','heroAll');
 			
@@ -2219,9 +2228,10 @@ class View {
 			
 		}
 		
-		if (isSplah) {
-			body.append(View.header(),top);
+		if (!isSplah) {
+			body.append(View.header());
 		}
+		body.append(top);
 		
 		return body;
 		
@@ -2364,7 +2374,7 @@ class View {
 		
 	}
 	
-	static game(){
+	static game(isSplash){
 		
 		let body = DOM({style:'game'});
 		
@@ -2715,6 +2725,14 @@ class Window {
 	static async top(hero = 0) {
 		let viewTop = await View.top(hero, true);
 		return DOM({id: 'wtop'}, viewTop);
+	}
+	static async farm() {
+		let view = await View.game(true);
+		return DOM({id: 'wgame'}, view);
+	}
+	static async history() {
+		let view = await View.history(true);
+		return DOM({id: 'whistory'}, view);
 	}
 	static async menu() {
 		return DOM({id: 'wcastle-menu'},
@@ -3074,9 +3092,9 @@ class Build{
 			
 		}]});
 		
-		container.style.width = '30cqw';
+		container.style.width = '60cqmin';
 		
-		container.style.height = '30cqw';
+		container.style.height = '60cqmin';
 		
 		let state = false;
 		let get = DOM({event:['click', async () => {

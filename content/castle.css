@@ -59,10 +59,28 @@
 	cursor: pointer;
 }
 
-.castle-builds{
+.castle-top{
     width: 7cqh;
 	height: 7cqh;
 	background-image: url('talents/268.webp');
+	background-size: cover;
+    object-fit: cover;
+	cursor: pointer;
+}
+
+.castle-history{
+    width: 7cqh;
+	height: 7cqh;
+	background-image: url('talents/441.webp');
+	background-size: cover;
+    object-fit: cover;
+	cursor: pointer;
+}
+
+.castle-farm{
+    width: 7cqh;
+	height: 7cqh;
+	background-image: url('talents/762.webp');
 	background-size: cover;
     object-fit: cover;
 	cursor: pointer;
@@ -403,7 +421,7 @@
 	align-items:center;
 	flex-flow:row nowrap;
 	width:100cqw;
-	height:15cqh;
+	height:13cqh;
 	background-image:linear-gradient(rgba(38, 109, 103, 0),rgba(18, 69, 73, 0.596),rgba(21,51,59,0.8),rgba(4,32,42,0.8));
 	
 }
@@ -416,7 +434,6 @@
 	flex-flow:column nowrap;
 	justify-content:center;
 	align-items:center;
-	
 }
 
 .castle-bottom-menu div{
@@ -426,8 +443,16 @@
 	margin:0.2cqw 0;
 	border-radius:50%;
 	background:rgba(255,255,255,0.3);
+	background-size: contain;
 	cursor:pointer;
 	
+}
+
+.castle-bottom-menu :first-child {
+	background-image: url('htalents/270.webp');
+}
+.castle-bottom-menu :last-child {
+	background-image: url('htalents/456.webp');
 }
 
 .castle-bottom-content{
@@ -435,7 +460,7 @@
 	display:flex;
 	align-items:center;
 	flex-flow:row nowrap;
-	height:15cqh;
+	height:12cqh;
 	width:97cqw;
 	overflow-x:scroll;
 	
@@ -489,7 +514,7 @@
 .castle-friend-request{
 	
 	color:rgba(255,255,255,0.8);
-	font-size:0.6cqw;
+	font-size:12cqw;
 	text-align:center;
 	
 }
