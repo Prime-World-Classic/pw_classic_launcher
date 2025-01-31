@@ -31,7 +31,16 @@ window.addEventListener('DOMContentLoaded',() => {
 	});
 	
 	App.init();
-	
+
+	let testRadminConnection = async () => { 
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.radminHasConnection = true;
+		}
+	}
+	setTimeout(_ => {		
+		testRadminConnection();
+	}, 3000);
 });
 
 class DataBase {
@@ -1147,17 +1156,6 @@ class View {
 							PWGame.gameConnectionTestIsActive = false;
 							
 						}
-						else{
-							
-							//if(!await Protect.checkInstall()){
-								
-								//App.error('Нужен windows лаунчер');
-								
-								//return;
-								
-							//}
-							
-						}
 						
 						await App.api.request(CURRENT_MM,'readyParty',{id:MM.partyId});
 						
@@ -1918,13 +1916,7 @@ class View {
 						}
 						else{
 							
-							if(!await Protect.checkInstall()){
-								
-								App.error('Проверка');
-								
-								return;
-								
-							}
+							return;
 							
 						}
 						
@@ -6325,6 +6317,8 @@ class PWGame {
 
 	static gameServerHasConnection = false;
 
+	static radminHasConnection = false;
+
 	static gameConnectionTestIsActive = false;
 
 	static isUpToDate = false;
@@ -6335,13 +6329,15 @@ class PWGame {
 
 	static isTestHashesFailed = false;
 
-	static gameServerConnectionCheckTimeout = 1000 * 60 * 10; // 10 minutes
+	static gameServerConnectionCheckTimeout = 1000 * 60 * 100; // 100 minutes
+
+	static playPwProtocol = `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
 	
 	static async start(id, callback){
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',`pwclassic://runGame/${id}/${PW_VERSION}`], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', playPwProtocol], callback);
 		
 	}
 	
@@ -6349,7 +6345,7 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',`pwclassic://reconnect/${id}/${PW_VERSION}`], callback);
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol',playPwProtocol], callback);
 		
 	}
 	
@@ -6379,30 +6375,41 @@ class PWGame {
 			throw 'Проверка файлов не завершена! Подождите';
 		}
 	}
+
+	
+	static gameServerIps = [
+		'http://81.88.210.30:27302/api',
+		'http://26.250.19.245:27302/api' // test connection to Radmin IP
+	];
+	static MAIN_GAME_SERVER_IP = 0
+	static RADMIN_GAME_SERVER_IP = 1;
+
+	static async testServerConnection(serverIp) {
+		const data = {
+			method: 'checkConnection'
+		};
+		try {
+			let response = await fetch(serverIp, {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {
+					"Content-type": "application/json; charset=UTF-8"
+				}
+			});
+			return true;
+		} catch (e) {
+			// No connection
+		}
+		return false;
+	}
 	
 	static async testGameServerConnection() {
 		if (PWGame.gameServerHasConnection) {
 			return;
 		}
-		const data = {
-			method: 'checkConnection'
-		};
-
-		let gameServerIps = [
-			'http://81.88.210.30:27302/api',
-			'http://26.250.19.245:27302/api' // test connection to Radmin IP
-		];
 
 		for (let ip of gameServerIps) {
-			try {
-				let response = await fetch(ip, {
-					method: "POST",
-					body: JSON.stringify(data),
-					headers: {
-					"Content-type": "application/json; charset=UTF-8"
-					}
-				});
-
+			if (testServerConnection(ip)) {
 				PWGame.gameServerHasConnection = true;
 
 				setTimeout(_ => {
@@ -6410,8 +6417,7 @@ class PWGame {
 				}, PWGame.gameServerConnectionCheckTimeout);
 
 				break;
-			} catch (e) {
-			};
+			}
 		}
 		if (!PWGame.gameServerHasConnection) {
 			throw 'Игровой сервер недоступен!';
@@ -7985,57 +7991,6 @@ class Protect {
 		
 	}
 	
-	static async checkInstall(){
-		
-		if(!Protect.storage.data.s){
-			
-			if(Protect.storage.data.c){
-				
-				let request = await App.api.request(CURRENT_MM,'check',{id:Protect.storage.data.c});
-				
-				if(request){
-					
-					if(request == Protect.storage.data.c){
-						
-						await Protect.storage.set({v:PW_VERSION,s:true});
-						
-						return true;
-						
-					}
-					
-				}
-				
-			}
-			else{
-				
-				let c = Date.now();
-				
-				await Protect.storage.set({c:c});
-				
-				await App.api.request(CURRENT_MM,'check',{id:c});
-				
-			}
-			
-			let launch = DOM({tag:'a',href:`pwclassic://checkInstall/${App.storage.data.token}/${PW_VERSION}`});
-			
-			launch.click();
-			
-			return false;
-			
-		}
-		
-		if(Protect.storage.data.v != PW_VERSION){
-			
-			await Protect.storage.set({c:'',s:false});
-			
-			return false;
-			
-		}
-		
-		return true;
-		
-	}
-	
 }
 
 class MM {
@@ -8214,21 +8169,6 @@ class MM {
 			
 		}
 		else{
-			/*
-			if(!await Protect.checkInstall()){
-				
-				MM.button.innerText = 'Проверка';
-				
-				setTimeout(() => {
-					
-					MM.button.innerText = 'В бой!';
-					
-				},5000);
-				
-				
-				
-			}
-			*/
 			
 			let download = DOM({tag:'p'});
 			
