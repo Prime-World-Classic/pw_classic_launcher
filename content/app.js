@@ -2425,7 +2425,7 @@ class View {
 		DOM({tag:'p'},'— засчитывается комбинация минимум из трёх одинаковых талантов;'),
 		DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
-		DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
+		isSplash ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
 		);
 		
 		body.append(dscription);
@@ -9201,8 +9201,6 @@ class Game {
 	
 	static sizeY = 15;
 	
-	static weight = 64;
-	
 	static target = false;
 	
 	static targetAnimate = false;
@@ -9240,70 +9238,22 @@ class Game {
 		}
 		
 		Game.units = new Array();
+
+		Game.info = DOM({style:"game-info",event:['click',(e) => Game.click(e)]});
+
+		Game.scoring = DOM({style:"game-scoring",event:['click',(e) => Game.click(e)]});
+
+		Game.field = DOM({style:"game-field",event:['click',(e) => Game.click(e)]});
+
+		Game.fieldScoringContainer = DOM({style:"game-field-scoring-container",event:['click',(e) => Game.click(e)]}, Game.scoring, Game.field);
 		
-		Game.field = document.createElement('div');
+		Game.viewScore = DOM({style:"game-view-score"});
 		
-		Game.field.addEventListener('click',(event) => Game.click(event));
+		Game.viewInfo = DOM({style:"game-view-info"});
 		
-		Game.field.style.height = `${Game.sizeX * Game.weight}px`;
+		Game.viewMoves = DOM();;
 		
-		Game.field.style.width = `${Game.sizeY * Game.weight}px`;
-		
-		Game.field.style.position = 'relative';
-		
-		Game.field.style.transform = 'scale(1.3)';
-		
-		Game.viewScore = document.createElement('div');
-		
-		Game.viewScore.style.width = `${Game.weight}px`;
-		
-		Game.viewScore.style.height = `${Game.sizeX * Game.weight}px`;
-		
-		Game.viewScore.style.position = 'absolute';
-		
-		Game.viewScore.style.left = '-100px';
-		
-		Game.viewScore.style.display = 'flex';
-		
-		Game.viewScore.style.flexFlow = 'column';
-		
-		Game.viewScore.style.justifyContent = 'center';
-		
-		Game.viewScore.style.alignItems = 'center';
-		
-		Game.viewScore.style.fontFamily = 'Tahoma';
-		
-		Game.viewScore.style.fontSize = '18px';
-		
-		Game.viewScore.style.color = 'rgba(255,255,255,0.8)';
-		
-		Game.viewScore.style.fontWeight = '800';
-		
-		Game.viewScore.style.textShadow = '1px 1px 2px rgba(0,0,0,0.9)';
-		
-		Game.viewInfo = document.createElement('div');
-		
-		Game.viewInfo.style.width = `${Game.sizeY * Game.weight}px`;
-		
-		Game.viewInfo.style.position = 'absolute';
-		
-		Game.viewInfo.style.top = '-25px';
-		
-		Game.viewInfo.style.fontFamily = 'Verdana';
-		
-		Game.viewInfo.style.fontStyle = 'italic';
-		
-		Game.viewInfo.style.fontSize = '14px';
-		
-		Game.viewInfo.style.color = 'rgba(255,255,255,0.3)';
-		
-		Game.viewInfo.style.textAlign = 'center';
-		
-		Game.viewInfo.style.cursor = 'pointer';
-		
-		Game.viewMoves = document.createElement('span');
-		
-		Game.viewTotalScore = document.createElement('span');
+		Game.viewTotalScore = DOM();
 		
 		Game.map = object.map;
 		
@@ -9334,24 +9284,25 @@ class Game {
 		Game.viewTotalScore.innerText = `Оcколки: ${Game.totalScore} | `;
 		
 		Game.viewInfo.append(
-		DOM({tag:'span',event:['click',() => Game.eventBack()]},'Вернуться назад'),
-		DOM({tag:'span'},` | `),
+		DOM({event:['click',() => Game.eventBack()]},'Вернуться назад'),
+		DOM({},` | `),
 		Game.viewTotalScore,
 		Game.viewMoves,
-		DOM({tag:'span'},` | `),
-		DOM({tag:'span',event:['click',() => Game.eventFinish()]},'Завершить игру')
+		DOM({},` | `),
+		DOM({event:['click',() => Game.eventFinish()]},'Завершить игру')
 		);
 		
-		Game.field.append(Game.viewScore,Game.viewInfo);
+		Game.scoring.append(Game.viewScore);
+		Game.info.append(Game.viewInfo);
 		
 		if(body){
 			
-			body.append(Game.field);
+			body.append(Game.info, Game.fieldScoringContainer);
 			
 		}
 		else{
 			
-			document.body.append(Game.field);
+			document.body.append(Game.info, Game.field);
 			
 		}
 		
@@ -9369,31 +9320,10 @@ class Game {
 		
 		if( !(id in Game.dataScore) ){
 			
-			let unit = document.createElement('div'), text = document.createElement('span');
-			
-			unit.classList.add(`rarity${Game.rarity[id]}`);
-			
-			unit.style.width = `${Game.weight}px`;
-			
-			unit.style.height = `${Game.weight}px`;
-			
-			unit.style.margin = '7px 0';
+			let unit = DOM({style: [`rarity${Game.rarity[id]}`,'game-rarity-general']});
+			let text = DOM({style: 'game-text'});
 			
 			unit.style.backgroundImage = `url(content/talents/${id}.webp)`;
-			
-			unit.style.position = 'relative';
-			
-			text.style.position = 'absolute';
-			
-			text.style.width = `${Game.weight}px`;
-			
-			text.style.textAlign = 'center';
-			
-			text.style.color = 'color:rgba(255,255,255,0.5)';
-			
-			text.style.left = '-25px';
-			
-			text.innerText = 0;
 			
 			unit.append(text);
 			
@@ -9415,31 +9345,23 @@ class Game {
 	
 	static position(coordinate){
 		
-		return (coordinate ? (coordinate * Game.weight) : 0);
+		return (coordinate ? `${coordinate * 100}cqh` : '0');
 		
 	}
 	
 	static createUnit(id,x,y){
 		
-		let unit = document.createElement('div');
-		
-		unit.id = `${x}:${y}`;
-		
-		unit.style.width = `${Game.weight}px`;
-		
-		unit.style.height = `${Game.weight}px`;
-		
-		unit.style.zIndex = 9999;
+		let unit = DOM({style:'game-unit-item', id:`${x}:${y}`});
 		
 		let rarity = '';
 		
 		switch(Game.rarity[id]){
 			
-			case 2: rarity = '0px 0px 25px rgba(174,80,251,0.8), inset 10px 10px 15px rgba(174,80,251,0.5)'; break;
+			case 2: rarity = '0 0 20cqh rgba(174,80,251,0.8), inset 10cqh 10cqh 15cqh rgba(174,80,251,0.5)'; break;
 			
-			case 3: rarity = '0px 0px 25px rgba(255,156,32,0.8), inset 10px 10px 15px rgba(255,156,32,0.5)'; break;
+			case 3: rarity = '0 0 20cqh rgba(255,156,32,0.8), inset 10cqh 10cqh 15cqh rgba(255,156,32,0.5)'; break;
 			
-			case 4: rarity = '0px 0px 25px rgba(255,26,26,0.8), inset 10px 10px 15px rgba(255,26,26,0.5)'; break;
+			case 4: rarity = '0 0 20cqh rgba(255,26,26,0.8), inset 10cqh 10cqh 15cqh rgba(255,26,26,0.5)'; break;
 			
 		}
 		
@@ -9451,23 +9373,11 @@ class Game {
 		
 		unit.style.backgroundImage = `url(content/talents/${id}.webp)`;
 		
-		unit.style.backgroundRepeat = 'no-repeat';
+		unit.style.top = `${Game.position(x)}`;
 		
-		unit.style.backgroundSize = 'cover';
+		unit.style.left = `${Game.position(y)}`;
 		
-		unit.style.borderRadius = '15px';
-		
-		unit.style.position = 'absolute';
-		
-		unit.style.top = `${Game.position(x)}px`;
-		
-		unit.style.left = `${Game.position(y)}px`;
-		
-		unit.style.transform = 'scale(0.9)';
-		
-		unit.style.opacity = 0;
-		
-		Game.field.append(unit);
+		Game.field.append(DOM({style:'unit-container',event:['click',(e) => Game.click(e)]},unit));
 		
 		return unit;
 		
@@ -9475,33 +9385,17 @@ class Game {
 	
 	static createBackgroundUnit(x,y){
 		
-		let unit = document.createElement('div');
+		let unit = DOM({style:'game-unit-bg', id:`${x}:${y}`});
 		
 		unit.id = `BG:${x}:${y}`;
 		
-		unit.style.width = `${Game.weight}px`;
-		
-		unit.style.height = `${Game.weight}px`;
-		
-		unit.style.zIndex = 9998;
-		
 		unit.style.backgroundImage = `url(content/talents/763.webp)`;
 		
-		unit.style.backgroundRepeat = 'no-repeat';
+		unit.style.top = `${Game.position(x)}`;
 		
-		unit.style.backgroundSize = 'cover';
+		unit.style.left = `${Game.position(y)}`;
 		
-		unit.style.position = 'absolute';
-		
-		unit.style.top = `${Game.position(x)}px`;
-		
-		unit.style.left = `${Game.position(y)}px`;
-		
-		unit.style.transform = 'scale(0.9)';
-		
-		unit.style.opacity = 0;
-		
-		Game.field.append(unit);
+		Game.field.append(DOM({style:'unit-container',event:['click',(e) => Game.click(e)]},unit));
 		
 		return unit;
 		
@@ -9566,8 +9460,15 @@ class Game {
 		for(let unit of units){
 			
 			number++;
+
+			let topOffset = `${(unit.offsetTop) + Game.getRandomInt(-50,50)}cqh`;
+
+			let leftOffset = `${(unit.offsetLeft) + Game.getRandomInt(-50,50)}cqh`;
 			
-			let animate = unit.animate({top:[`${parseInt(unit.style.top) + Game.getRandomInt(-50,50)}px`,unit.style.top],left:[`${parseInt(unit.style.left) + Game.getRandomInt(-50,50)}px`,unit.style.left],opacity:[0,1],transform:['scale(2.5)','scale(0.9)']},{delay:delay,duration:250,fill:'both',easing:'ease-out'});
+			let animate = unit.animate({top:[topOffset,unit.style.top],left:[leftOffset,unit.style.left],
+				opacity:[0,1],
+				transform:['scale(2.5)','scale(0.9)']},
+				{delay:delay,duration:250,fill:'both',easing:'ease-out'});
 			
 			delay += 5;
 			
@@ -9702,9 +9603,9 @@ class Game {
 			
 		}
 		
-		let element1Animate = element1.animate({top:[`${Game.position(data1[0])}px`,`${Game.position(data2[0])}px`],left:[`${Game.position(data1[1])}px`,`${Game.position(data2[1])}px`]},{duration:250,fill:'both'});
+		let element1Animate = element1.animate({top:[`${Game.position(data1[0])}`,`${Game.position(data2[0])}`],left:[`${Game.position(data1[1])}`,`${Game.position(data2[1])}`]},{duration:250,fill:'both'});
 		
-		let element2Animate = element2.animate({top:[`${Game.position(data2[0])}px`,`${Game.position(data1[0])}px`],left:[`${Game.position(data2[1])}px`,`${Game.position(data1[1])}px`]},{duration:250,fill:'both'});
+		let element2Animate = element2.animate({top:[`${Game.position(data2[0])}`,`${Game.position(data1[0])}`],left:[`${Game.position(data2[1])}`,`${Game.position(data1[1])}`]},{duration:250,fill:'both'});
 		
 		element1Animate.onfinish = async () => {
 			
@@ -9927,7 +9828,7 @@ class Game {
 				
 				findUnit.id = `${unit.x2}:${unit.y2}`;
 				
-				let animate = findUnit.animate({top:[`${Game.position(unit.x1)}px`,`${Game.position(unit.x2)}px`],transform:['rotate(0) scale(0.9)',`rotate(${Game.getRandomInt(-180,180)}deg) scale(0.9)`,'rotate(0) scale(0.9)']},{duration:250,fill:'both',easing:'ease-in'});
+				let animate = findUnit.animate({top:[`${Game.position(unit.x1)}`,`${Game.position(unit.x2)}`],transform:['rotate(0) scale(0.9)',`rotate(${Game.getRandomInt(-180,180)}deg) scale(0.9)`,'rotate(0) scale(0.9)']},{duration:250,fill:'both',easing:'ease-in'});
 				
 				if(number == data.length){
 					
