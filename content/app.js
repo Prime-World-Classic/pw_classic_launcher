@@ -8018,6 +8018,30 @@ class Settings {
 			Settings.settings = Settings.defaultSettings;
 			return;
 		}
+		
+		try {
+			const homeDir = NativeAPI.os.homedir();
+			let pwcDocumentsPath = [
+				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
+			]
+
+			if (process.env.OneDrive) {
+				pwcDocumentsPath.push(
+					NativeAPI.path.join(process.env.OneDrive, 'Documents', 'My Games', 'Prime World Classic'),
+					NativeAPI.path.join(process.env.OneDrive, 'Документы', 'My Games', 'Prime World Classic'),
+					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
+				);
+			}
+			
+			for (let path of pwcDocumentsPath) {
+				if (NativeAPI.fileSystem.existsSync(path)) {
+					Settings.pwcDocumentsPath = path;
+					Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcDocumentsPath, '/launcher.cfg');
+				}
+			}
+		} catch (e) {
+			App.error(e.stack);
+		}
 
 		try {
 			if (!NativeAPI.fileSystem.existsSync(Settings.settingsFilePath)) {
@@ -8061,33 +8085,10 @@ class Settings {
 	}
 	
 	static async init(){
-		try {
-			const homeDir = NativeAPI.os.homedir();
-			let pwcDocumentsPath = [
-				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
-			]
 
-			if (process.env.OneDrive) {
-				pwcDocumentsPath.push(
-					NativeAPI.path.join(process.env.OneDrive, 'Documents', 'My Games', 'Prime World Classic'),
-					NativeAPI.path.join(process.env.OneDrive, 'Документы', 'My Games', 'Prime World Classic'),
-					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
-				);
-			}
-			
-			for (let path of pwcDocumentsPath) {
-				if (NativeAPI.fileSystem.existsSync(path)) {
-					Settings.pwcDocumentsPath = path;
-					Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcDocumentsPath, '/launcher.cfg');
-				}
-			}
+		await Settings.ReadSettings();
 
-			await Settings.ReadSettings();
-
-			await Settings.ApplySettings();
-		} catch (e) {
-			App.error(e.stack);
-		}
+		await Settings.ApplySettings();
 
 		Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 		
