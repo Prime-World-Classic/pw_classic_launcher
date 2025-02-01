@@ -2394,15 +2394,9 @@ class View {
 			
 			request.finish = async () => {
 				
-				if(!confirm('Завершить фарм?')){
-					
-					return;
-					
-				}
-				
 				await App.api.request('gamev2','finish');
 				
-				View.show('castle');
+				isSplash ? Window.show('main', 'game') : View.show('castle');
 				
 			}
 			
