@@ -8009,7 +8009,8 @@ class Settings {
 	}
 	static settings;
 
-	static settingsFilePath = `/primeworldclassic_settings.cfg`; // TODO: ACTUAL DOCUMENTS FOLDER INCLUDING ONEDRIVE!
+	static pwcDocumentsPath;
+	static settingsFilePath;
 
 	// Функция для чтения настроек из файла
 	static async ReadSettings() {
@@ -8019,15 +8020,13 @@ class Settings {
 		}
 
 		try {
-			const fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
-
-			if (!NativeAPI.fileSystem.existsSync(fullSettingsFilePath)) {
+			if (!NativeAPI.fileSystem.existsSync(Settings.settingsFilePath)) {
 				Settings.settings = Settings.defaultSettings;
 				Settings.WriteSettings();
 				return;
 			}
 
-			const data = await NativeAPI.fileSystem.promises.readFile(fullSettingsFilePath);
+			const data = await NativeAPI.fileSystem.promises.readFile(Settings.settingsFilePath);
 			Settings.settings = JSON.parse(data);
 		} catch (error) {
 			App.error(error);
@@ -8040,10 +8039,8 @@ class Settings {
 			return;
 		}
 
-		const fullSettingsFilePath = process.env.USERPROFILE + Settings.settingsFilePath;
-
 		try {
-			await NativeAPI.write(fullSettingsFilePath, JSON.stringify(Settings.settings));
+			await NativeAPI.write(Settings.settingsFilePath, JSON.stringify(Settings.settings));
 		} catch (error) {
 			App.error(error);
 		}
@@ -8064,10 +8061,33 @@ class Settings {
 	}
 	
 	static async init(){
+		try {
+			const homeDir = NativeAPI.os.homedir();
+			let pwcDocumentsPath = [
+				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
+			]
 
-		await Settings.ReadSettings();
+			if (process.env.OneDrive) {
+				pwcDocumentsPath.push(
+					NativeAPI.path.join(process.env.OneDrive, 'Documents', 'My Games', 'Prime World Classic'),
+					NativeAPI.path.join(process.env.OneDrive, 'Документы', 'My Games', 'Prime World Classic'),
+					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
+				);
+			}
+			
+			for (let path of pwcDocumentsPath) {
+				if (NativeAPI.fileSystem.existsSync(path)) {
+					Settings.pwcDocumentsPath = path;
+					Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcDocumentsPath, '/launcher.cfg');
+				}
+			}
 
-		await Settings.ApplySettings();
+			await Settings.ReadSettings();
+
+			await Settings.ApplySettings();
+		} catch (e) {
+			App.error(e.stack);
+		}
 
 		Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 		
