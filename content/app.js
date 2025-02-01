@@ -2396,7 +2396,7 @@ class View {
 				
 				await App.api.request('gamev2','finish');
 				
-				isSplash ? Window.show('main', 'game') : View.show('castle');
+				isSplash ? Window.close('main') : View.show('castle');
 				
 			}
 			
@@ -8018,7 +8018,7 @@ class Settings {
 			Settings.settings = Settings.defaultSettings;
 			return;
 		}
-		
+
 		try {
 			const homeDir = NativeAPI.os.homedir();
 			let pwcDocumentsPath = [
@@ -8032,6 +8032,9 @@ class Settings {
 					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
 				);
 			}
+
+			// Fallback
+			pwcDocumentsPath.push(process.env.USERPROFILE);
 			
 			for (let path of pwcDocumentsPath) {
 				if (NativeAPI.fileSystem.existsSync(path)) {
