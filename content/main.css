@@ -2671,14 +2671,14 @@ cursor:pointer;
 #wgame {
 	container-type: size;
 	position: absolute;
-	margin-top: 12cqh;
+	margin-top: 9cqh;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;
 	right: 0;
 	text-align: center;
-	width: calc(min(110cqh, 95cqw));
-	height: 70cqh;
+	width: calc(min(120cqh, 95cqw));
+	height: 77cqh;
 	/*background-color: #8d8b8b;*/
 	border-radius: 2cqh;
 	border: 0.1cqh solid rgb(158, 155, 104);
