@@ -8009,6 +8009,7 @@ class Settings {
 	}
 	static settings;
 
+	static pwcLauncherSettingsDir;
 	static pwcDocumentsPath;
 	static settingsFilePath;
 
@@ -8021,6 +8022,12 @@ class Settings {
 
 		try {
 			const homeDir = NativeAPI.os.homedir();
+			Settings.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+			if (!NativeAPI.fileSystem.existsSync(Settings.pwcLauncherSettingsDir)) {
+				NativeAPI.fileSystem.mkdirSync(Settings.pwcLauncherSettingsDir);
+			}
+			Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcLauncherSettingsDir, '/launcher.cfg');
+
 			let pwcDocumentsPath = [
 				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
 			]
@@ -8032,18 +8039,14 @@ class Settings {
 					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
 				);
 			}
-
-			// Fallback
-			pwcDocumentsPath.push(process.env.USERPROFILE);
 			
 			for (let path of pwcDocumentsPath) {
 				if (NativeAPI.fileSystem.existsSync(path)) {
 					Settings.pwcDocumentsPath = path;
-					Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcDocumentsPath, '/launcher.cfg');
 				}
 			}
 		} catch (e) {
-			App.error(e.stack);
+			App.error(e);
 		}
 
 		try {
@@ -8065,7 +8068,7 @@ class Settings {
 		if (!NativeAPI.status) { 
 			return;
 		}
-
+		
 		try {
 			await NativeAPI.write(Settings.settingsFilePath, JSON.stringify(Settings.settings));
 		} catch (error) {
