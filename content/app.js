@@ -3419,40 +3419,45 @@ class Build{
 		
 	}
 
+	static buildSelectName(method, btnName, data, isSplash) {
+		
+		const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
+			Splash.hide();
+		}]}, '[x]');
+					
+		let template = document.createDocumentFragment();
+		
+		let name = DOM({tag:'input',placeholder:'Наименование билда'});
+		
+		let button = DOM({style:'splash-content-button',event:['click', async () => {
+			
+			if(!name.value){
+				
+				Splash.hide();
+				
+			}
+
+			data['name'] = name.value;
+			
+			await App.api.request('build', method, data);
+			
+			Splash.hide();
+			
+		 isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
+			
+		}]}, btnName);
+		
+		template.append(name,button, close);
+		
+		Splash.show(template);
+		
+	}
+
 	static buildActions(builds, isSplash){
 		if(builds.length < 6){
-			const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
-				Splash.hide();
-			}]}, '[x]');
 			const create = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
-				title: 'Создать новую вкладку билда',  
-				event:['click', () => {
-					
-				let template = document.createDocumentFragment();
-				
-				let name = DOM({tag:'input',placeholder:'Наименование билда'});
-				
-				let button = DOM({style:'splash-content-button',event:['click', async () => {
-					
-					if(!name.value){
-						
-						Splash.hide();
-						
-					}
-					
-					await App.api.request('build','create',{heroId:Build.heroId,name:name.value});
-					
-					Splash.hide();
-					
-				 isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
-					
-				}]},'Создать билд');
-				
-				template.append(name,button, close);
-				
-				Splash.show(template);
-				
-			}]});
+				title: 'Создать новую вкладку билда',  // {heroId:Build.heroId, id:Build.id, name:name.value}
+				event:['click', () => Build.buildSelectName('create', 'Создать билд', {heroId:Build.heroId}, isSplash)]});
 
 			let backgroundImg = DOM({style: ['btn-create', 'build-action-item-background']});
 			backgroundImg.style.backgroundImage = `url('content/icons/plus.svg')`;
@@ -3518,9 +3523,16 @@ class Build{
 		for(let build of builds){
 			
 			const item = DOM(
-				{tag: 'button', style: ['build-tab-item', 'btn-hover']},
+				{tag: 'button', style: ['build-tab-item', 'btn-hover'], event:[
+					'click', () => {
+					isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
+				}]},
 				`${build.name}`,
 			);
+			item.addEventListener('contextmenu', (e) => {
+					e.preventDefault();
+					Build.buildSelectName('rename', 'Переименовать билд', {id:build.id}, isSplash);
+				});
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
 
@@ -3528,14 +3540,6 @@ class Build{
 				item.classList.add('list-highlight');
 			} else {
 				item.classList.add('list-not-highlight');
-			}
-
-			item.onclick = () => {/*
-				setTimeout(_ => {
-					const _i = [...item.parentNode.parentNode.children].indexOf(item.parentNode);
-					document.querySelectorAll('.button-build--wrapper')[_i-1].classList.add('list-highlight');
-				}, 300);*/
-				isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
 			}
 
 			Build.listView.append(div);
