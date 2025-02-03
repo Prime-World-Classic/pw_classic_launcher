@@ -2412,18 +2412,19 @@ class View {
 				
 			}
 			
-			Game.init(body,request);
+			Game.init(body, request, isSplash);
 			
 		}]},'Начать фарм');
 		
 		let dscription = DOM({style:'game-description'},
 		DOM({tag:'h1'},'Лорды и леди!'),
-		DOM({tag:'p'},'— необходимо собрать 1000 осколков одного и того же таланта, чтобы получить 1 талант для билда на старте сервера Prime World;'),
+		DOM({tag:'p'},'— необходимо собрать 1000 осколков одного и того же таланта, чтобы получить 1 талант для билда;'),
 		DOM({tag:'p'},'— на одну карту рассчитано 100 ходов;'),
-		DOM({tag:'p'},'— кулдаун между играми 60 минут;'),
+		//DOM({tag:'p'},'— кулдаун между играми 60 минут;'),
 		DOM({tag:'p'},'— чтобы сделать ход, переставляйте два соседних таланта местами. Если такая перестановка приводит к образованию комбинации, то «выстроившиеся»‎ таланты исчезают, и на их место падают таланты верхних рядов;'),
 		DOM({tag:'p'},'— засчитывается комбинация минимум из трёх одинаковых талантов;'),
-		DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
+		DOM({tag:'p'},'— если за 100 ходов серебряных монет будет 150, даётся +100 дополнительных ходов;'),
+		//DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
 		isSplash ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
 		);
@@ -9260,7 +9261,7 @@ class Game {
 	
 	static eventExit = false;
 	
-	static init(body,object){
+	static init(body, object, isSplah){
 		
 		if(object){
 			
@@ -9329,10 +9330,15 @@ class Game {
 		Game.viewMoves.innerText = `Ходы: ${object.move} (${object.moveTotal})`;
 		
 		Game.viewTotalScore.innerText = `Оcколки: ${Game.totalScore} | `;
+
+		if (!isSplah) {
+			Game.viewInfo.append(
+			DOM({event:['click',() => Game.eventBack()]},'Вернуться назад'),
+			DOM({},` | `)
+			)
+		}
 		
 		Game.viewInfo.append(
-		DOM({event:['click',() => Game.eventBack()]},'Вернуться назад'),
-		DOM({},` | `),
 		Game.viewTotalScore,
 		Game.viewMoves,
 		DOM({},` | `),
