@@ -1072,6 +1072,8 @@ class View {
 		
 		play.classList.add('castle-button-play');
 		
+		play.append(DOM({id:'MMQueue'},'0'));
+		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
 		let data = await App.api.request(CURRENT_MM,'loadParty'), players = new Array();
@@ -5787,10 +5789,22 @@ class Events {
 		MM.searchActive(data.status);
 		
 	}
-
-	static stat(data) {
+	
+	static MMQueue(value){
 		
-		document.getElementById('STAT').innerText = `В сети: ${data.online}, Матчмейкинг: ${data.player} | Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`;
+		let find = document.getElementById('MMQueue');
+		
+		if(find){
+			
+			find.innerText = value;
+			
+		}
+		
+	}
+
+	static ADMStat(data){
+		
+		document.getElementById('ADMStat').innerText = `${data.online}`;
 		
 	}
 	
@@ -5895,7 +5909,11 @@ class App {
 		
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 		
-		//document.body.append(DOM({id:'STAT'}));
+		if(App.isAdmin()){
+			
+			document.body.append(DOM({id:'ADMStat'}));
+			
+		}
 		
 	}
 	
