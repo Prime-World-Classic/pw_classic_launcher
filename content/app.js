@@ -3528,7 +3528,7 @@ class Build{
 					'click', () => {
 					isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
 				}]},
-				`${build.name}`,
+				DOM({}, `${build.name}`),
 			);
 			item.addEventListener('contextmenu', (e) => {
 					e.preventDefault();
