@@ -1072,7 +1072,11 @@ class View {
 		
 		play.classList.add('castle-button-play');
 		
-		play.append(DOM({id:'MMQueue'},'0'));
+		if(!play.children.length){
+			
+			play.append(DOM({id:'MMQueue'},'0'));
+			
+		}
 		
 		let lobby = DOM({style:'castle-play-lobby'});
 		
