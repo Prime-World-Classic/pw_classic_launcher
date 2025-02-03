@@ -7148,7 +7148,8 @@ class Castle {
 		
 		}
 		
-		let shaderNames = [], texNames = [], sceneBuildings = new Map, uniqShaderNames = [], uniqTexNames = [];
+		let shaderNames = [], texNames = [];
+		Castle.sceneBuildings = new Object;
 
 		let sceneMeshesToLoadCount = -1; // Initial value. Scene must have objects
 		
@@ -7193,13 +7194,13 @@ class Castle {
 				
 				obj.transform[11] -= buildingTranslation[1];
 				
-				if (!sceneBuildings.has(building.name)) {
+				if (!(building.name in Castle.sceneBuildings)) {
 					
-					sceneBuildings.set(building.name, {size: building.size, objects: [], transparentObjects: []});
+					Castle.sceneBuildings[building.name] = {size: building.size, objects: [], transparentObjects: []};
 					
 				}
 				
-				let selectedContainer = obj.blend ? sceneBuildings.get(building.name).transparentObjects : sceneBuildings.get(building.name).objects;
+				let selectedContainer = obj.blend ? Castle.sceneBuildings[building.name].transparentObjects : Castle.sceneBuildings[building.name].objects;
 				
 				selectedContainer.push({
 					meshName: obj.mesh, meshData: {}, shader: obj.shader, shaderId: {}, blend: obj.blend,
@@ -7218,66 +7219,8 @@ class Castle {
 
 
 
-
-
-
-
-
-/*
-	// Remove duplicates from content/shaders/textures. Associate object with its shader and texture by id
-	async function waitLoadScene() {
-		if (sceneMeshesToLoadCount == 0) {
-			uniqShaderNames = [...new Set(shaderNames)];
-			uniqTexNames = [...new Set(texNames)];
-
-			function remapIndices(sceneObjectsContainer, objId) {
-				sceneObjectsContainer[objId].shaderId = uniqShaderNames.findIndex(value => value === sceneObjectsContainer[objId].shader);
-				sceneObjectsContainer[objId].textureId = uniqTexNames.findIndex(value => value === sceneObjectsContainer[objId].texture);
-				sceneObjectsContainer[objId].texture2Id = uniqTexNames.findIndex(value => value === sceneObjectsContainer[objId].texture_2);
-				sceneObjectsContainer[objId].texture3Id = uniqTexNames.findIndex(value => value === sceneObjectsContainer[objId].texture_3);
-				sceneObjectsContainer[objId].texture4Id = uniqTexNames.findIndex(value => value === sceneObjectsContainer[objId].texture_4);
-			}
-
-			for (var objId = 0; objId < sceneObjects.length; objId++) {
-				remapIndices(sceneObjects, objId);
-			}
-			sceneBuildings.forEach(function (value, key, map){
-				var building = value.objects;
-				for (objId = 0; objId < building.length; ++objId) {
-					remapIndices(building, objId);
-				}
-				
-				building = value.transparentObjects;
-				for (objId = 0; objId < building.length; ++objId) {
-					remapIndices(building, objId);
-				}
-			});
-
-			let loadResources = await Castle.loadResources(sceneObjects, sceneBuildings, uniqShaderNames, uniqTexNames);
-			
-			//var canvas = globalCanvas; //document.getElementById('game-surface');
-			Castle.globalCanvas.classList.add('castle-fade-in');
-			let backgroundImage = document.getElementById('castle-background-img');
-			backgroundImage.classList.add('castle-background-image-fade-out');
-			Castle.MainLoop(sceneObjects, sceneBuildings, loadResources.shader, loadResources.texture);
-			
-			
-			
-			
-			
-			
-			
-		} else {
-			window.setTimeout(waitLoadScene, 100);
-		}
-	}
-*/
-
-	/*	
-	waitLoadScene();
-	*/
 	
-	    await Castle.loadResources(Castle.sceneObjects, sceneBuildings, shaderNames, texNames);
+	    await Castle.loadResources(Castle.sceneObjects, Castle.sceneBuildings, shaderNames, texNames);
 		
 		//var canvas = globalCanvas; //document.getElementById('game-surface');
 		
@@ -7294,7 +7237,7 @@ class Castle {
 			playCastleMusic();
 		}
 		
-		Castle.MainLoop(Castle.sceneObjects, sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
+		Castle.MainLoop(Castle.sceneObjects, Castle.sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
 		
 	}
 	
@@ -7339,17 +7282,17 @@ class Castle {
 		for (var objId = 0; objId < sceneObjects.length; objId++) {
 			remapIndices(sceneObjects, objId);
 		}
-		sceneBuildings.forEach(function (value, key, map){
-			var building = value.objects;
+		for (let b in Castle.sceneBuildings) {
+			let building = Castle.sceneBuildings[b].objects;
 			for (objId = 0; objId < building.length; ++objId) {
 				remapIndices(building, objId);
 			}
 			
-			building = value.transparentObjects;
-			for (objId = 0; objId < building.length; ++objId) {
-				remapIndices(building, objId);
+			let buildingTransp = Castle.sceneBuildings[b].transparentObjects;
+			for (objId = 0; objId < buildingTransp.length; ++objId) {
+				remapIndices(buildingTransp, objId);
 			}
-		});
+		}
 		
 		Castle.sceneTextures = new Array(texNames.length);
 		let loaded = {mesh:0,texture:0,shader:0};
@@ -7392,19 +7335,9 @@ class Castle {
 		
 		let totalMeshes = Castle.sceneObjects.length;
 		
-		for(let i = 0; i < sceneBuildings.length; ++i){
+		for(let buildingMain in Castle.sceneBuildings){
 			
-			let building = sceneBuildings[i].objects;
-			
-			for (let objId = 0; objId < building.length; ++objId) {
-				
-				await Castle.loadMesh(shaderNames,building,objId);
-				
-			}
-			
-			totalMeshes += building.length;
-			
-			building =  sceneBuildings[i].transparentObjects;
+			let building = Castle.sceneBuildings[buildingMain].objects;
 			
 			for (let objId = 0; objId < building.length; ++objId) {
 				
@@ -7413,6 +7346,16 @@ class Castle {
 			}
 			
 			totalMeshes += building.length;
+			
+			let buildingTransp =  Castle.sceneBuildings[buildingMain].transparentObjects;
+			
+			for (let objId = 0; objId < buildingTransp.length; ++objId) {
+				
+				await Castle.loadMesh(shaderNames,buildingTransp,objId);
+				
+			}
+			
+			totalMeshes += buildingTransp.length;
 			
 		}
 		
@@ -7544,7 +7487,7 @@ class Castle {
 	static MainLoop(sceneObjects,sceneBuildings,sceneShaders,sceneTextures){
 		
 		if (Castle.sceneBuildings) {
-			var gridBuilding = Castle.sceneBuildings.get('grid');
+			var gridBuilding = Castle.sceneBuildings['grid'];
 			
 			var gridTransform = gridBuilding.transparentObjects[0].transform;
 			
@@ -7620,20 +7563,20 @@ class Castle {
 		
 		let buildingsToDraw = [];
 		
-		let buildingSelector = document.getElementsByClassName("buildings");
+		let buildingSelector = []; // [10] // document.getElementsByClassName("buildings");
 		
-		let buildingRotation = document.getElementsByClassName("rotation");
+		let buildingRotation = [0.0]; // document.getElementsByClassName("rotation");
 		
-		let buildingPositionX = document.getElementsByClassName("positionX");
+		let buildingPositionX = [1.0]; // document.getElementsByClassName("positionX");
 		
-		let buildingPositionZ = document.getElementsByClassName("positionZ");
+		let buildingPositionZ = [1.0]; // document.getElementsByClassName("positionZ");
 		
 		for (let i = 0; i < buildingSelector.length; ++i) {
-			if (buildingSelector[i].checked) {
-				var mesh = sceneBuildings.get(buildings[i]);
-				buildingsToDraw.push({mesh: mesh, rotation: buildingRotation[i].value, 
-					translation: [zeroTranslation[0] + (buildingPositionX[i].value * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, zeroTranslation[1] + (buildingPositionZ[i].value * 7.0 + mesh.size[1] / 2.0 * 7.0)]});
-			}
+			//if (buildingSelector[i].checked) {
+				var mesh = Castle.sceneBuildings[buildings[buildingSelector[i]]];
+				buildingsToDraw.push({mesh: mesh, rotation: buildingRotation[i], 
+					translation: [Castle.zeroTranslation[0] + (buildingPositionX[i] * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (buildingPositionZ[i] * 7.0 + mesh.size[1] / 2.0 * 7.0)]});
+			//}
 		}
 
 		Castle.updateMainCam();
@@ -7650,9 +7593,9 @@ class Castle {
 					break;
 				Castle.prepareAndDrawObject(obj, true);
 			}
-			for (buildingToDraw of buildingsToDraw) {
-				for (i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
-					PrepareAndDrawObject(buildingToDraw.mesh.objects[i], true, buildingToDraw.rotation, buildingToDraw.translation);
+			for (let buildingToDraw of buildingsToDraw) {
+				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
+					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], true, buildingToDraw.rotation, buildingToDraw.translation);
 				}
 			}
 
@@ -7662,8 +7605,8 @@ class Castle {
 		Castle.gl.viewport(0, 0, Castle.gl.canvas.width, Castle.gl.canvas.height);
 		Castle.gl.clearColor(0.75, 0.85, 0.8, 1.0);
 		Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
-		for (buildingToDraw of buildingsToDraw) {
-			for (i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
+		for (let buildingToDraw of buildingsToDraw) {
+			for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
 				Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, buildingToDraw.translation);
 			}
 		}
@@ -7671,8 +7614,8 @@ class Castle {
 			for (let i = 0; i < Castle.sceneObjects.length; ++i) {
 				Castle.prepareAndDrawObject(Castle.sceneObjects[i], false);
 			}
-			for (buildingToDraw of buildingsToDraw) {
-				for (i = 0; i < buildingToDraw.mesh.transparentObjects.length; ++i) {
+			for (let buildingToDraw of buildingsToDraw) {
+				for (let i = 0; i < buildingToDraw.mesh.transparentObjects.length; ++i) {
 					Castle.prepareAndDrawObject(buildingToDraw.mesh.transparentObjects[i], false, buildingToDraw.rotation, buildingToDraw.translation);
 				}
 			}
