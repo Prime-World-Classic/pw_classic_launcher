@@ -1895,7 +1895,7 @@ cursor:pointer;
 	align-items:center;
 	color:rgba(255, 255, 255, 0.9);
 	cursor:pointer;
-	
+	position: relative;
 }
 
 .top-filter div{
