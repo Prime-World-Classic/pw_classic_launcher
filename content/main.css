@@ -2106,19 +2106,16 @@ cursor:pointer;
 }
 
 
-#STAT{
+#ADMStat{
 	
 	position:fixed;
-	bottom:0;
-	left: 1cqh;
-	width:100%;
-	text-align:center;
+	top:0;
+	right:0;
 	z-index:9999;
-    font: 1cqw / 1 Verdana;
-	margin:0.5cqw 0;
-	color: rgba(255, 255, 255, 0.9);
-	text-shadow: rgba(0, 0, 0, 0.3) 0 0 0.5cqh;
-	font-size: 1.5cqh;
+    font: 1cqw / 1 Arial;
+	padding:0.3vw;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 1cqh;
 }
 
 .history {
