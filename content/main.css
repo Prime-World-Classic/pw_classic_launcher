@@ -547,7 +547,12 @@ button.build-action-item:hover {
 
 	overflow-y: hidden;
 	overflow-x: scroll;
+	max-width: 70cqw;
 }
+.button-build--wrapper {
+	height: 4.5cqh;
+}
+
 
 .build-tab-item {
 	border-top-left-radius: 1cqh !important;
@@ -570,10 +575,10 @@ button.build-action-item:hover {
 
 .build-list::-webkit-scrollbar {
 	background-color: rgba(0, 51, 0, 0.479);
-	height: 0.5cqh;
+	height: 0.7cqh;
 }
 .build-list::-webkit-scrollbar-thumb {
-	background-color: #030;
+	background-color: rgb(255, 255, 255);
 }
 
 .build-action-item{
@@ -581,10 +586,6 @@ button.build-action-item:hover {
     border-radius: 3cqh;
     box-shadow: 0 0 1cqh rgba(0, 0, 0, 0.3);
 }
-.button-build--wrapper {
-	height: 4.5cqh;
-}
-
 .build-play{
 	
 	background:rgba(255,50,0,0.9);
