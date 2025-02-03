@@ -1569,8 +1569,9 @@ class View {
 							template.oncontextmenu = () => {
 								
 								let body = document.createDocumentFragment();
-								
-								body.append(DOM({style:'splash-content-button',event:['click', async () => {
+								body.append(
+								DOM({}, item.nickname),
+								DOM({style:'splash-content-button',event:['click', async () => {
 									
 									await App.api.request('user','blocked',{id:item.id});
 									
@@ -1588,9 +1589,20 @@ class View {
 									
 									let password = await App.api.request('user','restore',{id:item.id});
 									
-									body.append(`Пароль: ${password}`);
+									App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
+
+									navigator.clipboard.writeText(password);
 									
 								}]},'Cброс пароля'),
+								// App.input( async (value) => {
+									
+								// 	let object = new Object();
+									
+								// 	object['nickname'] = value;
+									
+								// 	await App.api.request('user','edit',{id:item.id,object:object});
+									
+								// },{value:item.nickname}),
 								DOM({style:'splash-content-button',event:['click', () => {
 									
 									Splash.hide();
