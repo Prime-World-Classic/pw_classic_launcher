@@ -1400,7 +1400,7 @@ class View {
 		input.max='1';
 		input.step='0.01';
 		
-		let body = DOM({style:['castle-settings']}, menu, ratings, history, farm);
+		let body = DOM({style:['castle-settings']}, menu, ratings, history);
 		
 		return body; 
 		
@@ -2123,9 +2123,9 @@ class View {
 		
 	}
 
-	static async history(isSplash){
+	static async history(isWindow){
 		
-		let body = DOM({style:'main'}), history = DOM({style:isSplash ? 'whistory' : 'history'});
+		let body = DOM({style:'main'}), history = DOM({style:isWindow ? 'whistory' : 'history'});
 		
 		let result = await App.api.request(CURRENT_MM,'history');
 		
@@ -2147,7 +2147,7 @@ class View {
 			
 		}
 		
-		if (!isSplash) {
+		if (!isWindow) {
 			body.append(View.header());
 		}
 		body.append(history);
@@ -2349,7 +2349,7 @@ class View {
 		
 	}
 	
-	static inventory(){
+	static inventory(isWindow){
 		
 		let body = DOM({style:'main'});
 		
@@ -2359,7 +2359,7 @@ class View {
 			
 			for(let item of result){
 				
-				let unit = DOM({style:`rarity${item.rarity}`});
+				let unit = DOM({style:[`rarity${item.rarity}`]});
 				
 				unit.style.backgroundImage = `url(content/talents/${item.id}.webp)`;
 				
@@ -2372,21 +2372,26 @@ class View {
 		},'gamev2','inventory');
 		
 
+		if (!isWindow) {
 		body.append(DOM({style:'main-header'},
 		DOM({tag:'img',src:'content/img/logo.webp'}),
 		DOM({style:'main-header-item',event:['click',() => View.show('castle')]},App.storage.data.login),
 		DOM({style:'main-header-item',event:['click',() => View.show('inventory')]},'Осколки'),
 		DOM({style:'main-header-item',event:['click',() => View.show('game')]},'Фарм'),
 		DOM({style:'main-header-item',event:['click',() => View.exitOrLogout()]},'Выйти')
-		),
-		DOM({style:'main-body-full'},inventory)
+		))
+		} else {
+			body.append(DOM({style:'inventory-header'}, 'Библиотека'))
+		}	
+		body.append(
+			DOM({style:'main-body-full'},inventory)
 		);
 
 		return body;
 		
 	}
 	
-	static game(isSplash){
+	static game(isWindow){
 		
 		let body = DOM({style:'game'});
 		
@@ -2414,7 +2419,7 @@ class View {
 				
 				await App.api.request('gamev2','finish');
 				
-				isSplash ? Window.close('main') : View.show('castle');
+				isWindow ? Window.close('main') : View.show('castle');
 				
 			}
 			
@@ -2424,7 +2429,7 @@ class View {
 				
 			}
 			
-			Game.init(body, request, isSplash);
+			Game.init(body, request, isWindow);
 			
 		}]},'Начать фарм');
 		
@@ -2438,7 +2443,7 @@ class View {
 		DOM({tag:'p'},'— если за 100 ходов серебряных монет будет 150, даётся +100 дополнительных ходов;'),
 		//DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
-		isSplash ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
+		isWindow ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
 		);
 		
 		body.append(dscription);
@@ -2447,11 +2452,11 @@ class View {
 		
 	}
 	
-	static async build(heroId, targetId = 0, isSplash = false) {
+	static async build(heroId, targetId = 0, isWindow = false) {
 
     const body = DOM({style: 'build-horizontal'});
 
-    await Build.init(heroId, targetId, isSplash);
+    await Build.init(heroId, targetId, isWindow);
 
     body.append(
         DOM({style: 'build-left'}, 
@@ -2477,13 +2482,13 @@ class View {
         )
     );
 
-    if (!isSplash) {
+    if (!isWindow) {
         body.append(DOM({
             style: ['build-list-close', 'close-button'],
             title: 'Закрыть',
             event: ['click', () => {
                 Build.CleanInvalidDescriptions();
-                if (isSplash) {
+                if (isWindow) {
                     View.show('castle');
                 } else {
                     View.show('builds');
@@ -2492,7 +2497,7 @@ class View {
         }, DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}))); // Замените путь к изображению
     }
 
-    return isSplash ? body : DOM({id:'viewbuild'}, body);
+    return isWindow ? body : DOM({id:'viewbuild'}, body);
 
     }
 
@@ -2704,7 +2709,7 @@ class Window {
 			style: 'close-button',
 			title: 'Закрыть',
 			event: ['click', () => {
-				Window.windows[category].remove();
+				Window.close(category);
 			}]
 		},
 		DOM({tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style'}));
@@ -2725,8 +2730,8 @@ class Window {
 		return false;
 	}
 
-	static async build(heroId, targetId = 0, isSplash = false) {
-		let viewBuild = await View.build(heroId, targetId, isSplash);
+	static async build(heroId, targetId = 0, isWindow = false) {
+		let viewBuild = await View.build(heroId, targetId, isWindow);
 		return DOM({id: 'wbuild'}, viewBuild);
 	}
 	static async top(hero = 0) {
@@ -2740,6 +2745,10 @@ class Window {
 	static async history() {
 		let view = await View.history(true);
 		return DOM({id: 'whistory'}, view);
+	}
+	static async inventory() {
+		let view = await View.inventory(true);
+		return DOM({id: 'winventory'}, view);
 	}
 	static async menu() {
 		return DOM({id: 'wcastle-menu'}, 
@@ -3239,7 +3248,7 @@ class Build{
 		
 	}
 	
-	static async init(heroId,targetId,isSplash){
+	static async init(heroId,targetId,isWindow){
 		
 		Build.talents = new Object();
 
@@ -3353,8 +3362,8 @@ class Build{
 		Build.applyStak = true;
 		Build.applyBuffs = true;
 		
-		Build.list(request.build, isSplash);
-		Build.buildActions(request.build, isSplash);
+		Build.list(request.build, isWindow);
+		Build.buildActions(request.build, isWindow);
 
 		request.hero.stats['damage'] = 0;
 		request.hero.stats['critProb'] = 0;
@@ -3432,7 +3441,7 @@ class Build{
 		
 	}
 
-	static buildSelectName(method, btnName, data, isSplash) {
+	static buildSelectName(method, btnName, data, isWindow) {
 		
 		const close = DOM({tag: 'div', style: 'close', event: ['click', _ => {
 			Splash.hide();
@@ -3456,7 +3465,7 @@ class Build{
 			
 			Splash.hide();
 			
-		 isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
+		 isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build',Build.heroId);
 			
 		}]}, btnName);
 		
@@ -3466,11 +3475,11 @@ class Build{
 		
 	}
 
-	static buildActions(builds, isSplash){
+	static buildActions(builds, isWindow){
 		if(builds.length < 6){
 			const create = DOM({tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'], 
 				title: 'Создать новую вкладку билда',  // {heroId:Build.heroId, id:Build.id, name:name.value}
-				event:['click', () => Build.buildSelectName('create', 'Создать билд', {heroId:Build.heroId}, isSplash)]});
+				event:['click', () => Build.buildSelectName('create', 'Создать билд', {heroId:Build.heroId}, isWindow)]});
 
 			let backgroundImg = DOM({style: ['btn-create', 'build-action-item-background']});
 			backgroundImg.style.backgroundImage = `url('content/icons/plus.svg')`;
@@ -3488,7 +3497,7 @@ class Build{
 
 					await App.api.request('build', 'random', { id: Build.id });
 
-					isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+					isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 
 				}]
 			});
@@ -3510,7 +3519,7 @@ class Build{
 						event: ['click', async () => {
 							await App.api.request('build', 'clear', { id: Build.id });
 							await App.api.request('build','steal',{user:8796,hero:Build.heroId});
-						 	isSplash ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+						 	isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 							Splash.hide();
 						}]
 					}, 'Сбросить')
@@ -3529,7 +3538,7 @@ class Build{
 		}
 	}
 	
-	static list(builds, isSplash){
+	static list(builds, isWindow){
 
 		const buildButtonsWrapper = DOM({style: 'build-list'});
 
@@ -3538,13 +3547,13 @@ class Build{
 			const item = DOM(
 				{tag: 'button', style: ['build-tab-item', 'btn-hover'], event:[
 					'click', () => {
-					isSplash ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
+					isWindow ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build',Build.heroId,build.id);
 				}]},
 				DOM({}, `${build.name}`),
 			);
 			item.addEventListener('contextmenu', (e) => {
 					e.preventDefault();
-					Build.buildSelectName('rename', 'Переименовать билд', {id:build.id}, isSplash);
+					Build.buildSelectName('rename', 'Переименовать билд', {id:build.id}, isWindow);
 				});
 
 			const div = DOM({tag: 'div', style: 'button-build--wrapper'}, item);
@@ -6783,6 +6792,15 @@ class NativeAPI {
 	
 }
 
+class CastleBuildingsEvents {
+	static library() {
+		Window.show('main', 'inventory');
+	}
+	static talent_farm() {
+		Window.show('main', 'farm');
+	}
+}
+
 class Castle {
 
 	static canvas;
@@ -6997,6 +7015,14 @@ class Castle {
 			Castle.cursorPosition = [Castle.canvasWidth, Castle.canvasHeight];
 			
 		}, true);
+
+		canvas.addEventListener('click', function(event) {
+			if (Castle.outlinedBuilding) {
+				if (Castle.outlinedBuilding.name in CastleBuildingsEvents) {
+					CastleBuildingsEvents[Castle.outlinedBuilding.name]();
+				}
+			}
+		});
 		
 		Castle.globalCanvas = canvas;
 
@@ -7563,23 +7589,39 @@ class Castle {
 		
 		let buildingsToDraw = [];
 		
-		let buildingSelector = []; // [10] // document.getElementsByClassName("buildings");
+		let buildingSelector = [10, 6]; // [10] // document.getElementsByClassName("buildings");
 		
-		let buildingRotation = [0.0]; // document.getElementsByClassName("rotation");
+		let buildingRotation = [0.0, 0.0]; // document.getElementsByClassName("rotation");
 		
-		let buildingPositionX = [1.0]; // document.getElementsByClassName("positionX");
+		let buildingPositionX = [20.0, 10.0]; // document.getElementsByClassName("positionX");
 		
-		let buildingPositionZ = [1.0]; // document.getElementsByClassName("positionZ");
+		let buildingPositionZ = [1.0, 10.0]; // document.getElementsByClassName("positionZ");
 		
 		for (let i = 0; i < buildingSelector.length; ++i) {
 			//if (buildingSelector[i].checked) {
 				var mesh = Castle.sceneBuildings[buildings[buildingSelector[i]]];
-				buildingsToDraw.push({mesh: mesh, rotation: buildingRotation[i], 
+				buildingsToDraw.push({mesh: mesh, rotation: buildingRotation[i], position: [buildingPositionX[i], buildingPositionZ[i]], name: buildings[buildingSelector[i]],
 					translation: [Castle.zeroTranslation[0] + (buildingPositionX[i] * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (buildingPositionZ[i] * 7.0 + mesh.size[1] / 2.0 * 7.0)]});
 			//}
 		}
 
 		Castle.updateMainCam();
+
+		let outlinedBuilding = -1;
+		Castle.outlinedBuilding = null;
+		if (Object.keys(Window.windows).length === 0) { // do not outline when any window is active
+			for (let i = 0; i < buildingsToDraw.length; ++i) {
+				let building = buildingsToDraw[i];
+				let shift = [Castle.zeroTranslation[0] + Castle.gridTranslation[0], Castle.zeroTranslation[1] + Castle.gridTranslation[1]];
+				if (shift[0] - Castle.gridCursorPosX  > building.translation[0] - building.mesh.size[0] / 2 * 7 && shift[0] - Castle.gridCursorPosX < building.translation[0] + building.mesh.size[1] / 2 * 7 && 
+					shift[1] - Castle.gridCursorPosZ > building.translation[2] - building.mesh.size[1] / 2 * 7 && shift[1] - Castle.gridCursorPosZ < building.translation[2] + building.mesh.size[1] / 2 * 7
+				) {
+					outlinedBuilding = i;
+					Castle.outlinedBuilding = buildingsToDraw[i];
+					break;
+				}
+			}
+		}
 		
 		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects) {
 			Castle.isStaticSMCached = true;
@@ -7605,15 +7647,38 @@ class Castle {
 		Castle.gl.viewport(0, 0, Castle.gl.canvas.width, Castle.gl.canvas.height);
 		Castle.gl.clearColor(0.75, 0.85, 0.8, 1.0);
 		Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
-		for (let buildingToDraw of buildingsToDraw) {
-			for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
-				Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, buildingToDraw.translation);
-			}
-		}
+		
 		if (Castle.sceneObjects) {
+			let blendsFrom;
 			for (let i = 0; i < Castle.sceneObjects.length; ++i) {
+				if (Castle.sceneObjects[i].blend) {
+					blendsFrom = i;
+					break;
+				}
 				Castle.prepareAndDrawObject(Castle.sceneObjects[i], false);
 			}
+
+			if (outlinedBuilding >= 0) {
+				Castle.gl.disable(Castle.gl.DEPTH_TEST);
+				Castle.gl.depthMask(false);
+				let buildingToDraw = buildingsToDraw[outlinedBuilding];
+				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
+					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, buildingToDraw.translation, [0, 20, 0, 1]);
+				}
+				Castle.gl.enable(Castle.gl.DEPTH_TEST);
+				Castle.gl.depthMask(true);
+			}
+		
+			for (let buildingToDraw of buildingsToDraw) {
+				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
+					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, buildingToDraw.translation);
+				}
+			}
+			
+			for (let i = blendsFrom; i < Castle.sceneObjects.length; ++i) {
+				Castle.prepareAndDrawObject(Castle.sceneObjects[i], false);
+			}
+
 			for (let buildingToDraw of buildingsToDraw) {
 				for (let i = 0; i < buildingToDraw.mesh.transparentObjects.length; ++i) {
 					Castle.prepareAndDrawObject(buildingToDraw.mesh.transparentObjects[i], false, buildingToDraw.rotation, buildingToDraw.translation);
@@ -7632,7 +7697,7 @@ class Castle {
 		
 	}
 	
-	static prepareAndDrawObject(obj, isSMPass, rotation, translation) {
+	static prepareAndDrawObject(obj, isSMPass, rotation, translation, tintOverride) {
 		
 		let meshData = obj.meshData;
 		let associatedTexture = obj.textureId;
@@ -7656,7 +7721,7 @@ class Castle {
 			textures,meshData.vertices, meshData.indexCount, 
 			meshData.vertStride, Castle.sceneShaders[obj.shaderId].attributes, 
 			obj.strip, obj.transform, isSMPass, 
-			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation);
+			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride);
 		
 	}
 	
@@ -7812,7 +7877,7 @@ class Castle {
 		
 	}
 	
-	static drawObject(program,textures,vertices,indexCount,vertStride,attributes,strip,transform,isSMPass,blend,tintColor,uvScale,uvScroll,rotation,translation){
+	static drawObject(program,textures,vertices,indexCount,vertStride,attributes,strip,transform,isSMPass,blend,tintColor,uvScale,uvScroll,rotation,translation,tintOverride){
 		
 		if(blend){
 			
@@ -7861,7 +7926,7 @@ class Castle {
 		
 		isSMPass ? Castle.setupSMCam(program) : Castle.setupMainCam(program);
 		
-		let tintColorValue = tintColor ? tintColor : [1, 1, 1, 1];
+		let tintColorValue = tintOverride ? tintOverride : (tintColor ? tintColor : [1, 1, 1, 1]);
 		
 		let tintColorLocation = Castle.gl.getUniformLocation(program, 'tintColor');
 		
@@ -7898,19 +7963,26 @@ class Castle {
 		
 		mat4.transpose(worldMatrix2, worldMatrix);
 		
-		mat4.fromRotation(worldMatrix3, rotation, [0, 1, 0]);
-		
 		if(rotation){
+		
+			mat4.fromRotation(worldMatrix3, rotation, [0, 1, 0]);
 			
 			mat4.mul(worldMatrix2, worldMatrix3, worldMatrix2);
 			
+		}
+
+		if (tintOverride) {
+		
+			mat4.fromScaling(worldMatrix3, [1.1, 1.1, 1.1]);
+			
+			mat4.mul(worldMatrix2, worldMatrix3, worldMatrix2);
 		}
 		
 		if(translation){
 			
 			worldMatrix2[12] += translation[0];
 			
-			worldMatrix2[13] += translation[1];
+			worldMatrix2[13] += translation[1] + tintOverride ? -4 : 0;
 			
 			worldMatrix2[14] += translation[2];
 			

@@ -853,9 +853,11 @@ button.build-action-item:hover {
 }
 
 .inventory-header{
-	
-	
-	
+	margin-top: 2cqh;
+	width: 100cqw;
+	color:rgba(255,255,255,0.8);
+	text-shadow:rgba(0,0,0,1.0) 0 0 4cqh;
+	font: 8cqh / 1 Verdana;
 }
 .inventory{
 	padding-top:3cqh;
@@ -864,14 +866,15 @@ button.build-action-item:hover {
 	flex-flow:row wrap;
 	width:100cqw;
 	overflow-y:scroll;
-	
+	align-content: flex-start;
+	justify-content: center;
 }
 
 .inventory div{
 	
-	width:96px;
-	height:96px;
-	margin: 15px 15px 50px 15px;
+	width:10cqh;
+	height:10cqh;
+	margin: 1cqh 1cqh 5cqh 1cqh;
 	background-size:cover;
 	background-position:center;
 	position:relative;
@@ -881,9 +884,9 @@ button.build-action-item:hover {
 .inventory span{
 	
 	position:absolute;
-	width:96px;
+	width:10cqh;
 	text-align:center;
-	top:100px;
+	top:10cqh;
 	color:rgba(255,255,255,0.5);
 	
 	
@@ -2667,6 +2670,25 @@ cursor:pointer;
 	align-items: center;
 }
 
+#winventory {
+	container-type: size;
+	position: absolute;
+	margin-top: 12cqh;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	text-align: center;
+	width: calc(min(80cqh, 95cqw));
+	height: 60cqh;
+	/*background-color: #8d8b8b;*/
+	border-radius: 2cqh;
+	border: 0.1cqh solid rgb(158, 155, 104);
+	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
+	display: flex;
+	align-items: center;
+}
+
 #wgame {
 	container-type: size;
 	position: absolute;
@@ -2767,6 +2789,7 @@ cursor:pointer;
     height: auto;
     margin: 0cqw 0.5cqw;
 }
+
 
 .castle-menu-title {
 	width: 90cqw;
