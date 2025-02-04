@@ -1663,15 +1663,25 @@ class View {
 					
 				}
 				
-				let friend = DOM({style:'castle-friend-item',oncontextmenu: () => {
-					
-					App.api.request('friend','remove',{id:item.id});
-					
-					friend.remove();
-					
-					return false;
-					
-				}},heroNameBase,bottom);
+				let friend = DOM({
+					style: 'castle-friend-item',
+					oncontextmenu: () => {
+
+						App.api.request('friend', 'remove', { id: item.id });
+
+						friend.remove();
+
+						return false;
+
+					},
+					onclick: () => { 
+								
+						App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
+						
+						App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
+
+					}
+				}, heroNameBase, bottom);
 				
 				if(item.status == 2){
 					
