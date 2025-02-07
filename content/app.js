@@ -1071,13 +1071,13 @@ class View {
 		play.classList.remove('button-play');
 		
 		play.classList.add('castle-button-play');
-		
+		/*
 		if(!play.children.length){
 			
 			play.append(DOM({id:'MMQueue'},'0'));
 			
 		}
-		
+		*/
 		let lobby = DOM({style:'castle-play-lobby'});
 		
 		let data = await App.api.request(CURRENT_MM,'loadParty'), players = new Array();
@@ -8179,7 +8179,7 @@ class MM {
 	
 	static view = document.createElement('div');
 	
-	static button = document.createElement('div');
+	static button = DOM({tag:'div'},DOM({tag:'div'}),DOM({id:'MMQueue'},'0'));
 	
 	static renderBody = false;
 	
@@ -8218,7 +8218,7 @@ class MM {
 		
 		document.body.append(MM.view);
 		
-		MM.button.innerText = 'В бой!';
+		MM.button.firstChild.innerText = 'В бой!';
 		
 		MM.button.onclick = () => MM.start();
 		
@@ -8289,7 +8289,7 @@ class MM {
 			
 			MM.buttonAnimate = MM.button.animate({opacity:[1,0.5,1]},{duration:1000,iterations:Infinity,easing:'ease-out'});
 			
-			MM.button.innerText = 'Поиск боя';
+			MM.button.firstChild.innerText = 'Поиск боя';
 			
 		}
 		
@@ -8303,7 +8303,7 @@ class MM {
 				
 			}
 			
-			MM.button.innerText = 'В бой!';
+			MM.button.firstChild.innerText = 'В бой!';
 			
 		}	
 		
@@ -8316,7 +8316,7 @@ class MM {
 				return;
 			}
 			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) {
-				MM.button.innerText = 'Проверка';
+				MM.button.firstChild.innerText = 'Проверка';
 			}
 			
 			try{
@@ -8338,7 +8338,7 @@ class MM {
 				PWGame.gameConnectionTestIsActive = false;
 				
 				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) { // Неудача
-					MM.button.innerText = 'В бой!';
+					MM.button.firstChild.innerText = 'В бой!';
 				}
 				
 				return App.error(error);
