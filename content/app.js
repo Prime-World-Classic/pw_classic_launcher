@@ -1639,7 +1639,7 @@ class View {
 				
 				input.focus();
 				
-			}},DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request'},'Добавить друга')));
+			}},DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-add'},'+')));
 			
 			preload.add(buttonAdd);
 			
@@ -1659,41 +1659,51 @@ class View {
 				
 				if(item.online){
 					
-					bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
-					
+					// bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
+					// status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
 				}
 				
-				let friend = DOM({
-					style: 'castle-friend-item',
-					oncontextmenu: () => {
-
-						App.api.request('friend', 'remove', { id: item.id });
-
-						friend.remove();
-
-						return false;
-
-					},
-					onclick: () => { 
-								
-						App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
+				let friend = DOM({style: 'castle-friend-item'}, heroNameBase, bottom);
+				
+				
+				if(item.status == 1){
+					
+					bottom.append(DOM({style:'castle-friend-add-group',event:['click',async () => {
+						
+						await App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
 						
 						App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
-
-					}
-				}, heroNameBase, bottom);
-				
-				if(item.status == 2){
+						
+					}]},'Группа'));
 					
-					let accept = DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request',onclick: async () => {
+				}
+				else if(item.status == 2){
+					
+					bottom.append(DOM({style:'castle-friend-confirm',event:['click', async () => {
 						
 						await App.api.request('friend','accept',{id:item.id});
 						
-						accept.remove();
+						while(bottom.firstChild){
+							
+							bottom.firstChild.remove();
+							
+						}
 						
-					}},'Принять'));
-					
-					friend.append(accept);
+						bottom.append(DOM({style:'castle-friend-add-group',event:['click',async () => {
+							
+							await App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
+							
+							App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
+							
+						}]},'Группа'));
+						
+					}]},'Принять'),DOM({style:'castle-friend-cancel',event:['click', async () => {
+						
+						await App.api.request('friend','remove',{id:item.id});
+
+						friend.remove();
+						
+					}]},'Отклонить'));
 					
 				}
 				else if(item.status == 3){
@@ -1701,6 +1711,14 @@ class View {
 					friend.append(DOM({style:'castle-friend-item-middle'},DOM({style:'castle-friend-request'},'Ожидание')));
 					
 					friend.style.filter = 'grayscale(1)';
+					
+					bottom.append(DOM({style:'castle-friend-cancel',event:['click',async () => {
+						
+						await App.api.request('friend','remove',{id:item.id});
+
+						friend.remove();
+						
+					}]},'Отменить'));
 					
 				}
 				
