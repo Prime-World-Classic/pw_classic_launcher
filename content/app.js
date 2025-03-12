@@ -1657,24 +1657,30 @@ class View {
 				
 				let bottom = DOM({style:'castle-friend-item-bottom'});
 				
-				if(item.online){
-					
-					// bottom.append(DOM({style:'castle-friend-online'},'Онлайн'));
-					// status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
-				}
-				
 				let friend = DOM({style: 'castle-friend-item'}, heroNameBase, bottom);
-				
 				
 				if(item.status == 1){
 					
-					bottom.append(DOM({style:'castle-friend-add-group',event:['click',async () => {
+					let group = DOM({style:'castle-friend-add-group'},(item.online) ? 'Группа' : 'Не в сети');
+					
+					if(!item.online){
 						
-						await App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
+						group.style.filter = 'grayscale(1)';
 						
-						App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
+					}
+					else{
 						
-					}]},'Группа'));
+						group.onclick = async () => {
+							
+							await App.api.request(CURRENT_MM,'inviteParty',{id:item.id});
+							
+							App.notify(`Приглашение отправлено игроку ${item.nickname}`);
+							
+						}
+						
+					}
+					
+					bottom.append(group);
 					
 				}
 				else if(item.status == 2){
@@ -1693,7 +1699,7 @@ class View {
 							
 							await App.api.request(CURRENT_MM,'inviteParty',{id: item.id});
 							
-							App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
+							App.notify(`Приглашение отправлено игроку ${item.nickname}`);
 							
 						}]},'Группа'));
 						
