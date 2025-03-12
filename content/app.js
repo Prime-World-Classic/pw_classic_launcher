@@ -1093,7 +1093,7 @@ class View {
 			players.push({id:key,hero:data.users[key].hero,nickname:data.users[key].nickname,ready:data.users[key].ready,rating:data.users[key].rating,skin:data.users[key].skin});
 			
 		}
-		
+		/*
 		if(players.length < 5){
 			
 			while(players.length < 5){
@@ -1103,7 +1103,7 @@ class View {
 			}
 			
 		}
-		
+		*/
 		for(let p in players){
 			let player = players[p];
 			
@@ -1311,7 +1311,7 @@ class View {
 					Splash.show(bodyHero,false);
 					
 				}
-				
+				/*
 				if( ( (item.dataset.id == 0) && ( (!MM.partyId ) || (MM.partyId == App.storage.data.id) ) ) ){
 					
 					let input = DOM({tag:'input',style:'search-input'});
@@ -1359,7 +1359,7 @@ class View {
 					input.focus();
 					
 				}
-				
+				*/
 			})
 
 			lobby.append(playerX);
