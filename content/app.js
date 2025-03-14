@@ -1366,7 +1366,46 @@ class View {
 			
 		}
 		
-		body.append(play,lobby);
+		
+		let bloading = DOM({style:'castle-button-play-l1'});
+		
+		let b4 = DOM({style:'castle-button-play-4'});
+		
+		let b5 = DOM({style:'castle-button-play-5'});
+		
+		let b6 = DOM({style:'castle-button-play-6'});
+		let b7 = DOM({style:'castle-button-play-7'});
+		
+		let bplay = DOM({style:'castle-button-play-3',onclick:() => {
+			
+			bloading.style.display = 'block';
+			
+			bplay.innerText = 'Отменить';
+			
+			b4.style.filter = 'grayscale(80%)';
+			b5.style.filter = 'grayscale(80%)';
+			b6.style.filter = 'grayscale(70%)';
+			b7.style.filter = 'grayscale(70%)';
+			
+			
+		}},'В бой!');
+		
+		let button = DOM({style:'castle-button-play'},
+		DOM({style:'castle-button-play-mode'}),
+		DOM({style:'castle-button-play-1'}),
+		DOM({style:'castle-button-play-2'}),
+		bplay,
+		b4,
+		b5,
+		b6,
+		b7,
+		bloading
+		
+		
+		
+		);
+		
+		body.append(button,lobby);
 		
 		return body; 
 		
