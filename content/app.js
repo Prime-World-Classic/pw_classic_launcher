@@ -864,6 +864,184 @@ class Api {
 	
 }
 
+class CastleNAVBAR {
+	
+	static state = false;
+	
+	static init(){
+		
+		let items = [
+		'castle-button-play-l1',
+		'castle-button-play-4',
+		'castle-button-play-5',
+		'castle-button-play-6',
+		'castle-button-play-7',
+		'castle-button-play-3',
+		'castle-button-play-mode',
+		'castle-button-play-1',
+		'castle-button-play-2',
+		'castle-button-play-8',
+		'castle-button-play-9',
+		'castle-button-play-m1',
+		'castle-button-play-m2',
+		'castle-button-play-m3',
+		'castle-button-play-m4'
+		];
+		
+		CastleNAVBAR.body = DOM({style:'castle-button-play'});
+		
+		for(let item of items){
+			
+			CastleNAVBAR.body.append(DOM({style:item}));
+			
+		}
+		
+		CastleNAVBAR.body.children[5].innerText = 'В бой!';
+		
+		CastleNAVBAR.body.children[5].onclick = () => {
+			
+			if(CastleNAVBAR.state){
+				
+				CastleNAVBAR.cancel();
+				
+			}
+			else{
+				
+				CastleNAVBAR.play();
+				
+			}
+			
+		}
+		
+		CastleNAVBAR.body.children[6].onclick = () => {
+			
+			CastleNAVBAR.mode();
+			
+		}
+		
+		CastleNAVBAR.body.children[11].onclick = () => {
+			
+			CastleNAVBAR.setMode(1);
+			
+		};
+		
+		CastleNAVBAR.body.children[12].onclick = () => {
+			
+			CastleNAVBAR.setMode(2);
+			
+		};
+		
+		CastleNAVBAR.body.children[13].onclick = () => {
+			
+			CastleNAVBAR.setMode(3);
+			
+		};
+		
+		CastleNAVBAR.body.children[14].onclick = () => {
+			
+			CastleNAVBAR.setMode(4);
+			
+		};
+		
+		return CastleNAVBAR.body;
+		
+	}
+	
+	static play(){
+		
+		if(CastleNAVBAR.state){
+			
+			return;
+			
+		}
+		
+		CastleNAVBAR.state = true;
+		
+		CastleNAVBAR.body.children[0].style.display = 'block';
+		
+		CastleNAVBAR.body.children[5].innerText = 'Отменить';
+		
+		CastleNAVBAR.body.children[5].style.fontSize = '1.1vw';
+		
+		CastleNAVBAR.body.children[1].style.filter = 'grayscale(80%)';
+		
+		CastleNAVBAR.body.children[2].style.filter = 'grayscale(80%)';
+		
+		CastleNAVBAR.body.children[3].style.filter = 'grayscale(70%)';
+		
+		CastleNAVBAR.body.children[4].style.filter = 'grayscale(70%)';
+		
+	}
+	
+	static cancel(){
+		
+		if(!CastleNAVBAR.state){
+			
+			return;
+			
+		}
+		
+		CastleNAVBAR.state = false;
+		
+		CastleNAVBAR.body.children[0].style.display = 'none';
+		
+		CastleNAVBAR.body.children[5].innerText = 'В бой!';
+		
+		CastleNAVBAR.body.children[5].style.fontSize = '1.4vw';
+		
+		CastleNAVBAR.body.children[1].style.filter = 'grayscale(0)';
+		
+		CastleNAVBAR.body.children[2].style.filter = 'grayscale(0)';
+		
+		CastleNAVBAR.body.children[3].style.filter = 'grayscale(0)';
+		
+		CastleNAVBAR.body.children[4].style.filter = 'grayscale(0)';
+		
+	}
+	
+	static mode(){
+		
+		
+		CastleNAVBAR.body.children[5].style.display = 'none';
+		
+		CastleNAVBAR.body.children[10].style.display = 'block';
+		
+		CastleNAVBAR.body.children[11].style.display = 'block';
+		
+		CastleNAVBAR.body.children[12].style.display = 'block';
+		
+		CastleNAVBAR.body.children[13].style.display = 'block';
+		
+		CastleNAVBAR.body.children[14].style.display = 'block';
+		
+		
+		
+	}
+	
+	static setMode(type){
+		
+		CastleNAVBAR.body.children[5].style.display = 'block';
+		
+		let background = window.getComputedStyle(CastleNAVBAR.body.children[`1${type}`],null).getPropertyValue('background-image');
+		
+		CastleNAVBAR.body.children[6].style.backgroundImage = background;
+		
+		CastleNAVBAR.body.children[10].style.display = 'none';
+		
+		CastleNAVBAR.body.children[11].style.display = 'none';
+		
+		CastleNAVBAR.body.children[12].style.display = 'none';
+		
+		CastleNAVBAR.body.children[13].style.display = 'none';
+		
+		CastleNAVBAR.body.children[14].style.display = 'none';
+		
+	}
+	
+	
+	
+}
+
 class View {
 	
 	static activeTemplate = false;
@@ -1366,46 +1544,9 @@ class View {
 			
 		}
 		
+		CastleNAVBAR.init();
 		
-		let bloading = DOM({style:'castle-button-play-l1'});
-		
-		let b4 = DOM({style:'castle-button-play-4'});
-		
-		let b5 = DOM({style:'castle-button-play-5'});
-		
-		let b6 = DOM({style:'castle-button-play-6'});
-		let b7 = DOM({style:'castle-button-play-7'});
-		
-		let bplay = DOM({style:'castle-button-play-3',onclick:() => {
-			
-			bloading.style.display = 'block';
-			
-			bplay.innerText = 'Отменить';
-			
-			b4.style.filter = 'grayscale(80%)';
-			b5.style.filter = 'grayscale(80%)';
-			b6.style.filter = 'grayscale(70%)';
-			b7.style.filter = 'grayscale(70%)';
-			
-			
-		}},'В бой!');
-		
-		let button = DOM({style:'castle-button-play'},
-		DOM({style:'castle-button-play-mode'}),
-		DOM({style:'castle-button-play-1'}),
-		DOM({style:'castle-button-play-2'}),
-		bplay,
-		b4,
-		b5,
-		b6,
-		b7,
-		bloading
-		
-		
-		
-		);
-		
-		body.append(button,lobby);
+		body.append(CastleNAVBAR.body,lobby);
 		
 		return body; 
 		
