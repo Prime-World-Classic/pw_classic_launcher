@@ -8654,7 +8654,7 @@ class MM {
 			
 			try{
 				
-				await App.api.request(CURRENT_MM,'ready',{id:MM.id});
+				await App.api.request(CURRENT_MM,'ready',{id:data.id});
 				
 			}
 			catch(error){
