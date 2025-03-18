@@ -8577,7 +8577,7 @@ class MM {
 			
 			try{
 				
-				MM.id = await App.api.request(CURRENT_MM,'cancel');
+				await App.api.request(CURRENT_MM,'cancel');
 				
 			}
 			catch(error){
@@ -8596,8 +8596,6 @@ class MM {
 			try{
 				
 				let request = await App.api.request(CURRENT_MM,'start',{hero:MM.activeSelectHero,version:PW_VERSION});
-				
-				MM.id = request.id;
 				
 				if(request.type == 'reconnect'){
 					
@@ -8624,19 +8622,11 @@ class MM {
 		
 	}
 	
-	static async cancel(){
-		
-		await App.api.request(CURRENT_MM,'start');
-		
-		MM.id = '';
-		
-	}
-	
 	static async ready(data){
 		
 		MM.id = data.id;
 		
-		let body = DOM({style:'mm-ready'},Timer.body,DOM({id:`MMReady`,style:'mm-ready-count'},`0/10`));
+		let body = DOM({style:'mm-ready'},Timer.body,DOM({id:`MMReady`,style:'mm-ready-count'},`0/${data.limit}`));
 		
 		await Timer.start(data.id,'Бой найден',() => {
 			
@@ -8780,7 +8770,7 @@ class MM {
 			
 			try{
 				
-				await App.api.request(CURRENT_MM,'hero',{id:MM.id,heroId:MM.targetHeroId});
+				await App.api.request(CURRENT_MM,'hero',{id:data.id,heroId:MM.targetHeroId});
 				
 			}
 			catch(error){
