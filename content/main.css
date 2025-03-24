@@ -65,7 +65,6 @@ border: none;
 	margin-left: -7cqh;
 	bottom: 0.8cqh;
 	height: 6cqh;
-	cursor: pointer;
 }
 
 .invite-input {
@@ -206,7 +205,6 @@ border-radius:50px;
 font: 1.3rem / 1 Verdana;
 text-align:center;
 background:rgba(255,255,255,0.2);
-cursor:pointer;
 color:rgba(0,0,0,0.7);
 }
 
@@ -276,7 +274,6 @@ height: 100cqh;
 	text-align:center;
 	transition: all 0.3s ease-out;
 	padding:0.8cqh 1cqw;
-	cursor:pointer;
 	border-radius:1cqh;
 	box-shadow:0 0 2cqh rgba(0,0,0,0.3);
 	
@@ -387,7 +384,6 @@ height: 100cqh;
 	flex-flow:row nowrap;
 	justify-content:space-between;
 	text-shadow:0 0 0.1cqh rgba(25,25,25,0.9);
-	cursor:pointer;
 	padding: calc(min(1cqh,2cqw));
 	border-radius:2cqh;
 	box-shadow:0 0 2cqh rgba(0,0,0,0.3);
@@ -398,7 +394,6 @@ height: 100cqh;
 }
 .build-hero-stats-item.passive:hover {
 	background: none;
-	cursor: default;
 }
 .build-hero-stats-item.highlight {
 	background: #2a6d3d !important;
@@ -411,7 +406,6 @@ height: 100cqh;
 	padding: 0.1cqh;
 	border-radius:50%;
 	margin-right:0.1cqh;
-	cursor:pointer;
 	
 }
 
@@ -444,7 +438,6 @@ height: 100cqh;
     right: -4cqh;
     background-size: contain;
     position: absolute;
-    cursor: pointer;
     transform: scale(0.8);
     transition: transform 0.2s ease; /* Добавляем плавный переход */
 }
@@ -482,7 +475,6 @@ button.build-action-item {
 	border-width: 0;
 	margin: 1cqmin;
 	padding: 1cqmin;
-	cursor: pointer;
 	box-shadow: 0 0 2cqmin rgba(0, 0, 0, 0.3);
 	container-type: inline-size;
 	display: flex;
@@ -521,7 +513,6 @@ button.build-action-item:hover {
 	font-size: 8cqmin;
 	line-height: 8cqmin;
 	align-self: center;
-	cursor: default;
 }
 
 .btn-skins,
@@ -535,7 +526,6 @@ button.build-action-item:hover {
     margin: 1cqh;
     border-radius: 4cqmin;
     background-size: 300% 100%;
-	cursor: pointer;
 	border-width: 0;
 }
 
@@ -568,7 +558,6 @@ button.build-action-item:hover {
 	position: relative;
 	bottom: 0cqh;
     color: #fff;
-    cursor: pointer;
     text-align:center;
 }
 
@@ -594,7 +583,6 @@ button.build-action-item:hover {
 	padding:15px 20px;
 	border-radius:75px;
 	text-shadow:0 0 5px rgba(15,15,15,0.5);
-	cursor:pointer;
 	
 }
 
@@ -621,7 +609,6 @@ button.build-action-item:hover {
 	line-height:calc(100cqw / 6);
 	background:rgba(255,255,255,0.2);
 	border-radius:50%;
-	cursor:pointer;
 	transform:scale(0.7);
 	box-shadow:0 0 2cqh rgba(25,25,25,0.5);
 }
@@ -677,7 +664,6 @@ button.build-action-item:hover {
 	background-size: contain;
 	background-position:center;
 	background-repeat:no-repeat;
-	cursor:pointer;
 	position: static;
 }
 
@@ -770,7 +756,6 @@ button.build-action-item:hover {
 	right: -1cqh;
 	bottom: -1cqh;
 	border: 0.2cqh solid #000;
-	cursor:pointer;
 }
 
 .build-rarity{
@@ -789,7 +774,6 @@ button.build-action-item:hover {
 	height: 8cqw;
 	border-radius:50%;
 	margin:0 1cqw;
-	cursor:pointer;
 	container-type: size;
 }
 
@@ -996,7 +980,6 @@ text-align:center;
 	container-type: size;
 	width:14cqh;
 	height:14cqh;
-	cursor:pointer;
 	background-size:cover;
 	background-position:center;
 	background-repeat:no-repeat;
@@ -1085,7 +1068,7 @@ text-align:center;
 	
 	position:fixed;
 	width:94%;
-	margin:10cqh 3%;
+	margin:20cqh 3%;
 	display:flex;
 	flex-flow:row nowrap;
 	justify-content:center;
@@ -1288,7 +1271,6 @@ border-radius:50px;
 font: 1.3rem / 1 Verdana;
 text-align:center;
 background:rgba(255,255,255,0.2);
-cursor:pointer;
 color:rgba(0,0,0,0.7);
 margin:0.3cqh 0;
 	
@@ -1305,7 +1287,6 @@ background:rgba(255,255,255,0.5);
 	position: absolute;
 	top: 1cqh;
 	right: 2cqw;
-	cursor: pointer;
 }
 
 .splash-content .wrap {
@@ -1315,7 +1296,6 @@ background:rgba(255,255,255,0.5);
 }
 .splash-content .wrap div {
 	margin: 2cqh;
-	cursor: pointer;
 }
 
 .mm-timer{
@@ -1363,7 +1343,6 @@ background:rgba(255,255,255,0.5);
 	text-align:center;
 	transition: all 0.3s ease-out;
 	padding:0.9cqh 1cqw;
-	cursor:pointer;
 	border-radius:15px;
 	box-shadow:0 0 25px rgba(0,0,0,0.3);
 	
@@ -1519,7 +1498,6 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
     transition: all 0.3s ease-out;
     padding: 0.8cqh 1cqw;
 	margin:0 0.3cqw;
-    cursor: pointer;
     border-radius: 1.3cqw;
 
 	
@@ -1544,7 +1522,6 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	background-position:center;
 	background-repeat:no-repeat;
 	background-size:cover;
-	cursor:pointer;
 	position:relative;
 	container-type: size;
 	
@@ -1656,7 +1633,6 @@ color:rgba(255,255,255,0.9);
 text-align:center;
 margin-top:1cqh;
 border-radius:5px;
-cursor:pointer;
 	
 }
 
@@ -1708,7 +1684,6 @@ cursor:pointer;
 .party-middle-item div:first-child span{
 	
 	margin-left:10px;
-	cursor:pointer;
 	
 }
 
@@ -1721,7 +1696,6 @@ cursor:pointer;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
 	font-weight:600;
 	font-style:italic;
-	cursor:pointer;
 	
 }
 
@@ -1734,7 +1708,6 @@ cursor:pointer;
 	text-shadow:rgba(0,0,0,0.3) 0 0 5px;
 	font-weight:600;
 	font-style:italic;
-	cursor:pointer;
 	
 }
 
@@ -1748,7 +1721,6 @@ cursor:pointer;
 	background-position:center;
 	background-repeat:no-repeat;
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-	cursor:pointer;
 	font:6cqw / 1 Verdana;
 	line-height:9.5cqw;
 	text-align:center;
@@ -1792,7 +1764,6 @@ cursor:pointer;
 	background-repeat:repeat-y;
 	background-color:rgba(255,255,255,0.1);
 	background-size:110%;
-	cursor:pointer;
 	border-radius:50%;
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	
@@ -1897,7 +1868,6 @@ cursor:pointer;
 	justify-content:center;
 	align-items:center;
 	color:rgba(255, 255, 255, 0.9);
-	cursor:pointer;
 	position: relative;
 }
 
@@ -1943,7 +1913,6 @@ cursor:pointer;
 	align-items:center;
 	box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 	border-radius:5cqw;
-	cursor:pointer;
 	
 }
 
@@ -2051,7 +2020,7 @@ cursor:pointer;
 
 .build-bottom div{
 	
-	cursor:pointer;
+
 	
 }
 
@@ -2097,7 +2066,6 @@ cursor:pointer;
 	background:rgba(255,255,255,0.3);
 	border-radius:15px;
 	text-decoration:underline;
-	cursor:pointer;
 	
 }
 
@@ -2105,7 +2073,6 @@ cursor:pointer;
 	
 	text-align:center;
 	color: rgba(255, 255, 255, 0.7);
-	cursor:pointer;
 }
 
 
@@ -2193,7 +2160,6 @@ cursor:pointer;
 	display: inline-block;
 	width: 100%;
 	text-align: center;
-	cursor:pointer;
 	box-sizing: border-box;
 	background: linear-gradient(90deg, #03a9f4, #f441a5, #ffeb3b, #03a9f4);
 	background-size: 400%;
@@ -2390,7 +2356,6 @@ cursor:pointer;
 	position: relative;
 	width: 2.5cqh;
 	height: 2.5cqh;
-	cursor: pointer;
 	font:2.5cqh / 1 Verdana;
 	color:rgba(255, 255, 255, 0.377)
 }
@@ -2423,7 +2388,6 @@ cursor:pointer;
 .chat-body-item:hover{
 	
 	background:rgba(255,255,255,0.1);
-	cursor:pointer;
 	
 }
 
@@ -2465,7 +2429,6 @@ cursor:pointer;
 	background-size:110%;
 	border-radius:50%;
 	backdrop-filter:blur(0.2cqw);
-	cursor:pointer;
 	
 }
 
@@ -2595,7 +2558,6 @@ cursor:pointer;
 	width: 100cqw;
 	color: rgba(255,255,255,0.3);
 	text-align: center;
-	cursor: pointer;
 	display: flex;
 	justify-content: center;
 	font-size: 2cqw;
@@ -2667,6 +2629,7 @@ cursor:pointer;
 	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.8), rgba(18, 69, 73, 0.6), rgba(21, 51, 59, 0.5), rgba(18, 69, 73, 0.6), rgba(4, 32, 42, 0.8));
 	display: flex;
 	align-items: center;
+	z-index:100;
 }
 
 #winventory {
@@ -2819,7 +2782,6 @@ cursor:pointer;
 	right: 0cqw;
 	top: 50%;
 	transform: translateY(-50%);
-	cursor: pointer;
 }
 
 .castle-menu-item input[type="checkbox"]::before {
@@ -2846,7 +2808,6 @@ cursor:pointer;
 	text-align:center;
 	padding:1cqw 1cqw;
 	margin: 4cqw 1cqw;
-	cursor:pointer;
 	border-radius: 2cqw;
 	border: 0.1cqw solid rgb(158, 155, 104);
 	box-shadow:0 0 3cqw rgba(0,0,0,0.3);
@@ -2863,7 +2824,6 @@ cursor:pointer;
 	padding:1cqw 1cqw;
 	margin: 4cqw 1cqw;
 	top: 30cqw;
-	cursor:pointer;
 	border-radius: 2cqw;
 	border: 0.1cqw solid rgb(158, 155, 104);
 	box-shadow:0 0 3cqw rgba(0,0,0,0.3);
@@ -2898,7 +2858,6 @@ cursor:pointer;
 	border-radius: 50%;
 	border: 0.1cqw solid rgb(158, 155, 104);
 	background: rgba(4, 32, 42, 0.8);
-	cursor: pointer;
 }
 
 .castle-menu-slider::-webkit-slider-thumb:hover {

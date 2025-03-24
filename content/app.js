@@ -868,6 +868,8 @@ class CastleNAVBAR {
 	
 	static state = false;
 	
+	static mode = 0;
+	
 	static init(){
 		
 		let items = [
@@ -896,6 +898,18 @@ class CastleNAVBAR {
 			
 		}
 		
+		CastleNAVBAR.body.children[3].onclick = () => {
+			
+			App.error('Привет от ifst 😎');
+			
+		}
+		
+		CastleNAVBAR.body.children[4].onclick = () => {
+			
+			App.error('Привет от ifst 😎');
+			
+		}
+		
 		CastleNAVBAR.body.children[5].innerText = 'В бой!';
 		
 		CastleNAVBAR.body.children[5].onclick = () => {
@@ -913,11 +927,13 @@ class CastleNAVBAR {
 			
 		}
 		
-		CastleNAVBAR.body.children[6].onclick = () => {
+		CastleNAVBAR.body.children[9].onclick = () => {
 			
-			CastleNAVBAR.mode();
+			CastleNAVBAR.viewMode();
 			
 		}
+		
+		CastleNAVBAR.body.children[9].append(DOM({title:'Очередь игроков матчмейкинга на данный режим игры'}));
 		
 		CastleNAVBAR.body.children[11].onclick = () => {
 			
@@ -997,10 +1013,11 @@ class CastleNAVBAR {
 		
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(0)';
 		
+		CastleNAVBAR.body.children[9].firstChild.innerText = '';
+		
 	}
 	
-	static mode(){
-		
+	static viewMode(){
 		
 		CastleNAVBAR.body.children[5].style.display = 'none';
 		
@@ -1015,10 +1032,11 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[14].style.display = 'block';
 		
 		
-		
 	}
 	
 	static setMode(type){
+		
+		CastleNAVBAR.mode = (type - 1);
 		
 		CastleNAVBAR.body.children[5].style.display = 'block';
 		
@@ -1038,7 +1056,29 @@ class CastleNAVBAR {
 		
 	}
 	
-	
+	static queue(data){
+		
+		if(!CastleNAVBAR.state){
+			
+			return;
+			
+		}
+		
+		let queue = 8;
+		
+		if(CastleNAVBAR.mode in data.mode){
+			
+			if(data.mode[CastleNAVBAR.mode]){
+				
+				queue = data.mode[CastleNAVBAR.mode];
+				
+			}
+			
+		}
+		
+		CastleNAVBAR.body.children[9].firstChild.innerText = ( (queue) ? queue : '');
+		
+	}
 	
 }
 
@@ -1857,6 +1897,30 @@ class View {
 							App.notify(`Приглашение отправлено игроку ${item.nickname}`);
 							
 						}
+						
+					}
+					
+					friend.oncontextmenu = () => {
+						
+						let body = document.createDocumentFragment();
+						
+						let b1 = DOM({style:'splash-content-button',event:['click', async () => {
+							
+							await App.api.request('friend','remove',{id:item.id});
+							
+							friend.remove();
+							
+							Splash.hide();
+							
+						}]},'Удалить');
+						
+						let b2 = DOM({style:'splash-content-button',event:['click',() => Splash.hide()]},'Отмена');
+						
+						body.append(DOM(`Удалить ${item.nickname} из друзей?`),b1,b2);
+						
+						Splash.show(body);
+						
+						return false;
 						
 					}
 					
@@ -6043,6 +6107,12 @@ class Events {
 			find.innerText = value;
 			
 		}
+		
+	}
+	
+	static MMQueueV2(data){
+		
+		CastleNAVBAR.queue(data);
 		
 	}
 
