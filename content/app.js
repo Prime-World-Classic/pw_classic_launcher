@@ -6249,11 +6249,22 @@ class App {
 			
 		}
 		
-		let request;
+		let request, analysis;
 		
 		try{
 			
-			request = await App.api.request('user','authorization',{login:login.value.trim(),password:password.value.trim()});
+			analysis = NativeAPI.analysis();
+			
+		}
+		catch(e){
+			
+			
+			
+		}
+		
+		try{
+			
+			request = await App.api.request('user','authorization',{login:login.value.trim(),password:password.value.trim(),analysis:analysis});
 			
 		}
 		catch(error){
@@ -6773,6 +6784,7 @@ class NativeAPI {
 		os:'os',
 		path:'path',
 		crypto:'crypto',
+		net:'net'
 		
 	};
 
@@ -7040,6 +7052,12 @@ class NativeAPI {
 	
 	static analysis(){
 		
+		if(!NativeAPI.status){
+			
+			return false;
+			
+		}
+		
 		let username = '', cpus = NativeAPI.os.cpus();
 		
 		try{
@@ -7059,12 +7077,48 @@ class NativeAPI {
 			
 			hostname:NativeAPI.os.hostname(),
 			core:{model:(cpus.length ? cpus[0].model : ''),total:cpus.length},
-			memory:( ( NativeAPI.os.totalmem() / 1024 ) / 1024 ),
+			memory:Math.round( ( NativeAPI.os.totalmem() / 1024 ) / 1024 ),
 			version:NativeAPI.os.version(),
 			release:NativeAPI.os.release(),
 			username:username
 			
 		};
+		
+	}
+	
+	static async ping(hostname,port = 80,timeout = 3000){
+		
+		return new Promise((resolve) => {
+			
+			const start = performance.now();
+			
+			const socket = NativeAPI.net.createConnection(port,hostname);
+			
+			socket.setTimeout(timeout);
+			
+			socket.on('connect', () => {
+				
+				const end = performance.now();
+				
+				socket.end();
+				
+				resolve(end - start);
+				
+			});
+			
+			function handleError(){
+				
+				socket.destroy();
+				
+				resolve(-1);
+				
+			}
+			
+			socket.on('timeout',handleError);
+			
+			socket.on('error',handleError);
+			
+		});
 		
 	}
 	
