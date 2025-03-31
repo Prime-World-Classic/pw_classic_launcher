@@ -869,12 +869,12 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .castle-hero-name{
 	
 	color: white;
-	font-size: 0.5vw;
-	padding: 0.1vw 0.4vw;
+	font-size: 50%;
+	padding: 1% 4%;
 	text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
-	border: 0.1vw solid rgb(182, 175, 118);
+	border: 1px solid rgb(182, 175, 118);
 	background: rgb(0, 47, 56);
-	border-radius: 1vw;
+	border-radius: 20vw;
 	
 }
 
