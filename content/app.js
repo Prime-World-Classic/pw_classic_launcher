@@ -6726,7 +6726,7 @@ class PWGame {
 	
 	static gameServerIps = [
 		'http://81.88.210.30:27302/api',
-		'http://26.250.19.245:27302/api' // test connection to Radmin IP
+		'http://26.133.141.83:27302/api' // test connection to Radmin IP
 	];
 	static MAIN_GAME_SERVER_IP = 0
 	static RADMIN_GAME_SERVER_IP = 1;
