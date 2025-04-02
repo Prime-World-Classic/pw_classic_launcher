@@ -1064,7 +1064,7 @@ class CastleNAVBAR {
 			
 		}
 		
-		let queue = 8;
+		let queue = 0;
 		
 		if(CastleNAVBAR.mode in data.mode){
 			
