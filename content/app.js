@@ -5910,7 +5910,7 @@ class Events {
 		
 		if(find){
 			
-			find.innerText = `${data.count}/10`
+			find.innerText = `${data.count}/${data.limit}`
 			
 		}
 		
