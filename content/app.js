@@ -8625,7 +8625,7 @@ class MM {
 			
 			MM.active = false;
 			
-			CastleNAVBAR.play();
+			CastleNAVBAR.cancel();
 			
 			/*
 			if(MM.buttonAnimate){
