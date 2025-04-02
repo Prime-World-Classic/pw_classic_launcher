@@ -9087,7 +9087,7 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},MM.renderMap()),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},( (data.mode == 0) ? MM.renderMap() : DOM() ),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
 		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop:true});
 		
