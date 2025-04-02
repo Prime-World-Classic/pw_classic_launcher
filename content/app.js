@@ -911,7 +911,7 @@ class CastleNAVBAR {
 		}
 		
 		CastleNAVBAR.body.children[5].innerText = 'В бой!';
-		
+		/*
 		CastleNAVBAR.body.children[5].onclick = () => {
 			
 			if(CastleNAVBAR.state){
@@ -926,7 +926,7 @@ class CastleNAVBAR {
 			}
 			
 		}
-		
+		*/
 		CastleNAVBAR.body.children[9].onclick = () => {
 			
 			CastleNAVBAR.viewMode();
@@ -959,7 +959,7 @@ class CastleNAVBAR {
 			
 		};
 		
-		return CastleNAVBAR.body;
+		return CastleNAVBAR.body.children[5];
 		
 	}
 	
@@ -1583,8 +1583,6 @@ class View {
 			lobby.append(playerX);
 			
 		}
-		
-		CastleNAVBAR.init();
 		
 		body.append(CastleNAVBAR.body,lobby);
 		
@@ -8546,9 +8544,9 @@ class MM {
 		
 		document.body.append(MM.view);
 		
-		MM.button.firstChild.innerText = 'В бой!';
+		let button = CastleNAVBAR.init();
 		
-		MM.button.onclick = () => MM.start();
+		button.onclick = () => MM.start();
 		
 		Timer.init();
 		
@@ -8615,9 +8613,11 @@ class MM {
 			
 			MM.active = true;
 			
-			MM.buttonAnimate = MM.button.animate({opacity:[1,0.5,1]},{duration:1000,iterations:Infinity,easing:'ease-out'});
+			//MM.buttonAnimate = MM.button.animate({opacity:[1,0.5,1]},{duration:1000,iterations:Infinity,easing:'ease-out'});
 			
-			MM.button.firstChild.innerText = 'Поиск боя';
+			//MM.button.firstChild.innerText = 'Поиск боя';
+			
+			CastleNAVBAR.play();
 			
 		}
 		
@@ -8625,6 +8625,9 @@ class MM {
 			
 			MM.active = false;
 			
+			CastleNAVBAR.play();
+			
+			/*
 			if(MM.buttonAnimate){
 				
 				MM.buttonAnimate.cancel();
@@ -8632,6 +8635,7 @@ class MM {
 			}
 			
 			MM.button.firstChild.innerText = 'В бой!';
+			*/
 			
 		}	
 		
@@ -8719,7 +8723,7 @@ class MM {
 			
 			try{
 				
-				let request = await App.api.request(CURRENT_MM,'start',{hero:MM.activeSelectHero,version:PW_VERSION});
+				let request = await App.api.request(CURRENT_MM,'start',{hero:MM.activeSelectHero,version:PW_VERSION,mode:CastleNAVBAR.mode});
 				
 				if(request.type == 'reconnect'){
 					
@@ -9087,7 +9091,10 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},( (data.mode == 0) ? MM.renderMap() : DOM() ),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
+		let body = DOM({style:'mm-lobby'},
+		DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),
+		DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},(data.mode == 0) ? MM.renderMap() : DOM(),MM.chatBody,chatInput),
+		lobbyBuild,MM.lobbyHeroes)));
 		
 		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop:true});
 		
