@@ -1,8 +1,8 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.1.0';
+PW_VERSION = '2.2.0';
 
-CURRENT_MM = 'mmtest'
+CURRENT_MM = 'mm'
 
 window.addEventListener('DOMContentLoaded',() => {
 	
