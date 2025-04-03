@@ -6163,7 +6163,7 @@ class App {
 		
 		await MM.init();
 		
-		 /*
+		/*
 		setTimeout(() => {
 			let obj = {id:1, users:{
 				10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
@@ -6177,7 +6177,7 @@ class App {
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 				},target:1,map:[App.storage.data.id,2,4,5,6,7,8,9,10,1858]};
 
-			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:0,rating:1100,select:true,team:1};
+			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:0,rating:1100,select:true,team:1,mode:0};
 				
 		 	MM.lobby(obj);
 			
@@ -9091,10 +9091,7 @@ class MM {
 			
 		});
 		
-		let body = DOM({style:'mm-lobby'},
-		DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),
-		DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},(data.mode == 0) ? MM.renderMap() : DOM(),MM.chatBody,chatInput),
-		lobbyBuild,MM.lobbyHeroes)));
+		let body = DOM({style:'mm-lobby'},DOM({style:'mm-lobby-header'},leftTeam,info,rightTeam),DOM({style:'mm-lobby-middle'},DOM({style:'mm-lobby-middle-chat'},DOM({style:'mm-lobby-middle-chat-map'},(data.mode == 0) ? MM.renderMap() : DOM()),MM.chatBody,chatInput),lobbyBuild,MM.lobbyHeroes));
 		
 		Sound.play('content/sounds/tambur.ogg',{id:'tambur',volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop:true});
 		
