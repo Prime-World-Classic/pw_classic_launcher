@@ -906,7 +906,7 @@ class CastleNAVBAR {
 		
 		CastleNAVBAR.body.children[4].onclick = () => {
 			
-			App.error('Привет от ifst 😎');
+			App.error('Товарищеские матчи в процессе разработки...');
 			
 		}
 		
@@ -1013,8 +1013,6 @@ class CastleNAVBAR {
 		
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(0)';
 		
-		CastleNAVBAR.body.children[9].firstChild.innerText = '';
-		
 	}
 	
 	static viewMode(){
@@ -1035,6 +1033,8 @@ class CastleNAVBAR {
 	}
 	
 	static setMode(type){
+		
+		CastleNAVBAR.body.children[9].firstChild.innerText = '';
 		
 		CastleNAVBAR.mode = (type - 1);
 		
@@ -1057,12 +1057,6 @@ class CastleNAVBAR {
 	}
 	
 	static queue(data){
-		
-		if(!CastleNAVBAR.state){
-			
-			return;
-			
-		}
 		
 		let queue = 0;
 		
@@ -7150,12 +7144,14 @@ class Castle {
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
 	static GetVolume(type) {
+		
 		if (type == Castle.AUDIO_MUSIC) {
 			return Castle.globalVolume * Castle.musicVolume;
 		}
 		if (type == Castle.AUDIO_SOUNDS) {
 			return Castle.globalVolume * Castle.soundsVolume;
 		}
+		
 	}
 	static testSoundIsPlaying = false;
 
