@@ -6142,9 +6142,8 @@ class Events {
 
 class App {
 	
-	static async init(){ // ws://192.168.31.29:3737
-		// ws://192.168.31.194:3737 // wss://playpw.fun:443/api/v1/ // ['wss://playpw.fun:443/api/v1/','wss://pw.26rus-game.ru:8443/']
-		// ['wss://playpw.fun:443/api/v1','wss://relay.26rus-game.ru:8442','wss://pw.26rus-game.ru:8443']
+	static async init(){
+		
 		App.api = new Api(['wss://pw.26rus-game.ru:8443','wss://api.playpw.fun:8443'], Events);
 		
 		await Store.init();
@@ -6152,8 +6151,6 @@ class App {
 		App.storage = new Store('u3');
 		
 		await App.storage.init({id:0,token:'',login:''});
-		
-		await Protect.init();
 		
 		await MM.init();
 		
@@ -7139,7 +7136,7 @@ class Castle {
 
 	static globalVolume = 1.0;
 	static musicVolume = 0.5;
-	static soundsVolume = 0.75;
+	static soundsVolume = 0.3;
 
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
@@ -8374,17 +8371,6 @@ class Castle {
 	
 }
 
-class Protect {
-	
-	static async init(){
-		
-		Protect.storage = new Store('p');
-		
-		await Protect.storage.init({c:'',v:PW_VERSION,s:false});
-		
-	}
-	
-}
 class Settings {
 	static defaultSettings = {
 		fullscreen: true,
