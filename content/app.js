@@ -9222,12 +9222,12 @@ class MM {
 		Timer.stop();
 		
 		MM.close();
-
-		MM.gameRunEvent();
 		
 		if(data.mode == 3){
 			
 			ARAM.briefing(data.hero,data.role,() => {
+				
+				MM.gameRunEvent();
 				
 				PWGame.start(data.key,MM.gameStopEvent);
 				
@@ -9237,6 +9237,8 @@ class MM {
 			
 		}
 		else{
+			
+			MM.gameRunEvent();
 			
 			PWGame.start(data.key,MM.gameStopEvent);
 			
