@@ -6193,6 +6193,13 @@ class App {
 			
 		},2000);
 		*/
+		/*
+		setTimeout(() => {
+			
+			ARAM.briefing(12,1,() => alert(1));
+			
+		},3000);
+		*/
 		Chat.init();
 		
 		await App.api.init();
@@ -9218,9 +9225,24 @@ class MM {
 
 		MM.gameRunEvent();
 		
-		PWGame.start(data.key, MM.gameStopEvent);
-		
-		View.show('castle');
+		if(data.mode == 3){
+			
+			ARAM.briefing(data.hero,data.role,() => {
+				
+				PWGame.start(data.key,MM.gameStopEvent);
+				
+				View.show('castle');
+				
+			});
+			
+		}
+		else{
+			
+			PWGame.start(data.key,MM.gameStopEvent);
+			
+			View.show('castle');
+			
+		}
 		
 	}
 	
@@ -9318,6 +9340,69 @@ class MM {
 		MM.chatBody.append(item);
 		
 		item.scrollIntoView({block:'end',behavior:'smooth'});
+		
+	}
+	
+}
+
+class ARAM {
+	
+	static role = [
+	{name:'Защитник',target:'Прорвать оборону противника и недопустить подход вражеских героев к более уязвимым героям вашей команды.'},
+	{name:'Боец дальнего боя',target:'Нанести основной урон противнику, находясь на расстояние от цели. Соблюдайте дистанцию и не подпускайте врагов близко к себе.'},
+	{name:'Боец ближнего боя',target:'Нанести второстепенный урон врагам вокруг.'},
+	{name:'Ассасин',target:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.'},
+	{name:'Поддержка',target:'Не допустить ослабления героев союзной команды.'}
+	];
+	
+	static briefing(heroId,roleId,callback){
+		
+		setTimeout(() => {
+			
+			Sound.play(`content/hero/${heroId}/revive/${App.getRandomInt(1,4)}.ogg`,{volume:Castle.GetVolume(Castle.AUDIO_SOUNDS)});
+			
+		},1000);
+		
+		let hero = DOM({style:'aram-briefing-left'});
+		
+		let second = 5, timer = DOM({style:'aram-timer'},'Начало боя через 5...');
+		
+		hero.style.backgroundImage = `url(content/hero/${heroId}/1.webp)`;
+		
+		let content = DOM({style:'aram-briefing'},hero,DOM({style:'aram-briefing-right'},
+		DOM({tag:'h3'},'Ваша роль'),
+		DOM({tag:'p'},ARAM.role[roleId].name),
+		DOM({tag:'h3'},'Ваша задача'),
+		DOM({tag:'p'},ARAM.role[roleId].target)
+		),timer);
+		
+		let timerId = setInterval(() => {
+			
+			if(second == 0){
+				
+				clearInterval(timerId);
+				
+				callback();
+				
+				Splash.hide();
+				
+				return;
+				
+			}
+			
+			second--;
+			
+			timer.innerText = (second == 0) ? 'Запуск боя' : `Начало боя через ${second}...`;
+			
+		},1000);
+		
+		let background = DOM({style:'aram-background'},content);
+		
+		hero.animate({backgroundSize:['100%','150%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
+		
+		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1,2)}.jpg)`;
+		
+		Splash.show(background,false);
 		
 	}
 	
