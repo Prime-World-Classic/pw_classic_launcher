@@ -9350,11 +9350,11 @@ class MM {
 class ARAM {
 	
 	static role = [
-	{name:'Защитник',target:'Прорвать оборону противника и недопустить подход вражеских героев к более уязвимым героям вашей команды.'},
-	{name:'Боец дальнего боя',target:'Нанести основной урон противнику, находясь на расстояние от цели. Соблюдайте дистанцию и не подпускайте врагов близко к себе.'},
-	{name:'Боец ближнего боя',target:'Нанести второстепенный урон врагам вокруг.'},
-	{name:'Ассасин',target:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.'},
-	{name:'Поддержка',target:'Не допустить ослабления героев союзной команды.'}
+	{name:'Защитник',task:'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым героям вашей команды.',hero:[46,30,35,17,27,59,42,36,15]},
+	{name:'Боец дальнего боя',task:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к себе.',hero:[52,47,63,26,24,34,40,32,31,55,7,28,8,57,2,44,21,5,12,54,65,43,18,62,29,58,9,25,50]},
+	{name:'Боец ближнего боя',task:'Нанести как можно больше второстепенного урона всем противникам вокруг.',hero:[48,33,4,10,49,1,23,60,51,22,11,20,56,41,53,39,45,14,64]},
+	{name:'Ассасин',task:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.',hero:[3,61,37,6,16]},
+	{name:'Поддержка',task:'Не допустить ослабления героев союзной команды.',hero:[19,38,13]}
 	];
 	
 	static briefing(heroId,roleId,callback){
@@ -9367,7 +9367,7 @@ class ARAM {
 		
 		let hero = DOM({style:'aram-briefing-left'});
 		
-		let second = 5, timer = DOM({style:'aram-timer'},'Начало боя через 5...');
+		let second = 10, timer = DOM({style:'aram-timer'},'Начало боя через 10...');
 		
 		hero.style.backgroundImage = `url(content/hero/${heroId}/1.webp)`;
 		
@@ -9375,7 +9375,7 @@ class ARAM {
 		DOM({tag:'h3'},'Ваша роль'),
 		DOM({tag:'p'},ARAM.role[roleId].name),
 		DOM({tag:'h3'},'Ваша задача'),
-		DOM({tag:'p'},ARAM.role[roleId].target)
+		DOM({tag:'p'},ARAM.role[roleId].task)
 		),timer);
 		
 		let timerId = setInterval(() => {
@@ -9394,13 +9394,13 @@ class ARAM {
 			
 			second--;
 			
-			timer.innerText = (second == 0) ? 'Запуск боя' : `Начало боя через ${second}...`;
+			timer.innerText = (second == 0) ? 'В бой!' : `Начало боя через ${second}...`;
 			
 		},1000);
 		
 		let background = DOM({style:'aram-background'},content);
 		
-		hero.animate({backgroundSize:['100%','150%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
+		hero.animate({backgroundSize:['100%','125%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
 		
 		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1,2)}.jpg)`;
 		
