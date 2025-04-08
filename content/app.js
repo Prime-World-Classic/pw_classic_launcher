@@ -6196,7 +6196,7 @@ class App {
 		/*
 		setTimeout(() => {
 			
-			ARAM.briefing(12,1,() => alert(1));
+			ARAM.briefing(13,4,() => alert(1));
 			
 		},3000);
 		*/
@@ -9350,30 +9350,60 @@ class MM {
 class ARAM {
 	
 	static role = [
-	{name:'Защитник',task:'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым героям вашей команды.',hero:[46,30,35,17,27,59,42,36,15]},
-	{name:'Боец дальнего боя',task:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к себе.',hero:[52,47,63,26,24,34,40,32,31,55,7,28,8,57,2,44,21,5,12,54,65,43,18,62,29,58,9,25,50]},
-	{name:'Боец ближнего боя',task:'Нанести как можно больше второстепенного урона всем противникам вокруг.',hero:[48,33,4,10,49,1,23,60,51,22,11,20,56,41,53,39,45,14,64]},
+	{name:'Защитник',task:'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.',hero:[46,30,35,17,27,59,42,36,15]},
+	{name:'Боец дальнего боя',task:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.',hero:[52,47,63,26,24,34,40,32,31,55,7,28,8,57,2,44,21,5,12,54,65,43,18,62,29,58,9,25,50]},
+	{name:'Боец ближнего боя',task:'Нанести как можно больше урона всем противникам вокруг.',hero:[48,33,4,10,49,1,23,60,51,22,11,20,56,41,53,39,45,14,64]},
 	{name:'Ассасин',task:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.',hero:[3,61,37,6,16]},
-	{name:'Поддержка',task:'Не допустить ослабления героев союзной команды.',hero:[19,38,13]}
+	{name:'Поддержка',task:'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.',hero:[19,38,13]}
 	];
 	
 	static briefing(heroId,roleId,callback){
 		
-		setTimeout(() => {
+		let hero = DOM({style:'aram-briefing-left'},DOM({style:'aram-random'}));
+		
+		let lastRandomHero = 0, second = 15, timer = DOM({style:'aram-timer'},'Начало боя через 15...');
+		
+		let setIntervalId = setInterval(() => {
 			
-			Sound.play(`content/hero/${heroId}/revive/${App.getRandomInt(1,4)}.ogg`,{volume:Castle.GetVolume(Castle.AUDIO_SOUNDS)});
+			if(second <= 5){
+				
+				clearInterval(setIntervalId);
+				
+				hero.style.backgroundImage = `url(content/hero/${heroId}/1.webp)`;
+				
+				Sound.play(`content/hero/${heroId}/revive/${App.getRandomInt(1,4)}.ogg`,{volume:Castle.GetVolume(Castle.AUDIO_SOUNDS)});
+				
+				hero.firstChild.animate({opacity:[1,0]},{duration:5000,fill:'forwards',easing:'ease-out'});
+				
+				hero.animate({backgroundSize:['100%','150%']},{duration:5000,fill:'forwards',easing:'ease-in'});
+				
+				return;
+				
+			}
 			
-		},1000);
-		
-		let hero = DOM({style:'aram-briefing-left'});
-		
-		let second = 10, timer = DOM({style:'aram-timer'},'Начало боя через 10...');
-		
-		hero.style.backgroundImage = `url(content/hero/${heroId}/1.webp)`;
+			let heroRandom = 0;
+			
+			while(true){
+				
+				heroRandom = ARAM.role[roleId].hero[Math.floor(Math.random() * ARAM.role[roleId].hero.length)];
+				
+				if(heroRandom != lastRandomHero){
+					
+					lastRandomHero = heroRandom;
+					
+					break;
+					
+				}
+				
+			}
+			
+			hero.style.backgroundImage = `url(content/hero/${heroRandom}/1.webp)`;
+			
+		},300);
 		
 		let content = DOM({style:'aram-briefing'},hero,DOM({style:'aram-briefing-right'},
 		DOM({tag:'h3'},'Ваша роль'),
-		DOM({tag:'p'},ARAM.role[roleId].name),
+		DOM({tag:'p',style:'aram-hero-role'},ARAM.role[roleId].name),
 		DOM({tag:'h3'},'Ваша задача'),
 		DOM({tag:'p'},ARAM.role[roleId].task)
 		),timer);
@@ -9400,7 +9430,9 @@ class ARAM {
 		
 		let background = DOM({style:'aram-background'},content);
 		
-		hero.animate({backgroundSize:['100%','125%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
+		timer.animate({transform:['scale(1)','scale(1.1)','scale(1)']},{duration:1000,iterations:Infinity,easing:'ease-out'});
+		
+		//hero.animate({backgroundSize:['100%','125%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
 		
 		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1,2)}.jpg)`;
 		
