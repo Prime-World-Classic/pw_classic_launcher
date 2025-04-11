@@ -3591,7 +3591,42 @@ class Build{
 				event:['click', async () => Build.skinChange()]
 			},
 			'Скины'
-		)
+		);
+		
+		Build.training = DOM({
+				tag: 'button',
+				style: ['btn-skins', 'btn-hover', 'color-3'],
+				title: 'Режим тренировки',
+				event:['click', async () => {
+					
+					try{
+						
+						if(NativeAPI.status){
+							
+							await MM.gameStartCheck();
+							
+							await App.api.request(CURRENT_MM,'heroParty',{id:MM.partyId,hero:Build.heroId});
+							
+							await App.api.request(CURRENT_MM,'start',{version:PW_VERSION,mode:99});
+							
+						}
+						else{
+							
+							App.error('Необходима Windows версия лаунчера');
+							
+						}
+						
+					}
+					catch(error){
+						
+						return App.error(error);
+						
+					}
+					
+				}]
+			},
+			'Тренировка'
+		);
 
 		Build.inventoryView.append(buildTalents);
 
@@ -4320,7 +4355,7 @@ class Build{
 		
 		Build.heroImg.append(rank);
 		
-		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView);
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView, Build.training);
 		
 		Build.heroView.append(
 			wrapper,
@@ -8630,41 +8665,58 @@ class MM {
 		
 	}
 	
+	static async gameStartCheck(){
+		
+		if(PWGame.gameConnectionTestIsActive){
+			
+			return;
+			
+		}
+		
+		if(!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated){
+			
+			MM.button.firstChild.innerText = 'Проверка';
+			
+		}
+		
+		try{
+			
+			if(!MM.active){
+				
+				PWGame.gameConnectionTestIsActive = true;
+				
+				await PWGame.check();
+				
+				await PWGame.testGameServerConnection();
+				
+				await PWGame.checkUpdates();
+				
+				PWGame.gameConnectionTestIsActive = false;
+				
+			}
+			
+		}
+		catch(error){
+			
+			PWGame.gameConnectionTestIsActive = false;
+			
+			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) { // Неудача
+			
+			MM.button.firstChild.innerText = 'В бой!';
+			
+			}
+			
+			return App.error(error);
+			
+		}
+		
+	}
+	
 	static async start(){
 		
 		if(NativeAPI.status){
-			if (PWGame.gameConnectionTestIsActive) {
-				return;
-			}
-			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) {
-				MM.button.firstChild.innerText = 'Проверка';
-			}
 			
-			try{
-				
-				if (!MM.active) {
-					PWGame.gameConnectionTestIsActive = true;
-
-					await PWGame.check();
-
-					await PWGame.testGameServerConnection();
-
-					await PWGame.checkUpdates();
-
-					PWGame.gameConnectionTestIsActive = false;
-				}
-				
-			}
-			catch(error){
-				PWGame.gameConnectionTestIsActive = false;
-				
-				if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) { // Неудача
-					MM.button.firstChild.innerText = 'В бой!';
-				}
-				
-				return App.error(error);
-				
-			}
+			await MM.gameStartCheck();
 			
 		}
 		else{
