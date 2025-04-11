@@ -9413,6 +9413,8 @@ class ARAM {
 		
 		let hero = DOM({style:'aram-briefing-left'},DOM({style:'aram-random'}));
 		
+		hero.style.backgroundImage = `url(content/hero/empty.webp)`;
+		
 		let lastRandomHero = 0, second = 15, timer = DOM({style:'aram-timer'},'Начало боя через 15...');
 		
 		let setIntervalId = setInterval(() => {
@@ -9484,9 +9486,9 @@ class ARAM {
 		
 		timer.animate({transform:['scale(1)','scale(1.1)','scale(1)']},{duration:1000,iterations:Infinity,easing:'ease-out'});
 		
-		//hero.animate({backgroundSize:['100%','125%','100%']},{duration:10000,iterations:Infinity,easing:'ease-out'});
-		
 		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1,2)}.jpg)`;
+		
+		Sound.play('content/sounds/aram/bg1.mp3',{id:'backgroundAram',volume:Castle.GetVolume(Castle.AUDIO_MUSIC)});
 		
 		Splash.show(background,false);
 		
