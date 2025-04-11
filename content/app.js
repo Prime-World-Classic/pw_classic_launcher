@@ -9468,6 +9468,8 @@ class ARAM {
 				
 				clearInterval(timerId);
 				
+				Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR,true);
+				
 				callback();
 				
 				Splash.hide();
