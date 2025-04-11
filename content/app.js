@@ -9448,8 +9448,17 @@ class Sound {
 	
 	static play(source,object = new Object(), callback){
 		
-		let audio = new Audio();
+		if( ('id' in object) && (object.id) ){
+			
+			if(object.id in Sound.all){
+				
+				Sound.stop(object.id);
+				
+			}
+			
+		}
 		
+		let audio = new Audio();
 		
 		if('loop' in object){
 			
