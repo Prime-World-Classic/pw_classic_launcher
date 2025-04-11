@@ -9488,6 +9488,8 @@ class ARAM {
 		
 		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1,2)}.jpg)`;
 		
+		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR,false);
+		
 		Sound.play('content/sounds/aram/bg1.mp3',{id:'backgroundAram',volume:Castle.GetVolume(Castle.AUDIO_MUSIC)});
 		
 		Splash.show(background,false);
