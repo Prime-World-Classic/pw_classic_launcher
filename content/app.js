@@ -2,7 +2,7 @@ APP_VERSION = '0';
 
 PW_VERSION = '2.2.0';
 
-CURRENT_MM = 'mmtest'
+CURRENT_MM = 'mm'
 
 window.addEventListener('DOMContentLoaded',() => {
 	
@@ -4354,8 +4354,8 @@ class Build{
 		let rank = DOM({style:'rank'},DOM({style:'rank-lvl'},data.rating),rankIcon);
 		
 		Build.heroImg.append(rank);
-		
-		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView, Build.training);
+		// Build.training
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView);
 		
 		Build.heroView.append(
 			wrapper,
