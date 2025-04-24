@@ -3120,7 +3120,8 @@ class Window {
 				}),
 				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 		),
-			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад')
+			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад'),
+			DOM({ style: 'castle-menu-label-description' }, 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: пкм на значок звука на панели задач -> микшер громкости -> значок игры -> делаете тише.')
 		);
 	}
 
