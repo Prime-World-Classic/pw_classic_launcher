@@ -2793,7 +2793,7 @@ border-radius:5px;
 	right: 0;
 	text-align: center;
 	width: calc(min(26cqh, 19cqw));
-	height: 50cqh;
+	height: 53cqh;
 	/*background-color: #8d8b8b;*/
 	border-radius: 2cqh;
 	border: 0.1cqh solid rgb(158, 155, 104);
@@ -2953,6 +2953,17 @@ border-radius:5px;
 	text-align:center;
 	padding:1cqw 1cqw;
 	margin: 4cqw 1cqw;
+}
+
+.castle-menu-label-description {
+	width: 90cqw;
+	color:rgba(255,255,255,0.9);
+	text-shadow:rgba(0,0,0,0.3) 0 0 1cqw;
+	font: 4cqw / 1 Tahoma;
+	text-align:center;
+	padding:1cqw 1cqw;
+	margin: 4cqw 1cqw;
+	line-height: normal;
 }
 
 .castle-menu-slider {
