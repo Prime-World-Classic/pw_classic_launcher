@@ -43,6 +43,7 @@ class Lang {
 			damage: 'Damage',
 			criticalHit: 'Critical Hit',
 			attacksPerSecond: 'Attacks per second',
+			penetration: 'Penetration',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -75,6 +76,7 @@ class Lang {
 			damage: 'Урон',
 			criticalHit: 'Шанс крита',
 			attacksPerSecond: 'Скорость атаки',
+			penetration: 'Пробивание',
 		},
 		be: {
 			fight: 'У бой!',
@@ -107,6 +109,7 @@ class Lang {
 			damage: 'Шкода',
 			criticalHit: 'Шанец крытычнага траплення',
 			attacksPerSecond: 'Хуткасць атакі',
+			penetration: 'Прабіванне',
 		},
 
 	};
@@ -4042,7 +4045,7 @@ class Build{
 			damage: Lang.text('damage'),
 			critProb: Lang.text('criticalHit'),
 			attackSpeed: Lang.text('attacksPerSecond'),
-			punching: 'Пробивание',
+			punching: Lang.text('penetration'),
 			protectionBody: 'Защита тела',
 			protectionSpirit: 'Защита духа',
 		};
