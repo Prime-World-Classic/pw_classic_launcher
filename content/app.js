@@ -36,6 +36,7 @@ class Lang {
 			speed: 'Speed',
 			power: 'Power',
 			intelligence: 'Intelligence',
+			agility: 'Agility',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -61,6 +62,7 @@ class Lang {
 			speed: 'Скорость',
 			power: 'Сила',
 			intelligence: 'Разум',
+			agility: 'Проворство',
 		},
 		be: {
 			fight: 'У бой!',
@@ -86,6 +88,7 @@ class Lang {
 			speed: 'Хуткасць',
 			power: 'Сіла',
 			intelligence: 'Розум',
+			agility: 'Шпаркасць',
 		},
 
 	};
@@ -3393,7 +3396,7 @@ class Build{
 	static language = {
 		sr: 'Сила/Разум',
 		hp: Lang.text('health'),
-		provorstvo: 'Проворство',
+		provorstvo: Lang.text('agility'),
 		hitrost: 'Хитрость',
 		regenmp: 'Регенерация энергии',
 		stoikost: 'Стойкость',
@@ -4014,7 +4017,7 @@ class Build{
 			speed: Lang.text('speed'),
 			sila: Lang.text('power'),
 			razum: Lang.text('intelligence'),
-			provorstvo:'Проворство',
+			provorstvo: Lang.text('agility'),
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
 			volia:'Воля',
