@@ -5975,10 +5975,16 @@ class Build{
 							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
 							const param1 = isHpOrEnergy ? 600.0 : 50.0;
 							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-							outputString = Math.round(lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2));
+							outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
+							if (outputString.endsWith(('.0'))){
+								outputString = outputString.replace('.0','')
+							}
 						} else {
 							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-							outputString = Math.round(minValue + maxValue * refineBonus);
+							outputString = (minValue + maxValue * refineBonus).toFixed(1);
+							if (outputString.endsWith(('.0'))){
+								outputString = outputString.replace('.0','');
+							}
 						}
 
 						if (specialTag.innerHTML) {
