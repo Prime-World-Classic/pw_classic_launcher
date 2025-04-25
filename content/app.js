@@ -20,6 +20,7 @@ class Lang {
 			menu: 'Меню',
 			preferences: 'Preferences',
 			windowMode: 'Window mode',
+			threeD: '3D',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -29,6 +30,7 @@ class Lang {
 			menu: 'Меню',
 			preferences: 'Настройки',
 			windowMode: 'Оконный режим',
+			threeD: '3D графика',
 		},
 		be: {
 			fight: 'У бой!',
@@ -38,6 +40,7 @@ class Lang {
 			menu: 'Мяню',
 			preferences: 'Прылады',
 			windowMode: 'Аконны рэжым',
+			threeD: '3D графіка',
 		},
 
 	};
@@ -3125,7 +3128,7 @@ class Window {
 						Settings.ApplySettings();
 					}]
 				}),
-				DOM({ tag: 'label', for: 'render-toggle' }, '3D графика')
+				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
 		),
 			DOM({ style: 'castle-menu-label' }, 'Общая громкость',
 				DOM({
