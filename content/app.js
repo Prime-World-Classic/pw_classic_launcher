@@ -46,6 +46,7 @@ class Lang {
 			penetration: 'Penetration',
 			defencePsys: 'Defence Psysical',
 			defenceMagic: 'Defence Magic',
+			skins: 'Skins',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -81,6 +82,7 @@ class Lang {
 			penetration: 'Пробивание',
 			defencePsys: 'Защита тела',
 			defenceMagic: 'Защита духа',
+			skins: 'Скины',
 		},
 		be: {
 			fight: 'У бой!',
@@ -116,6 +118,7 @@ class Lang {
 			penetration: 'Прабіванне',
 			defencePsys: 'Абарона цела',
 			defenceMagic: 'Абарона духу',
+			skins: 'Абалонкаі',
 		},
 
 	};
@@ -3717,7 +3720,7 @@ class Build{
 				title: 'Образы на героя',
 				event:['click', async () => Build.skinChange()]
 			},
-			'Скины'
+			Lang.text('skins')
 		);
 		
 		Build.training = DOM({
