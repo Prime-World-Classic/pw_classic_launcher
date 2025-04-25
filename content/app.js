@@ -17,18 +17,21 @@ class Lang {
 			enterTextAndPressEnter: 'Enter the text and press Enter',
 			ready: 'Ready',
 			library: 'Library',
+			menu: 'Меню',
 		},
 		ru: {
 			fight: 'В бой!',
 			enterTextAndPressEnter: 'Введите текст и нажмите Enter',
 			ready: 'Готов',
 			library: 'Библиотека',
+			menu: 'Меню',
 		},
 		be: {
 			fight: 'У бой!',
 			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
 			ready: 'Гатоў',
 			library: 'Бібліятэка',
+			menu: 'Мяню',
 		},
 
 	};
@@ -1636,7 +1639,7 @@ class View {
 		
 		let clan = DOM({style:['castle-clans','button-outline'], title: 'Кланы',event:['click',() => Frame.open('clan')]});
 		
-		let menu = DOM({style:['castle-menu','button-outline'], title: 'Меню',event:['click',() => Window.show('main', 'menu')]});
+		let menu = DOM({style:['castle-menu','button-outline'], title: Lang.text('menu'), event:['click',() => Window.show('main', 'menu')]});
 		
 		let history = DOM({style:['castle-history','button-outline'], title: 'История',event:['click',() => Window.show('main', 'history')]});
 		
@@ -3061,7 +3064,7 @@ class Window {
 	}
 	static async menu() {
 		return DOM({id: 'wcastle-menu'}, 
-			DOM({style: 'castle-menu-title'}, 'Меню'),
+			DOM({style: 'castle-menu-title'}, Lang.text('menu')),
 			App.isAdmin() ? DOM({style: 'castle-menu-item-v'}, 
 				DOM({event: ['click', () => Window.show('main', 'adminPanel')]}, 'Админ')) : DOM(),
 			DOM({style: 'castle-menu-item-v'}, 
