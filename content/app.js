@@ -29,6 +29,7 @@ class Lang {
 			support: 'Support',
 			supportDesk: 'Questions? Feel free to contact us:',
 			accountSwitch: 'Switch account',
+			exit: 'Exit from Prime World',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -47,6 +48,7 @@ class Lang {
 			support: 'Поддержка',
 			supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
 			accountSwitch: 'Сменить аккаунт',
+			exit: 'Выйти из Prime World',
 		},
 		be: {
 			fight: 'У бой!',
@@ -65,6 +67,7 @@ class Lang {
 			support: 'Падтрымка',
 			supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
 			accountSwitch: 'Змяніць рахунак',
+			exit: 'Выйсці з Prime World',
 		},
 
 	};
@@ -2064,7 +2067,7 @@ class View {
 
 		if (NativeAPI.status) {
 		
-			let exit = DOM({event:['click',() => NativeAPI.exit()]},'Выйти из игры');
+			let exit = DOM({event:['click',() => NativeAPI.exit()]}, Lang.text('exit'));
 		
 			wrap = DOM({style:'wrap'},logout,exit,close);
 
@@ -3114,7 +3117,7 @@ class Window {
 				if (NativeAPI.status) {
 					NativeAPI.exit();
 				}
-			}]}, 'Выйти из игры'),
+			}]}, Lang.text('exit')),
 			DOM({style: 'castle-menu-label'}, `Версия игры: v.${PW_VERSION}`),
 			DOM({style: 'menu-icons'},
 				DOM({tag: 'a', href: 'https://vk.com/primeworldclassic', target: '_blank'}, 
