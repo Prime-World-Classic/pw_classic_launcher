@@ -3200,7 +3200,7 @@ class Window {
 	static async support() {
 		return DOM({id: 'wcastle-support'},
 			DOM({style: 'castle-menu-title'}, Lang.text('support')),
-			DOM({style: 'support-text'}, Lang.text('supportDesc')),
+			DOM({style: 'support-text'}, Lang.text('supportDesk')),
 			DOM({style: 'support-icons'},
 				DOM({tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank'}, 
 					DOM({tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon'})
