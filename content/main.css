@@ -88,6 +88,9 @@ rz{
 num{
 	color: yellow;
 }
+tn{
+	color: #ff8c00;
+}
 prime{
 	color: cyan;
 }
@@ -820,7 +823,7 @@ button.build-action-item:hover {
 .build-description span{
 	display:block;
 	font:1.6cqh / 1 Tahoma;
-	color:rgb(51,204,51);
+	color:rgb(87 166 57);
 	margin-top:1cqh;
 	
 }
