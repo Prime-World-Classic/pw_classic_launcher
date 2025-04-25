@@ -14,15 +14,18 @@ class Lang {
 	static list = {
 		en: {
 			fight: 'Fight!',
-			enterTextAndPressEnter: 'Enter the text and press Enter'
+			enterTextAndPressEnter: 'Enter the text and press Enter',
+			ready: 'Ready',
 		},
 		ru: {
 			fight: 'В бой!',
-			enterTextAndPressEnter: 'Введите текст и нажмите Enter'
+			enterTextAndPressEnter: 'Введите текст и нажмите Enter',
+			ready: 'Готов'
 		},
 		be: {
-			fight: 'У бой!!',
-			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter'
+			fight: 'У бой!',
+			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
+			ready: 'Гатоў'
 		},
 
 	};
