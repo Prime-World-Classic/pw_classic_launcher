@@ -18,6 +18,7 @@ class Lang {
 			ready: 'Ready',
 			library: 'Library',
 			menu: 'Меню',
+			preferences: 'Preferences',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -25,6 +26,7 @@ class Lang {
 			ready: 'Готов',
 			library: 'Библиотека',
 			menu: 'Меню',
+			preferences: 'Настройки',
 		},
 		be: {
 			fight: 'У бой!',
@@ -32,6 +34,7 @@ class Lang {
 			ready: 'Гатоў',
 			library: 'Бібліятэка',
 			menu: 'Мяню',
+			preferences: 'Прылады',
 		},
 
 	};
@@ -3068,7 +3071,7 @@ class Window {
 			App.isAdmin() ? DOM({style: 'castle-menu-item-v'}, 
 				DOM({event: ['click', () => Window.show('main', 'adminPanel')]}, 'Админ')) : DOM(),
 			DOM({style: 'castle-menu-item-v'}, 
-				DOM({event: ['click', () => Window.show('main', 'settings')]}, 'Настройки')
+				DOM({event: ['click', () => Window.show('main', 'settings')]}, Lang.text('preferences'))
 			),
 			DOM({style: 'castle-menu-item-v'}, 
 				DOM({event: ['click', () => Window.show('main', 'support')]}, 'Поддержка')
@@ -3101,7 +3104,7 @@ class Window {
 	let soundTestId = 'sound_test';
 
 		return DOM({ id: 'wcastle-menu' },
-			DOM({ style: 'castle-menu-title' }, 'Настройки'),
+			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
