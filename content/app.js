@@ -25,7 +25,8 @@ class Lang {
 			volumeMusic: 'Volume of music',
 			volumeSound: 'Volume of sounds',
 			back: 'Back',
-			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter'
+			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
+			support: 'Support',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -41,6 +42,7 @@ class Lang {
 			volumeSound: 'Громкость звуков',
 			back: 'Назад',
 			soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
+			support: 'Поддержка',
 		},
 		be: {
 			fight: 'У бой!',
@@ -55,7 +57,8 @@ class Lang {
 			volumeMusic: 'Гучнасць музыкі',
 			volumeSound: 'Гучнасць гукаў',
 			back: 'Назад',
-			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй'
+			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
+			support: 'Падтрымка',
 		},
 
 	};
@@ -3095,7 +3098,7 @@ class Window {
 				DOM({event: ['click', () => Window.show('main', 'settings')]}, Lang.text('preferences'))
 			),
 			DOM({style: 'castle-menu-item-v'}, 
-				DOM({event: ['click', () => Window.show('main', 'support')]}, 'Поддержка')
+				DOM({event: ['click', () => Window.show('main', 'support')]}, Lang.text('support'))
 			),
 			DOM({style: 'castle-menu-item-v', event: ['click', async () => {
 				App.exit();
@@ -3193,7 +3196,7 @@ class Window {
 
 	static async support() {
 		return DOM({id: 'wcastle-support'},
-			DOM({style: 'castle-menu-title'}, 'Поддержка'),
+			DOM({style: 'castle-menu-title'}, Lang.text('support')),
 			DOM({style: 'support-text'}, 'Если у Вас есть вопросы, Вы можете связаться с нами через:'),
 			DOM({style: 'support-icons'},
 				DOM({tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank'}, 
