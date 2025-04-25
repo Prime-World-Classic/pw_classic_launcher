@@ -3121,7 +3121,7 @@ class Window {
 				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 		),
 			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад'),
-			DOM({ style: 'castle-menu-label-description' }, 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: пкм на значок звука на панели задач -> микшер громкости -> значок игры -> делаете тише.')
+			DOM({ style: 'castle-menu-label-description' }, 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише.')
 		);
 	}
 
