@@ -27,6 +27,7 @@ class Lang {
 			back: 'Back',
 			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
 			support: 'Support',
+			supportDesk: 'Questions? Feel free to contact us:',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -43,6 +44,7 @@ class Lang {
 			back: 'Назад',
 			soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
 			support: 'Поддержка',
+			supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
 		},
 		be: {
 			fight: 'У бой!',
@@ -59,6 +61,7 @@ class Lang {
 			back: 'Назад',
 			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
 			support: 'Падтрымка',
+			supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
 		},
 
 	};
@@ -3197,7 +3200,7 @@ class Window {
 	static async support() {
 		return DOM({id: 'wcastle-support'},
 			DOM({style: 'castle-menu-title'}, Lang.text('support')),
-			DOM({style: 'support-text'}, 'Если у Вас есть вопросы, Вы можете связаться с нами через:'),
+			DOM({style: 'support-text'}, Lang.text('supportDesc')),
 			DOM({style: 'support-icons'},
 				DOM({tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank'}, 
 					DOM({tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon'})
