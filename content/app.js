@@ -33,6 +33,7 @@ class Lang {
 			version: 'Version',
 			health: 'Health',
 			energy: 'Energy',
+			speed: 'Speed',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -55,6 +56,7 @@ class Lang {
 			version: 'Версия',
 			health: 'Здоровье',
 			energy: 'Энергия',
+			speed: 'Скорость',
 		},
 		be: {
 			fight: 'У бой!',
@@ -77,6 +79,7 @@ class Lang {
 			version: 'Версія',
 			health: 'Здароўе',
 			energy: 'Энергія',
+			speed: 'Хуткасць'
 		},
 
 	};
@@ -3417,7 +3420,7 @@ class Build{
 		svvz: 'Стойкость/Воля на вражеской земле',
 		krajahpvz: 'Кража здоровья на вражеской земле',
 		vs: 'Воля/Стойкость',
-		speed: 'Скорость',
+		speed: Lang.text('speed'),
 		speedrz: 'Скорость на родной земле',
 		speedvz: 'Скорость на вражеской или нейтральной земле',
 		dopspeed: 'Дополнительный бонус к скорости',
@@ -4002,7 +4005,7 @@ class Build{
 			
 			hp: Lang.text('health'),
 			mp: Lang.text('energy'),
-			speed:'Скорость',
+			speed: Lang.text('speed'),
 			sila:'Сила',
 			razum:'Разум',
 			provorstvo:'Проворство',
