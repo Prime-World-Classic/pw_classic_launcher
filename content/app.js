@@ -16,16 +16,19 @@ class Lang {
 			fight: 'Fight!',
 			enterTextAndPressEnter: 'Enter the text and press Enter',
 			ready: 'Ready',
+			library: 'Library',
 		},
 		ru: {
 			fight: 'В бой!',
 			enterTextAndPressEnter: 'Введите текст и нажмите Enter',
-			ready: 'Готов'
+			ready: 'Готов',
+			library: 'Библиотека',
 		},
 		be: {
 			fight: 'У бой!',
 			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
-			ready: 'Гатоў'
+			ready: 'Гатоў',
+			library: 'Бібліятэка',
 		},
 
 	};
@@ -2687,7 +2690,7 @@ class View {
 		DOM({style:'main-header-item',event:['click',() => View.exitOrLogout()]},'Выйти')
 		))
 		} else {
-			body.append(DOM({style:'inventory-header'}, 'Библиотека'))
+			body.append(DOM({style:'inventory-header'}, Lang.text('library')))
 		}	
 		body.append(
 			DOM({style:'main-body-full'},inventory)
