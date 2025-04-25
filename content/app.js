@@ -118,7 +118,7 @@ class Lang {
 			penetration: 'Прабіванне',
 			defencePsys: 'Абарона цела',
 			defenceMagic: 'Абарона духу',
-			skins: 'Абалонкаі',
+			skins: 'Абалонкі',
 		},
 
 	};
