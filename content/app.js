@@ -38,6 +38,7 @@ class Lang {
 			intelligence: 'Intelligence',
 			agility: 'Agility',
 			dexterity: 'Dexterity',
+			stamina: 'Stamina',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -65,6 +66,7 @@ class Lang {
 			intelligence: 'Разум',
 			agility: 'Проворство',
 			dexterity: 'Хитрость',
+			stamina: 'Стойкость',
 		},
 		be: {
 			fight: 'У бой!',
@@ -92,6 +94,7 @@ class Lang {
 			intelligence: 'Розум',
 			agility: 'Шпаркасць',
 			dexterity: 'Хітрасць',
+			stamina: 'Цягавітасьць',
 		},
 
 	};
@@ -3402,7 +3405,7 @@ class Build{
 		provorstvo: Lang.text('agility'),
 		hitrost: Lang.text('dexterity'),
 		regenmp: 'Регенерация энергии',
-		stoikost: 'Стойкость',
+		stoikost: Lang.text('stamina'),
 		volia: 'Воля',
 		ph: 'Проворство/Хитрость',
 		sv: 'Стойкость/Воля',
@@ -4022,7 +4025,7 @@ class Build{
 			razum: Lang.text('intelligence'),
 			provorstvo: Lang.text('agility'),
 			hitrost: Lang.text('dexterity'),
-			stoikost:'Стойкость',
+			stoikost: Lang.text('stamina'),
 			volia:'Воля',
 			damage: 'Урон',
 			critProb: 'Шанс крита',
