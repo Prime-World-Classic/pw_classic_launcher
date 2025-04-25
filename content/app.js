@@ -41,6 +41,7 @@ class Lang {
 			stamina: 'Stamina',
 			will: 'Will',
 			damage: 'Damage',
+			criticalHit: 'Critical Hit',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -71,6 +72,7 @@ class Lang {
 			stamina: 'Стойкость',
 			will: 'Воля',
 			damage: 'Урон',
+			criticalHit: 'Шанс крита',
 		},
 		be: {
 			fight: 'У бой!',
@@ -101,6 +103,7 @@ class Lang {
 			stamina: 'Цягавітасьць',
 			will: 'Воля',
 			damage: 'Шкода',
+			criticalHit: 'Шанец крытычнага траплення',
 		},
 
 	};
@@ -4034,7 +4037,7 @@ class Build{
 			stoikost: Lang.text('stamina'),
 			volia: Lang.text('will'),
 			damage: Lang.text('damage'),
-			critProb: 'Шанс крита',
+			critProb: Lang.text('criticalHit'),
 			attackSpeed: 'Скорость атаки',
 			punching: 'Пробивание',
 			protectionBody: 'Защита тела',

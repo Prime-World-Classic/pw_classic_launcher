@@ -338,7 +338,7 @@ height: 100cqh;
 	font-weight: 600;
 	
 	container-type: inline-size;
-	width: 90cqw;
+	width: 100cqw;
 	height: calc(min(5cqh, 10cqw));
 	font-size: calc(min(3cqh,6cqw));
 }
@@ -2733,7 +2733,7 @@ border-radius:5px;
 	left: 0;
 	right: 0;
 	text-align: center;
-	width: calc(min(130cqh, 95cqw));
+	width: calc(min(140cqh, 95cqw));
 	height: 70cqh;
 	/*background-color: #8d8b8b;*/
 	border-radius: 2cqh;
