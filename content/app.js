@@ -34,6 +34,7 @@ class Lang {
 			health: 'Health',
 			energy: 'Energy',
 			speed: 'Speed',
+			power: 'Power',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -57,6 +58,7 @@ class Lang {
 			health: 'Здоровье',
 			energy: 'Энергия',
 			speed: 'Скорость',
+			power: 'Сила',
 		},
 		be: {
 			fight: 'У бой!',
@@ -79,7 +81,8 @@ class Lang {
 			version: 'Версія',
 			health: 'Здароўе',
 			energy: 'Энергія',
-			speed: 'Хуткасць'
+			speed: 'Хуткасць',
+			power: 'Сіла',
 		},
 
 	};
@@ -3395,7 +3398,7 @@ class Build{
 		ph: 'Проворство/Хитрость',
 		sv: 'Стойкость/Воля',
 		razum: 'Разум',
-		sila: 'Сила',
+		sila: Lang.text('power'),
 		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
 		krajahp: 'Кража здоровья',
@@ -4006,7 +4009,7 @@ class Build{
 			hp: Lang.text('health'),
 			mp: Lang.text('energy'),
 			speed: Lang.text('speed'),
-			sila:'Сила',
+			sila: Lang.text('power'),
 			razum:'Разум',
 			provorstvo:'Проворство',
 			hitrost:'Хитрость',
