@@ -25,6 +25,7 @@ class Lang {
 			volumeMusic: 'Volume of music',
 			volumeSound: 'Volume of sounds',
 			back: 'Back',
+			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter'
 		},
 		ru: {
 			fight: 'В бой!',
@@ -39,6 +40,7 @@ class Lang {
 			volumeMusic: 'Громкость музыки',
 			volumeSound: 'Громкость звуков',
 			back: 'Назад',
+			soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
 		},
 		be: {
 			fight: 'У бой!',
@@ -53,6 +55,7 @@ class Lang {
 			volumeMusic: 'Гучнасць музыкі',
 			volumeSound: 'Гучнасць гукаў',
 			back: 'Назад',
+			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй'
 		},
 
 	};
@@ -3184,7 +3187,7 @@ class Window {
 				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 		),
 			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back')),
-			DOM({ style: 'castle-menu-label-description' }, 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише.')
+			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
 		);
 	}
 
