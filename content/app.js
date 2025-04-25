@@ -40,6 +40,7 @@ class Lang {
 			dexterity: 'Dexterity',
 			stamina: 'Stamina',
 			will: 'Will',
+			damage: 'Damage',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -69,6 +70,7 @@ class Lang {
 			dexterity: 'Хитрость',
 			stamina: 'Стойкость',
 			will: 'Воля',
+			damage: 'Урон',
 		},
 		be: {
 			fight: 'У бой!',
@@ -98,6 +100,7 @@ class Lang {
 			dexterity: 'Хітрасць',
 			stamina: 'Цягавітасьць',
 			will: 'Воля',
+			damage: 'Шкода',
 		},
 
 	};
@@ -4030,7 +4033,7 @@ class Build{
 			hitrost: Lang.text('dexterity'),
 			stoikost: Lang.text('stamina'),
 			volia: Lang.text('will'),
-			damage: 'Урон',
+			damage: Lang.text('damage'),
 			critProb: 'Шанс крита',
 			attackSpeed: 'Скорость атаки',
 			punching: 'Пробивание',
