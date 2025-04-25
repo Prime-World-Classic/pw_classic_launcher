@@ -31,6 +31,7 @@ class Lang {
 			accountSwitch: 'Switch account',
 			exit: 'Exit from Prime World',
 			version: 'Version',
+			health: 'Health',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -51,6 +52,7 @@ class Lang {
 			accountSwitch: 'Сменить аккаунт',
 			exit: 'Выйти из Prime World',
 			version: 'Версия',
+			health: 'Здоровье',
 		},
 		be: {
 			fight: 'У бой!',
@@ -71,6 +73,7 @@ class Lang {
 			accountSwitch: 'Змяніць рахунак',
 			exit: 'Выйсці з Prime World',
 			version: 'Версія',
+			health: 'Здароўе',
 		},
 
 	};
@@ -3377,7 +3380,7 @@ class Build{
 	
 	static language = {
 		sr: 'Сила/Разум',
-		hp: 'Здоровье',
+		hp: Lang.text('health'),
 		provorstvo: 'Проворство',
 		hitrost: 'Хитрость',
 		regenmp: 'Регенерация энергии',
@@ -3994,7 +3997,7 @@ class Build{
 		
 		let template = {
 			
-			hp:'Здоровье',
+			hp: Lang.text('health'),
 			mp:'Энергия',
 			speed:'Скорость',
 			sila:'Сила',
