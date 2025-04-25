@@ -6,7 +6,7 @@ CURRENT_MM = 'mmtest'
 
 class Lang {
 
-	static target = 'en'; // TODO get from the system
+	static target = 'ru'; // TODO get from the system
 	// TODO add UI dropdown?
 
 	static default = 'ru';
@@ -3437,6 +3437,7 @@ class Build{
 		sila: Lang.text('strength'),
 		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
+		hpmp: 'Здоровье/Энергия',
 		krajahp: 'Кража здоровья',
 		regenhp: 'Регенерация здоровья',
 		mp: Lang.text('energy'),
@@ -4660,6 +4661,9 @@ class Build{
 			}
 			else if(key == 'srsv'){
 				registerStat(Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']), key)
+			}
+			else if(key == 'hpmp'){
+				registerStat(Build.getMaxStat(['hp', 'mp']), key)
 			}
 			else{
 				registerStat(key, key);
@@ -5960,6 +5964,9 @@ class Build{
 							case 'ph_max':
 								resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
 								break;
+							case 'hpmp_max':
+								resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
+								break;	
 							default:
 								resolvedStatAffection = statAffection;
 								break;
