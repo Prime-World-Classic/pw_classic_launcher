@@ -21,6 +21,7 @@ class Lang {
 			preferences: 'Preferences',
 			windowMode: 'Window mode',
 			threeD: '3D',
+			volume: 'Volume',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -31,6 +32,7 @@ class Lang {
 			preferences: 'Настройки',
 			windowMode: 'Оконный режим',
 			threeD: '3D графика',
+			volume: 'Общая громкость',
 		},
 		be: {
 			fight: 'У бой!',
@@ -41,6 +43,7 @@ class Lang {
 			preferences: 'Прылады',
 			windowMode: 'Аконны рэжым',
 			threeD: '3D графіка',
+			volume: 'Агульная гучнасць',
 		},
 
 	};
@@ -3130,7 +3133,7 @@ class Window {
 				}),
 				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
 		),
-			DOM({ style: 'castle-menu-label' }, 'Общая громкость',
+			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
 				DOM({
 					tag: 'input', type: 'range', value: (Settings.settings.globalVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
