@@ -6,7 +6,7 @@ CURRENT_MM = 'mmtest'
 
 class Lang {
 
-	static target = 'ru'; // TODO get from the system
+	static target = 'en'; // TODO get from the system
 	// TODO add UI dropdown?
 
 	static default = 'ru';
@@ -1374,14 +1374,14 @@ class View {
 				
 				if(player.ready){
 					
-					status.firstChild.innerText = 'Готов';
+					status.firstChild.innerText = Lang.text('ready');
 					
 					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == player.id){
 					
-					status.firstChild.innerText = 'Готов';
+					status.firstChild.innerText = Lang.text('ready');
 					
 					status.classList.replace('castle-party-middle-item-not-ready','castle-party-middle-item-ready');
 					
@@ -2209,14 +2209,14 @@ class View {
 				
 				if(item.ready){
 					
-					status.firstChild.innerText = 'Готов';
+					status.firstChild.innerText = Lang.text('ready');
 					
 					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
 				}
 				else if(MM.partyId == item.id){
 					
-					status.firstChild.innerText = 'Готов';
+					status.firstChild.innerText = Lang.text('ready');
 					
 					status.classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 					
@@ -6146,7 +6146,7 @@ class Events {
 		
 		if(find){
 			
-			find.children[2].firstChild.innerText = 'Готов';
+			find.children[2].firstChild.innerText = Lang.text('ready');
 			
 			find.children[2].classList.replace('party-middle-item-not-ready','party-middle-item-ready');
 			
@@ -8867,7 +8867,7 @@ class MM {
 			
 			button.style.opacity = 0;
 			
-		}]},'Готов!');
+		}]}, Lang.text('ready'));
 		
 		
 		button.style.fontSize = '2cqw';
