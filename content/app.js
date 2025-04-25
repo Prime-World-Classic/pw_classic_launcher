@@ -35,6 +35,7 @@ class Lang {
 			energy: 'Energy',
 			speed: 'Speed',
 			power: 'Power',
+			intelligence: 'Intelligence',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -59,6 +60,7 @@ class Lang {
 			energy: 'Энергия',
 			speed: 'Скорость',
 			power: 'Сила',
+			intelligence: 'Разум',
 		},
 		be: {
 			fight: 'У бой!',
@@ -83,6 +85,7 @@ class Lang {
 			energy: 'Энергія',
 			speed: 'Хуткасць',
 			power: 'Сіла',
+			intelligence: 'Розум',
 		},
 
 	};
@@ -3397,7 +3400,7 @@ class Build{
 		volia: 'Воля',
 		ph: 'Проворство/Хитрость',
 		sv: 'Стойкость/Воля',
-		razum: 'Разум',
+		razum: Lang.text('intelligence'),
 		sila: Lang.text('power'),
 		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
@@ -4010,7 +4013,7 @@ class Build{
 			mp: Lang.text('energy'),
 			speed: Lang.text('speed'),
 			sila: Lang.text('power'),
-			razum:'Разум',
+			razum: Lang.text('intelligence'),
 			provorstvo:'Проворство',
 			hitrost:'Хитрость',
 			stoikost:'Стойкость',
