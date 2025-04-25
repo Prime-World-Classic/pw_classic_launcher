@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded',() => {
 			PWGame.radminHasConnection = true;
 		}
 	}
-	setTimeout(_ => {		
+	setTimeout(_ => {
 		testRadminConnection();
 	}, 3000);
 });
