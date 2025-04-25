@@ -4007,7 +4007,7 @@ class Build{
 		
 		let stats = DOM({style:'build-hero-stats-view'});
 		
-		let template = {
+		const template = {
 			
 			hp: Lang.text('health'),
 			mp: Lang.text('energy'),
