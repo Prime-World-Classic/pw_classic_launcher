@@ -42,6 +42,7 @@ class Lang {
 			will: 'Will',
 			damage: 'Damage',
 			criticalHit: 'Critical Hit',
+			attacksPerSecond: 'Attacks per second',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -73,6 +74,7 @@ class Lang {
 			will: 'Воля',
 			damage: 'Урон',
 			criticalHit: 'Шанс крита',
+			attacksPerSecond: 'Скорость атаки',
 		},
 		be: {
 			fight: 'У бой!',
@@ -104,6 +106,7 @@ class Lang {
 			will: 'Воля',
 			damage: 'Шкода',
 			criticalHit: 'Шанец крытычнага траплення',
+			attacksPerSecond: 'Хуткасць атакі',
 		},
 
 	};
@@ -4038,7 +4041,7 @@ class Build{
 			volia: Lang.text('will'),
 			damage: Lang.text('damage'),
 			critProb: Lang.text('criticalHit'),
-			attackSpeed: 'Скорость атаки',
+			attackSpeed: Lang.text('attacksPerSecond'),
 			punching: 'Пробивание',
 			protectionBody: 'Защита тела',
 			protectionSpirit: 'Защита духа',
