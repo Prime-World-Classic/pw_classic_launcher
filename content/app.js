@@ -13,13 +13,16 @@ class Lang {
 
 	static list = {
 		en: {
-			fight: 'Fight!'
+			fight: 'Fight!',
+			enterTextAndPressEnter: 'Enter the text and press Enter'
 		},
 		ru: {
-			fight:'В бой!'
+			fight: 'В бой!',
+			enterTextAndPressEnter: 'Введите текст и нажмите Enter'
 		},
 		be: {
-			fight:'У бой!!'
+			fight: 'У бой!!',
+			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter'
 		},
 
 	};
@@ -6511,7 +6514,7 @@ class Chat {
 	let input = DOM({
 		tag: 'input',
 		style: 'chat-input',
-		placeholder: 'Введите текст и нажмите Enter'
+		placeholder: Lang.text('enterTextAndPressEnter')
 	});
 
 	Chat.input = DOM({style: 'chat-input-container'}, input, scrollBtn);
@@ -9137,7 +9140,7 @@ class MM {
 		
 		MM.chatBody = DOM({style:'mm-lobby-middle-chat-body'});
 		
-		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder:'Введите текст и нажмите <Enter>'})
+		let chatInput = DOM({tag:'input',style:'mm-lobby-middle-chat-button',placeholder: Lang.text('enterTextAndPressEnter')})
 		
 		chatInput.addEventListener('keyup', async (event) => {
 			
