@@ -6461,7 +6461,33 @@ class App {
 	
 }
 
-	class Chat {
+class Lang {
+	
+	static target = 0;
+	
+	static default = 0;
+	
+	static list = [
+	{fight:'В бой!'}, // Рус
+	{fight:''} // Англ
+	];
+	
+	static text(word){
+		
+		if(word in Lang.list[Lang.target]){
+			
+			return Lang.list[Lang.target][word];
+			
+		}
+		
+		return Lang.list[Lang.default][word];		
+		
+	}
+	
+}
+
+
+class Chat {
 	
 	static body;
 	
