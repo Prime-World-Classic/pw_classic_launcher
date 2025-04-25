@@ -32,6 +32,7 @@ class Lang {
 			exit: 'Exit from Prime World',
 			version: 'Version',
 			health: 'Health',
+			energy: 'Energy',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -53,6 +54,7 @@ class Lang {
 			exit: 'Выйти из Prime World',
 			version: 'Версия',
 			health: 'Здоровье',
+			energy: 'Энергия',
 		},
 		be: {
 			fight: 'У бой!',
@@ -74,6 +76,7 @@ class Lang {
 			exit: 'Выйсці з Prime World',
 			version: 'Версія',
 			health: 'Здароўе',
+			energy: 'Энергія',
 		},
 
 	};
@@ -3394,7 +3397,7 @@ class Build{
 		srsv: 'Сила/Разум/Стойкость/Воля',
 		krajahp: 'Кража здоровья',
 		regenhp: 'Регенерация здоровья',
-		mp: 'Энергия',
+		mp: Lang.text('energy'),
 		krajamp: 'Кража энергии',
 		stoikostrz: 'Стойкость на родной земле',
 		voliarz: 'Воля на родной земле',
@@ -3998,7 +4001,7 @@ class Build{
 		let template = {
 			
 			hp: Lang.text('health'),
-			mp:'Энергия',
+			mp: Lang.text('energy'),
 			speed:'Скорость',
 			sila:'Сила',
 			razum:'Разум',
