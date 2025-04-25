@@ -4,6 +4,36 @@ PW_VERSION = '2.3.0';
 
 CURRENT_MM = 'mmtest'
 
+class Lang {
+
+	static target = 'ru'; // TODO get from the system
+	// TODO add UI dropdown?
+
+	static default = 'ru';
+
+	static list = {
+		en: {
+			fight: 'Fight!'
+		},
+		ru: {
+			fight:'В бой!'
+		},
+		be: {
+			fight:'У бой!!'
+		},
+
+	};
+
+	static text(word){
+		if(word in Lang.list[Lang.target]){
+			return Lang.list[Lang.target][word];
+		}
+
+		return Lang.list[Lang.default][word];
+	}
+
+}
+
 window.addEventListener('DOMContentLoaded',() => {
 	
 	Splash.init();
@@ -910,7 +940,7 @@ class CastleNAVBAR {
 			
 		}
 		
-		CastleNAVBAR.body.children[5].innerText = 'В бой!';
+		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
 		/*
 		CastleNAVBAR.body.children[5].onclick = () => {
 			
@@ -1001,7 +1031,7 @@ class CastleNAVBAR {
 		
 		CastleNAVBAR.body.children[0].style.display = 'none';
 		
-		CastleNAVBAR.body.children[5].innerText = 'В бой!';
+		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
 		
 		CastleNAVBAR.body.children[5].style.fontSize = '1.4vw';
 		
@@ -6461,32 +6491,6 @@ class App {
 	
 }
 
-class Lang {
-	
-	static target = 0;
-	
-	static default = 0;
-	
-	static list = [
-	{fight:'В бой!'}, // Рус
-	{fight:''} // Англ
-	];
-	
-	static text(word){
-		
-		if(word in Lang.list[Lang.target]){
-			
-			return Lang.list[Lang.target][word];
-			
-		}
-		
-		return Lang.list[Lang.default][word];		
-		
-	}
-	
-}
-
-
 class Chat {
 	
 	static body;
@@ -8685,7 +8689,7 @@ class MM {
 				
 			}
 			
-			MM.button.firstChild.innerText = 'В бой!';
+			MM.button.firstChild.innerText = Lang.text('fight');
 			*/
 			
 		}	
@@ -8729,7 +8733,7 @@ class MM {
 			
 			if (!PWGame.gameServerHasConnection || !PWGame.isUpToDate || !PWGame.isValidated) { // Неудача
 			
-			MM.button.firstChild.innerText = 'В бой!';
+			MM.button.firstChild.innerText = Lang.text('fight');
 			
 			}
 			
@@ -9507,7 +9511,7 @@ class ARAM {
 			
 			second--;
 			
-			timer.innerText = (second == 0) ? 'В бой!' : `Начало боя через ${second}...`;
+			timer.innerText = (second == 0) ? Lang.text('fight') : `Начало боя через ${second}...`;
 			
 		},1000);
 		
