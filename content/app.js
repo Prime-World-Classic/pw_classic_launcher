@@ -22,6 +22,7 @@ class Lang {
 			windowMode: 'Window mode',
 			threeD: '3D',
 			volume: 'Volume',
+			volumeMusic: 'Volume of music',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -33,6 +34,7 @@ class Lang {
 			windowMode: 'Оконный режим',
 			threeD: '3D графика',
 			volume: 'Общая громкость',
+			volumeMusic: 'Громкость музыки',
 		},
 		be: {
 			fight: 'У бой!',
@@ -44,6 +46,7 @@ class Lang {
 			windowMode: 'Аконны рэжым',
 			threeD: '3D графіка',
 			volume: 'Агульная гучнасць',
+			volumeMusic: 'Гучнасць музыкі',
 		},
 
 	};
@@ -3146,7 +3149,7 @@ class Window {
 				}),
 				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume) * 100)}%`)
 		), 
-			DOM({ style: 'castle-menu-label' }, 'Громкость музыки',
+			DOM({ style: 'castle-menu-label' }, Lang.text('volumeMusic'),
 				DOM({
 					tag: 'input', type: 'range', value: (Settings.settings.musicVolume) * 100, min: '0', max: '100', step: '1',
 				style: 'castle-menu-slider', event: ['input', (e) => {
