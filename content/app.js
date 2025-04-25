@@ -45,6 +45,7 @@ class Lang {
 			attacksPerSecond: 'Attacks per second',
 			penetration: 'Penetration',
 			defencePsys: 'Defence Psysical',
+			defenceMagic: 'Defence Magic',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -79,6 +80,7 @@ class Lang {
 			attacksPerSecond: 'Скорость атаки',
 			penetration: 'Пробивание',
 			defencePsys: 'Защита тела',
+			defenceMagic: 'Защита духа',
 		},
 		be: {
 			fight: 'У бой!',
@@ -113,6 +115,7 @@ class Lang {
 			attacksPerSecond: 'Хуткасць атакі',
 			penetration: 'Прабіванне',
 			defencePsys: 'Абарона цела',
+			defenceMagic: 'Абарона духу',
 		},
 
 	};
@@ -4050,7 +4053,7 @@ class Build{
 			attackSpeed: Lang.text('attacksPerSecond'),
 			punching: Lang.text('penetration'),
 			protectionBody: Lang.text('defencePsys'),
-			protectionSpirit: 'Защита духа',
+			protectionSpirit: Lang.text('defenceMagic'),
 		};
 		
 		if( !('profile' in Build.dataRequest) ){
