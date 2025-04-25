@@ -24,6 +24,7 @@ class Lang {
 			volume: 'Volume',
 			volumeMusic: 'Volume of music',
 			volumeSound: 'Volume of sounds',
+			back: 'Back',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -37,6 +38,7 @@ class Lang {
 			volume: 'Общая громкость',
 			volumeMusic: 'Громкость музыки',
 			volumeSound: 'Громкость звуков',
+			back: 'Назад',
 		},
 		be: {
 			fight: 'У бой!',
@@ -50,6 +52,7 @@ class Lang {
 			volume: 'Агульная гучнасць',
 			volumeMusic: 'Гучнасць музыкі',
 			volumeSound: 'Гучнасць гукаў',
+			back: 'Назад',
 		},
 
 	};
@@ -1275,7 +1278,7 @@ class View {
 		password2,
 		DOM({style:'login-box-forma-buttons'},
 		DOM({style:'login-box-forma-button',event:['click',() => App.registration(fraction,invite,login,password,password2)]},'Зарегистрироваться'),
-		DOM({style:'login-box-forma-button',event:['click',() => View.show('authorization')]},'Назад')
+		DOM({style:'login-box-forma-button',event:['click',() => View.show('authorization')]}, Lang.text('back'))
 		)
 		),
 		DOM({tag:'div'},DOM({tag:'img',style:'login-box-forma-logo',src:'content/img/logo_classic.webp'}))
@@ -1879,7 +1882,7 @@ class View {
 									
 									Splash.hide();
 									
-								}]},'Назад'));
+								}]}, Lang.text('back')));
 								
 								Splash.show(body);
 								
@@ -2403,7 +2406,7 @@ class View {
 						
 						Splash.hide();
 						
-					}]},`[Назад]`));
+					}]}, Lang.text('back')));
 					
 					input.addEventListener('input', async () => {
 						
@@ -2773,7 +2776,7 @@ class View {
 		DOM({tag:'p'},'— если за 100 ходов серебряных монет будет 150, даётся +100 дополнительных ходов;'),
 		//DOM({tag:'p'},'— в рейтинге на главной страничке отображается сумма всех очков на одного игрока за всё время.'),
 		button,
-		isWindow ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]},'Назад')
+		isWindow ? DOM() : DOM({style:'game-button',event:['click',() => View.show('castle')]}, Lang.text('back'))
 		);
 		
 		body.append(dscription);
@@ -3180,7 +3183,7 @@ class Window {
 				}),
 				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 		),
-			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, 'Назад'),
+			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back')),
 			DOM({ style: 'castle-menu-label-description' }, 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише.')
 		);
 	}
@@ -3200,7 +3203,7 @@ class Window {
 					DOM({tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'support-icon'})
 				)
 			),
-			DOM({style: 'castle-menu-item-s', event: ['click', () => Window.show('main', 'menu')]}, 'Назад')
+			DOM({style: 'castle-menu-item-s', event: ['click', () => Window.show('main', 'menu')]}, Lang.text('back'))
 		);
 	}
 	static async adminPanel() {
@@ -3215,7 +3218,7 @@ class Window {
 			DOM({style: 'castle-menu-item-v', event: ['click', () => {
 				View.show('users'); // Логика для управления пользователями
 			}]}, 'Пользователи'),
-			DOM({style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')]}, 'Назад')
+			DOM({style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')]}, Lang.text('back'))
 		);
 	}
 }
