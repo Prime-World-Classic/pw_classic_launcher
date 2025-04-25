@@ -19,6 +19,7 @@ class Lang {
 			library: 'Library',
 			menu: 'Меню',
 			preferences: 'Preferences',
+			windowMode: 'Window mode',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -27,6 +28,7 @@ class Lang {
 			library: 'Библиотека',
 			menu: 'Меню',
 			preferences: 'Настройки',
+			windowMode: 'Оконный режим',
 		},
 		be: {
 			fight: 'У бой!',
@@ -35,6 +37,7 @@ class Lang {
 			library: 'Бібліятэка',
 			menu: 'Мяню',
 			preferences: 'Прылады',
+			windowMode: 'Аконны рэжым',
 		},
 
 	};
@@ -3113,7 +3116,7 @@ class Window {
 					}]
 				},
 					{ checked: Settings.settings.fullscreen }),
-				DOM({ tag: 'label', for: 'fullscreen-toggle' }, 'Оконный режим')
+				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 		),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
