@@ -6555,7 +6555,7 @@ class App {
 		
 	}
 	
-	static error(message){
+	static error(message, timeout = 3000){
 		
 		let body = DOM({style:'error-message'},DOM({tag:'div'},`${message}`));
 		
@@ -6563,7 +6563,7 @@ class App {
 			
 			body.remove();
 			
-		},3000);
+		},timeout);
 		
 		document.body.append(body);
 		
@@ -6850,6 +6850,36 @@ class PWGame {
 
 	static gameServerConnectionCheckTimeout = 1000 * 60 * 100; // 100 minutes
 
+	static currentPlayPwProtocol = 'pwclassic://runGame/Tester00Tester00Tester00Tester004c8fa55b5ee54d6ddbaab2373f8a6a74d7f9c5d739bdd79da12f3beda73c7115/2.0.0/0';
+
+	static protocolServer;
+
+	static async openProtocolSocket() {
+		try {
+			const http = require('http');
+
+			if (PWGame.protocolServer) {
+				PWGame.protocolServer.close(() => {});
+			}
+
+			PWGame.protocolServer = http.createServer((req, res) => {
+				if (req.url === '/getConnectionData' && req.method === 'POST') {
+					res.writeHead(200, { 'Content-Type': 'text/plain' });
+					res.end(JSON.stringify({ protocol: PWGame.currentPlayPwProtocol }));
+
+					PWGame.protocolServer.close(() => {});
+				} else {
+					res.writeHead(404, { 'Content-Type': 'text/plain' });
+					res.end('Not Found');
+				}
+			});
+
+			PWGame.protocolServer.listen(34980, '127.0.0.1', () => {});
+		} catch (e) {
+			App.error(e, 30000);
+		}
+	}
+
 	static GetPlayPwProtocol(id) {
 		return `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
 	} 
@@ -6858,7 +6888,11 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.GetPlayPwProtocol(id)], callback);
+		PWGame.currentPlayPwProtocol = PWGame.GetPlayPwProtocol(id);
+
+		PWGame.openProtocolSocket();
+		
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
 		
 	}
 	
@@ -6866,7 +6900,11 @@ class PWGame {
 		
 		await PWGame.check();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.GetPlayPwProtocol(id)], callback);
+		PWGame.currentPlayPwProtocol = PWGame.GetPlayPwProtocol(id);
+
+		PWGame.openProtocolSocket();
+		
+		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
 		
 	}
 	
