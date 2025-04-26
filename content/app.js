@@ -2,7 +2,7 @@ APP_VERSION = '0';
 
 PW_VERSION = '2.3.0';
 
-CURRENT_MM = 'mmtest'
+CURRENT_MM = 'mm'
 
 class Lang {
 
