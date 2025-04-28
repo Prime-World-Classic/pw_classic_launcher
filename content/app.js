@@ -2,7 +2,7 @@ APP_VERSION = '0';
 
 PW_VERSION = '2.3.0';
 
-CURRENT_MM = 'mm'
+CURRENT_MM = 'mmtest'
 
 class Lang {
 
@@ -6829,6 +6829,8 @@ class PWGame {
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
 	static WORKING_DIR_PATH = '../Game/Bin/';
+
+	static LUTRIS_EXEC = 'lutris';
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
 	
@@ -6856,7 +6858,7 @@ class PWGame {
 
 	static async openProtocolSocket() {
 		try {
-			const http = require('http');
+			const http = NativeAPI.http;
 
 			if (PWGame.protocolServer) {
 				PWGame.protocolServer.close(() => {});
@@ -6867,7 +6869,7 @@ class PWGame {
 					res.writeHead(200, { 'Content-Type': 'text/plain' });
 					res.end(JSON.stringify({ protocol: PWGame.currentPlayPwProtocol }));
 
-					PWGame.protocolServer.close(() => {});
+					//PWGame.protocolServer.close(() => {});
 				} else {
 					res.writeHead(404, { 'Content-Type': 'text/plain' });
 					res.end('Not Found');
@@ -6892,19 +6894,19 @@ class PWGame {
 
 		PWGame.openProtocolSocket();
 		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+		const platform = NativeAPI.os.platform();
+
+		if (platform === 'linux') {
+			await NativeAPI.exec(PWGame.LUTRIS_EXEC, '', ['lutris:rungame/prime-world'], callback, '');
+		} else {
+			await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+		}
 		
 	}
 	
 	static async reconnect(id, callback){
 		
-		await PWGame.check();
-		
-		PWGame.currentPlayPwProtocol = PWGame.GetPlayPwProtocol(id);
-
-		PWGame.openProtocolSocket();
-		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+		this.start(id, callback);
 		
 	}
 	
@@ -6996,7 +6998,8 @@ class NativeAPI {
 		os:'os',
 		path:'path',
 		crypto:'crypto',
-		net:'net'
+		net:'net',
+		http:'http'
 		
 	};
 
@@ -7066,7 +7069,7 @@ class NativeAPI {
 		
 	}
 	
-	static async exec(exeFile, workingDir, args, callback){
+	static async exec(exeFile, workingDir, args, callback, cwd = process.cwd()){
 		
 		return new Promise((resolve,reject) => {
 			
@@ -7076,8 +7079,8 @@ class NativeAPI {
 				
 			}
 			
-			let workingDirPath = NativeAPI.path.join(process.cwd(), workingDir), executablePath = NativeAPI.path.join(process.cwd(), exeFile);
-			
+			    let workingDirPath = NativeAPI.path.join(cwd, workingDir);
+                let executablePath = NativeAPI.path.join(cwd, exeFile);
 			NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
 				
 				if(error){
