@@ -325,6 +325,7 @@ height: 100cqh;
 	justify-content: center;
 	position: relative;
 	top: 7cqh;
+	left: 2cqh;
 }
 
 .build-hero-stats-line{
@@ -2737,7 +2738,7 @@ border-radius:5px;
 	right: 0;
 	text-align: center;
 	width: calc(min(140cqh, 95cqw));
-	height: 70cqh;
+	height: 75cqh;
 	/*background-color: #8d8b8b;*/
 	border-radius: 2cqh;
 	border: 0.1cqh solid rgb(158, 155, 104);
