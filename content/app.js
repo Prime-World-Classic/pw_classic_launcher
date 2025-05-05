@@ -2,7 +2,7 @@ APP_VERSION = '0';
 
 PW_VERSION = '2.3.0';
 
-CURRENT_MM = 'mm'
+CURRENT_MM = 'mmtest'
 
 class Lang {
 
@@ -6556,16 +6556,25 @@ class App {
 	}
 	
 	static error(message, timeout = 3000){
-		
-		let body = DOM({style:'error-message'},DOM({tag:'div'},`${message}`));
+
+		let previousErrors = document.getElementsByClassName('error-message');
+        let body;
+        if (previousErrors.length == 0) {
+            body = DOM({style:'error-message'});
+    		document.body.append(body);
+        } else {
+            body = previousErrors[0];
+        }
+	
+		let msg = DOM({tag:'div'},`${message}`);
 		
 		setTimeout(() => {
 			
-			body.remove();
+			msg.remove();
 			
 		},timeout);
 		
-		document.body.append(body);
+		body.append(msg);
 		
 	}
 	
@@ -6829,8 +6838,12 @@ class PWGame {
 	static PATH = '../Game/Bin/PW_Game.exe';
 	
 	static WORKING_DIR_PATH = '../Game/Bin/';
+
+	static LUTRIS_EXEC = 'lutris lutris:rungame/prime-world';
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
+	
+	static PATH_UPDATE_LINUX = '../update.sh';
 	
 	static PATH_TEST_HASHES = './content/PW_HashTest.exe';
 
@@ -6856,7 +6869,7 @@ class PWGame {
 
 	static async openProtocolSocket() {
 		try {
-			const http = require('http');
+			const http = NativeAPI.http;
 
 			if (PWGame.protocolServer) {
 				PWGame.protocolServer.close(() => {});
@@ -6867,7 +6880,7 @@ class PWGame {
 					res.writeHead(200, { 'Content-Type': 'text/plain' });
 					res.end(JSON.stringify({ protocol: PWGame.currentPlayPwProtocol }));
 
-					PWGame.protocolServer.close(() => {});
+					//PWGame.protocolServer.close(() => {});
 				} else {
 					res.writeHead(404, { 'Content-Type': 'text/plain' });
 					res.end('Not Found');
@@ -6891,20 +6904,18 @@ class PWGame {
 		PWGame.currentPlayPwProtocol = PWGame.GetPlayPwProtocol(id);
 
 		PWGame.openProtocolSocket();
-		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+
+		if (NativeAPI.platform == 'linux') {
+			await NativeAPI.childProcess.exec(PWGame.LUTRIS_EXEC);
+		} else {
+			await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+		}
 		
 	}
 	
 	static async reconnect(id, callback){
 		
-		await PWGame.check();
-		
-		PWGame.currentPlayPwProtocol = PWGame.GetPlayPwProtocol(id);
-
-		PWGame.openProtocolSocket();
-		
-		await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
+		this.start(id, callback);
 		
 	}
 	
@@ -6988,6 +6999,12 @@ class PWGame {
 class NativeAPI {
 	
 	static status = false;
+
+	static platform;
+
+    static title;
+    static updated = false;
+    static curLabel;
 	
 	static modules = {
 		
@@ -6996,7 +7013,8 @@ class NativeAPI {
 		os:'os',
 		path:'path',
 		crypto:'crypto',
-		net:'net'
+		net:'net',
+		http:'http'
 		
 	};
 
@@ -7050,6 +7068,8 @@ class NativeAPI {
 		
 		NativeAPI.loadModules();
 		
+		NativeAPI.platform = NativeAPI.os.platform();
+		
 		window.addEventListener('error', (event) => NativeAPI.write('error.txt',event.error.toString()));
 		
 		window.addEventListener('unhandledrejection', (event) => NativeAPI.write('unhandledrejection.txt',event.reason.stack));
@@ -7066,7 +7086,7 @@ class NativeAPI {
 		
 	}
 	
-	static async exec(exeFile, workingDir, args, callback){
+	static async exec(exeFile, workingDir, args, callback, cwd = process.cwd()){
 		
 		return new Promise((resolve,reject) => {
 			
@@ -7076,9 +7096,9 @@ class NativeAPI {
 				
 			}
 			
-			let workingDirPath = NativeAPI.path.join(process.cwd(), workingDir), executablePath = NativeAPI.path.join(process.cwd(), exeFile);
-			
-			NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
+			    let workingDirPath = NativeAPI.path.join(cwd, workingDir);
+                let executablePath = NativeAPI.path.join(cwd, exeFile);
+				NativeAPI.childProcess.execFile(executablePath, args, { cwd: workingDirPath }, (error, stdout, stderr) => {
 				
 				if(error){
 					
@@ -7155,6 +7175,10 @@ class NativeAPI {
 	}
 
 	static testHashes() {
+		if (NativeAPI.platform == 'linux') {
+			PWGame.isValidated = true;
+			return; // No hash check for linux
+		}
 		NativeAPI.fileSystem.promises.access(PWGame.PATH_TEST_HASHES);
 
 		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_TEST_HASHES);
@@ -7169,6 +7193,85 @@ class NativeAPI {
 			}
 	});
 	}
+
+	static updateLinux(data, callback) {
+		let outputs = data.toString().split('\n');  // I have used space, you can use any thing.
+		for(let o of outputs) {
+            if (o == 'Updating game files') {
+                this.title = 'Обновление игры';
+                this.curLabel = 'game';
+                continue;
+            }
+            if (o == 'Updating launcher') {
+                this.title = 'Обновление лаунчера';
+                this.curLabel = 'content';
+                continue;
+            }
+            
+            if (o.startsWith('Receiving objects:')) {
+				if (this.curLabel == 'content') {
+					this.updated = true;
+				}
+
+                let percent = parseInt(o.substring(19, o.indexOf('%')));
+					
+				callback({update:true,title:this.title,total:percent});
+				
+				NativeAPI.progress(percent / 100);
+            }
+		}
+
+	}
+
+	static updateWindows(data, callback) {
+			
+		let progressDataElements = data.toString().substring(1).split('#');
+		
+		for(let progressDataElement of progressDataElements){
+			
+			let json = JSON.parse(progressDataElement);
+			
+			if(json.type){
+				
+				if(json.type == 'bar'){
+					
+					if (this.curLabel == 'content') {
+						this.updated = true;
+					}
+					
+					callback({update:true,title:this.title,total:Number(json.data)});
+					
+					NativeAPI.progress(Number(json.data) / 100);
+					
+				}
+				else if(json.type == 'label'){
+					
+					switch(json.data){
+						
+						case 'game': this.title = 'Обновление игры'; this.curLabel = json.data; break;
+						
+						case 'content': this.title = 'Обновление лаунчера'; this.curLabel = json.data; break;
+						
+						case 'game_data0': this.title = 'Загрузка игровых архивов 1/8'; this.curLabel = json.data; break;
+						case 'game_data1': this.title = 'Загрузка игровых архивов 2/8'; this.curLabel = json.data; break;
+						case 'game_data2': this.title = 'Загрузка игровых архивов 3/8'; this.curLabel = json.data; break;
+						case 'game_data3': this.title = 'Загрузка игровых архивов 4/8'; this.curLabel = json.data; break;
+						case 'game_data4': this.title = 'Загрузка игровых архивов 5/8'; this.curLabel = json.data; break;
+						case 'game_data5': this.title = 'Загрузка игровых архивов 6/8'; this.curLabel = json.data; break;
+						case 'game_data6': this.title = 'Загрузка игровых архивов 7/8'; this.curLabel = json.data; break;
+						case 'game_data7': this.title = 'Загрузка игровых архивов 8/8'; this.curLabel = json.data; break;
+
+						default: this.title = 'Загрузка игровых архивов'; this.curLabel = json.data; break;
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 	
 	static async update(callback){
 
@@ -7177,62 +7280,24 @@ class NativeAPI {
 			return false;
 			
 		}
+
+		const isLinuxUpdate = NativeAPI.platform == 'linux';
+
+		const updaterPath = isLinuxUpdate ? PWGame.PATH_UPDATE_LINUX : PWGame.PATH_UPDATE;
 		
-		await NativeAPI.fileSystem.promises.access(PWGame.PATH_UPDATE);
+		await NativeAPI.fileSystem.promises.access(updaterPath);
 		
-		let spawn = NativeAPI.childProcess.spawn(PWGame.PATH_UPDATE), title = 'Проверка обновлений', updated = false, curLabel;
+		let spawn = NativeAPI.childProcess.spawn(updaterPath);
 
 		App.notify('Проверка обновлений и файлов игры... Подождите');
 
-		spawn.stdout.on('data',(data) => {
-			
-			let progressDataElements = data.toString().substring(1).split('#');
-			
-			for(let progressDataElement of progressDataElements){
-				
-				let json = JSON.parse(progressDataElement);
-				
-				if(json.type){
-					
-					if(json.type == 'bar'){
-						
-						if (curLabel == 'content') {
-							updated = true;
-						}
-						
-						callback({update:true,title:title,total:Number(json.data)});
-						
-						NativeAPI.progress(Number(json.data) / 100);
-						
-					}
-					else if(json.type == 'label'){
-						
-						switch(json.data){
-							
-							case 'game': title = 'Обновление игры'; curLabel = json.data; break;
-							
-							case 'content': title = 'Обновление лаунчера'; curLabel = json.data; break;
-							
-							case 'game_data0': title = 'Загрузка игровых архивов 1/8'; curLabel = json.data; break;
-							case 'game_data1': title = 'Загрузка игровых архивов 2/8'; curLabel = json.data; break;
-							case 'game_data2': title = 'Загрузка игровых архивов 3/8'; curLabel = json.data; break;
-							case 'game_data3': title = 'Загрузка игровых архивов 4/8'; curLabel = json.data; break;
-							case 'game_data4': title = 'Загрузка игровых архивов 5/8'; curLabel = json.data; break;
-							case 'game_data5': title = 'Загрузка игровых архивов 6/8'; curLabel = json.data; break;
-							case 'game_data6': title = 'Загрузка игровых архивов 7/8'; curLabel = json.data; break;
-							case 'game_data7': title = 'Загрузка игровых архивов 8/8'; curLabel = json.data; break;
-
-							default: title = 'Загрузка игровых архивов'; curLabel = json.data; break;
-							
-						}
-						
-					}
-					
-				}
-				
-			}
-			
-		});
+		spawn.stdout.on('data', (data) => { 
+            if (isLinuxUpdate)  {
+                this.updateLinux(data, callback) 
+            } else {
+                this.updateWindows(data, callback)
+            }
+        });
 		
 		spawn.on('close', async (code) => {
 			
@@ -7254,7 +7319,7 @@ class NativeAPI {
 
 			}
 				
-			if (updated) {
+			if (this.updated) {
 				NativeAPI.reset();
 			}
 			
