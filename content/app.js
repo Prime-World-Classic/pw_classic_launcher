@@ -6906,7 +6906,11 @@ class PWGame {
 		PWGame.openProtocolSocket();
 
 		if (NativeAPI.platform == 'linux') {
-			await NativeAPI.childProcess.exec(PWGame.LUTRIS_EXEC);
+			let spawn = await NativeAPI.childProcess.exec(PWGame.LUTRIS_EXEC);
+			spawn.on('close', async (code) => {
+				callback();
+			});
+
 		} else {
 			await NativeAPI.exec(PWGame.PATH, PWGame.WORKING_DIR_PATH, ['protocol', PWGame.currentPlayPwProtocol], callback);
 		}
