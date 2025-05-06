@@ -6839,7 +6839,7 @@ class PWGame {
 	
 	static WORKING_DIR_PATH = '../Game/Bin/';
 
-	static LUTRIS_EXEC = 'lutris lutris:rungame/prime-world';
+	static LUTRIS_EXEC = 'lutris lutris:rungame/prime-world-classic';
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
 	
@@ -7399,9 +7399,12 @@ class NativeAPI {
 		
 	}
 	
-	static async write(file,body){
-		
+	static async write(file,body, append = false){
+		if (append) {
+			await NativeAPI.fileSystem.promises.appendFile(file,body);
+		} else {
 		await NativeAPI.fileSystem.promises.writeFile(file,body);
+		}
 		
 	}
 	
@@ -8817,6 +8820,12 @@ class MM {
 		let button = CastleNAVBAR.init();
 		
 		button.onclick = () => MM.start();
+
+		// Linux test
+		//let testRun = DOM({style:'castle-button-play-test'}, "Test");
+		//CastleNAVBAR.body.append(testRun);
+		
+		//testRun.onclick = () => PWGame.start("Tester00Tester00Tester00Tester004c8fa55b5ee54d6ddbaab2373f8a6a74d7f9c5d739bdd79da12f3beda73c7115", MM.gameStopEvent);
 		
 		Timer.init();
 		
