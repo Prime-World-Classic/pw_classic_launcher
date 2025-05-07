@@ -3344,6 +3344,30 @@ class Frame {
 	
 }
 
+class Winrate {
+	
+	static icon(number){
+		
+		if(number <= 25){
+			
+			return 3;
+			
+		}
+		else if(number <= 50){
+			
+			return 2;
+			
+		}
+		else{
+			
+			return 1;
+			
+		}
+		
+	}
+	
+}
+
 class Rank {
 	
 	static name = ['','Рекрут','Наёмник','Рядовой','Капрал','Сержант','Лейтенант','Капитан','Майор','Подполковник','Полковник','Генерал','Маршал','Бог'];
@@ -6331,43 +6355,30 @@ class App {
 		await App.storage.init({id:0,token:'',login:''});
 		
 		await MM.init();
-		
 		/*
 		setTimeout(() => {
 			let obj = {id:1, users:{
-				10:{nickname:'Nesh',hero:3,ready:1,rating:1300,select:false,team:1},
+				10:{nickname:'Nesh',hero:15,ready:1,rating:1300,select:false,team:1},
 				1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
-				2:{nickname:'Коао',hero:22,ready:1,rating:1100,select:false,team:1},
-				4:{nickname:'XIIIAngel',hero:12,ready:1,rating:1100,select:false,team:1},
-				5:{nickname:'Lantarm',hero:8,ready:1,rating:1100,select:false,team:2},
+				2:{nickname:'Коао',hero:12,ready:1,rating:1100,select:false,team:1},
+				4:{nickname:'Lantarm',hero:24,ready:1,rating:1100,select:false,team:1},
+				5:{nickname:'123',hero:8,ready:1,rating:1100,select:false,team:2},
 				6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2},
 				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
 				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-				},target:1,map:[App.storage.data.id,2,4,5,6,7,8,9,10,1858]};
+				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858]};
 
-			obj.users[App.storage.data.id] = {nickname:App.storage.data.login,hero:3,ready:0,rating:1100,select:true,team:1,mode:0};
+			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:49,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
 				
 		 	MM.lobby(obj);
 			
-		 }, 10000);
+		 }, 1000);
 		setTimeout(() => {
 			
+			MM.chat({id:1,message:'тестовое сообщение'});
 			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			MM.chat({id:2,message:'тестовое сообщение'});
-			
-			
+			MM.chat({id:7,message:'тестовое сообщение'});
 			
 		},2000);
 		*/
@@ -9251,6 +9262,14 @@ class MM {
 			
 			hero.append(rank);
 			
+			if('commander' in data.users[key]){
+				
+				hero.append(DOM({style:`mm-status-commander-${Winrate.icon(data.users[key].winrate)}`}));
+				
+				name.setAttribute('style','color:rgba(255,215,0,0.9)');
+				
+			}
+			
 			hero.style.backgroundImage = (data.users[key].hero) ? `url(content/hero/${data.users[key].hero}/1.webp)` : `url(content/hero/empty.webp)`;
 			
 			player.append(hero,name);
@@ -9645,6 +9664,11 @@ class MM {
 		if(data.id == 1){
 			
 			message.style.color = 'rgba(255, 50, 0, 0.9)';
+			
+		}
+		else if('commander' in MM.lobbyUsers[data.id]){
+			
+			message.style.color = 'rgba(255,215,0,0.9)';
 			
 		}
 		
