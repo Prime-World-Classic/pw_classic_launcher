@@ -6839,7 +6839,7 @@ class PWGame {
 	
 	static WORKING_DIR_PATH = '../Game/Bin/';
 
-	static LUTRIS_EXEC = 'lutris lutris:rungame/prime-world-classic';
+	static LUTRIS_EXEC = 'lutris lutris:rungame/prime-world';
 	
 	static PATH_UPDATE = '../Tools/PW_NanoUpdater.exe';
 	
