@@ -4510,7 +4510,7 @@ class Build{
 		
 		Build.heroImg.append(rank);
 		// Build.training
-		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView);
+		const wrapper = DOM({style:'build-hero-avatar-and-name'},Build.heroImg, Build.skinView, Build.training);
 		
 		Build.heroView.append(
 			wrapper,
