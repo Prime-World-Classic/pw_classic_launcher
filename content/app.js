@@ -7319,7 +7319,6 @@ class NativeAPI {
 	static updateLinux(data, callback) {
 		let outputs = data.toString().split('\n');  // I have used space, you can use any thing.
 		for (let o of outputs) {
-			App.error(o, 10000);
 			if (o == 'Updating game files') {
 				this.title = 'Обновление игры';
 				this.curLabel = 'game';
