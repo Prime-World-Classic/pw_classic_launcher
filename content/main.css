@@ -1479,13 +1479,13 @@ box-shadow: 0 20px 40px 0 rgba(51,255,51,0.8);
 	
 	display:inline;
 	font-weight:bold;
+	padding-right:0.5cqw;
 	
 }
 
 .mm-lobby-middle-chat-body-item div:last-child{
 	
 	display:inline;
-	padding-left:0.5cqw;
 	color:rgba(255,255,255,0.7);
 	
 }

@@ -6476,7 +6476,7 @@ class App {
 		 }, 1000);
 		setTimeout(() => {
 			
-			MM.chat({id:1,message:'тестовое сообщение'});
+			MM.chat({id:0,message:'тестовое сообщение'});
 			MM.chat({id:2,message:'тестовое сообщение'});
 			MM.chat({id:7,message:'тестовое сообщение'});
 			
@@ -9785,20 +9785,28 @@ class MM {
 		if (data.id == 1) {
 
 			message.style.color = 'rgba(255, 50, 0, 0.9)';
-
+			
 		}
-		else if ('commander' in MM.lobbyUsers[data.id]) {
+		else if ( (data.id) && ('commander' in MM.lobbyUsers[data.id]) ) {
 
 			message.style.color = 'rgba(255,215,0,0.9)';
-
+			
 		}
-
-		let item = DOM({ style: 'mm-lobby-middle-chat-body-item' }, DOM(`${MM.lobbyUsers[data.id].nickname}:`), message);
+		
+		let item = DOM({ style: 'mm-lobby-middle-chat-body-item' });
+		
+		if(data.id){
+			
+			item.append(DOM({tag:'div'},`${MM.lobbyUsers[data.id].nickname}:`));
+			
+		}
+		
+		item.append(message);
 
 		MM.chatBody.append(item);
 
 		item.scrollIntoView({ block: 'end', behavior: 'smooth' });
-
+		
 	}
 
 }
