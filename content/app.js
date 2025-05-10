@@ -7337,13 +7337,15 @@ class NativeAPI {
 				} else {
 					this.updated = this.lastBranchV != o;
 				}
-
-				let percent = parseInt(o.substring(19, o.indexOf('%')));
-
-				callback({ update: true, title: this.title, total: percent });
-
-				NativeAPI.progress(percent / 100);
 			}
+            
+            if (o.startsWith('Receiving objects:')) {
+                let percent = parseInt(o.substring(19, o.indexOf('%')));
+					
+				callback({update:true,title:this.title,total:percent});
+				
+				NativeAPI.progress(percent / 100);
+            }
 		}
 
 	}
