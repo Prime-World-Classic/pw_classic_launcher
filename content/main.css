@@ -157,8 +157,16 @@ align-items:center;
 justify-content: center;
 
 }
-.login-box-forma img {
+
+.login-box-forma-right{
 	
+	display:flex;
+	flex-flow:column nowrap;
+	margin-left:3vw;
+	
+}
+
+.login-box-forma img {
 	
 	width:15cqw;
 	
@@ -167,6 +175,17 @@ justify-content: center;
     width: 100%;
 
 }
+
+.login-box-form-invite-text{
+	
+	font: 0.9vw / 1 Tahoma;
+	color:rgba(255,255,255,0.8);
+	font-style:italic;
+	margin-bottom:1vh;
+	text-align:center;
+	
+}
+
 .login-box-forma-inputs{
 	display: flex;
 	flex-direction: column;
