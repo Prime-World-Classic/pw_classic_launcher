@@ -1334,7 +1334,7 @@ class View {
 			}]
 		});
 
-		let invite = DOM({ tag: 'input', placeholder: 'Инвайт', event: numEnterEvent });
+		let invite = DOM({ tag: 'input', placeholder: 'Инвайт-код', event: numEnterEvent });
 
 		let inviteContainer = DOM({ style: 'invite-input' }, invite, telegramBotLink)
 
@@ -1357,7 +1357,7 @@ class View {
 					DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('authorization')] }, Lang.text('back'))
 				)
 			),
-			DOM({ tag: 'div' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' }))
+			DOM({ style: 'login-box-forma-right' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' }),DOM({style:'login-box-form-invite-text'},`Получить инвайт-код через QR-код`), DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/pwclassicbot.png' }))
 
 		), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 
