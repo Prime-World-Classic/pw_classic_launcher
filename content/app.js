@@ -7431,7 +7431,7 @@ class NativeAPI {
 
 			NativeAPI.progress(-1);
 
-			if ((code == 0)) {
+			if ((code == 0 || code == null)) {
 				PWGame.isUpToDate = true;
 				try {
 					NativeAPI.testHashes();
