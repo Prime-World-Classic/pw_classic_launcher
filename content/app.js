@@ -6582,11 +6582,22 @@ class App {
 
 		}
 
-		let request;
+		let request,analysis;
+		
+		try {
+
+			analysis = NativeAPI.analysis();
+			
+		}
+		catch (e) {
+
+
+
+		}
 
 		try {
 
-			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim() });
+			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim(), analysis: analysis});
 
 		}
 		catch (error) {
