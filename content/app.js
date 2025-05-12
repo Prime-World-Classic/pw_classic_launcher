@@ -1328,11 +1328,7 @@ class View {
 
 		let tgBotUrl = 'https://t.me/primeworldclassic_bot';
 
-		let telegramBotLink = DOM({
-			style: 'telegram-bot', event: ['click', () => {
-				window.open(tgBotUrl);
-			}]
-		});
+		let telegramBotLink = DOM({ style: 'telegram-bot' , tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)]});
 
 		let invite = DOM({ tag: 'input', placeholder: 'Инвайт-код', event: numEnterEvent });
 
@@ -3245,13 +3241,13 @@ class Window {
 			}, Lang.text('exit')),
 			DOM({ style: 'castle-menu-label' }, `${Lang.text('version')}: v.${PW_VERSION}`),
 			DOM({ style: 'menu-icons' },
-				DOM({ tag: 'a', href: 'https://vk.com/primeworldclassic', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://vk.com/primeworldclassic', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'menu-icons' })
 				),
-				DOM({ tag: 'a', href: 'https://t.me/primeworldclassic', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://t.me/primeworldclassic', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/telegram.webp', alt: 'Telegram', style: 'menu-icons' })
 				),
-				DOM({ tag: 'a', href: 'https://discord.gg/MueeP3aAzh', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://discord.gg/MueeP3aAzh', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'menu-icons' })
 				)
 			)
@@ -3333,13 +3329,13 @@ class Window {
 			DOM({ style: 'castle-menu-title' }, Lang.text('support')),
 			DOM({ style: 'support-text' }, Lang.text('supportDesk')),
 			DOM({ style: 'support-icons' },
-				DOM({ tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon' })
 				),
-				DOM({ tag: 'a', href: 'https://t.me/primeworldclassic/8232', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://t.me/primeworldclassic/8232', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/telegram.webp', alt: 'Telegram', style: 'support-icon' })
 				),
-				DOM({ tag: 'a', href: 'https://discord.com/channels/1252164250265325598/1298407885876891691', target: '_blank' },
+				DOM({ tag: 'a', href: 'https://discord.com/channels/1252164250265325598/1298407885876891691', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'support-icon' })
 				)
 			),
@@ -6840,16 +6836,12 @@ class Chat {
 		}
 
 		if (App.isAdmin(data.id)) {
-
+			
 			if ((String(data.message).includes('https')) && (!String(data.message).includes('.gif'))) {
 				message.innerHTML = this.wrapLinksInATag(message.innerHTML);
 			}
 			if (NativeAPI.status) {
-				message.addEventListener('click', function (evt) {
-					evt.preventDefault();
-					var url = evt.target.href;
-					nw.Shell.openExternal(url);
-				});
+				message.addEventListener('click', (e) => NativeAPI.linkHandler(e));
 			}
 		}
 
@@ -7561,6 +7553,17 @@ class NativeAPI {
 			await NativeAPI.fileSystem.promises.writeFile(file, body);
 		}
 
+	}
+
+	static linkHandler(evt) {
+		if (NativeAPI.status) {
+			evt.preventDefault();
+			let url = evt.target.href;
+			if (evt.currentTarget.href) {
+				url = evt.currentTarget.href;
+			}
+			nw.Shell.openExternal(url);
+		}
 	}
 
 }
