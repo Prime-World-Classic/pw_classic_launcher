@@ -2451,6 +2451,21 @@ border-radius:5px;
 	
 }
 
+.chat-body-item div a{
+	
+	color:rgb(0, 225, 255);
+	
+    text-decoration: underline;
+	text-decoration-thickness: 0.1cqh;
+
+}
+.chat-body-item div a:visited{
+	
+	color:rgb(0, 179, 202);
+	
+}
+
+
 .chat-body:hover .chat-body-item div{
 	opacity: 100%;
 }
