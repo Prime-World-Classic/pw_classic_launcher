@@ -6761,11 +6761,16 @@ class Chat {
 
 		Chat.body = DOM({ style: 'chat' }, DOM({ style: 'chat-body' }), Chat.input);
 
-		input.addEventListener('keyup', async (event) => {
-			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
-				Chat.sendMessage();
+		const handleSend = async (event) => {
+			if (event.key === 'Enter' || event.keyCode === 13 || event.code === 'Enter' || event.code === 'NumpadEnter') {
+				event.preventDefault();
+				await Chat.sendMessage();
 			}
-		});
+		};
+
+		input.addEventListener('keyup', handleSend);
+		input.addEventListener('keypress', handleSend);
+		input.addEventListener('keydown', handleSend);
 
 
 		input.addEventListener('input', () => {
