@@ -6808,6 +6808,11 @@ class Chat {
 
 	}
 
+	static wrapLinksInATag(message) {
+		const urlRegex = /(https:\/\/[^\s]+)/g;
+		return message.replace(urlRegex, '<a href="$1">$1</a>');
+	}
+
 	static viewMessage(data) {
 
 		let nickname = DOM({ tag: 'div' }, data.nickname + ": ");
@@ -6835,8 +6840,16 @@ class Chat {
 		}
 
 		if (App.isAdmin(data.id)) {
-			if ((String(data.message).slice(0, 5) == 'https') && (String(data.message).indexOf('.gif') == -1)) {
-				message.innerHTML = '<a target="_blank" href=' + data.message + '>' + data.message + '</a>';
+
+			if ((String(data.message).includes('https')) && (!String(data.message).includes('.gif'))) {
+				message.innerHTML = this.wrapLinksInATag(message.innerHTML);
+			}
+			if (NativeAPI.status) {
+				message.addEventListener('click', function (evt) {
+					evt.preventDefault();
+					var url = evt.target.href;
+					nw.Shell.openExternal(url);
+				});
 			}
 		}
 
