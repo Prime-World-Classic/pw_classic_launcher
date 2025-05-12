@@ -9135,7 +9135,7 @@ class MM {
 
 			let download = DOM({ tag: 'p' });
 
-			download.innerHTML = 'Загрузите и установите последнюю Windows версию лаунчера всего один раз <a href="https://github.com/Prime-World-Classic/Prime-World/releases/download/2.0/install_2_0.exe">install_2_0.exe</a>, теперь вам не нужно будет делать лишних действий по обновлению игры, лаунчер все сделает автоматически.';
+			download.innerHTML = 'Загрузите и установите последнюю Windows версию <a href="https://pw.26rus-game.ru/">лаунчера</a> всего один раз, теперь вам не нужно будет делать лишних действий по обновлению игры, лаунчер все сделает автоматически.';
 
 			Splash.show(DOM({ style: 'splash-text' },
 				DOM({ tag: 'h1' }, `Необходима Windows версия лаунчера!`),
