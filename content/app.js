@@ -4199,12 +4199,14 @@ class Build {
 							Build.removeSortInventory('stats', 'regenhpvz');
 							Build.removeSortInventory('stats', 'krajahpvz');
 							Build.removeSortInventory('stats', 'regenhp');
+							Build.removeSortInventory('stats', 'hpmp');
 						}
 						else if (key == 'mp') {
 							Build.removeSortInventory('stats', 'mp');
 							Build.removeSortInventory('stats', 'regenmp');
 							Build.removeSortInventory('stats', 'krajamp');
 							Build.removeSortInventory('stats', 'regenmpvz');
+							Build.removeSortInventory('stats', 'hpmp');
 						}
 						else if (key == 'speed') {
 							Build.removeSortInventory('stats', 'speed');
@@ -4266,12 +4268,14 @@ class Build {
 							Build.setSortInventory('stats', 'regenhpvz');
 							Build.setSortInventory('stats', 'krajahpvz');
 							Build.setSortInventory('stats', 'regenhp');
+							Build.setSortInventory('stats', 'hpmp');
 						}
 						else if (key == 'mp') {
 							Build.setSortInventory('stats', 'mp');
 							Build.setSortInventory('stats', 'regenmp');
 							Build.setSortInventory('stats', 'krajamp');
 							Build.setSortInventory('stats', 'regenmpvz');
+							Build.setSortInventory('stats', 'hpmp');
 						}
 						else if (key == 'speed') {
 							Build.setSortInventory('stats', 'speed');
@@ -4319,6 +4323,8 @@ class Build {
 							Build.setSortInventory('stats', 'voliarz');
 							Build.setSortInventory('stats', 'svvz');
 							Build.setSortInventory('stats', 'vs');
+						}else if (key == 'hpmp') {
+							Build.setSortInventory('stats', 'hpmp');
 						} else {
 							Build.setSortInventory('stats', key);
 						}
