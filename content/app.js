@@ -4739,6 +4739,11 @@ class Build {
 
 		return maxStat;
 	}
+	
+	static getSumStat(stats){
+		let sumStat = stats[0];
+		return sumStat;
+	}
 
 	static getTalentRefineByRarity(rarity) {
 		return rarity ? Build.talentRefineByRarity[rarity] - 1.0 : 4.0;
@@ -6078,6 +6083,8 @@ class Build {
 						}
 
 						let resolvedStatAffection;
+						let resolvedStatAffection1;
+						let resolvedStatAffection2;
 						switch (statAffection) {
 							case 'sr_max':
 								resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
@@ -6091,6 +6098,22 @@ class Build {
 							case 'hpmp_max':
 								resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
 								break;
+							case 'sr_sum':	
+								resolvedStatAffection1 = 'sila';
+								resolvedStatAffection2 = 'razum';						
+								break;
+							case 'ph_sum':	
+								resolvedStatAffection1 = 'provorstvo';
+								resolvedStatAffection2 = 'hitrost';						
+								break;
+							case 'sv_sum':	
+								resolvedStatAffection1 = 'stoikost';
+								resolvedStatAffection2 = 'volia';						
+								break;	
+							case 'hpmp_sum':	
+								resolvedStatAffection1 = 'hp';
+								resolvedStatAffection2 = 'mp';						
+								break;	
 							default:
 								resolvedStatAffection = statAffection;
 								break;
@@ -6099,25 +6122,36 @@ class Build {
 						function lerp(a, b, alpha) {
 							return a + alpha * (b - a);
 						}
-
+						
 						let outputString;
-						if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
-							let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
-							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
-							const param1 = isHpOrEnergy ? 600.0 : 50.0;
-							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-							outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
-							if (outputString.endsWith(('.0'))) {
-								outputString = outputString.replace('.0', '')
-							}
+						if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
+							let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
+							let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
+								const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
+								const param1 = isHpOrEnergy ? 600.0 : 50.0;
+								const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+								outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
+								if (outputString.endsWith(('.0'))) {
+									outputString = outputString.replace('.0', '')
+								}
 						} else {
-							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-							outputString = (minValue + maxValue * refineBonus).toFixed(1);
-							if (outputString.endsWith(('.0'))) {
-								outputString = outputString.replace('.0', '');
+							if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+								let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+								const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+								const param1 = isHpOrEnergy ? 600.0 : 50.0;
+								const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+								outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
+								if (outputString.endsWith(('.0'))) {
+									outputString = outputString.replace('.0', '')
+								}
+							} else {
+								let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+								outputString = (minValue + maxValue * refineBonus).toFixed(1);
+								if (outputString.endsWith(('.0'))) {
+									outputString = outputString.replace('.0', '');
+								}
 							}
 						}
-
 						if (specialTag.innerHTML) {
 							specialTag.innerHTML = tagString.replace('%s', outputString);
 						} else {
