@@ -3984,11 +3984,11 @@ class Build {
 	static buildSelectName(method, btnName, data, isWindow) {
 
 		const close = DOM({
-			tag: 'div', style: 'close', event: ['click', _ => {
-				Splash.hide();
-			}]
-		}, '[x]');
-
+			tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]
+		});
+		
+		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+		
 		let template = document.createDocumentFragment();
 
 		let name = DOM({ tag: 'input', placeholder: 'Наименование билда' });
@@ -4023,67 +4023,144 @@ class Build {
 		if (builds.length < 6) {
 			const create = DOM({
 				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Создать новую вкладку билда',  // {heroId:Build.heroId, id:Build.id, name:name.value}
+				title: 'Создать новую вкладку билда',
 				event: ['click', () => Build.buildSelectName('create', 'Создать билд', { heroId: Build.heroId }, isWindow)]
 			});
 
-			let backgroundImg = DOM({ style: ['btn-create', 'build-action-item-background'] });
-			backgroundImg.style.backgroundImage = `url('content/icons/plus.svg')`;
-			create.append(backgroundImg);
-
-
+			let createBg = DOM({ style: ['btn-create', 'build-action-item-background'] });
+			createBg.style.backgroundImage = `url('content/icons/plus.svg')`;
+			create.append(createBg);
 			Build.buildActionsView.append(create);
 		}
 
+		// Кнопка дублирования
+		{
+		const duplicate = DOM({
+			tag: 'button', 
+			style: ['build-action-item', 'btn-hover', 'color-1'],
+			title: 'Дублировать текущий билд',
+			event: ['click', async () => {
+				if (builds.length >= 6) {
+					const fragment = document.createDocumentFragment();
+					const title = DOM({ style: 'splash-text' }, 'Достигнут лимит билдов (6). Выберите билд для замены:');
+					fragment.append(title);
+					
+					// Фильтруем билды, исключая текущий
+					builds.filter(build => build.id !== Build.id).forEach(build => {
+						const btn = DOM({
+							tag: 'button',
+							style: ['build-replace-btn', 'btn-hover'],
+							event: ['click', async () => {
+								await App.api.request('build', 'duplicate', {
+									id: Build.id,
+									replaceId: build.id
+								});
+								Splash.hide();
+								isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+							}]
+						}, build.name);
+						fragment.append(btn);
+					});
+					
+					const cancel = DOM({
+						tag: 'button',
+						style: ['build-replace-cancel', 'btn-hover'],
+						event: ['click', () => Splash.hide()]
+					}, 'Отмена');
+					fragment.append(cancel);
+					
+					Splash.show(fragment);
+				} else {
+					Build.buildSelectName('duplicate', 'Дублировать билд', {
+						heroId: Build.heroId,
+						id: Build.id
+					}, isWindow);
+				}
+			}]
+		});
+
+		let duplicateBg = DOM({ style: ['btn-duplicate'] });
+		duplicateBg.style.backgroundImage = `url('content/icons/copy.svg')`;
+		duplicate.append(duplicateBg);
+		Build.buildActionsView.append(duplicate);
+	}
+
+		// Кнопка случайного билда
 		{
 			const random = DOM({
 				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
 				title: 'Сгенерировать случайный билд',
 				event: ['click', async () => {
-
 					await App.api.request('build', 'random', { id: Build.id });
-
 					isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
-
 				}]
 			});
 
-			let backgroundImg = DOM({ style: ['btn-random', 'build-action-item-background'] });
-			backgroundImg.style.backgroundImage = `url('content/icons/dice.svg')`;
-			random.append(backgroundImg);
-
+			let randomBg = DOM({ style: ['btn-random', 'build-action-item-background'] });
+			randomBg.style.backgroundImage = `url('content/icons/dice.svg')`;
+			random.append(randomBg);
 			Build.buildActionsView.append(random);
 		}
 
-
+		// Кнопка сброса билда
 		{
 			const resetBuild = DOM({
-				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
+				tag: 'button', 
+				style: ['build-action-item', 'btn-hover', 'color-1'],
 				title: 'Сбросить таланты в этом билде',
 				event: ['click', async () => {
+					const fragment = document.createDocumentFragment();
+					const title = DOM({ style: 'splash-text' }, 'Сбросить таланты в этом билде?');
+					fragment.append(title);
+					
+					// Красная кнопка сброса
 					const reset = DOM({
+						tag: 'button',
+						style: ['build-replace-btn', 'btn-hover'],
 						event: ['click', async () => {
 							await App.api.request('build', 'clear', { id: Build.id });
-							// await App.api.request('build','steal',{user:8796,hero:Build.heroId});
-							isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 							Splash.hide();
+							isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 						}]
-					}, 'Сбросить')
-					const close = DOM({ event: ['click', () => Splash.hide()] }, 'Отмена')
-					const wrap = DOM({ style: 'wrap' }, reset, close);
-					const dom = DOM({ style: 'div' }, 'Сбросить таланты в этом билде?', wrap);
-					Splash.show(dom)
+					}, 'Сбросить');
+					
+					// Явно задаём красный цвет
+					reset.style.backgroundColor = '#7b001c';
+					reset.style.color = 'white';
+					reset.style.borderColor = '#ff3333';
+					reset.addEventListener('mouseover', () => {
+						reset.style.backgroundColor = '#ff3333';
+					});
+					reset.addEventListener('mouseout', () => {
+						reset.style.backgroundColor = '#7b001c';
+					});
+					
+					fragment.append(reset);
+					
+					// Обычная кнопка отмены без цвета
+					const cancel = DOM({
+						tag: 'button',
+						style: ['build-replace-cancel', 'btn-hover'],
+						event: ['click', () => Splash.hide()]
+					}, 'Отмена');
+					
+					// Явно сбрасываем стили для отмены
+					cancel.style.backgroundColor = '';
+					cancel.style.color = '';
+					cancel.style.borderColor = '';
+					
+					fragment.append(cancel);
+					
+					Splash.show(fragment);
 				}]
 			});
 
-			let backgroundImg = DOM({ style: ['btn-trash', 'build-action-item-background'] });
-			backgroundImg.style.backgroundImage = `url('content/icons/trash.svg')`;
-			resetBuild.append(backgroundImg);
-
+			let resetBg = DOM({ style: ['btn-trash', 'build-action-item-background'] });
+			resetBg.style.backgroundImage = `url('content/icons/trash.svg')`;
+			resetBuild.append(resetBg);
 			Build.buildActionsView.append(resetBuild);
 		}
 	}
-
 	static list(builds, isWindow) {
 
 		const buildButtonsWrapper = DOM({ style: 'build-list' });

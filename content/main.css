@@ -464,7 +464,37 @@ height: 100cqh;
 	margin-right: 1cqw;
 	
 }
+.close-button {
+    position: absolute;
+    top: 1cqh;
+    right: 2cqw;
+    width: 24px;
+    height: 24px;
+    background-image: url('content/icons/close-cropped.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    border: none;
+    background-color: transparent;
+}
 
+.close-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: 
+        brightness(1.2) 
+        drop-shadow(0 0 2px rgba(255, 215, 0, 0.7)); /* Золотое свечение */
+}
+
+/* Для поддержки темной/светлой темы */
+@media (prefers-color-scheme: light) {
+    .close-button {
+        filter: invert(1);
+    }
+}
 .close-button {
     top: -4cqh;
     right: -4cqh;
@@ -1201,8 +1231,9 @@ text-align:center;
 
 .splash-text{
 	
+	text-align: center;
 	margin:0 15cqw;
-	font: 1.5cqw / 1.3 Tahoma;
+	font: 1.2rem / 1.3 Tahoma;
 	color:rgba(255,255,255,0.9);
 	text-shadow: rgba(0, 0, 0, 0.3) 0 0 0.5cqw;
 	
@@ -1260,15 +1291,25 @@ text-align:center;
 	
 }
 
-.splash-content{
-	
-	width: 35cqw;
-	display:flex;
-	flex-flow:column nowrap;
-	font: 2rem / 1 Tahoma;
-	color:rgba(255,255,255,0.8);
-	container-type: inline-size;
-	
+.splash-content {
+    --splash-text-color: rgba(255, 255, 255, 0.9);
+    --splash-bg-color: linear-gradient(to bottom, rgba(4, 32, 42, 0.9), rgba(18, 69, 73, 0.85), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.85), rgba(4, 32, 42, 0.9));
+    
+    width: min(35cqw, 400px); /* Ограничение максимальной ширины */
+    padding: 2.5cqmin;
+    display: flex;
+    flex-direction: column;
+    background: var(--splash-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    font-family: Tahoma, sans-serif;
+    font-size: clamp(1.5rem, 3.5cqw, 2rem); /* Адаптивный размер текста */
+    line-height: 1.3;
+    color: var(--splash-text-color);
+    text-align: center;
+    container-type: inline-size;
+    border: 0.1cqh solid rgb(158, 155, 104);
 }
 
 .splash-content div{
@@ -1299,31 +1340,47 @@ text-align:center;
 }
 
 
-.splash-content-button{
-	
-flex-grow:1;
-transition: all 0.3s ease-out;
-padding: 2vmin 2vmin;
-border-radius:50px;
-font: 1.3rem / 1 Tahoma;
-text-align:center;
-background:rgba(255,255,255,0.2);
-color:rgba(0,0,0,0.7);
-margin:0.3cqh 0;
-	
-	
+.splash-content-button {
+    padding: 1.5cqmin 3cqmin;
+    font-size: 0.8em;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.25s ease-out;
+}
+/* Адаптация для маленьких экранов */
+@container (width < 300px) {
+    .splash-content {
+        padding: 5cqmin;
+        gap: 3cqmin;
+        font-size: 1.3rem;
+    }
 }
 
-.splash-content-button:hover{
-
-background:rgba(255,255,255,0.5);
-
+/* Элементы внутри контента */
+.splash-content > * {
+    margin: 0;
+    padding: 0.5cqmin 0;
+}
+.splash-content-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
 }
 
+.splash-content input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
 .splash-content .close {
-	position: absolute;
-	top: 1cqh;
-	right: 2cqw;
+	 top: -4cqh;
+    right: -4cqh;
+    background-size: contain;
+    position: absolute;
+    transform: scale(0.8);
+    transition: transform 0.2s ease; /* Добавляем плавный переход */
 }
 
 .splash-content .wrap {
@@ -1334,7 +1391,88 @@ background:rgba(255,255,255,0.5);
 .splash-content .wrap div {
 	margin: 2cqh;
 }
+.btn-duplicate {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: url('content/icons/copy-white.svg') no-repeat center;
+    background-size: contain;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+.build-action-item:hover .btn-duplicate {
+	opacity: 1;
+    filter: brightness(1.2); /* Усиливаем яркость белого */
+}
 
+.btn-duplicate:hover {
+    filter: invert(0.6) brightness(1.4); /* Эффект при наведении */
+}
+.btn-danger {
+    background-color: #ff4d4d;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #ff3333;
+}
+
+/* Стили для окна замены билда */
+.build-replace-title {
+    font: 1.5rem / 1 Tahoma;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 3cqh;
+    text-align: center;
+}
+
+.build-replace-btn {
+    transition: all 0.3s ease-out;
+    width: 100%;
+    padding: 2vmin 0;
+    margin-bottom: 1cqh;
+    font: 1.3rem / 1 Tahoma;
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 50px;
+    color: rgba(0,0,0,0.9);
+    text-align: center;
+}
+
+.build-replace-btn:hover {
+    background: rgba(255,255,255,0.6);
+}
+
+.build-replace-cancel {
+    transition: all 0.3s ease-out;
+    width: 100%;
+    padding: 2vmin 0;
+    margin-top: 2cqh;
+    font: 1.3rem / 1 Tahoma;
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 50px;
+    color: rgba(0,0,0,0.9);
+    text-align: center;
+}
+
+.build-replace-cancel:hover {
+    background: rgba(255, 100, 100, 0.6);
+}
+
+/* Адаптация под мобильные устройства */
+@container (max-width: 500px) {
+    .build-replace-btn,
+    .build-replace-cancel {
+        font-size: 1.1rem;
+        padding: 1.5vmin 0;
+    }
+    
+    .build-replace-title {
+        font-size: 1.3rem;
+    }
+}
 .mm-timer{
 	
 	display:flex;
