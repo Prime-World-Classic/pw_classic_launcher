@@ -696,85 +696,74 @@ class Api {
 	}
 
 	async connect() {
-
-		this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`); // + ${App.storage.data.token}		
-
+		// Закрываем предыдущее соединение, если оно есть
+		if (this.WebSocket) {
+			this.WebSocket.close();
+			this.WebSocket = null;
+		}
+	
+		this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`);
 		this.WebSocket.addEventListener('message', (event) => this.message(event.data));
-
+	
 		if (Array.isArray(this.host)) {
 			console.log('Selecting host');
 			this.state = this.states.TRY_CONNECT;
-
+	
 			this.WebSocket.addEventListener('open', async () => {
 				this.state = this.states.CONNECTION_ESTABLISHED;
+				console.log(`Соединение установлено с ${this.MAIN_HOST}`);
 			});
-
-			setTimeout(() => {
-				console.log('Testing connection');
-				if (this.state == this.states.TRY_CONNECT) {
+	
+			// Таймер для проверки соединения
+			const connectionTimer = setTimeout(() => {
+				if (this.state === this.states.TRY_CONNECT) {
 					console.log('Failed connection');
 					this.currentHost = (this.currentHost + 1) % this.host.length;
-					if (this.currentHost == 0) {
+					if (this.currentHost === 0) {
 						this.retryCount++;
 					}
 					this.MAIN_HOST = this.host[this.currentHost];
 					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
+					this.connect(); // Вызываем переподключение
 				}
 			}, Math.min(15000, this.retryCount * 5000));
+	
+			// Очищаем таймер при успешном соединении
+			this.WebSocket.addEventListener('open', () => {
+				clearTimeout(connectionTimer);
+			});
 		}
-
-		setTimeout
-
+	
 		this.WebSocket.addEventListener('close', async () => {
 			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
 			if ((Date.now() - this.CONNECTION_FALLED_TIME) < 15000) {
-
 				this.CONNECTION_FALLED++;
-
 				this.CONNECTION_FALLED_TIME = Date.now();
-
 			}
-
+	
 			if ((this.CONNECTION_FALLED >= 3) && (Array.isArray(this.host))) {
-
-				if ((this.host.indexOf(this.MAIN_HOST) + 1) <= (this.host.length - 1)) {
-
-					this.MAIN_HOST = this.host[(this.host.indexOf(this.MAIN_HOST) + 1)];
-
-				}
-				else {
-
-					this.MAIN_HOST = this.host[0];
-
-				}
+				const currentIndex = this.host.indexOf(this.MAIN_HOST);
+				const nextIndex = (currentIndex + 1) % this.host.length;
+				this.MAIN_HOST = this.host[nextIndex];
 				console.log(`Переподключаем API (${this.MAIN_HOST})`);
 				this.CONNECTION_FALLED = 0;
-
 				this.CONNECTION_FALLED_TIME = Date.now();
-
 			}
-
-			try {
-
-				await this.connect();
-
-			}
-			catch (e) {
-
-				// разрыв соединения
-
-			}
-
+	
+			// Задержка перед переподключением
+			setTimeout(async () => {
+				try {
+					await this.connect();
+				} catch (e) {
+					console.error('Ошибка переподключения:', e);
+				}
+			}, 1000);
 		});
-
+	
 		return await new Promise((resolve, reject) => {
-
 			this.WebSocket.addEventListener('open', resolve);
-
 			this.WebSocket.addEventListener('error', reject);
-
 		});
-
 	}
 
 	async message(body) {
