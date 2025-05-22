@@ -1091,7 +1091,7 @@ class CastleNAVBAR {
 			CastleNAVBAR.setMode(4);
 
 		};
-
+		
 		return CastleNAVBAR.body.children[5];
 
 	}
@@ -2960,88 +2960,142 @@ class View {
 
 
 	static async talents() {
+    let body = DOM({ style: 'main' });
+    
+    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
+    let header = DOM({ style: 'adm-header' });
+    
+    // Кнопка закрытия
+    let closeBtn = DOM({ 
+        style: 'close-btn',
+        event: ['click', () => View.show('castle')] 
+    }, '[X]');
+    
+    // Строка поиска
+    let searchInput = DOM({
+        tag: 'input',
+        placeholder: 'Поиск талантов...',
+        style: 'search-input'
+    });
+    
+    header.append(closeBtn, searchInput);
+    
+    let adm = DOM({ style: 'adm' }, header);
+    let result = await App.api.request('build', 'talentAll');
+    let talentContainers = [];
+    let talentsContainer = DOM({ style: 'talents-container' });
 
-		let body = DOM({ style: 'main' }), adm = DOM({ style: 'adm' }, DOM({ event: ['click', () => View.show('castle')] }, '[X]'));
+    for (let item of result) {
+        let div = DOM({ tag: 'div', class: 'talent-item' });
+        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
 
-		let result = await App.api.request('build', 'talentAll');
+        for (let key in item) {
+            if (key == 'id') continue;
+            div.append(
+                DOM({ tag: 'div' }, key),
+                App.input(async (value) => {
+                    let object = new Object();
+                    object[key] = value;
+                    await App.api.request('build', 'talentEdit', { id: item.id, object: object });
+                }, { value: item[key] })
+            );
+        }
+        
+        talentContainers.push({ element: div, data: item });
+        talentsContainer.append(div);
+    }
+    
+    const filterTalents = (searchText) => {
+        searchText = searchText.toLowerCase();
+        talentContainers.forEach(({ element, data }) => {
+            let matches = false;
+            for (let key in data) {
+                if (String(data[key]).toLowerCase().includes(searchText)) {
+                    matches = true;
+                    break;
+                }
+            }
+            element.style.display = matches ? 'flex' : 'none';
+        });
+    };
+    
+    searchInput.addEventListener('input', (e) => {
+        filterTalents(e.target.value);
+    });
+    
+    adm.append(talentsContainer);
+    body.append(adm);
+    return body;
+}
 
-		for (let item of result) {
+static async talents2() {
+    let body = DOM({ style: 'main' });
+    
+    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
+    let header = DOM({ style: 'adm-header' });
+    
+    // Кнопка закрытия
+    let closeBtn = DOM({ 
+        style: 'close-btn',
+        event: ['click', () => View.show('castle')] 
+    }, '[X]');
+    
+    // Строка поиска
+    let searchInput = DOM({
+        tag: 'input',
+        placeholder: 'Поиск геройских талантов...',
+        style: 'search-input'
+    });
+    
+    header.append(closeBtn, searchInput);
+    
+    let adm = DOM({ style: 'adm' }, header);
+    let result = await App.api.request('build', 'talentHeroAll');
+    let talentContainers = [];
+    let talentsContainer = DOM({ style: 'talents-container' });
 
-			let div = DOM({ tag: 'div' });
+    for (let item of result) {
+        let div = DOM({ tag: 'div', class: 'talent-item' });
+        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
 
-			div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
-
-			for (let key in item) {
-
-				if (key == 'id') {
-
-					continue;
-
-				}
-
-				div.append(DOM({ tag: 'div' }, key), App.input(async (value) => {
-
-					let object = new Object();
-
-					object[key] = value;
-
-					await App.api.request('build', 'talentEdit', { id: item.id, object: object });
-
-				}, { value: item[key] }));
-
-			}
-
-			adm.append(div);
-
-		}
-
-		body.append(adm);
-
-		return body;
-
-	}
-
-	static async talents2() {
-
-		let body = DOM({ style: 'main' }), adm = DOM({ style: 'adm' }, DOM({ event: ['click', () => View.show('castle')] }, '[X]'));
-
-		let result = await App.api.request('build', 'talentHeroAll');
-
-		for (let item of result) {
-
-			let div = DOM({ tag: 'div' });
-
-			div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
-
-			for (let key in item) {
-
-				if (key == 'id') {
-
-					continue;
-
-				}
-
-				div.append(DOM({ tag: 'div' }, key), App.input(async (value) => {
-
-					let object = new Object();
-
-					object[key] = value;
-
-					await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
-
-				}, { value: item[key] }));
-
-			}
-
-			adm.append(div);
-
-		}
-
-		body.append(adm);
-
-		return body;
-
-	}
+        for (let key in item) {
+            if (key == 'id') continue;
+            div.append(
+                DOM({ tag: 'div' }, key),
+                App.input(async (value) => {
+                    let object = new Object();
+                    object[key] = value;
+                    await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
+                }, { value: item[key] })
+            );
+        }
+        
+        talentContainers.push({ element: div, data: item });
+        talentsContainer.append(div);
+    }
+    
+    const filterTalents = (searchText) => {
+        searchText = searchText.toLowerCase();
+        talentContainers.forEach(({ element, data }) => {
+            let matches = false;
+            for (let key in data) {
+                if (String(data[key]).toLowerCase().includes(searchText)) {
+                    matches = true;
+                    break;
+                }
+            }
+            element.style.display = matches ? 'flex' : 'none';
+        });
+    };
+    
+    searchInput.addEventListener('input', (e) => {
+        filterTalents(e.target.value);
+    });
+    
+    adm.append(talentsContainer);
+    body.append(adm);
+    return body;
+}
 
 	static async users() {
 
@@ -4162,44 +4216,56 @@ class Build {
 		}
 	}
 	static list(builds, isWindow) {
+    const buildButtonsWrapper = DOM({ style: 'build-list' });
 
-		const buildButtonsWrapper = DOM({ style: 'build-list' });
+    for (let build of builds) {
+        const item = DOM(
+            {
+                tag: 'button', style: ['build-tab-item', 'btn-hover'], event: [
+                    'click', () => {
+                        isWindow ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build', Build.heroId, build.id);
+                    }]
+            },
+            DOM({}, `${build.name}`),
+        );
+        item.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            Build.buildSelectName('rename', 'Переименовать билд', { id: build.id }, isWindow);
+        });
 
-		for (let build of builds) {
+        const div = DOM({ tag: 'div', style: 'button-build--wrapper' }, item);
 
-			const item = DOM(
-				{
-					tag: 'button', style: ['build-tab-item', 'btn-hover'], event: [
-						'click', () => {
-							isWindow ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build', Build.heroId, build.id);
-						}]
-				},
-				DOM({}, `${build.name}`),
-			);
-			item.addEventListener('contextmenu', (e) => {
-				e.preventDefault();
-				Build.buildSelectName('rename', 'Переименовать билд', { id: build.id }, isWindow);
-			});
+        if (build.target) {
+            item.classList.add('list-highlight');
+        } else {
+            item.classList.add('list-not-highlight');
+        }
 
-			const div = DOM({ tag: 'div', style: 'button-build--wrapper' }, item);
+        Build.listView.append(div);
+    }
 
-			if (build.target) {
-				item.classList.add('list-highlight');
-			} else {
-				item.classList.add('list-not-highlight');
-			}
+    // Добавляем обработчик колесика мыши после создания списка
+    setTimeout(() => {
+        const buildList = document.querySelector('.build-list');
+        if (buildList) {
+            buildList.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                this.scrollLeft += e.deltaY;
+                
+                // Опционально: можно добавить множитель для скорости прокрутки
+                // this.scrollLeft += e.deltaY * 2;
+            });
+        }
+    }, 0);
 
-			Build.listView.append(div);
-
-		}
-		/*
-		setTimeout(_ => {
-			if (!document.querySelector('.build-list.list-highlight')) {
-				document.querySelector('.build-list').classList.add('list-highlight');
-			}
-		}, 300);
-		*/
-	}
+    /*
+    setTimeout(_ => {
+        if (!document.querySelector('.build-list.list-highlight')) {
+            document.querySelector('.build-list').classList.add('list-highlight');
+        }
+    }, 300);
+    */
+}
 
 	static totalStat(stat) {
 

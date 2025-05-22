@@ -464,30 +464,37 @@ height: 100cqh;
 	margin-right: 1cqw;
 	
 }
+
+
+/* Базовый стиль кнопки закрытия */
 .close-button {
     position: absolute;
-    top: 1cqh;
-    right: 2cqw;
-    width: 24px;
-    height: 24px;
+    top: 0;
+    right: 0;
+    width: 48px;
+    height: 48px;
     background-image: url('content/icons/close-cropped.svg');
-    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
-    opacity: 0.8;
+    opacity: 0.7;
     transition: all 0.3s ease;
     border: none;
     background-color: transparent;
+    z-index: 10;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transform: translate(50%, -40%); /* Сдвигаем кнопку на половину её ширины/высоты */
 }
 
-.close-button:hover {
+
+
+/* Альтернативный вариант - увеличение всей кнопки */
+ .close-button:hover {
     opacity: 1;
-    transform: scale(1.1);
-    filter: 
-        brightness(1.2) 
-        drop-shadow(0 0 2px rgba(255, 215, 0, 0.7)); /* Золотое свечение */
-}
+    transform: translate(50%, -40%) scale(1.1);
+} 
 
 /* Для поддержки темной/светлой темы */
 @media (prefers-color-scheme: light) {
@@ -495,27 +502,17 @@ height: 100cqh;
         filter: invert(1);
     }
 }
-.close-button {
-    top: -4cqh;
-    right: -4cqh;
-    background-size: contain;
-    position: absolute;
-    transform: scale(0.8);
-    transition: transform 0.2s ease; /* Добавляем плавный переход */
-}
 
+/* Модификаторы ДОЛЖНЫ содержать только отличия от базового стиля */
 .build-list-close {
-    top: -2.5cqh;
-    right: -1cqw;
-}
-
-.close-button:hover {
-    transform: scale(0.9); /* Увеличиваем масштаб при наведении */
+    /* Если нужны специфичные стили, иначе можно удалить этот класс */
 }
 
 .close-image-style {
-	width: 8cqh;
-	height: 8cqh;
+    /* Фиксируем размеры, переопределяя возможные другие стили */
+    width: 48px !important;
+    height: 48px !important;
+    /* !important используется как крайняя мера, если другие стили переопределяют размеры */
 }
 
 .build-active-bar-hint {
@@ -593,15 +590,7 @@ button.build-action-item:hover {
 }
 
 
-.build-list {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
 
-	overflow-y: hidden;
-	overflow-x: scroll;
-	max-width: 70cqw;
-}
 .button-build--wrapper {
 	height: 4.5cqh;
 }
@@ -623,7 +612,15 @@ button.build-action-item:hover {
     color: #fff;
     text-align:center;
 }
-
+.build-list {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+    white-space: nowrap;
+	overflow-y: hidden;
+	overflow-x: scroll;
+	max-width: 70cqw;
+}
 
 .build-list::-webkit-scrollbar {
 	background-color: rgba(0, 51, 0, 0.479);
@@ -1098,35 +1095,137 @@ text-align:center;
 
 }
 
-.adm{
-	
-	display:flex;
-	flex-flow:column nowrap;
-	align-items:center;
-	overflow-y:scroll;
-	height:100cqh;
-	color:rgba(255,255,255,0.7)
-	
-	
+.adm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+  height: 100cqh;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: rgba(25, 25, 35, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
 }
 
-.adm div{
-	display:flex;
-	flex-flow:row nowrap;
-	padding:1cqh 1cqw;
-	
-	
+.adm div {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem; /* Уменьшил отступ между элементами */
+  padding: 0.5rem 0.75rem; /* Уменьшил padding */
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px; /* Уменьшил скругление */
+  transition: all 0.2s ease;
 }
 
-.adm input{
-	width:200px;
-	border:none;
-	font-size:28px;
-	background:rgba(255,255,255,0.1);
-	border-radius:25px;
-	
+.adm-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
 }
 
+.adm div:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.adm input {
+  width: 100%;
+  max-width: 250px; /* Уменьшил максимальную ширину */
+  padding: 0.5rem 1rem; /* Уменьшил padding */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Уменьшил толщину границы */
+  font-size: 0.9rem; /* Уменьшил размер шрифта */
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px; /* Уменьшил скругление */
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.adm input:focus {
+  outline: none;
+  border-color: rgba(100, 150, 255, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 2px rgba(100, 150, 255, 0.2); /* Уменьшил тень */
+}
+
+/* Уменьшенные лейблы */
+.adm label {
+  min-width: 80px; /* Уменьшил минимальную ширину */
+  font-size: 0.8rem; /* Уменьшил размер шрифта */
+  color: rgba(255, 255, 255, 0.6); /* Сделал текст менее заметным */
+}
+
+/* Стиль для скроллбара */
+.adm::-webkit-scrollbar {
+  width: 6px; /* Уменьшил ширину */
+}
+
+.adm::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.adm::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px; /* Уменьшил скругление */
+}
+
+.adm::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.close-btn {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 50, 50, 0.2);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+.close-btn:hover {
+  background: rgba(255, 50, 50, 0.3);
+}
+.search-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+.search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(100, 150, 255, 0.3);
+}
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+
+/* Стиль для контейнера талантов */
+.talents-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Стиль для отдельного таланта */
+.talent-item {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
 .error-message, .notify-message{
 	
 	position:fixed;
@@ -1295,7 +1394,7 @@ text-align:center;
     --splash-text-color: rgba(255, 255, 255, 0.9);
     --splash-bg-color: linear-gradient(to bottom, rgba(4, 32, 42, 0.9), rgba(18, 69, 73, 0.85), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.85), rgba(4, 32, 42, 0.9));
     
-    width: min(35cqw, 400px); /* Ограничение максимальной ширины */
+    width: min(35cqw, 500px); /* Ограничение максимальной ширины */
     padding: 2.5cqmin;
     display: flex;
     flex-direction: column;
@@ -1312,19 +1411,14 @@ text-align:center;
     border: 0.1cqh solid rgb(158, 155, 104);
 }
 
-.splash-content div{
-	
-	margin-bottom:2cqh;
-	
-}
 
 .splash-content input{
 	
 transition: all 0.3s ease-out;
 width:100%;
-padding: 2vmin 0;
+padding: 0.6vmin 0;
 margin-bottom:15px;
-font: 1.5rem / 1 Tahoma;
+font: 1.0rem / 1 Tahoma;
 background:rgba(255,255,255,0.5);
 border:none;
 border-radius:50px;
@@ -1342,7 +1436,7 @@ text-align:center;
 
 .splash-content-button {
     padding: 1.5cqmin 3cqmin;
-    font-size: 0.8em;
+    font-size: 1.0rem;
     background: rgba(255, 255, 255, 0.15);
     color: white;
     border: none;
