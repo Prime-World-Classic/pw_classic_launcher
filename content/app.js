@@ -1099,7 +1099,7 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[5].innerText = 'Отменить';
 
-		CastleNAVBAR.body.children[5].style.fontSize = '1.1vw';
+		//CastleNAVBAR.body.children[5].style.fontSize = '1.1vw';
 
 		CastleNAVBAR.body.children[1].style.filter = 'grayscale(80%)';
 
@@ -1125,7 +1125,7 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
 
-		CastleNAVBAR.body.children[5].style.fontSize = '1.4vw';
+		//CastleNAVBAR.body.children[5].style.fontSize = '1.4vw';
 
 		CastleNAVBAR.body.children[1].style.filter = 'grayscale(0)';
 
