@@ -1867,33 +1867,29 @@ class View {
 			console.log('ДРУЗЬЯ', result);
 
 			let buttonAdd = DOM({
-				style: 'castle-friend-item', onclick: () => {
+			style: 'castle-friend-item',
+			onclick: () => {
+				let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+				let body = DOM({ style: 'search-body' });
 
-					let input = DOM({ tag: 'input', style: 'search-input' });
+				// Создаём крестик для закрытия (как в buildSelectName)
+				let closeButton = DOM({
+					tag: 'div',
+					style: 'close-button',
+					event: ['click', () => Splash.hide()]
+				});
+				closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
-					let body = DOM({ style: 'search-body' });
+				let search = DOM({ style: 'search' }, input, body, closeButton);
 
-					let search = DOM({ style: 'search' }, input, body, DOM({
-						style: 'search-bottom', event: ['click', () => {
+				input.addEventListener('input', async () => {
+					let request = await App.api.request('user', 'find', { nickname: input.value });
 
-							Splash.hide();
-
-						}]
-					}, `[Отменить]`));
-
-					input.addEventListener('input', async () => {
-
-						let request = await App.api.request('user', 'find', { nickname: input.value });
-
-						if (body.firstChild) {
-
-							while (body.firstChild) {
-
-								body.firstChild.remove();
-
-							}
-
+					if (body.firstChild) {
+						while (body.firstChild) {
+							body.firstChild.remove();
 						}
+					}
 
 						for (let item of request) {
 
@@ -1914,61 +1910,46 @@ class View {
 							if ('blocked' in item) {
 
 								template.oncontextmenu = () => {
+								let body = document.createDocumentFragment();
+								
+								// Создаём крестик для закрытия
+								const closeButton = DOM({
+									tag: 'div',
+									style: 'close-button',
+									event: ['click', () => Splash.hide()]
+								});
+								closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
-									let body = document.createDocumentFragment();
-									body.append(
-										DOM({}, item.nickname),
-										DOM({
-											style: 'splash-content-button', event: ['click', async () => {
+								body.append(
+									DOM({}, item.nickname),
+									DOM({
+										style: 'splash-content-button',
+										event: ['click', async () => {
+											await App.api.request('user', 'blocked', { id: item.id });
+											Splash.hide();
+										}]
+									}, (item.blocked ? 'Разблокировать' : 'Заблокировать')),
+									DOM({
+										style: 'splash-content-button',
+										event: ['click', async () => {
+											await App.api.request('user', 'mute', { id: item.id });
+											Splash.hide();
+										}]
+									}, (item.mute ? 'Убрать мут' : 'Мут чата')),
+									DOM({
+										style: 'splash-content-button',
+										event: ['click', async () => {
+											let password = await App.api.request('user', 'restore', { id: item.id });
+											App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
+											navigator.clipboard.writeText(password);
+										}]
+									}, 'Сброс пароля'),
+									closeButton // Добавляем крестик вместо кнопки "Назад"
+								);
 
-												await App.api.request('user', 'blocked', { id: item.id });
-
-												Splash.hide();
-
-											}]
-										}, (item.blocked ? 'Разблокировать' : 'Заблокировать')),
-										DOM({
-											style: 'splash-content-button', event: ['click', async () => {
-
-												await App.api.request('user', 'mute', { id: item.id });
-
-												Splash.hide();
-
-											}]
-										}, (item.mute ? 'Убрать мут' : 'Мут чата')),
-										DOM({
-											style: 'splash-content-button', event: ['click', async () => {
-
-												let password = await App.api.request('user', 'restore', { id: item.id });
-
-												App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
-
-												navigator.clipboard.writeText(password);
-
-											}]
-										}, 'Cброс пароля'),
-										// App.input( async (value) => {
-
-										// 	let object = new Object();
-
-										// 	object['nickname'] = value;
-
-										// 	await App.api.request('user','edit',{id:item.id,object:object});
-
-										// },{value:item.nickname}),
-										DOM({
-											style: 'splash-content-button', event: ['click', () => {
-
-												Splash.hide();
-
-											}]
-										}, Lang.text('back')));
-
-									Splash.show(body);
-
-									return false;
-
-								}
+								Splash.show(body);
+								return false;
+							}
 
 								if (item.mute) {
 
@@ -4077,18 +4058,41 @@ class Build {
 		}
 
 		// Кнопка дублирования
-		{
+		
 		const duplicate = DOM({
 			tag: 'button', 
 			style: ['build-action-item', 'btn-hover', 'color-1'],
 			title: 'Дублировать текущий билд',
 			event: ['click', async () => {
+				// Проверяем, готов ли API duplicate
+				if (typeof App.api.build?.duplicate !== 'function') {
+					const fragment = document.createDocumentFragment();
+					const container = DOM({ style: 'splash-container' });
+					
+					// Создаем крестик для закрытия
+					const closeBtn = DOM({
+						tag: 'div',
+						style: 'close-button',
+						event: ['click', () => Splash.hide()]
+					});
+					closeBtn.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+					closeBtn.style.position = 'absolute';
+					
+					const text = DOM({ style: 'splash-text' }, 'Функция дублирования билда скоро будет доступна.');
+					
+					container.append(text, closeBtn);
+					fragment.append(container);
+					
+					Splash.show(fragment);
+					return;
+				}
+
+				// Основная логика
 				if (builds.length >= 6) {
 					const fragment = document.createDocumentFragment();
 					const title = DOM({ style: 'splash-text' }, 'Достигнут лимит билдов (6). Выберите билд для замены:');
 					fragment.append(title);
 					
-					// Фильтруем билды, исключая текущий
 					builds.filter(build => build.id !== Build.id).forEach(build => {
 						const btn = DOM({
 							tag: 'button',
@@ -4126,7 +4130,7 @@ class Build {
 		duplicateBg.style.backgroundImage = `url('content/icons/copy.svg')`;
 		duplicate.append(duplicateBg);
 		Build.buildActionsView.append(duplicate);
-	}
+	
 
 		// Кнопка случайного билда
 		{
@@ -4180,20 +4184,13 @@ class Build {
 					
 					fragment.append(reset);
 					
-					// Обычная кнопка отмены без цвета
-					const cancel = DOM({
-						tag: 'button',
-						style: ['build-replace-cancel', 'btn-hover'],
+					let closeButton = DOM({
+						tag: 'div',
+						style: 'close-button',
 						event: ['click', () => Splash.hide()]
-					}, 'Отмена');
-					
-					// Явно сбрасываем стили для отмены
-					cancel.style.backgroundColor = '';
-					cancel.style.color = '';
-					cancel.style.borderColor = '';
-					
-					fragment.append(cancel);
-					
+					});
+					closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+					fragment.append(closeButton);
 					Splash.show(fragment);
 				}]
 			});
@@ -4204,6 +4201,7 @@ class Build {
 			Build.buildActionsView.append(resetBuild);
 		}
 	}
+	
 	static list(builds, isWindow) {
     const buildButtonsWrapper = DOM({ style: 'build-list' });
 
@@ -5603,113 +5601,98 @@ class Build {
 	}
 
 	static move(element, fromActiveBar) {
+    let elementFromPoint = (x, y) => {
+        let elems = document.elementsFromPoint(x, y);
+        return elems[0].className == 'build-level' ? elems[1] : elems[0];
+    };
 
-		let elementFromPoint = (x, y) => {
-			let elems = document.elementsFromPoint(x, y);
-			return elems[0].className == 'build-level' ? elems[1] : elems[0];
-		};
+    let elementSetDisplay = (element, display) => {
+        if (element.parentElement.classList == 'build-talent-item-container') {
+            element.parentElement.style.display = display;
+        }
+        element.style.display = display;
+    };
 
-		let elementSetDisplay = (element, display) => {
-			if (element.parentElement.classList == 'build-talent-item-container') {
-				element.parentElement.style.display = display;
-			}
-			element.style.display = display;
-		}
+    element.onmousedown = (event) => {
+        if (event.button != 0) return;
 
-		element.onmousedown = (event) => {
+        let moveStart = Date.now();
+        Build.descriptionView.style.display = 'none';
 
-			if (event.button != 0) {
-				return;
-			}
+        let data = Build.talents[element.dataset.id];
+        let fieldRow = document.getElementById(`bfr${data.level}`);
 
-			let moveStart = Date.now();
+        if (!fromActiveBar) {
+            fieldRow.style.background = 'rgba(255,255,255,0.5)';
+            fieldRow.style.borderRadius = '1cqh';
+        }
 
-			Build.descriptionView.style.display = 'none';
+        // Фикс для transform
+        element.style.transformOrigin = 'center center';
+        element.style.willChange = 'transform';
+        element.style.setProperty('transform', 'scale(1.1)', 'important');
+        element.style.transition = 'transform 0.1s ease';
 
-			let data = Build.talents[element.dataset.id];
+        let rect = element.getBoundingClientRect();
+        let shiftX = event.pageX - rect.left-5;
+        let shiftY = event.pageY - rect.top-5;
 
-			let fieldRow = document.getElementById(`bfr${data.level}`);
+        let offsetParent = element;
+        do {
+            shiftX += offsetParent.offsetParent.offsetLeft;
+            shiftY += offsetParent.offsetParent.offsetTop;
+            offsetParent = offsetParent.offsetParent;
+        } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
 
-			if (!fromActiveBar) {
-				fieldRow.style.background = 'rgba(255,255,255,0.5)';
+        element.style.zIndex = '9999';
+        element.style.position = 'absolute';
+        element.style.left = event.pageX - shiftX - 1 + 'px';
+        element.style.top = event.pageY - shiftY - 1 + 'px';
 
-				fieldRow.style.borderRadius = '1cqh';
-			}
+        elementSetDisplay(element, 'none');
+        let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
+        elementSetDisplay(element, 'block');
 
-			let rect = element.getBoundingClientRect();
+        document.onmousemove = (e) => {
+            element.style.left = e.pageX - shiftX - 1 + 'px';
+            element.style.top = e.pageY - shiftY - 1 + 'px';
+        };
 
-			let shiftX = event.pageX - rect.left;
-			let shiftY = event.pageY - rect.top;
+        element.onmouseup = async (event) => {
+            // Возвращаем исходный размер
+            element.style.setProperty('transform', 'scale(1)', 'important');
 
-			let offsetParent = element;
-			do {
-				shiftX += offsetParent.offsetParent.offsetLeft;
-				shiftY += offsetParent.offsetParent.offsetTop;
-				offsetParent = offsetParent.offsetParent;
-			} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
+            let moveEnd = Date.now();
+            let isClick = moveEnd - moveStart < 200;
 
-			element.style.zIndex = 9999;
+            document.onmousemove = null;
+            element.onmouseup = null;
 
-			element.style.position = 'absolute';
+            let field = Build.fieldView.getBoundingClientRect();
+            let inventory = Build.inventoryView.getBoundingClientRect();
+            let bar = Build.activeBarView.getBoundingClientRect();
+            let target = element.getBoundingClientRect();
 
-			element.style.left = event.pageX - shiftX - 5 + 'px';
-			// Without "-5" onmouseup will not trigger - because mouse will be not on the node - if mousedown on top-left,
-			// "mouseup event is released while the pointer is located inside" - from https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
-			element.style.top = event.pageY - shiftY - 5 + 'px';
+            let left = parseInt(element.style.left) + target.width / 2;
+            let top = parseInt(element.style.top) + target.height / 2;
 
-			elementSetDisplay(element, 'none');
-			let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
-			elementSetDisplay(element, 'block');
+            let offsetParent = element;
+            do {
+                left += offsetParent.offsetParent.offsetLeft;
+                top += offsetParent.offsetParent.offsetTop;
+                offsetParent = offsetParent.offsetParent;
+            } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
 
-			document.onmousemove = (e) => {
+            let isFieldTarget = left > field.x && left < field.x + field.width && top > field.y && top < field.y + field.height;
+            let isInventoryTarget = left > inventory.x && left < inventory.x + inventory.width && top > inventory.y && top < inventory.y + inventory.height;
+            let isActiveBarTarget = left > bar.x && left < bar.x + bar.width && top > bar.y && top < bar.y + bar.height;
 
-				element.style.left = e.pageX - shiftX - 5 + 'px';
-
-				element.style.top = e.pageY - shiftY - 5 + 'px';
-
-			}
-
-			element.onmouseup = async (event) => {
-
-				let moveEnd = Date.now();
-				let isClick = moveEnd - moveStart < 200;
-
-				document.onmousemove = null;
-
-				element.onmouseup = null;
-
-				let field = Build.fieldView.getBoundingClientRect();
-
-				let inventory = Build.inventoryView.getBoundingClientRect();
-
-				let bar = Build.activeBarView.getBoundingClientRect();
-
-				let target = element.getBoundingClientRect();
-
-				let left = parseInt(element.style.left) + (target.width / 2);
-
-				let top = parseInt(element.style.top) + (target.height / 2);
-
-				let offsetParent = element;
-				do {
-					left += offsetParent.offsetParent.offsetLeft;
-					top += offsetParent.offsetParent.offsetTop;
-					offsetParent = offsetParent.offsetParent;
-				} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'))
-
-				let isFieldTarget = (left > field.x) && (left < (field.x + field.width)) && (top > field.y) && (top < (field.y + field.height));
-
-				let isInventoryTarget = (left > inventory.x) && (left < (inventory.x + inventory.width)) && (top > inventory.y) && (top < (inventory.y + inventory.height));
-
-				let isActiveBarTarget = (left > bar.x) && (left < (bar.x + bar.width)) && (top > bar.y) && (top < (bar.y + bar.height));
-
-				if (isClick && (isFieldTarget || isActiveBarTarget && fromActiveBar)) {
-					elementSetDisplay(element, 'none');
-					let elemBelow = elementFromPoint(event.clientX, event.clientY);
-					elementSetDisplay(element, 'block');
-					isClick = elemBelow == startingElementBelow;
-				}
-
+            if (isClick && (isFieldTarget || (isActiveBarTarget && fromActiveBar))) {
+                elementSetDisplay(element, 'none');
+                let elemBelow = elementFromPoint(event.clientX, event.clientY);
+                elementSetDisplay(element, 'block');
+                isClick = elemBelow == startingElementBelow;
+            }
 				if (isClick) {
 					if (element.dataset.state == 2) {
 						isFieldTarget = false;
