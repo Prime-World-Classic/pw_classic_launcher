@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.4.0';
+PW_VERSION = '2.4.1';
 
 CURRENT_MM = 'mmtest'
 
@@ -9326,7 +9326,7 @@ class MM {
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 		document.body.style.display = 'block';
 		NativeAPI.window.show();
-		
+		NativeAPI.setDefaultWindow();
 
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 
