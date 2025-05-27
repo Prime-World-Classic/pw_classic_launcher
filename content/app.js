@@ -3245,11 +3245,9 @@ class Window {
 			App.isAdmin() ? DOM({ style: 'castle-menu-item-v' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
 			DOM({ style: 'castle-menu-item-v' },
-				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))
-			),
+				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-v' },
-				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))
-			),
+				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
 			DOM({
 				style: 'castle-menu-item-v', event: ['click', async () => {
 					App.exit();
@@ -3280,7 +3278,7 @@ class Window {
 
 	static async settings() {
 		let soundTestId = 'sound_test';
-
+		
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
 			DOM({ style: 'castle-menu-item' },
@@ -3343,11 +3341,190 @@ class Window {
 				}),
 				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
 			),
-			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back')),
+			// Добавленная кнопка "Клавиши"
+			/*DOM({ 
+				style: 'castle-menu-item-v',
+				event: ['click', () => {
+					console.log("Клавиши clicked"); // Для отладки
+					Window.show('main','keybindings'); 
+				}]
+			}, Lang.text('keys') || 'Клавиши'), // Fallback на текст, если перевод отсутствует
+			*/
+			// Кнопка "Назад"
+			DOM({ 
+				style: 'castle-menu-item-v', 
+				event: ['click', () => Window.show('main', 'menu')] 
+			}, Lang.text('back')),
+			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
 		);
 	}
 
+	static async keybindings() {
+    async function findConfigFile() {
+        const possiblePaths = [
+            `${nw.App.getDataPath('documents')}/My Games/Prime World Classic/input_new.cfg`,
+            `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/input_new.cfg`,
+            `${process.env.USERPROFILE}/OneDrive/Documents/My Games/Prime World Classic/input_new.cfg`
+        ];
+        
+        for (const path of possiblePaths) {
+            try {
+                await fs.access(path);
+                return path;
+            } catch (e) {
+                continue;
+            }
+        }
+        return null;
+    }
+
+    const configPath = await findConfigFile();
+    
+    if (!configPath) {
+        console.error("Не удалось найти файл конфигурации ни по одному из путей");
+        return DOM({ id: 'wcastle-keybindings' },
+            DOM({ style: 'castle-menu-error' }, 
+                Lang.text('keybindings_error', 'Не удалось найти файл конфигурации клавиш')
+            ),
+            DOM({ 
+                class: 'castle-menu-item-v',
+                event: ['click', () => Window.show('settings', 'menu')]
+            }, Lang.text('back', 'Назад'))
+        );
+    }
+
+    const defaultKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    
+    let currentBinds = {};
+    let configReadError = false;
+    
+    try {
+        const configContent = await fs.readFile(configPath, 'utf-8');
+        const bindRegex = /bind cmd_action_bar_slot(\d+) '(.+?)'/g;
+        let match;
+        
+        while ((match = bindRegex.exec(configContent)) !== null) {
+            currentBinds[`slot${match[1]}`] = match[2];
+        }
+    } catch (e) {
+        console.error("Ошибка чтения конфига:", e);
+        configReadError = true;
+    }
+
+    return DOM({ id: 'wcastle-keybindings' },
+        DOM({ style: 'castle-menu-title' }, Lang.text('keybindings_title', 'Настройка клавиш')),
+        
+        configReadError 
+            ? DOM({ style: 'castle-menu-error' }, 
+                Lang.text('keybindings_error', 'Не удалось прочитать файл конфигурации клавиш. Проверьте путь:') + ' ' + configPath
+              )
+            : DOM({},
+                ...Array.from({ length: 10 }, (_, i) => {
+                    const slotNum = i + 1;
+                    const slotKey = `slot${slotNum}`;
+                    const currentKey = currentBinds[slotKey] || defaultKeys[i];
+                    
+                    return DOM({ style: 'castle-menu-label keybinding-row' }, 
+                        DOM({ style: 'keybinding-label' }, 
+                            Lang.text(`talent_slot_${slotNum}`, `Талант ${slotNum}`)
+                        ),
+                        DOM({
+                            tag: 'input',
+                            type: 'text',
+                            value: currentKey,
+                            class: 'castle-keybinding-input',
+                            maxLength: 1,
+                            event: [
+                                'keydown',
+                                (e) => {
+                                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                                        e.target.value = '';
+                                        currentBinds[slotKey] = '';
+                                        return;
+                                    }
+                                    
+                                    if (e.ctrlKey || e.altKey || e.metaKey || e.key.length > 1) {
+                                        return;
+                                    }
+                                    
+                                    e.preventDefault();
+                                    const key = e.key.toUpperCase();
+                                    
+                                    if (/^[0-9A-Z]$/.test(key)) {
+                                        e.target.value = key;
+                                        currentBinds[slotKey] = key;
+                                        e.target.classList.add('input-success');
+                                        setTimeout(() => e.target.classList.remove('input-success'), 200);
+                                    } else {
+                                        e.target.classList.add('input-error');
+                                        setTimeout(() => e.target.classList.remove('input-error'), 200);
+                                    }
+                                }
+                            ]
+                        })
+                    );
+                }),
+                
+                DOM({ 
+                    class: 'castle-menu-item-v reset-btn',
+                    event: ['click', () => {
+                        document.querySelectorAll('.castle-keybinding-input').forEach((input, i) => {
+                            input.value = defaultKeys[i];
+                            currentBinds[`slot${i+1}`] = defaultKeys[i];
+                        });
+                        
+                        const btn = document.querySelector('.reset-btn');
+                        btn.classList.add('action-success');
+                        btn.textContent = Lang.text('reset_complete', 'Сброшено!');
+                        setTimeout(() => {
+                            btn.classList.remove('action-success');
+                            btn.textContent = Lang.text('reset_defaults', 'Сбросить на 1-0');
+                        }, 1000);
+                    }]
+                }, Lang.text('reset_defaults', 'Сбросить на 1-0')),
+                
+                DOM({ 
+                    class: 'castle-menu-item-v save-btn',
+                    event: ['click', async () => {
+                        try {
+                            let newConfig = '';
+                            for (let i = 1; i <= 10; i++) {
+                                const key = currentBinds[`slot${i}`] || defaultKeys[i-1];
+                                newConfig += `bind cmd_action_bar_slot${i} '${key}'\n`;
+                            }
+                            
+                            await fs.writeFile(configPath, newConfig);
+                            
+                            const btn = document.querySelector('.save-btn');
+                            btn.classList.add('action-success');
+                            btn.textContent = Lang.text('saved', 'Сохранено!');
+                            setTimeout(() => {
+                                btn.classList.remove('action-success');
+                                btn.textContent = Lang.text('save', 'Сохранить');
+                            }, 1000);
+                            
+                        } catch (e) {
+                            console.error("Ошибка сохранения:", e);
+                            const btn = document.querySelector('.save-btn');
+                            btn.classList.add('action-error');
+                            btn.textContent = Lang.text('save_error', 'Ошибка!');
+                            setTimeout(() => {
+                                btn.classList.remove('action-error');
+                                btn.textContent = Lang.text('save', 'Сохранить');
+                            }, 1000);
+                        }
+                    }]
+                }, Lang.text('save', 'Сохранить'))
+            ),
+        
+        DOM({ 
+            class: 'castle-menu-item-v',
+            event: ['click', () => Window.show('settings', 'menu')]
+        }, Lang.text('back', 'Назад'))
+    );
+}
+	
 	static async support() {
 		return DOM({ id: 'wcastle-support' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('support')),
@@ -4042,6 +4219,8 @@ class Build {
 		Splash.show(template);
 
 	}
+	
+
 
 	static buildActions(builds, isWindow) {
 		if (builds.length < 6) {
@@ -4060,76 +4239,106 @@ class Build {
 		// Кнопка дублирования
 		
 		const duplicate = DOM({
-			tag: 'button', 
-			style: ['build-action-item', 'btn-hover', 'color-1'],
-			title: 'Дублировать текущий билд',
-			event: ['click', async () => {
-				// Проверяем, готов ли API duplicate
-				if (typeof App.api.build?.duplicate !== 'function') {
-					const fragment = document.createDocumentFragment();
-					const container = DOM({ style: 'splash-container' });
-					
-					// Создаем крестик для закрытия
-					const closeBtn = DOM({
-						tag: 'div',
-						style: 'close-button',
-						event: ['click', () => Splash.hide()]
-					});
-					closeBtn.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-					closeBtn.style.position = 'absolute';
-					
-					const text = DOM({ style: 'splash-text' }, 'Функция дублирования билда скоро будет доступна.');
-					
-					container.append(text, closeBtn);
-					fragment.append(container);
-					
-					Splash.show(fragment);
-					return;
-				}
+		tag: 'button', 
+		style: ['build-action-item', 'btn-hover', 'color-1'],
+		title: 'Дублировать текущий билд',
+		event: ['click', async () => {
+			// Сохраняем ID текущего билда до любых действий
+			const currentBuildId = Build.id;
+			
+			const fragment = document.createDocumentFragment();
+			const title = DOM({ style: 'splash-text' }, builds.length >= 6 
+				? 'Достигнут лимит билдов (6). Выберите билд для замены:' 
+				: 'Выберите билд для замены или создайте новый:');
+			fragment.append(title);
+			
+			// Показываем все билды кроме текущего
+			builds.filter(build => build.id !== currentBuildId).forEach(build => {
+				const btn = DOM({
+					tag: 'button',
+					style: ['build-replace-btn', 'btn-hover'],
+					event: ['click', async () => {
+						await App.api.request('build', 'duplicate', {
+							id: currentBuildId,
+							target: build.id
+						});
+						Splash.hide();
+				
+						isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
+					}]
+				}, build.name);
+				fragment.append(btn);
+			});
+			
+			// Если билдов меньше 6, добавляем кнопку создания нового
+			if (builds.length < 6) {
+				const createNewBtn = DOM({
+					tag: 'button',
+					style: ['build-replace-btn', 'btn-hover', 'color-1'],
+					event: ['click', async () => {
+						Splash.hide();
+						
+						// Создаем форму для имени нового билда
+						const close = DOM({
+							tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]
+						});
+						close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+						
+						let template = document.createDocumentFragment();
+						let name = DOM({ tag: 'input', placeholder: 'Наименование билда' });
 
-				// Основная логика
-				if (builds.length >= 6) {
-					const fragment = document.createDocumentFragment();
-					const title = DOM({ style: 'splash-text' }, 'Достигнут лимит билдов (6). Выберите билд для замены:');
-					fragment.append(title);
-					
-					builds.filter(build => build.id !== Build.id).forEach(build => {
-						const btn = DOM({
-							tag: 'button',
-							style: ['build-replace-btn', 'btn-hover'],
+						let button = DOM({
+							style: 'splash-content-button', 
 							event: ['click', async () => {
-								await App.api.request('build', 'duplicate', {
-									id: Build.id,
-									replaceId: build.id
+								if (!name.value) {
+									Splash.hide();
+									return;
+								}
+
+								// Сначала создаем новый билд
+								const createData = { heroId: Build.heroId, name: name.value };
+								const createResponse = await App.api.request('build', 'create', createData);
+								console.log(currentBuildId);
+								console.log(createResponse);
+								// Затем дублируем сохраненный билд в новый
+								
+								await App.api.request('build', 'duplicate', 
+								{
+									id: currentBuildId,
+									target: createResponse
 								});
+								
+
 								Splash.hide();
 								isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
 							}]
-						}, build.name);
-						fragment.append(btn);
-					});
-					
-					const cancel = DOM({
-						tag: 'button',
-						style: ['build-replace-cancel', 'btn-hover'],
-						event: ['click', () => Splash.hide()]
-					}, 'Отмена');
-					fragment.append(cancel);
-					
-					Splash.show(fragment);
-				} else {
-					Build.buildSelectName('duplicate', 'Дублировать билд', {
-						heroId: Build.heroId,
-						id: Build.id
-					}, isWindow);
-				}
-			}]
-		});
+						}, 'Создать и дублировать');
 
-		let duplicateBg = DOM({ style: ['btn-duplicate'] });
-		duplicateBg.style.backgroundImage = `url('content/icons/copy.svg')`;
-		duplicate.append(duplicateBg);
-		Build.buildActionsView.append(duplicate);
+						template.append(name, button, close);
+						Splash.show(template);
+					}]
+				}, 'Дублировать в новый билд');
+				fragment.append(createNewBtn);
+			}
+			
+			// Добавляем крестик для закрытия вместо кнопки "Отмена"
+			const closeButton = DOM({
+				tag: 'div',
+				style: 'close-button',
+				event: ['click', () => Splash.hide()]
+			});
+			closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+			fragment.append(closeButton);
+			
+			Splash.show(fragment);
+		}]
+	});
+
+	let duplicateBg = DOM({ style: ['btn-duplicate'] });
+	duplicateBg.style.backgroundImage = `url('content/icons/copy.svg')`;
+	duplicate.append(duplicateBg);
+	Build.buildActionsView.append(duplicate);
+
 	
 
 		// Кнопка случайного билда
@@ -9117,7 +9326,7 @@ class MM {
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 		document.body.style.display = 'block';
 		NativeAPI.window.show();
-		NativeAPI.setDefaultWindow();
+		
 
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 
@@ -9291,17 +9500,47 @@ class MM {
 		}
 		else {
 
-			let download = DOM({ tag: 'p' });
+			const downloadMessage = DOM({
+				tag: 'p',
+				innerHTML: 'Загрузите и установите последнюю Windows версию <a href="https://pw.26rus-game.ru/" class="launcher-link">лаунчера</a> всего один раз, теперь вам не нужно будет делать лишних действий по обновлению игры, лаунчер все сделает автоматически.'
+			});
 
-			download.innerHTML = 'Загрузите и установите последнюю Windows версию <a href="https://pw.26rus-game.ru/">лаунчера</a> всего один раз, теперь вам не нужно будет делать лишних действий по обновлению игры, лаунчер все сделает автоматически.';
+			const splashContent = DOM({ 
+				style: 'splash-content-window' 
+			});
 
-			Splash.show(DOM({ style: 'splash-text' },
-				DOM({ tag: 'h1' }, `Необходима Windows версия лаунчера!`),
-				DOM({ tag: 'p' }, `Мы отказались от поиска боя и запуска игры Prime World через браузер, так как у игроков регулярно возникали с этим проблемы.`),
-				DOM({ tag: 'p' }, `Мы полностью перенесли браузерный лаунчер в полцноценное Windows приложение с автоматическим обновлением клиентской части Prime World.`),
-				download
-			), false);
+			const heading = DOM({ tag: 'h1' }, 'Необходима Windows версия лаунчера!');
+			const paragraph1 = DOM({ tag: 'p' }, 'Мы отказались от поиска боя и запуска игры Prime World через браузер, так как у игроков регулярно возникали с этим проблемы.');
+			const paragraph2 = DOM({ tag: 'p' }, 'Мы полностью перенесли браузерный лаунчер в полноценное Windows приложение с автоматическим обновлением клиентской части Prime World.');
 
+			// Создаем кнопку закрытия
+			const closeButton = DOM({
+				tag: 'div',
+				style: 'close-button',
+				event: ['click', () => Splash.hide()]
+			});
+			closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+
+			splashContent.append(closeButton, heading, paragraph1, paragraph2, downloadMessage);
+
+			// Добавляем стили для ссылки
+			const style = DOM({
+				tag: 'style',
+				innerHTML: `
+					.launcher-link {
+						color: #ff0000;
+						text-decoration: none;
+						transition: color 0.3s ease;
+					}
+					.launcher-link:hover {
+						color: #ff6666;
+						text-decoration: underline;
+					}
+				`
+			});
+			document.head.append(style);
+
+			Splash.show(splashContent, false);
 			return;
 
 		}
