@@ -9187,111 +9187,112 @@ class Castle {
 }
 
 class Settings {
-	static defaultSettings = {
-		fullscreen: true,
-		render: Castle.render[Castle.RENDER_LAYER_PLAYER],
-		globalVolume: Castle.globalVolume,
-		musicVolume: Castle.musicVolume,
-		soundsVolume: Castle.soundsVolume,
-	}
-	static settings;
+    static defaultSettings = {
+        fullscreen: true,
+        render: true,
+        globalVolume: 0.5,
+        musicVolume: 0.7,
+        soundsVolume: 0.7
+    };
 
-	static pwcLauncherSettingsDir;
-	static pwcDocumentsPath;
-	static settingsFilePath;
+    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
+    static pwcLauncherSettingsDir;
+    static settingsFilePath;
 
-	// Функция для чтения настроек из файла
-	static async ReadSettings() {
-		if (!NativeAPI.status) {
-			Settings.settings = Settings.defaultSettings;
-			return;
-		}
+    static async ensureSettingsFile() {
+        const homeDir = NativeAPI.os.homedir();
+        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
 
-		try {
-			const homeDir = NativeAPI.os.homedir();
-			Settings.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
-			if (!NativeAPI.fileSystem.existsSync(Settings.pwcLauncherSettingsDir)) {
-				NativeAPI.fileSystem.mkdirSync(Settings.pwcLauncherSettingsDir);
-			}
-			Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcLauncherSettingsDir, '/launcher.cfg');
+        try {
+            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
+            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
+            return true;
+        } catch (e) {
+            App.error('Ошибка доступа к файлу настроек: ' + e);
+            await this.writeDefaultSettings();
+            return false;
+        }
+    }
 
-			let pwcDocumentsPath = [
-				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
-			]
+    static async writeDefaultSettings() {
+        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
+        await this.WriteSettings();
+    }
 
-			if (process.env.OneDrive) {
-				pwcDocumentsPath.push(
-					NativeAPI.path.join(process.env.OneDrive, 'Documents', 'My Games', 'Prime World Classic'),
-					NativeAPI.path.join(process.env.OneDrive, 'Документы', 'My Games', 'Prime World Classic'),
-					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
-				);
-			}
+    static async ReadSettings() {
+        if (!NativeAPI.status) {
+            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
+            this.settings = { ...this.defaultSettings };
+            return;
+        }
 
-			for (let path of pwcDocumentsPath) {
-				if (NativeAPI.fileSystem.existsSync(path)) {
-					Settings.pwcDocumentsPath = path;
-				}
-			}
-		} catch (e) {
-			App.error(e);
-		}
+        try {
+            if (await this.ensureSettingsFile()) {
+                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
+                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
+            }
+        } catch (e) {
+            App.error('Ошибка чтения настроек: ' + e);
+            this.settings = { ...this.defaultSettings };
+        }
+    }
 
-		try {
-			if (!NativeAPI.fileSystem.existsSync(Settings.settingsFilePath)) {
-				Settings.settings = Settings.defaultSettings;
-				Settings.WriteSettings();
-				return;
-			}
+    static async WriteSettings() {
+        if (!this.settingsFilePath || !NativeAPI.status) {
+            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
+            return;
+        }
+        
+        try {
+            await NativeAPI.fileSystem.promises.writeFile(
+                this.settingsFilePath,
+                JSON.stringify(this.settings, null, 2),
+                'utf-8'
+            );
+        } catch (e) {
+            App.error('Ошибка сохранения настроек: ' + e);
+        }
+    }
 
-			const data = await NativeAPI.fileSystem.promises.readFile(Settings.settingsFilePath);
-			Settings.settings = JSON.parse(data);
-		} catch (error) {
-			App.error(error);
-			Settings.settings = Settings.defaultSettings;
-		}
-	}
+    static async ApplySettings() {
+        if (!NativeAPI.status || !NativeAPI.window) {
+            App.error('Не могу применить настройки: окно недоступно');
+            return;
+        }
 
-	static async WriteSettings() {
-		if (!NativeAPI.status) {
-			return;
-		}
+        try {
+            const currentMode = await NativeAPI.window.isFullscreen;
+            if (this.settings.fullscreen && !currentMode) {
+                await NativeAPI.window.enterFullscreen();
+            } else if (!this.settings.fullscreen && currentMode) {
+                await NativeAPI.window.leaveFullscreen();
+                NativeAPI.window.resizeTo(1280, 720);
+                NativeAPI.window.setPosition('center');
+            }
+        } catch (e) {
+            App.error('Ошибка переключения режима окна: ' + e);
+        }
 
-		try {
-			await NativeAPI.write(Settings.settingsFilePath, JSON.stringify(Settings.settings));
-		} catch (error) {
-			App.error(error);
-		}
-	}
+        if (Castle) {
+            Castle.globalVolume = this.settings.globalVolume;
+            Castle.musicVolume = this.settings.musicVolume;
+            Castle.soundsVolume = this.settings.soundsVolume;
+        }
+        
+        if (Sound?.setVolume) {
+            Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
+        }
+    }
 
-	static async ApplySettings() {
-		Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, Settings.settings.render);
-		if (NativeAPI.status) {
-			if (Settings.settings.fullscreen) {
-				NativeAPI.window.enterFullscreen();
-			} else {
-				NativeAPI.window.leaveFullscreen();
-			}
-		}
-		Castle.globalVolume = Settings.settings.globalVolume;
-		Castle.musicVolume = Settings.settings.musicVolume;
-		Castle.soundsVolume = Settings.settings.soundsVolume;
-	}
-
-	static async init() {
-
-		await Settings.ReadSettings();
-
-		await Settings.ApplySettings();
-
-		Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-
-		window.addEventListener('beforeunload', () => {
-
-			Settings.WriteSettings();
-
-		});
-
-	}
+    static async init() {
+        await this.ReadSettings();
+        await this.ApplySettings();
+        
+        window.addEventListener('beforeunload', () => {
+            this.WriteSettings();
+        });
+    }
 }
 
 class MM {
@@ -9325,11 +9326,18 @@ class MM {
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 		document.body.style.display = 'block';
-		NativeAPI.window.show();
-		NativeAPI.setDefaultWindow();
-
-		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
-
+		
+		if (NativeAPI.status) {
+			try {
+				Settings.ApplySettings();
+				
+				NativeAPI.window.show();
+				NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
+			} catch (e) {
+				App.error(e);
+			}
+		}
+		
 		View.show('castle');
 	}
 
@@ -10095,34 +10103,24 @@ class MM {
 	}
 
 	static finish(data) {
-
 		Timer.stop();
-
 		MM.close();
-
+	
+		try {
+			Settings.ApplySettings();
+		} catch (e) {
+			App.error(e);
+		}
+	
 		if (data.mode == 3) {
-
 			ARAM.briefing(data.hero, data.role, () => {
-
 				MM.gameRunEvent();
-
 				PWGame.start(data.key, MM.gameStopEvent);
-
-				View.show('castle');
-
 			});
-
-		}
-		else {
-
+		} else {
 			MM.gameRunEvent();
-
 			PWGame.start(data.key, MM.gameStopEvent);
-
-			View.show('castle');
-
 		}
-
 	}
 
 	static eventChangeHero(data) {
