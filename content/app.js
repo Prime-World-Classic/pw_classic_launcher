@@ -8438,40 +8438,16 @@ class Castle {
 
 		Castle.globalCanvas.classList.add('castle-fade-in');
 
-		if (NativeAPI.fileSystem && !Sound.all?.castle) {
-			try {
-				const soundFiles = await NativeAPI.fileSystem.promises.readdir(`content/sounds/${sceneName}`);
+		if (NativeAPI.fileSystem && !('castle' in Sound.all)) {
+			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
 
-				const supportedFormats = ['.ogg', '.mp3', '.wav'];
-				const audioFiles = soundFiles.filter(file => 
-					supportedFormats.some(format => file.endsWith(format))
-				);
-		
-				if (audioFiles.length === 0) {
-					App.error('Нет подходящих аудиофайлов в директории');
-					return;
-				}
+			let playCastleMusic = function () {
+				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
+				Sound.stop('castle');
+				Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic)
 
-				const playCastleMusic = () => {
-					if (!Sound.all?.castle) { // Проверка существования звука
-						const randomTrack = audioFiles[Math.floor(Math.random() * audioFiles.length)];
-						const musicPath = `content/sounds/${sceneName}/${randomTrack}`;
-						
-						Sound.play(musicPath, {
-							id: 'castle',
-							volume: Castle.GetVolume(Castle.AUDIO_MUSIC),
-							onend: playCastleMusic // Циклическое воспроизведение
-						});
-					}
-				};
-
-				if (!Sound.all?.castle) {
-					playCastleMusic();
-				}
-			} catch (e) {
-				App.error(`Ошибка загрузки музыки (${sceneName}): ${e.message}`);
 			}
-
+			playCastleMusic();
 		}
 
 		Castle.MainLoop(Castle.sceneObjects, Castle.sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
