@@ -3278,68 +3278,111 @@ class Window {
 
 	static async settings() {
 		let soundTestId = 'sound_test';
-		
+	
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 						Settings.settings.fullscreen = !e.target.checked;
-						Settings.ApplySettings();
+						Settings.ApplySettings({render: false, audio: false});
 					}]
 				},
 					{ checked: Settings.settings.fullscreen }),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
 			DOM({ style: 'castle-menu-item' },
-				DOM({
-					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: Settings.settings.render, event: ['change', (e) => {
-						Settings.settings.render = e.target.checked;
-						Settings.ApplySettings();
-					}]
-				}),
-				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
-			),
+            	DOM({
+                	tag: 'input',
+                	type: 'checkbox',
+                	id: 'render-toggle',
+                	checked: Settings.settings.render,
+                	event: ['change', (e) => {
+                    	Settings.settings.render = e.target.checked;
+                    	Settings.ApplySettings({audio: false, window: false});
+                	}]
+            	}),
+            	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
+        	),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
-				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.globalVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.globalVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
-						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-						document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
-					}]
-				}),
-				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume) * 100)}%`)
+            	DOM({
+                	tag: 'input',
+                	type: 'range',
+                	value: Settings.settings.globalVolume * 100,
+                	min: '0',
+                	max: '100',
+                	step: '1',
+                	style: 'castle-menu-slider',
+                	event: ['input', (e) => {
+                    	Settings.settings.globalVolume = parseFloat(e.target.value) / 100;
+                    	Settings.ApplySettings({render: false, window: false});
+																	  
+																		  
+                    	document.getElementById('global-volume-percentage').textContent = 
+                        	`${Math.round(Settings.settings.globalVolume * 100)}%`;
+                	}]
+            	}),
+				DOM({ 
+					tag: 'span', 
+					id: 'global-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.globalVolume * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeMusic'),
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.musicVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.musicVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
-						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-						document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
+					tag: 'input', 
+					type: 'range', 
+					value: Settings.settings.musicVolume * 100, 
+					min: '0', 
+					max: '100', 
+					step: '1',
+					style: 'castle-menu-slider', 
+					event: ['input', (e) => {
+						Settings.settings.musicVolume = parseFloat(e.target.value) / 100;
+						Settings.ApplySettings({render: false, window: false});
+																	  
+						document.getElementById('music-volume-percentage').textContent = 
+							`${Math.round(Settings.settings.musicVolume * 100)}%`;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.musicVolume) * 100)}%`)
+				DOM({ 
+					tag: 'span', 
+					id: 'music-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.musicVolume * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeSound'),
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.soundsVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
+					tag: 'input', 
+					type: 'range', 
+					value: Settings.settings.soundsVolume * 100, 
+					min: '0', 
+					max: '100', 
+					step: '1',
+					style: 'castle-menu-slider', 
+					event: ['input', (e) => {
+						Settings.settings.soundsVolume = parseFloat(e.target.value) / 100;
+						Settings.ApplySettings({render: false, window: false});
+						
 						if (!Castle.testSoundIsPlaying) {
 							Castle.testSoundIsPlaying = true;
-							Sound.play('content/sounds/found.ogg', { id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) }, () => { Castle.testSoundIsPlaying = false });
+							Sound.play('content/sounds/found.ogg', { 
+								id: soundTestId, 
+								volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) 
+							}, () => { 
+								Castle.testSoundIsPlaying = false 
+							});
 						}
-						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-						document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
+																		  
+						document.getElementById('sounds-volume-percentage').textContent = 
+							`${Math.round(Settings.settings.soundsVolume * 100)}%`;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
+				DOM({ 
+					tag: 'span', 
+					id: 'sounds-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
 			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
@@ -7947,21 +7990,21 @@ class Castle {
 
 	static gl;
 
-	static globalVolume = 1.0;
-	static musicVolume = 0.5;
-	static soundsVolume = 0.3;
-
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
 	static GetVolume(type) {
-
+		// Используем настройки из Settings вместо внутренних переменных
+		const global = Settings.settings.globalVolume ?? 1.0;
+		const music = Settings.settings.musicVolume ?? 0.5;
+		const sounds = Settings.settings.soundsVolume ?? 0.3;
+	
 		if (type == Castle.AUDIO_MUSIC) {
-			return Castle.globalVolume * Castle.musicVolume;
+			return global * music;
 		}
 		if (type == Castle.AUDIO_SOUNDS) {
-			return Castle.globalVolume * Castle.soundsVolume;
+			return global * sounds;
 		}
-
+		return 1.0; // Значение по умолчанию
 	}
 	static testSoundIsPlaying = false;
 
@@ -8083,6 +8126,7 @@ class Castle {
 			Sound.pause('castle');
 		} else {
 			Sound.unpause('castle');
+			Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 		}
 	}
 
@@ -8394,15 +8438,40 @@ class Castle {
 
 		Castle.globalCanvas.classList.add('castle-fade-in');
 
-		if (NativeAPI.fileSystem && !('castle' in Sound.all)) {
-			var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
+		if (NativeAPI.fileSystem && !Sound.all?.castle) {
+			try {
+				const soundFiles = await NativeAPI.fileSystem.promises.readdir(`content/sounds/${sceneName}`);
 
-			let playCastleMusic = function () {
-				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
-				Sound.stop('castle');
-				Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic)
+				const supportedFormats = ['.ogg', '.mp3', '.wav'];
+				const audioFiles = soundFiles.filter(file => 
+					supportedFormats.some(format => file.endsWith(format))
+				);
+		
+				if (audioFiles.length === 0) {
+					App.error('Нет подходящих аудиофайлов в директории');
+					return;
+				}
+
+				const playCastleMusic = () => {
+					if (!Sound.all?.castle) { // Проверка существования звука
+						const randomTrack = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+						const musicPath = `content/sounds/${sceneName}/${randomTrack}`;
+						
+						Sound.play(musicPath, {
+							id: 'castle',
+							volume: Castle.GetVolume(Castle.AUDIO_MUSIC),
+							onend: playCastleMusic // Циклическое воспроизведение
+						});
+					}
+				};
+
+				if (!Sound.all?.castle) {
+					playCastleMusic();
+				}
+			} catch (e) {
+				App.error(`Ошибка загрузки музыки (${sceneName}): ${e.message}`);
 			}
-			playCastleMusic();
+
 		}
 
 		Castle.MainLoop(Castle.sceneObjects, Castle.sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
@@ -9255,35 +9324,51 @@ class Settings {
         }
     }
 
-    static async ApplySettings() {
-        if (!NativeAPI.status || !NativeAPI.window) {
-            App.error('Не могу применить настройки: окно недоступно');
-            return;
-        }
-
-        try {
-            const currentMode = await NativeAPI.window.isFullscreen;
-            if (this.settings.fullscreen && !currentMode) {
-                await NativeAPI.window.enterFullscreen();
-            } else if (!this.settings.fullscreen && currentMode) {
-                await NativeAPI.window.leaveFullscreen();
-                NativeAPI.window.resizeTo(1280, 720);
-                NativeAPI.window.setPosition('center');
-            }
-        } catch (e) {
-            App.error('Ошибка переключения режима окна: ' + e);
-        }
-
-        if (Castle) {
-            Castle.globalVolume = this.settings.globalVolume;
-            Castle.musicVolume = this.settings.musicVolume;
-            Castle.soundsVolume = this.settings.soundsVolume;
-        }
-        
-        if (Sound?.setVolume) {
-            Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-        }
-    }
+    static async ApplySettings(options = {}) {
+		// Установка значений по умолчанию для options
+		options = {
+			render: true,    // Применять настройки рендеринга по умолчанию
+			audio: true,     // Применять настройки звука по умолчанию
+			window: true,    // Применять настройки окна по умолчанию
+			...options       // Переопределение дефолтных значений
+		};
+	
+		try {
+			// 1. Применение настроек рендеринга (если не отключено в options)
+			if (options.render !== false && typeof Castle !== 'undefined') {
+				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, this.settings.render);
+			}
+	
+			// 2. Применение настроек окна (если не отключено в options)
+			if (options.window !== false && NativeAPI.status && NativeAPI.window) {
+				const currentMode = await NativeAPI.window.isFullscreen;
+				if (this.settings.fullscreen && !currentMode) {
+					await NativeAPI.window.enterFullscreen();
+				} else if (!this.settings.fullscreen && currentMode) {
+					await NativeAPI.window.leaveFullscreen();
+					NativeAPI.window.resizeTo(1280, 720);
+					NativeAPI.window.setPosition('center');
+				}
+			}
+	
+			// 3. Применение настроек звука (если не отключено в options)
+			if (options.audio !== false && typeof Sound !== 'undefined') {
+				// Обновляем громкость для всех звуков
+				for (const soundId in Sound.all) {
+					const type = soundId === 'castle' ? Castle.AUDIO_MUSIC : Castle.AUDIO_SOUNDS;
+					Sound.setVolume(soundId, Castle.GetVolume(type));
+				}
+				
+				// Специальная обработка тестового звука (если используется)
+				if (Castle.testSoundIsPlaying && Sound.all.sound_test) {
+					Sound.setVolume('sound_test', Castle.GetVolume(Castle.AUDIO_SOUNDS));
+				}
+			}
+	
+		} catch (e) {
+			App.error('Ошибка применения настроек: ' + e);
+		}
+	}
 
     static async init() {
         await this.ReadSettings();
@@ -10023,7 +10108,10 @@ class MM {
 
 	static async select(data) {
 
-		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, { volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, { 
+			id: `heroSound_${data.heroId}_${data.sound}`,
+			volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) 
+		});
 
 		MM.lobbyPlayerAnimate.cancel();
 
