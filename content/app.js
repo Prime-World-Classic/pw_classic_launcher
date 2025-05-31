@@ -8787,17 +8787,19 @@ class Castle {
 			"cat",
 			"dog",
 			"unicorn",
+
+			"deco_6",
 		];
 
 		let buildingsToDraw = [];
 
-		let buildingSelector = [10, 6]; // [10] // document.getElementsByClassName("buildings");
+		let buildingSelector = [10, 6, 21, 21, 21, 21]; // [10] // document.getElementsByClassName("buildings");
 
-		let buildingRotation = [0.0, 0.0]; // document.getElementsByClassName("rotation");
+		let buildingRotation = [0.0, 0.0, 0.0, 1.57, 3.14, 4.71]; // document.getElementsByClassName("rotation");
 
-		let buildingPositionX = [20.0, 10.0]; // document.getElementsByClassName("positionX");
+		let buildingPositionX = [20.0, 10.0, 2.0, 2.0, 2.0, 2.0]; // document.getElementsByClassName("positionX");
 
-		let buildingPositionZ = [1.0, 10.0]; // document.getElementsByClassName("positionZ");
+		let buildingPositionZ = [1.0, 10.0, 2.0, 5.0, 8.0, 11.0]; // document.getElementsByClassName("positionZ");
 
 		for (let i = 0; i < buildingSelector.length; ++i) {
 			//if (buildingSelector[i].checked) {
