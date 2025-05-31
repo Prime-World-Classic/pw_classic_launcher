@@ -3280,68 +3280,111 @@ class Window {
 
 	static async settings() {
 		let soundTestId = 'sound_test';
-		
+	
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
 			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 						Settings.settings.fullscreen = !e.target.checked;
-						Settings.ApplySettings();
+						Settings.ApplySettings({render: false, audio: false});
 					}]
 				},
 					{ checked: Settings.settings.fullscreen }),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
 			DOM({ style: 'castle-menu-item' },
-				DOM({
-					tag: 'input', type: 'checkbox', id: 'render-toggle', checked: Settings.settings.render, event: ['change', (e) => {
-						Settings.settings.render = e.target.checked;
-						Settings.ApplySettings();
-					}]
-				}),
-				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
-			),
+            	DOM({
+                	tag: 'input',
+                	type: 'checkbox',
+                	id: 'render-toggle',
+                	checked: Settings.settings.render,
+                	event: ['change', (e) => {
+                    	Settings.settings.render = e.target.checked;
+                    	Settings.ApplySettings({audio: false, window: false});
+                	}]
+            	}),
+            	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
+        	),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
-				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.globalVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.globalVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
-						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-						document.getElementById('global-volume-percentage').innerText = `${Math.round(Castle.globalVolume * 100)}%`;
-					}]
-				}),
-				DOM({ tag: 'span', id: 'global-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.globalVolume) * 100)}%`)
+            	DOM({
+                	tag: 'input',
+                	type: 'range',
+                	value: Settings.settings.globalVolume * 100,
+                	min: '0',
+                	max: '100',
+                	step: '1',
+                	style: 'castle-menu-slider',
+                	event: ['input', (e) => {
+                    	Settings.settings.globalVolume = parseFloat(e.target.value) / 100;
+                    	Settings.ApplySettings({render: false, window: false});
+																	  
+																		  
+                    	document.getElementById('global-volume-percentage').textContent = 
+                        	`${Math.round(Settings.settings.globalVolume * 100)}%`;
+                	}]
+            	}),
+				DOM({ 
+					tag: 'span', 
+					id: 'global-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.globalVolume * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeMusic'),
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.musicVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.musicVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
-						Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-						document.getElementById('music-volume-percentage').innerText = `${Math.round(Castle.musicVolume * 100)}%`;
+					tag: 'input', 
+					type: 'range', 
+					value: Settings.settings.musicVolume * 100, 
+					min: '0', 
+					max: '100', 
+					step: '1',
+					style: 'castle-menu-slider', 
+					event: ['input', (e) => {
+						Settings.settings.musicVolume = parseFloat(e.target.value) / 100;
+						Settings.ApplySettings({render: false, window: false});
+																	  
+						document.getElementById('music-volume-percentage').textContent = 
+							`${Math.round(Settings.settings.musicVolume * 100)}%`;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'music-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.musicVolume) * 100)}%`)
+				DOM({ 
+					tag: 'span', 
+					id: 'music-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.musicVolume * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeSound'),
 				DOM({
-					tag: 'input', type: 'range', value: (Settings.settings.soundsVolume) * 100, min: '0', max: '100', step: '1',
-					style: 'castle-menu-slider', event: ['input', (e) => {
-						Settings.settings.soundsVolume = parseFloat(e.srcElement.value) / 100.0;
-						Settings.ApplySettings();
+					tag: 'input', 
+					type: 'range', 
+					value: Settings.settings.soundsVolume * 100, 
+					min: '0', 
+					max: '100', 
+					step: '1',
+					style: 'castle-menu-slider', 
+					event: ['input', (e) => {
+						Settings.settings.soundsVolume = parseFloat(e.target.value) / 100;
+						Settings.ApplySettings({render: false, window: false});
+						
 						if (!Castle.testSoundIsPlaying) {
 							Castle.testSoundIsPlaying = true;
-							Sound.play('content/sounds/found.ogg', { id: soundTestId, volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) }, () => { Castle.testSoundIsPlaying = false });
+							Sound.play('content/sounds/found.ogg', { 
+								id: soundTestId, 
+								volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) 
+							}, () => { 
+								Castle.testSoundIsPlaying = false 
+							});
 						}
-						Sound.setVolume(soundTestId, Castle.GetVolume(Castle.AUDIO_SOUNDS));
-						document.getElementById('sounds-volume-percentage').innerText = `${Math.round(Castle.soundsVolume * 100)}%`;
+																		  
+						document.getElementById('sounds-volume-percentage').textContent = 
+							`${Math.round(Settings.settings.soundsVolume * 100)}%`;
 					}]
 				}),
-				DOM({ tag: 'span', id: 'sounds-volume-percentage', style: 'volume-percentage' }, `${Math.round((Settings.settings.soundsVolume) * 100)}%`)
+				DOM({ 
+					tag: 'span', 
+					id: 'sounds-volume-percentage', 
+					style: 'volume-percentage' 
+				}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
 			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
@@ -7962,21 +8005,21 @@ class Castle {
 
 	static gl;
 
-	static globalVolume = 1.0;
-	static musicVolume = 0.5;
-	static soundsVolume = 0.3;
-
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
 	static GetVolume(type) {
-
+		// Используем настройки из Settings вместо внутренних переменных
+		const global = Settings.settings.globalVolume ?? 1.0;
+		const music = Settings.settings.musicVolume ?? 0.5;
+		const sounds = Settings.settings.soundsVolume ?? 0.3;
+	
 		if (type == Castle.AUDIO_MUSIC) {
-			return Castle.globalVolume * Castle.musicVolume;
+			return global * music;
 		}
 		if (type == Castle.AUDIO_SOUNDS) {
-			return Castle.globalVolume * Castle.soundsVolume;
+			return global * sounds;
 		}
-
+		return 1.0; // Значение по умолчанию
 	}
 	static testSoundIsPlaying = false;
 
@@ -8098,6 +8141,7 @@ class Castle {
 			Sound.pause('castle');
 		} else {
 			Sound.unpause('castle');
+			Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
 		}
 	}
 
@@ -8416,6 +8460,7 @@ class Castle {
 				let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
 				Sound.stop('castle');
 				Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic)
+
 			}
 			playCastleMusic();
 		}
@@ -9202,111 +9247,128 @@ class Castle {
 }
 
 class Settings {
-	static defaultSettings = {
-		fullscreen: true,
-		render: Castle.render[Castle.RENDER_LAYER_PLAYER],
-		globalVolume: Castle.globalVolume,
-		musicVolume: Castle.musicVolume,
-		soundsVolume: Castle.soundsVolume,
-	}
-	static settings;
+    static defaultSettings = {
+        fullscreen: true,
+        render: true,
+        globalVolume: 0.5,
+        musicVolume: 0.7,
+        soundsVolume: 0.7
+    };
 
-	static pwcLauncherSettingsDir;
-	static pwcDocumentsPath;
-	static settingsFilePath;
+    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
+    static pwcLauncherSettingsDir;
+    static settingsFilePath;
 
-	// Функция для чтения настроек из файла
-	static async ReadSettings() {
-		if (!NativeAPI.status) {
-			Settings.settings = Settings.defaultSettings;
-			return;
-		}
+    static async ensureSettingsFile() {
+        const homeDir = NativeAPI.os.homedir();
+        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
 
+        try {
+            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
+            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
+            return true;
+        } catch (e) {
+            App.error('Ошибка доступа к файлу настроек: ' + e);
+            await this.writeDefaultSettings();
+            return false;
+        }
+    }
+
+    static async writeDefaultSettings() {
+        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
+        await this.WriteSettings();
+    }
+
+    static async ReadSettings() {
+        if (!NativeAPI.status) {
+            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
+            this.settings = { ...this.defaultSettings };
+            return;
+        }
+
+        try {
+            if (await this.ensureSettingsFile()) {
+                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
+                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
+            }
+        } catch (e) {
+            App.error('Ошибка чтения настроек: ' + e);
+            this.settings = { ...this.defaultSettings };
+        }
+    }
+
+    static async WriteSettings() {
+        if (!this.settingsFilePath || !NativeAPI.status) {
+            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
+            return;
+        }
+        
+        try {
+            await NativeAPI.fileSystem.promises.writeFile(
+                this.settingsFilePath,
+                JSON.stringify(this.settings, null, 2),
+                'utf-8'
+            );
+        } catch (e) {
+            App.error('Ошибка сохранения настроек: ' + e);
+        }
+    }
+
+    static async ApplySettings(options = {}) {
+		// Установка значений по умолчанию для options
+		options = {
+			render: true,    // Применять настройки рендеринга по умолчанию
+			audio: true,     // Применять настройки звука по умолчанию
+			window: true,    // Применять настройки окна по умолчанию
+			...options       // Переопределение дефолтных значений
+		};
+	
 		try {
-			const homeDir = NativeAPI.os.homedir();
-			Settings.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
-			if (!NativeAPI.fileSystem.existsSync(Settings.pwcLauncherSettingsDir)) {
-				NativeAPI.fileSystem.mkdirSync(Settings.pwcLauncherSettingsDir);
+			// 1. Применение настроек рендеринга (если не отключено в options)
+			if (options.render !== false && typeof Castle !== 'undefined') {
+				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, this.settings.render);
 			}
-			Settings.settingsFilePath = NativeAPI.path.join(Settings.pwcLauncherSettingsDir, '/launcher.cfg');
-
-			let pwcDocumentsPath = [
-				NativeAPI.path.join(homeDir, 'Documents', 'My Games', 'Prime World Classic'),
-			]
-
-			if (process.env.OneDrive) {
-				pwcDocumentsPath.push(
-					NativeAPI.path.join(process.env.OneDrive, 'Documents', 'My Games', 'Prime World Classic'),
-					NativeAPI.path.join(process.env.OneDrive, 'Документы', 'My Games', 'Prime World Classic'),
-					// Это некорректный способ поиска папки с документами. Прайм использует WinAPI метод SHGetFolderPath, который недоступен в NWJS
-				);
-			}
-
-			for (let path of pwcDocumentsPath) {
-				if (NativeAPI.fileSystem.existsSync(path)) {
-					Settings.pwcDocumentsPath = path;
+	
+			// 2. Применение настроек окна (если не отключено в options)
+			if (options.window !== false && NativeAPI.status && NativeAPI.window) {
+				const currentMode = await NativeAPI.window.isFullscreen;
+				if (this.settings.fullscreen && !currentMode) {
+					await NativeAPI.window.enterFullscreen();
+				} else if (!this.settings.fullscreen && currentMode) {
+					await NativeAPI.window.leaveFullscreen();
+					NativeAPI.window.resizeTo(1280, 720);
+					NativeAPI.window.setPosition('center');
 				}
 			}
+	
+			// 3. Применение настроек звука (если не отключено в options)
+			if (options.audio !== false && typeof Sound !== 'undefined') {
+				// Обновляем громкость для всех звуков
+				for (const soundId in Sound.all) {
+					const type = soundId === 'castle' ? Castle.AUDIO_MUSIC : Castle.AUDIO_SOUNDS;
+					Sound.setVolume(soundId, Castle.GetVolume(type));
+				}
+				
+				// Специальная обработка тестового звука (если используется)
+				if (Castle.testSoundIsPlaying && Sound.all.sound_test) {
+					Sound.setVolume('sound_test', Castle.GetVolume(Castle.AUDIO_SOUNDS));
+				}
+			}
+	
 		} catch (e) {
-			App.error(e);
-		}
-
-		try {
-			if (!NativeAPI.fileSystem.existsSync(Settings.settingsFilePath)) {
-				Settings.settings = Settings.defaultSettings;
-				Settings.WriteSettings();
-				return;
-			}
-
-			const data = await NativeAPI.fileSystem.promises.readFile(Settings.settingsFilePath);
-			Settings.settings = JSON.parse(data);
-		} catch (error) {
-			App.error(error);
-			Settings.settings = Settings.defaultSettings;
+			App.error('Ошибка применения настроек: ' + e);
 		}
 	}
 
-	static async WriteSettings() {
-		if (!NativeAPI.status) {
-			return;
-		}
-
-		try {
-			await NativeAPI.write(Settings.settingsFilePath, JSON.stringify(Settings.settings));
-		} catch (error) {
-			App.error(error);
-		}
-	}
-
-	static async ApplySettings() {
-		Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, Settings.settings.render);
-		if (NativeAPI.status) {
-			if (Settings.settings.fullscreen) {
-				NativeAPI.window.enterFullscreen();
-			} else {
-				NativeAPI.window.leaveFullscreen();
-			}
-		}
-		Castle.globalVolume = Settings.settings.globalVolume;
-		Castle.musicVolume = Settings.settings.musicVolume;
-		Castle.soundsVolume = Settings.settings.soundsVolume;
-	}
-
-	static async init() {
-
-		await Settings.ReadSettings();
-
-		await Settings.ApplySettings();
-
-		Sound.setVolume('castle', Castle.GetVolume(Castle.AUDIO_MUSIC));
-
-		window.addEventListener('beforeunload', () => {
-
-			Settings.WriteSettings();
-
-		});
-
-	}
+    static async init() {
+        await this.ReadSettings();
+        await this.ApplySettings();
+        
+        window.addEventListener('beforeunload', () => {
+            this.WriteSettings();
+        });
+    }
 }
 
 class MM {
@@ -9340,11 +9402,18 @@ class MM {
 		Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
 		Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
 		document.body.style.display = 'block';
-		NativeAPI.window.show();
-		NativeAPI.setDefaultWindow();
-
-		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
-
+		
+		if (NativeAPI.status) {
+			try {
+				Settings.ApplySettings();
+				
+				NativeAPI.window.show();
+				NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
+			} catch (e) {
+				App.error(e);
+			}
+		}
+		
 		View.show('castle');
 	}
 
@@ -10030,7 +10099,10 @@ class MM {
 
 	static async select(data) {
 
-		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, { volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+		Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, { 
+			id: `heroSound_${data.heroId}_${data.sound}`,
+			volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) 
+		});
 
 		MM.lobbyPlayerAnimate.cancel();
 
@@ -10110,34 +10182,24 @@ class MM {
 	}
 
 	static finish(data) {
-
 		Timer.stop();
-
 		MM.close();
-
+	
+		try {
+			Settings.ApplySettings();
+		} catch (e) {
+			App.error(e);
+		}
+	
 		if (data.mode == 3) {
-
 			ARAM.briefing(data.hero, data.role, () => {
-
 				MM.gameRunEvent();
-
 				PWGame.start(data.key, MM.gameStopEvent);
-
-				View.show('castle');
-
 			});
-
-		}
-		else {
-
+		} else {
 			MM.gameRunEvent();
-
 			PWGame.start(data.key, MM.gameStopEvent);
-
-			View.show('castle');
-
 		}
-
 	}
 
 	static eventChangeHero(data) {
