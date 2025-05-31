@@ -574,6 +574,1171 @@
                     ]
                 },
                 {
+                    "name": "deco_0",
+                    "translation": [1089.11, 1377.35],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/0_0.bin",
+                            "indexCount": 378,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct3826",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        },
+						{
+							"mesh": "doct/deco/0_1b.bin",
+							"indexCount": 90,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						}
+                    ]
+                },
+                {
+                    "name": "deco_1",
+                    "translation": [1089, 1392],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/1_0.bin",
+                            "indexCount": 894,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct3826",
+                            "transform": [
+                                1, 0, 0, 1089,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1392,
+                                0, 0, 0, 1
+                            ]
+                        },
+						{
+							"mesh": "doct/deco/1_1b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						},
+						{
+							"mesh": "doct/deco/1_2b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						},
+						{
+							"mesh": "doct/deco/1_3b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						}
+                    ]
+                },
+                {
+                    "name": "deco_2",
+                    "translation": [1089, 1406],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/2_0.bin",
+                            "indexCount": 450,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct4174",
+                            "transform": [
+                                1, 0, 0, 1089,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1406,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_3",
+                    "translation": [1088.18, 1419.98],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/3_0.bin",
+                            "indexCount": 240,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct3672",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        },
+						{
+							"mesh": "doct/deco/3_1a.bin",
+							"indexCount": 144,
+							"shader": "shader_pos_norm_uv_ak",
+							"texture": "doct3672",
+							"transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+							]
+						}
+                    ]
+                },
+                {
+                    "name": "deco_4",
+                    "translation": [1087.58, 1436.16],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/4_0.bin",
+                            "indexCount": 486,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1620190",
+                            "transform": [
+                                1.36, 1.04, 0.41, 1087.58,
+                                0, -0.64, 1.65, 33.61,
+                                1.12, -1.27, -0.5, 1436.16,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/4_1.bin",
+                            "indexCount": 696,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1620190",
+                            "transform": [
+                                1.36, 1.12, 0.0, 1085.51,
+                                0, -0.0, 1.77, 30.51,
+                                1.12, -1.36, -0.0, 1438.69,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/4_2.bin",
+                            "indexCount": 576,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1620190",
+                            "transform": [
+                                1.77, 0.0, 0.0, 1085.50,
+                                0, -0.0, 1.77, 26.79,
+                                0.0, -1.77, -0.0, 1439.28,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_5",
+                    "translation": [1085.78, 1459.02],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/5_0.bin",
+                            "indexCount": 1242,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1626297",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_6",
+                    "translation": [1085.5, 1479.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/6_0.bin",
+                            "indexCount": 1008,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1631742",
+                            "transform": [
+                                0.8, 0, 0, 1085.5,
+                                0, 0, 1, 26.79,
+                                0, -0.8, 0, 1479.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+						{
+							"mesh": "doct/deco/6_1b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "deco/3805",
+							"tintColor": [
+								1.0,
+								1.0,
+								1.0,
+								0.5
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								0.8, 0, 0.0, 1085.5,
+								0, 0, 1, 27.9,
+								0, -0.8, 0, 1479.5,
+								0, 0, 0, 1
+							],
+							"uvScroll": [
+								0.0,
+								0.1
+							]
+						},
+						{
+							"mesh": "doct/deco/6_2b.bin",
+							"indexCount": 336,
+							"shader": "shader_pos_color_uv",
+							"texture": "deco/3830",
+							"tintColor": [
+								1.0,
+								1.0,
+								1.0,
+								0.2
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							],
+							"uvScroll": [
+								0.0,
+								0.1
+							]
+						},
+						{
+							"mesh": "doct/deco/6_3b.bin",
+							"indexCount": 672,
+							"shader": "shader_pos_color_uv",
+							"texture": "deco/1631747",
+							"tintColor": [
+								1.0,
+								1.0,
+								1.0,
+								0.5
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1.5, 0, 0.0, 1085.5,
+								0, 1.7, 0, 38.07,
+								0.0, 0, 1.5, 1479.5,
+								0, 0, 0, 1
+							],
+							"uvScroll": [
+								0.0,
+								0.8
+							]
+						},
+						{
+							"mesh": "doct/deco/6_4b.bin",
+							"indexCount": 672,
+							"shader": "shader_pos_color_uv",
+							"texture": "deco/1631752",
+							"tintColor": [
+								1.0,
+								1.0,
+								1.0,
+								0.5
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								0.96, 0, 1.14, 1085.5,
+								0, 1.7, 0, 38.07,
+								-1.15, 0, 0.96, 1479.5,
+								0, 0, 0, 1
+							],
+							"uvScroll": [
+								0.0,
+								1
+							]
+						},
+						{
+							"mesh": "doct/deco/6_5b.bin",
+							"indexCount": 30,
+							"shader": "shader_pos_color_uv",
+							"texture": "deco/1631757",
+							"tintColor": [
+								1.0,
+								1.0,
+								1.0,
+								0.5
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							],
+							"uvScroll": [
+								0.0,
+								0.1
+							]
+						}
+                    ]
+                },
+                {
+                    "name": "deco_7",
+                    "translation": [1106.5, 1373.65],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/7_0.bin",
+                            "indexCount": 162,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 1106.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1373.65,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/7_1.bin",
+                            "indexCount": 2100,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1637457",
+                            "transform": [
+                                1, 0, 0, 1106.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1374.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/7_2_8.bin",
+                            "indexCount": 378,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct3826",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/7_3_8.bin",
+                            "indexCount": 378,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "doct3826",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        },
+						{
+							"mesh": "doct/deco/7_4b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						},
+						{
+							"mesh": "doct/deco/7_5b.bin",
+							"indexCount": 84,
+							"shader": "shader_pos_color_uv",
+							"texture": "blend3990",
+							"tintColor": [
+								0.99,
+								0.99,
+								0.99,
+								0.3
+							],
+							"blend": [
+								"SRC_ALPHA",
+								"ONE"
+							],
+							"transform": [
+								1, 0, 0, 0,
+								0, 1, 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1
+							]
+						}
+                    ]
+                },
+                {
+                    "name": "deco_8",
+                    "translation": [1103.0, 1392.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/8_0.bin",
+                            "indexCount": 540,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1392.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_9",
+                    "translation": [1103.0, 1406.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/9_0.bin",
+                            "indexCount": 684,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1406.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_10",
+                    "translation": [1103.0, 1420.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/10_0.bin",
+                            "indexCount": 684,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1420.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_11",
+                    "translation": [1103.0, 1434.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/11_0.bin",
+                            "indexCount": 660,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1434.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_12",
+                    "translation": [1103.0, 1448.38],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/12_0.bin",
+                            "indexCount": 420,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1448.38,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_13",
+                    "translation": [1103.0, 1462.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/13_0.bin",
+                            "indexCount": 528,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1462.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_14",
+                    "translation": [1103.0, 1476.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/14_0.bin",
+                            "indexCount": 528,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1103.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1476.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_15",
+                    "translation": [1124.0, 1378.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/15_0.bin",
+                            "indexCount": 528,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1124.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1378.0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_16",
+                    "translation": [1127.5, 1395.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/16_0.bin",
+                            "indexCount": 450,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1127.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1395.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/16_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_17",
+                    "translation": [1127.5, 1416.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/17_0.bin",
+                            "indexCount": 858,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1127.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1416.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/17_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_18",
+                    "translation": [1127.5, 1437.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/18_0.bin",
+                            "indexCount": 858,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1127.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1437.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/18_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_19",
+                    "translation": [1127.5, 1458.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/19_0.bin",
+                            "indexCount": 858,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1127.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1458.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/19_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_20",
+                    "translation": [1155.5, 1388.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/20_0.bin",
+                            "indexCount": 1116,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1155.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1388.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/20_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_21",
+                    "translation": [1155.5, 1409.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/21_0.bin",
+                            "indexCount": 1392,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1155.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1409.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/21_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_22",
+                    "translation": [1155.5, 1430.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/22_0.bin",
+                            "indexCount": 1392,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1155.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1430.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/22_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_23",
+                    "translation": [1155.5, 1451.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/23_0.bin",
+                            "indexCount": 1392,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1155.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1451.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/23_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_24",
+                    "translation": [1155.5, 1472.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/24_0.bin",
+                            "indexCount": 780,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1155.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1472.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/24_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_25",
+                    "translation": [1176.5, 1388.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/25_0.bin",
+                            "indexCount": 6570,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1176.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1388.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/25_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_26",
+                    "translation": [1180.0, 1413.0],
+                    "size": [3, 3],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/26_0.bin",
+                            "indexCount": 8646,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1180.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1413.0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/26_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_27",
+                    "translation": [1180.0, 1441.0],
+                    "size": [3, 3],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/27_0.bin",
+                            "indexCount": 3876,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1180.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1441.0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/27_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_28",
+                    "translation": [1180.0, 1469.0],
+                    "size": [3, 3],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/28_0.bin",
+                            "indexCount": 7908,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1180.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1469.0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/28_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_29",
+                    "translation": [1215.0, 1392.0],
+                    "size": [3, 3],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/29_0.bin",
+                            "indexCount": 13167,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1215.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1392.0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/29_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_30",
+                    "translation": [1208.0, 1420.0],
+                    "size": [1, 1],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/30_0.bin",
+                            "indexCount": 780,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1208.0,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1420.0,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/30_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_31",
+                    "translation": [1211.5, 1437.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/31_0.bin",
+                            "indexCount": 2850,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1211.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1437.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/31_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "deco_32",
+                    "translation": [1211.5, 1458.5],
+                    "size": [2, 2],
+                    "objects": [
+                        {
+                            "mesh": "doct/deco/32_0.bin",
+                            "indexCount": 756,
+                            "shader": "shader_pos_tangent_norm_uv_ak",
+                            "texture": "deco/1644823",
+                            "transform": [
+                                1, 0, 0, 1211.5,
+                                0, 0, 1, 26.79,
+                                0, -1, 0, 1458.5,
+                                0, 0, 0, 1
+                            ]
+                        },
+                        {
+                            "mesh": "doct/deco/32_1_8.bin",
+                            "indexCount": 174,
+                            "shader": "shader_pos_norm_uv",
+                            "texture": "deco/1637462",
+                            "transform": [
+                                1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "crystal_farm",
                     "translation": [1099.5, 1388.5],
                     "size": [8, 8],
