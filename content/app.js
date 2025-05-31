@@ -1226,6 +1226,8 @@ class View {
 
 		}
 
+		Window.close('main');
+
 		Castle.toggleRender(Castle.RENDER_LAYER_LAUNCHER, method == 'castle');
 
 		try {
@@ -3724,6 +3726,8 @@ class Rank {
 
 class Build {
 
+	static loading = false;
+
 	static language = {
 		sr: 'Сила/Разум',
 		hp: Lang.text('health'),
@@ -5357,6 +5361,9 @@ class Build {
 
 		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
 
+		if (data.id in Build.talents) {
+			App.error("fail")
+		}
 		Build.talents[data.id] = data;
 
 		talent.dataset.id = data.id;
@@ -5382,6 +5389,12 @@ class Build {
 
 	static inventory() {
 
+		if (Build.loading) {
+			return;
+		}
+
+		Build.loading = true;
+
 		App.api.silent((data) => {
 
 			for (let item of data) {
@@ -5397,6 +5410,8 @@ class Build {
 				preload.add(Build.templateViewTalent(item));
 
 			}
+
+			Build.loading = false;
 
 		}, 'build', 'inventory', { buildId: Build.id });
 
