@@ -673,26 +673,18 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	flex-flow:column nowrap;
 	justify-content:center;
 	align-items:center;
+	container-type: size;
 }
 
 .castle-bottom-menu div{
 	
-	width:2cqw;
-	min-width:5vh;
-	height:2cqw;
-	min-height:5vh;
-	margin:0.5vh 0;
+	width:25cqh;
+	height:25cqh;
+	margin:0.1vh 0;
 	border-radius:50%;
-	background:rgba(255,255,255,0.3);
+	background:rgba(255,255,255,0.0);
 	background-size: contain;
 	
-}
-
-.castle-bottom-menu :first-child {
-	background-image: url('htalents/270.webp');
-}
-.castle-bottom-menu :last-child {
-	background-image: url('htalents/456.webp');
 }
 
 .castle-bottom-content{
