@@ -8820,7 +8820,8 @@ class Castle {
 				let building = buildingsToDraw[i];
 				let shift = [Castle.zeroTranslation[0] + Castle.gridTranslation[0], Castle.zeroTranslation[1] + Castle.gridTranslation[1]];
 				if (shift[0] - Castle.gridCursorPosX > building.translation[0] - building.mesh.size[0] / 2 * 7 && shift[0] - Castle.gridCursorPosX < building.translation[0] + building.mesh.size[1] / 2 * 7 &&
-					shift[1] - Castle.gridCursorPosZ > building.translation[2] - building.mesh.size[1] / 2 * 7 && shift[1] - Castle.gridCursorPosZ < building.translation[2] + building.mesh.size[1] / 2 * 7
+					shift[1] - Castle.gridCursorPosZ > building.translation[2] - building.mesh.size[1] / 2 * 7 && shift[1] - Castle.gridCursorPosZ < building.translation[2] + building.mesh.size[1] / 2 * 7 &&
+					buildingsToDraw[i].name in CastleBuildingsEvents
 				) {
 					outlinedBuilding = i;
 					Castle.outlinedBuilding = buildingsToDraw[i];
