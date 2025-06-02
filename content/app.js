@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.4.1';
+PW_VERSION = '2.4.2';
 
 CURRENT_MM = 'mmtest'
 
