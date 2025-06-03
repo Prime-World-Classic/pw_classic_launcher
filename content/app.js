@@ -789,43 +789,26 @@ class Api {
 	async connect() {
 		// Закрываем предыдущее соединение, если оно есть
 		if (this.WebSocket) {
+			this.WebSocket.removeEventListener('open', this.handleOpen);
+			this.WebSocket.removeEventListener('message', this.handleMessage);
+			this.WebSocket.removeEventListener('close', this.handleClose);
+			this.WebSocket.removeEventListener('error', this.handleError);
 			this.WebSocket.close();
 			this.WebSocket = null;
 		}
 	
 		this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`);
-		this.WebSocket.addEventListener('message', (event) => this.message(event.data));
-	
-		if (Array.isArray(this.host)) {
-			console.log('Selecting host');
-			this.state = this.states.TRY_CONNECT;
-	
-			this.WebSocket.addEventListener('open', async () => {
-				this.state = this.states.CONNECTION_ESTABLISHED;
-				console.log(`Соединение установлено с ${this.MAIN_HOST}`);
-			});
-	
-			// Таймер для проверки соединения
-			const connectionTimer = setTimeout(() => {
-				if (this.state === this.states.TRY_CONNECT) {
-					console.log('Failed connection');
-					this.currentHost = (this.currentHost + 1) % this.host.length;
-					if (this.currentHost === 0) {
-						this.retryCount++;
-					}
-					this.MAIN_HOST = this.host[this.currentHost];
-					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
-					this.connect(); // Вызываем переподключение
-				}
-			}, Math.min(15000, this.retryCount * 5000));
-	
-			// Очищаем таймер при успешном соединении
-			this.WebSocket.addEventListener('open', () => {
-				clearTimeout(connectionTimer);
-			});
-		}
-	
-		this.WebSocket.addEventListener('close', async () => {
+		
+		// Сохраняем ссылки на обработчики для последующего удаления
+		this.handleMessage = (event) => this.message(event.data);
+		this.handleOpen = () => {
+			this.state = this.states.CONNECTION_ESTABLISHED;
+			console.log(`Соединение установлено с ${this.MAIN_HOST}`);
+			if (this.connectionTimer) {
+				clearTimeout(this.connectionTimer);
+			}
+		};
+		this.handleClose = async () => {
 			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
 			if ((Date.now() - this.CONNECTION_FALLED_TIME) < 15000) {
 				this.CONNECTION_FALLED++;
@@ -846,14 +829,54 @@ class Api {
 				try {
 					await this.connect();
 				} catch (e) {
-					console.error('Ошибка переподключения:', e);
+					App.error('Ошибка переподключения:', e);
 				}
 			}, 1000);
-		});
+		};
+		this.handleError = (error) => {
+			console.error('WebSocket error:', error);
+		};
+	
+		this.WebSocket.addEventListener('message', this.handleMessage);
+	
+		if (Array.isArray(this.host)) {
+			console.log('Selecting host');
+			this.state = this.states.TRY_CONNECT;
+	
+			this.WebSocket.addEventListener('open', this.handleOpen);
+	
+			// Таймер для проверки соединения
+			this.connectionTimer = setTimeout(() => {
+				if (this.state === this.states.TRY_CONNECT) {
+					console.log('Failed connection');
+					this.currentHost = (this.currentHost + 1) % this.host.length;
+					if (this.currentHost === 0) {
+						this.retryCount++;
+					}
+					this.MAIN_HOST = this.host[this.currentHost];
+					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
+					this.connect(); // Вызываем переподключение
+				}
+			}, Math.min(15000, this.retryCount * 5000));
+		}
+	
+		this.WebSocket.addEventListener('close', this.handleClose);
+		this.WebSocket.addEventListener('error', this.handleError);
 	
 		return await new Promise((resolve, reject) => {
-			this.WebSocket.addEventListener('open', resolve);
-			this.WebSocket.addEventListener('error', reject);
+			const tempOpenHandler = () => {
+				this.WebSocket.removeEventListener('open', tempOpenHandler);
+				this.WebSocket.removeEventListener('error', tempErrorHandler);
+				resolve();
+			};
+			const tempErrorHandler = (error) => {
+				this.WebSocket.removeEventListener('open', tempOpenHandler);
+				this.WebSocket.removeEventListener('error', tempErrorHandler);
+				reject(error);
+			};
+			
+			this.WebSocket.addEventListener('open', tempOpenHandler);
+			this.WebSocket.addEventListener('error', tempErrorHandler);
 		});
 	}
 
