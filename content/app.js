@@ -1883,21 +1883,87 @@ class View {
 
 		View.bodyCastleHeroes();
 
-		body.append(DOM({ style: 'castle-bottom-menu' }, DOM({
+		let heroesMenuItem = DOM({
 			event: ['click', () => {
 
 				View.bodyCastleHeroes();
+				Castle.buildMode = false;
 
 			}], title: 'Герои'
-		}), DOM({
+			});
+		let friendsMenuItem = DOM({
 			event: ['click', () => {
 
 				View.bodyCastleFriends();
+				Castle.buildMode = false;
 
 			}], title: 'Друзья'
-		})), View.castleBottom);
+			});
+		let buildingsMenuItem = DOM({
+			event: ['click', () => {
+
+				View.bodyCastleBuildings();
+				Castle.buildMode = true;
+
+			}], title: 'Строительство'
+			});
+		heroesMenuItem.style.backgroundImage = `url(content/htalents/270.webp)`;
+		friendsMenuItem.style.backgroundImage = `url(content/htalents/456.webp)`;
+		buildingsMenuItem.style.backgroundImage = `url(content/icons/buildings.webp)`;
+
+		body.append(DOM({ style: 'castle-bottom-menu' }, heroesMenuItem , friendsMenuItem, buildingsMenuItem), View.castleBottom);
 
 		return body;
+
+	}
+
+	static bodyCastleBuildings() {
+
+		while (View.castleBottom.firstChild) {
+
+			View.castleBottom.firstChild.remove();
+
+		}
+
+
+		let selectedFaction = -1;
+		if (Castle.currentSceneName == 'ad') {
+			selectedFaction = 0;
+		}
+		if (Castle.currentSceneName == 'doct') {
+			selectedFaction = 1;
+		}
+		if (selectedFaction == -1) {
+			return;
+		}
+
+		let preload = new PreloadImages(View.castleBottom);
+
+		for (let i = 1; i < Castle.buildings.length; ++i) {
+			let item = Castle.buildings[i];
+			let itemName = Castle.buildingsNames[i][selectedFaction];
+			
+			const buildingName = DOM({ style: 'castle-hero-name' }, DOM({}, itemName));
+
+			if (itemName.length > 10) {
+				buildingName.firstChild.classList.add('castle-name-autoscroll');
+			}
+
+			let buildingNameBase = DOM({ style: 'castle-item-hero-name' }, buildingName);
+
+			let building = DOM({ style: 'castle-hero-item' }, buildingNameBase);
+
+			building.dataset.url = `content/img/buildings/${Castle.currentSceneName}/${item}.png`;
+
+			building.dataset.buildingId = i;
+
+			building.addEventListener('click', async () => {
+				Castle.phantomBuilding.id = building.dataset.buildingId;
+			});
+
+			preload.add(building);
+
+		}
 
 	}
 
@@ -8207,6 +8273,7 @@ class Castle {
 	static cameraHeight = Castle.fixedCameraHeightValues[Math.floor(Castle.currentFixedValue)];
 
 	static doMove = false;
+	static wasMoved = false;
 
 	static cursorDeltaPos = [0.0, 0.0];
 
@@ -8226,7 +8293,180 @@ class Castle {
 
 	static globalCanvas;
 
+	static currentSceneName;
+
 	static sceneObjects = [];
+
+	static buildMode = false;
+
+	static buildings = [
+		"grid",
+
+		"crystal_farm",
+		"food_farm",
+		"heavy_farm",
+		"light_farm",
+		"silver_farm",
+		"talent_farm",
+
+		"clan_house",
+		"fair",
+		"house",
+		"library",
+		"storage",
+
+		"agility",
+		"cunning",
+		"health",
+		"intelligence",
+		"strength",
+		"tavern",
+
+		"cat",
+		"dog",
+		"unicorn",
+
+		"deco_0",
+		"deco_1",
+		"deco_2",
+		"deco_3",
+		"deco_4",
+		"deco_5",
+		"deco_6",
+		"deco_7",
+		"deco_8",
+		"deco_9",
+		"deco_10",
+		"deco_11",
+		"deco_12",
+		"deco_13",
+		"deco_14",
+		"deco_15",
+		"deco_16",
+		"deco_17",
+		"deco_18",
+		"deco_19",
+		"deco_20",
+		"deco_21",
+		"deco_22",
+		"deco_23",
+		"deco_24",
+		"deco_25",
+		"deco_26",
+		"deco_27",
+		"deco_28",
+		"deco_29",
+		"deco_30",
+		"deco_31",
+		"deco_32",
+	];
+
+	static placedBuildings = [
+		{
+			id: 10,
+			rot: 0,
+			posX: 20,
+			posY: 1
+		},
+		{
+			id: 6,
+			rot: 0,
+			posX: 10,
+			posY: 10
+		},
+		{
+			id: 21,
+			rot: 0,
+			posX: 2,
+			posY: 2
+		},
+		{
+			id: 21,
+			rot: 1,
+			posX: 2,
+			posY: 5
+		},
+		{
+			id: 21,
+			rot: 2,
+			posX: 2,
+			posY: 8
+		},
+		{
+			id: 21,
+			rot: 3,
+			posX: 2,
+			posY: 11
+		},
+	];
+	static phantomBuilding = {
+			id: 0,
+			rot: 0,
+			posX: 0,
+			posY: 1000
+	};
+
+	static buildingsNames = [
+		["",""],
+
+		["Жемчужная ферма","Дистиллятор прайма"],
+		["Грибница","Ферма"],
+		["Каучуковое дерево","Штольня"],
+		["Прядильня","Лесопилка"],
+		["Ткацкая мастерская","Мануфактура"],
+		["Сад талантов","Кузница талантов"],
+
+		["Дом клана","Дом клана"],
+		["Ярмарка","Ярмарка"],
+		["Особняк", "Терем"],
+		["Библиотека", "Библиотека"],
+		["Склад","Склад"],
+
+		["Арена", "Арена"],
+		["Шпиль","Секретная служба"],
+		["Альков жизни", "Бастион"],
+		["Храм чистоты","Дом милосердия"],
+		["Монумент","Таран"],
+		["Чайный домик","Таверна"],
+
+		["Кошкин дом","Кошкин дом"],
+		["Домик щенка","Домик щенка"],
+		["Домик единорожка","Домик единорожка"],
+
+		["Алый цветок","Фонарь"],
+		["Янтарный цветок","Большой фонарь"],
+		["Указатель","Указатель"],
+		["Статуя","Флагшток"],
+		["Барабаны","Подзорная труба"],
+		["Пальма с птицей","Глобус"],
+		["Фонтан","Фонтан"],
+		["Лавка с фонарями","Лавка с фонарями"],
+		["Багряный куст","Куст"],
+		["Лазурный куст","Цветущий куст"],
+		["Багряное соцветие","Цветущий куст"],
+		["Пурпурное соцветие","Цветущий куст"],
+		["Живая изгородь","Живая стена"],
+		["Живая изгородь","Цветущая стена"],
+		["Живая изгородь","Цветущая стена"],
+		["Колонна","Цветущая стена"],
+		["Клумба","Клумба"],
+		["Клумба","Клумба"],
+		["Клумба","Клумба"],
+		["Клумба","Клумба"],
+		["Маленькое дерево","Круглое дерево"],
+		["Цветущая сакура","Круглое дерево"],
+		["Бонсай","Круглое дерево"],
+		["Цветущий бонсай","Круглое дерево"],
+		["Тростниковая башня","Топиарный конус"],
+		["Миниатюрный сад","Фигура жирафа"],
+		["Большая сакура","Топиарный куб"],
+		["Огромный кактус","Большое дерево"],
+		["Раффлезия","Фигура слона"],
+		["Мухоловка","Фигура единорога"],
+		["Фигурный тростник","Малый топиарный конус"],
+		["Банановая пальма","Топиарная башня"],
+		["Кокосовая пальма","Топиарный столб"],
+	];
 
 	static toggleMusic(layer, value) {
 		Castle.music[layer] = value ? value : !Castle.music[layer];
@@ -8262,13 +8502,15 @@ class Castle {
 
 	static prepareMove(event) {
 
-		Castle.doMove = true;
+		if (Castle.phantomBuilding.id == 0) {
+			Castle.doMove = true;
+		}
 
 	}
 
 	static stopMove(event) {
-
-		Castle.doMove = false;
+		Castle.doMove = false
+		setTimeout(_ => { Castle.wasMoved = false }, 100);
 
 	}
 
@@ -8279,6 +8521,10 @@ class Castle {
 			Castle.cursorDeltaPos[0] = event.movementX * 2.0;
 
 			Castle.cursorDeltaPos[1] = event.movementY * 2.0;
+
+			if (Math.abs(event.movementX + event.movementY) > 0.1) {
+				Castle.wasMoved = true;
+			}
 
 		} else {
 
@@ -8292,9 +8538,45 @@ class Castle {
 
 		Castle.cursorPosition[1] = event.offsetY;
 
+		let shift = [Castle.gridTranslation[0], Castle.gridTranslation[1]];
+		if (Castle.phantomBuilding.id > 0 && Castle.gridCursorPosX && Castle.gridCursorPosX) {
+			Castle.phantomBuilding.posX = Math.floor((shift[0]-Castle.gridCursorPosX) / 7.0);
+			Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0);
+			//App.error(Castle.phantomBuilding.posX + " " + Castle.phantomBuilding.posY)
+		}
+
+	}
+
+	static addPhantomBuildingToRender() {
+		Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
+		Castle.isStaticSMCached = false;
+	}
+
+	static findAndRotateBuilding(posX, posY) {
+		for (let b = 0; b < Castle.placedBuildings.length; ++b) {
+			let building = Castle.placedBuildings[b];
+			if (building.posX == posX && building.posY == posY) {
+				building.rot = (building.rot + 1) % 4;
+				Castle.isStaticSMCached = false;
+				return;
+			}
+		}
+	}
+
+	static findAndDeleteBuilding(posX, posY) {
+		for (let b = 0; b < Castle.placedBuildings.length; ++b) {
+			let building = Castle.placedBuildings[b];
+			if (building.posX == posX && building.posY == posY) {
+				Castle.placedBuildings.splice(b, 1);
+				Castle.isStaticSMCached = false;
+				return;
+			}
+		}
 	}
 
 	static async initDemo(sceneName, canvas) {
+
+		Castle.currentSceneName = sceneName;
 
 		window.addEventListener('resize', function (event) {
 
@@ -8311,9 +8593,17 @@ class Castle {
 		}, true);
 
 		canvas.addEventListener('click', function (event) {
-			if (Castle.outlinedBuilding) {
-				if (Castle.outlinedBuilding.name in CastleBuildingsEvents) {
-					CastleBuildingsEvents[Castle.outlinedBuilding.name]();
+			if (Castle.phantomBuilding.id > 0) {
+				Castle.addPhantomBuildingToRender();
+			} else {
+				if (Castle.outlinedBuilding && !Castle.wasMoved) {
+					if (Castle.buildMode) {
+						Castle.findAndRotateBuilding(Castle.outlinedBuilding.position[0], Castle.outlinedBuilding.position[1]);
+					} else {
+						if (Castle.outlinedBuilding.name in CastleBuildingsEvents) {
+							CastleBuildingsEvents[Castle.outlinedBuilding.name]();
+						}
+					}
 				}
 			}
 		});
@@ -8331,6 +8621,16 @@ class Castle {
 		canvas.onmousedown = Castle.prepareMove;
 
 		canvas.onmouseup = Castle.stopMove;
+
+		oncontextmenu = (event) => { 
+			event.preventDefault();
+			Castle.phantomBuilding.id = 0; 
+			Castle.phantomBuilding.posX = 0; 
+			Castle.phantomBuilding.posY = 1000; 
+			if (Castle.buildMode && Castle.outlinedBuilding) {
+				Castle.findAndDeleteBuilding(Castle.outlinedBuilding.position[0], Castle.outlinedBuilding.position[1])
+			}
+		}
 
 		canvas.addEventListener('mousemove', Castle.moveMouse);
 
@@ -8854,52 +9154,14 @@ class Castle {
 
 		Castle.cameraHeight = Castle.lerp(targetCHVs[0], targetCHVs[1], camLerp);
 
-		let buildings = [
-			"grid",
-
-			"crystal_farm",
-			"food_farm",
-			"heavy_farm",
-			"light_farm",
-			"silver_farm",
-			"talent_farm",
-
-			"clan_house",
-			"fair",
-			"house",
-			"library",
-			"storage",
-
-			"agility",
-			"cunning",
-			"health",
-			"intelligence",
-			"strength",
-			"tavern",
-
-			"cat",
-			"dog",
-			"unicorn",
-		];
-
 		let buildingsToDraw = [];
 
-		let buildingSelector = [10, 6]; // [10] // document.getElementsByClassName("buildings");
-
-		let buildingRotation = [0.0, 0.0]; // document.getElementsByClassName("rotation");
-
-		let buildingPositionX = [20.0, 10.0]; // document.getElementsByClassName("positionX");
-
-		let buildingPositionZ = [1.0, 10.0]; // document.getElementsByClassName("positionZ");
-
-		for (let i = 0; i < buildingSelector.length; ++i) {
-			//if (buildingSelector[i].checked) {
-			var mesh = Castle.sceneBuildings[buildings[buildingSelector[i]]];
+		for (let building of Castle.placedBuildings) {
+			var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
 			buildingsToDraw.push({
-				mesh: mesh, rotation: buildingRotation[i], position: [buildingPositionX[i], buildingPositionZ[i]], name: buildings[buildingSelector[i]],
-				translation: [Castle.zeroTranslation[0] + (buildingPositionX[i] * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (buildingPositionZ[i] * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+				mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
+				translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (building.posY * 7.0 + mesh.size[1] / 2.0 * 7.0)]
 			});
-			//}
 		}
 
 		Castle.updateMainCam();
@@ -8907,15 +9169,26 @@ class Castle {
 		let outlinedBuilding = -1;
 		Castle.outlinedBuilding = null;
 		if (Object.keys(Window.windows).length === 0) { // do not outline when any window is active
-			for (let i = 0; i < buildingsToDraw.length; ++i) {
-				let building = buildingsToDraw[i];
-				let shift = [Castle.zeroTranslation[0] + Castle.gridTranslation[0], Castle.zeroTranslation[1] + Castle.gridTranslation[1]];
-				if (shift[0] - Castle.gridCursorPosX > building.translation[0] - building.mesh.size[0] / 2 * 7 && shift[0] - Castle.gridCursorPosX < building.translation[0] + building.mesh.size[1] / 2 * 7 &&
-					shift[1] - Castle.gridCursorPosZ > building.translation[2] - building.mesh.size[1] / 2 * 7 && shift[1] - Castle.gridCursorPosZ < building.translation[2] + building.mesh.size[1] / 2 * 7
-				) {
-					outlinedBuilding = i;
-					Castle.outlinedBuilding = buildingsToDraw[i];
-					break;
+			if (Castle.phantomBuilding.id > 0) {
+				let building = Castle.phantomBuilding;
+				var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
+				buildingsToDraw.push({
+					outlined: true, mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
+					translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (building.posY * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+				});
+				outlinedBuilding = buildingsToDraw.length - 1;
+			} else {
+				for (let i = 0; i < buildingsToDraw.length; ++i) {
+					let building = buildingsToDraw[i];
+					let shift = [Castle.zeroTranslation[0] + Castle.gridTranslation[0], Castle.zeroTranslation[1] + Castle.gridTranslation[1]];
+					if (shift[0] - Castle.gridCursorPosX > building.translation[0] - building.mesh.size[0] / 2 * 7 && shift[0] - Castle.gridCursorPosX < building.translation[0] + building.mesh.size[1] / 2 * 7 &&
+						shift[1] - Castle.gridCursorPosZ > building.translation[2] - building.mesh.size[1] / 2 * 7 && shift[1] - Castle.gridCursorPosZ < building.translation[2] + building.mesh.size[1] / 2 * 7 &&
+						(buildingsToDraw[i].name in CastleBuildingsEvents || Castle.buildMode)
+					) {
+						outlinedBuilding = i;
+						Castle.outlinedBuilding = buildingsToDraw[outlinedBuilding];
+						break;
+					}
 				}
 			}
 		}
@@ -8934,7 +9207,9 @@ class Castle {
 			}
 			for (let buildingToDraw of buildingsToDraw) {
 				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
-					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], true, buildingToDraw.rotation, buildingToDraw.translation);
+					if (!buildingToDraw.outlined) {
+						Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], true, buildingToDraw.rotation, buildingToDraw.translation);
+					}
 				}
 			}
 
@@ -8959,8 +9234,16 @@ class Castle {
 				Castle.gl.disable(Castle.gl.DEPTH_TEST);
 				Castle.gl.depthMask(false);
 				let buildingToDraw = buildingsToDraw[outlinedBuilding];
+				let outlineColor = [0, 20, 0 , 1];
+				if (Castle.buildMode) {
+					outlineColor = [20, 20, 0, 1];
+					if (Castle.phantomBuilding.id > 0) {
+					}
+				}
 				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
-					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, buildingToDraw.translation, [0, 20, 0, 1]);
+					let outlinedTranslation = [buildingToDraw.translation[0], buildingToDraw.translation[1], buildingToDraw.translation[2]];
+					outlinedTranslation[1] -= 6.0 / buildingToDraw.mesh.size[0];
+					Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, outlinedTranslation, outlineColor, 1.0 + (0.16 / Math.pow(buildingToDraw.mesh.size[0], 3/4)));
 				}
 				Castle.gl.enable(Castle.gl.DEPTH_TEST);
 				Castle.gl.depthMask(true);
@@ -8994,7 +9277,7 @@ class Castle {
 
 	}
 
-	static prepareAndDrawObject(obj, isSMPass, rotation, translation, tintOverride) {
+	static prepareAndDrawObject(obj, isSMPass, rotation, translation, tintOverride, scaleOverride) {
 
 		let meshData = obj.meshData;
 		let associatedTexture = obj.textureId;
@@ -9018,7 +9301,7 @@ class Castle {
 			textures, meshData.vertices, meshData.indexCount,
 			meshData.vertStride, Castle.sceneShaders[obj.shaderId].attributes,
 			obj.strip, obj.transform, isSMPass,
-			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride);
+			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride);
 
 	}
 
@@ -9174,7 +9457,7 @@ class Castle {
 
 	}
 
-	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride) {
+	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride) {
 
 		if (blend) {
 
@@ -9268,9 +9551,9 @@ class Castle {
 
 		}
 
-		if (tintOverride) {
+		if (scaleOverride) {
 
-			mat4.fromScaling(worldMatrix3, [1.1, 1.1, 1.1]);
+			mat4.fromScaling(worldMatrix3, [scaleOverride, scaleOverride, scaleOverride]);
 
 			mat4.mul(worldMatrix2, worldMatrix3, worldMatrix2);
 		}
@@ -9279,7 +9562,7 @@ class Castle {
 
 			worldMatrix2[12] += translation[0];
 
-			worldMatrix2[13] += translation[1] + tintOverride ? -4 : 0;
+			worldMatrix2[13] += translation[1];
 
 			worldMatrix2[14] += translation[2];
 
@@ -9328,12 +9611,6 @@ class Castle {
 	static lerp(a, b, alpha) {
 
 		return a + alpha * (b - a);
-
-	}
-
-	static clamp(val, min, max) {
-
-		return Math.min(Math.max(val, min), max);
 
 	}
 
