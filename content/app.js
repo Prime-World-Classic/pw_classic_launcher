@@ -6962,9 +6962,11 @@ class Events {
 	}
 
 	static PMMActive(data) {
-
+		
+		CastleNAVBAR.setMode(data.mode + 1);
+		
 		MM.searchActive(data.status);
-
+		
 	}
 
 	static MMQueue(value) {
