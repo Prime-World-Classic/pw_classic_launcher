@@ -7125,7 +7125,7 @@ class App {
 		/*
 		setTimeout(() => {
 			
-			ARAM.briefing(13,4,() => alert(1));
+			ARAM.briefing(6,4,() => alert(1));
 			
 		},3000);
 		*/
@@ -10763,7 +10763,7 @@ class ARAM {
 		{ name: 'Боец дальнего боя', task: 'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [52, 47, 63, 26, 24, 34, 40, 32, 31, 55, 7, 28, 8, 57, 2, 44, 21, 5, 12, 54, 65, 43, 18, 62, 29, 58, 9, 25, 50] },
 		{ name: 'Боец ближнего боя', task: 'Нанести как можно больше урона всем противникам вокруг.', hero: [48, 33, 4, 10, 49, 1, 23, 60, 51, 22, 11, 20, 56, 41, 53, 39, 45, 14, 64] },
 		{ name: 'Поддержка', task: 'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.', hero: [19, 38, 13, 59] },
-		{ name: 'Ассасин', task: 'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
+		{ name: 'Ассасин', task: 'Найдите уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
 	];
 
 	static briefing(heroId, roleId, callback) {
@@ -10772,7 +10772,7 @@ class ARAM {
 
 		hero.style.backgroundImage = `url(content/hero/empty.webp)`;
 
-		let lastRandomHero = 0, second = 15, timer = DOM({ style: 'aram-timer' }, 'Начало боя через 15...');
+		let lastRandomHero = 0, second = 17, timer = DOM({ style: 'aram-timer' }, 'Начало боя через 15...');
 
 		let setIntervalId = setInterval(() => {
 
@@ -10786,7 +10786,7 @@ class ARAM {
 
 				hero.firstChild.animate({ opacity: [1, 0] }, { duration: 5000, fill: 'forwards', easing: 'ease-out' });
 
-				hero.animate({ backgroundSize: ['100%', '150%'] }, { duration: 5000, fill: 'forwards', easing: 'ease-in' });
+				//hero.animate({ backgroundSize: ['100%', '125%'] }, { duration: 1500, fill: 'forwards', easing: 'ease-in' });
 
 				return;
 
@@ -10810,14 +10810,7 @@ class ARAM {
 
 			hero.style.backgroundImage = `url(content/hero/${heroRandom}/1.webp)`;
 
-		}, 300);
-
-		let content = DOM({ style: 'aram-briefing' }, hero, DOM({ style: 'aram-briefing-right' },
-			DOM({ tag: 'h3' }, 'Ваша роль'),
-			DOM({ tag: 'p', style: 'aram-hero-role' }, ARAM.role[roleId].name),
-			DOM({ tag: 'h3' }, 'Ваша задача'),
-			DOM({ tag: 'p' }, ARAM.role[roleId].task)
-		), timer);
+		}, 150);
 
 		let timerId = setInterval(() => {
 
@@ -10825,31 +10818,69 @@ class ARAM {
 
 				clearInterval(timerId);
 
-				Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
-
-				callback();
-
-				Splash.hide();
-
 				return;
-
+				
 			}
 
 			second--;
 
 			timer.innerText = (second == 0) ? Lang.text('fight') : `Начало боя через ${second}...`;
-
+			
 		}, 1000);
+		
+		let part = DOM({style:'aram-background-part'});
+		
+		part.style.backgroundImage = `url(content/img/aram/part.png)`;
+		
+		part.style.backdropFilter = 'blur(5vmax)';
+		
+		let text = DOM({style:'aram-text'},DOM({style:'aram-text-center'},DOM({tag:'div'},DOM({tag:'h1'},`Ваша роль — ${ARAM.role[roleId].name}`)),DOM({tag:'div'},ARAM.role[roleId].task)));
+		
+		setTimeout(() => {
+			
+			let animate = text.animate({ opacity: [0,1] }, { duration: 3000, fill: 'forwards'});
+			
+			setTimeout(() => {
+				
+				animate.reverse();
+				
+			},7500);
+			
+		},1000);
+		
+		let background = DOM({ style: 'aram-background' },part,hero,text); // content
+		
+		background.style.backgroundImage = `url(content/img/aram/bg.png)`;
 
-		let background = DOM({ style: 'aram-background' }, content);
+		//timer.animate({ transform: ['scale(1)', 'scale(1.1)', 'scale(1)'] }, { duration: 1000, iterations: Infinity, easing: 'ease-out' });
 
-		timer.animate({ transform: ['scale(1)', 'scale(1.1)', 'scale(1)'] }, { duration: 1000, iterations: Infinity, easing: 'ease-out' });
-
-		background.style.backgroundImage = `url(content/img/aram/${App.getRandomInt(1, 2)}.jpg)`;
+		setTimeout(() => {
+			
+			let animate = part.animate({ backdropFilter: ['blur(5vmax)', 'blur(0)'] }, { duration: 1000, fill: 'forwards'});
+			
+			animate.onfinish = () => {
+				
+				part.style.display = 'none';
+				
+				background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 2000, easing: 'ease-in-out', fill: 'forwards', easing: 'ease-out' });
+				
+				setTimeout(() => {
+					
+					//Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
+					
+					//callback();
+					
+					//Splash.hide();
+					
+				},1000);
+				
+			}
+			
+		},12000);
 
 		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, false);
 
-		Sound.play('content/sounds/aram/bg1.mp3', { id: 'backgroundAram', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) });
+		Sound.play('content/sounds/aram/bg.mp3', { id: 'backgroundAram', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) });
 
 		Splash.show(background, false);
 
