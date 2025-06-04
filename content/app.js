@@ -791,7 +791,7 @@ class Api {
 			
 			setTimeout( async () => {
 				
-				console.log(`Попытка соединения ${this.MAIN_HOST}...`);
+				console.log(`Попытка соединения ${this.MAIN_HOST} (${this.DISCONNECT_TOTAL })...`);
 				
 				if(this.WebSocket){
 					
@@ -805,7 +805,7 @@ class Api {
 					
 				}
 				
-				if(this.DISCONNECT_TOTAL > this.DISCONNECT_LIMIT){
+				if(this.DISCONNECT_TOTAL >= this.DISCONNECT_LIMIT){
 					
 					this.hostChange();
 					
@@ -817,8 +817,6 @@ class Api {
 				
 				this.WebSocket.onclose = () => {
 					
-					this.DISCONNECT_TOTAL++;
-					
 					this.connect(this.RECONNECT_TIME);
 					
 					reject();
@@ -826,6 +824,8 @@ class Api {
 				};
 				
 				this.WebSocket.onopen = () => {
+					
+					this.WebSocket.onclose = () => this.connect(this.RECONNECT_TIME);
 					
 					console.log(`Успешно подключились к ${this.MAIN_HOST}...`);
 					
@@ -848,6 +848,8 @@ class Api {
 			return;
 			
 		}
+		
+		this.DISCONNECT_TOTAL++;
 		
 		if(this.WebSocket.readyState == 3){
 			
