@@ -743,27 +743,35 @@ class Api {
 
 	constructor(host, events) {
 
-		if (!('WebSocket' in window)) {
+		if( !('WebSocket' in window) ) {
 
-			throw 'Ваш браузер не поддерживает WebSocket!';
-
+			throw 'Отсутствует поддержка WebSocket';
+			
 		}
+		
+		if(!Array.isArray(host)){
+			
+			throw 'Необходим массив хостов';
+			
+		}
+		
+		if(!host.length){
+			
+			throw 'Не указан хост';
+			
+		}
+		
+		this.WebSocket;
 
 		this.host = host;
 
-		this.MAIN_HOST = (Array.isArray(this.host) ? this.host[0] : this.host);
+		this.MAIN_HOST = this.host[0];
 
-		this.CONNECTION_FALLED = 0;
-
-		this.CONNECTION_FALLED_TIME = Date.now();
-
-		this.states = { TRY_CONNECT: 0, CONNECTION_ESTABLISHED: 1 };
-
-		this.state = 0;
-
-		this.currentHost = 0;
-
-		this.retryCount = 1;
+		this.DISCONNECT_TOTAL = 0; // количество неудачных соединений
+		
+		this.DISCONNECT_LIMIT = 15; // лимит неудачных соединений, чтобы перейти на другой хост (DISCONNECT_LIMIT * RECONNECT_TIME)
+		
+		this.RECONNECT_TIME = 1000; // через сколько делаем повторное соединение (1000 = 1 секунда)
 
 		this.awaiting = new Object();
 
@@ -771,113 +779,118 @@ class Api {
 
 	}
 
-	async init() {
-
-		try {
-
-			await this.connect();
-
-		}
-		catch (e) {
-
-
-
-		}
-
+	async init(){
+		
+		await this.connect();
+		
 	}
 
-	async connect() {
-		// Закрываем предыдущее соединение, если оно есть
-		if (this.WebSocket) {
-			this.WebSocket.removeEventListener('open', this.handleOpen);
-			this.WebSocket.removeEventListener('message', this.handleMessage);
-			this.WebSocket.removeEventListener('close', this.handleClose);
-			this.WebSocket.removeEventListener('error', this.handleError);
-			this.WebSocket.close();
-			this.WebSocket = null;
-		}
-	
-		this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`);
+	async connect(timeout = 0){
 		
-		// Сохраняем ссылки на обработчики для последующего удаления
-		this.handleMessage = (event) => this.message(event.data);
-		this.handleOpen = () => {
-			this.state = this.states.CONNECTION_ESTABLISHED;
-			console.log(`Соединение установлено с ${this.MAIN_HOST}`);
-			if (this.connectionTimer) {
-				clearTimeout(this.connectionTimer);
-			}
-		};
-		this.handleClose = async () => {
-			console.log(`Разрыв соединения API (${this.MAIN_HOST})`);
-			if ((Date.now() - this.CONNECTION_FALLED_TIME) < 15000) {
-				this.CONNECTION_FALLED++;
-				this.CONNECTION_FALLED_TIME = Date.now();
-			}
-	
-			if ((this.CONNECTION_FALLED >= 3) && (Array.isArray(this.host))) {
-				const currentIndex = this.host.indexOf(this.MAIN_HOST);
-				const nextIndex = (currentIndex + 1) % this.host.length;
-				this.MAIN_HOST = this.host[nextIndex];
-				console.log(`Переподключаем API (${this.MAIN_HOST})`);
-				this.CONNECTION_FALLED = 0;
-				this.CONNECTION_FALLED_TIME = Date.now();
-			}
-	
-			// Задержка перед переподключением
-			setTimeout(async () => {
-				try {
-					await this.connect();
-				} catch (e) {
-					App.error('Ошибка переподключения:', e);
-				}
-			}, 1000);
-		};
-		this.handleError = (error) => {
-			console.error('WebSocket error:', error);
-		};
-	
-		this.WebSocket.addEventListener('message', this.handleMessage);
-	
-		if (Array.isArray(this.host)) {
-			console.log('Selecting host');
-			this.state = this.states.TRY_CONNECT;
-	
-			this.WebSocket.addEventListener('open', this.handleOpen);
-	
-			// Таймер для проверки соединения
-			this.connectionTimer = setTimeout(() => {
-				if (this.state === this.states.TRY_CONNECT) {
-					console.log('Failed connection');
-					this.currentHost = (this.currentHost + 1) % this.host.length;
-					if (this.currentHost === 0) {
-						this.retryCount++;
-					}
-					this.MAIN_HOST = this.host[this.currentHost];
-					console.log(`RE: Переподключаем API (${this.MAIN_HOST})`);
-					this.connect(); // Вызываем переподключение
-				}
-			}, Math.min(15000, this.retryCount * 5000));
-		}
-	
-		this.WebSocket.addEventListener('close', this.handleClose);
-		this.WebSocket.addEventListener('error', this.handleError);
-	
-		return await new Promise((resolve, reject) => {
-			const tempOpenHandler = () => {
-				this.WebSocket.removeEventListener('open', tempOpenHandler);
-				this.WebSocket.removeEventListener('error', tempErrorHandler);
-				resolve();
-			};
-			const tempErrorHandler = (error) => {
-				this.WebSocket.removeEventListener('open', tempOpenHandler);
-				this.WebSocket.removeEventListener('error', tempErrorHandler);
-				reject(error);
-			};
+		return new Promise((resolve,reject) => {
 			
-			this.WebSocket.addEventListener('open', tempOpenHandler);
-			this.WebSocket.addEventListener('error', tempErrorHandler);
+			setTimeout( async () => {
+				
+				console.log(`Попытка соединения ${this.MAIN_HOST}...`);
+				
+				if(this.WebSocket){
+					
+					if(this.WebSocket.readyState == 1){
+						
+						resolve();
+						
+					}
+					
+					await this.WebSocket.disconnect();
+					
+				}
+				
+				if(this.DISCONNECT_TOTAL > this.DISCONNECT_LIMIT){
+					
+					this.hostChange();
+					
+				}
+				
+				this.WebSocket = new WebSocket(`${this.MAIN_HOST}/${App.storage.data.token}`);
+				
+				this.WebSocket.onmessage = (event) => this.message(event.data);
+				
+				this.WebSocket.onclose = () => {
+					
+					this.DISCONNECT_TOTAL++;
+					
+					this.connect(this.RECONNECT_TIME);
+					
+					reject();
+					
+				};
+				
+				this.WebSocket.onopen = () => {
+					
+					console.log(`Успешно подключились к ${this.MAIN_HOST}...`);
+					
+					resolve();
+					
+				};
+				
+				this.WebSocket.onerror = reject;
+				
+			},timeout);
+			
 		});
+		
+	}
+	
+	async disconnect(){
+		console.log(`Закрываем соединение ${this.MAIN_HOST}...`);
+		if(!this.WebSocket){
+			
+			return;
+			
+		}
+		
+		if(this.WebSocket.readyState == 3){
+			
+			return;
+			
+		}
+		
+		return new Promise((resolve,reject) => {
+			
+			this.WebSocket.onclose = resolve;
+			
+			this.WebSocket.onerror = reject;
+			
+			this.WebSocket.close();
+			
+		});
+		
+	}
+	
+	hostChange(){
+		
+		this.DISCONNECT_TOTAL = 0;
+		
+		if(this.host.length == 1){
+			
+			return;
+			
+		}
+		
+		for(let host of this.host){
+			
+			if(this.MAIN_HOST == host){
+				
+				continue;
+				
+			}
+			
+			this.MAIN_HOST = host;
+			
+			break;
+			
+		}
+		
 	}
 
 	async message(body) {
@@ -7045,7 +7058,7 @@ class Events {
 class App {
 
 	static async init() {
-
+		
 		App.api = new Api(['wss://pw.26rus-game.ru:8443', 'wss://api.playpw.fun:8443'], Events);
 		
 		await News.init();
@@ -7092,8 +7105,17 @@ class App {
 		},3000);
 		*/
 		Chat.init();
-
-		await App.api.init();
+		
+		try{
+			
+			await App.api.init();
+			
+		}
+		catch(error){
+			
+			
+			
+		}
 
 		if (App.storage.data.login) {
 
