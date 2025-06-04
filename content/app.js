@@ -791,7 +791,7 @@ class Api {
 			
 			setTimeout( async () => {
 				
-				console.log(`Попытка соединения ${this.MAIN_HOST} (${this.DISCONNECT_TOTAL })...`);
+				console.log(`Попытка соединения ${this.MAIN_HOST} (${this.DISCONNECT_TOTAL})...`);
 				
 				if(this.WebSocket){
 					
@@ -801,7 +801,7 @@ class Api {
 						
 					}
 					
-					await this.WebSocket.disconnect();
+					await this.disconnect();
 					
 				}
 				
