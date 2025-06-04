@@ -1140,7 +1140,9 @@ class CastleNAVBAR {
 			'castle-button-play-m1',
 			'castle-button-play-m2',
 			'castle-button-play-m3',
-			'castle-button-play-m4'
+			'castle-button-play-m4',
+			'castle-button-play-m5',
+			'castle-button-play-m6'
 		];
 
 		CastleNAVBAR.body = DOM({ style: 'castle-button-play' });
@@ -1209,7 +1211,19 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[14].onclick = () => {
 
 			CastleNAVBAR.setMode(4);
+			
+		};
+		
+		CastleNAVBAR.body.children[15].onclick = () => {
 
+			CastleNAVBAR.setMode(5);
+			
+		};
+		
+		CastleNAVBAR.body.children[16].onclick = () => {
+
+			CastleNAVBAR.setMode(6);
+			
 		};
 		
 		return CastleNAVBAR.body.children[5];
@@ -1281,8 +1295,11 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[13].style.display = 'block';
 
 		CastleNAVBAR.body.children[14].style.display = 'block';
-
-
+		
+		CastleNAVBAR.body.children[15].style.display = 'block';
+		
+		CastleNAVBAR.body.children[16].style.display = 'block';
+		
 	}
 
 	static setMode(type) {
@@ -1304,9 +1321,13 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[12].style.display = 'none';
 
 		CastleNAVBAR.body.children[13].style.display = 'none';
-
+		
 		CastleNAVBAR.body.children[14].style.display = 'none';
-
+		
+		CastleNAVBAR.body.children[15].style.display = 'none';
+		
+		CastleNAVBAR.body.children[16].style.display = 'none';
+		
 	}
 
 	static queue(data) {
