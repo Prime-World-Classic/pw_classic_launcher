@@ -785,7 +785,7 @@ class Api {
 		
 	}
 
-	async connect(timeout = 0){
+	async connect(delay = 0){
 		
 		return new Promise((resolve,reject) => {
 			
@@ -815,6 +815,8 @@ class Api {
 				
 				this.WebSocket.onmessage = (event) => this.message(event.data);
 				
+				this.WebSocket.onerror = (event) => console.log(`Разрыв соединения ${this.MAIN_HOST}...`,event);
+				
 				this.WebSocket.onclose = () => {
 					
 					this.connect(this.RECONNECT_TIME);
@@ -833,9 +835,9 @@ class Api {
 					
 				};
 				
-				this.WebSocket.onerror = reject;
+				// this.WebSocket.onerror = reject;
 				
-			},timeout);
+			},delay);
 			
 		});
 		
@@ -851,17 +853,17 @@ class Api {
 		
 		this.DISCONNECT_TOTAL++;
 		
-		if(this.WebSocket.readyState == 3){
-			
-			return;
-			
-		}
-		
 		return new Promise((resolve,reject) => {
+			
+			if(this.WebSocket.readyState == 3){
+				
+				resolve();
+				
+			}
 			
 			this.WebSocket.onclose = resolve;
 			
-			this.WebSocket.onerror = reject;
+			// this.WebSocket.onerror = reject;
 			
 			this.WebSocket.close();
 			
