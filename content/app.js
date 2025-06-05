@@ -10767,6 +10767,14 @@ class ARAM {
 	];
 
 	static briefing(heroId, roleId, callback) {
+		
+		let heroAll = new Array();
+		
+		for(let item of ARAM.role){
+			
+			heroAll = heroAll.concat(item.hero);
+			
+		}
 
 		let hero = DOM({ style: 'aram-briefing-left' }, DOM({ style: 'aram-random' }));
 
@@ -10786,7 +10794,7 @@ class ARAM {
 
 				hero.firstChild.animate({ opacity: [1, 0] }, { duration: 5000, fill: 'forwards', easing: 'ease-out' });
 
-				//hero.animate({ backgroundSize: ['100%', '125%'] }, { duration: 1500, fill: 'forwards', easing: 'ease-in' });
+				// hero.animate({ backgroundSize: ['100%', '125%'] }, { duration: 1500, fill: 'forwards', easing: 'ease-in' });
 
 				return;
 
@@ -10796,7 +10804,7 @@ class ARAM {
 
 			while (true) {
 
-				heroRandom = ARAM.role[roleId].hero[Math.floor(Math.random() * ARAM.role[roleId].hero.length)];
+				heroRandom = heroAll[Math.floor(Math.random() * heroAll.length)];
 
 				if (heroRandom != lastRandomHero) {
 
@@ -10856,23 +10864,28 @@ class ARAM {
 
 		setTimeout(() => {
 			
-			let animate = part.animate({ backdropFilter: ['blur(5vmax)', 'blur(0)'] }, { duration: 1000, fill: 'forwards'});
+			let animate = part.animate({ backdropFilter: ['blur(5vmax)', 'blur(0)'] }, { duration: 1000, fill: 'forwards' });
 			
 			animate.onfinish = () => {
 				
 				part.style.display = 'none';
 				
-				background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 2000, easing: 'ease-in-out', fill: 'forwards', easing: 'ease-out' });
-				
 				setTimeout(() => {
 					
-					//Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
+					background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 2000, easing: 'ease-in-out', fill: 'forwards' });
 					
-					//callback();
+					setTimeout(() => {
+						
+						//Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
+						
+						//callback();
+						
+						//Splash.hide();
+						
+					},1000);
 					
-					//Splash.hide();
 					
-				},1000);
+				},500);
 				
 			}
 			
