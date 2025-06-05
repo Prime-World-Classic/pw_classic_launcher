@@ -10763,7 +10763,7 @@ class ARAM {
 		{ name: 'Боец дальнего боя', task: 'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [52, 47, 63, 26, 24, 34, 40, 32, 31, 55, 7, 28, 8, 57, 2, 44, 21, 5, 12, 54, 65, 43, 18, 62, 29, 58, 9, 25, 50] },
 		{ name: 'Боец ближнего боя', task: 'Нанести как можно больше урона всем противникам вокруг.', hero: [48, 33, 4, 10, 49, 1, 23, 60, 51, 22, 11, 20, 56, 41, 53, 39, 45, 14, 64] },
 		{ name: 'Поддержка', task: 'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.', hero: [19, 38, 13, 59] },
-		{ name: 'Ассасин', task: 'Найдите уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
+		{ name: 'Ассасин', task: 'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
 	];
 
 	static briefing(heroId, roleId, callback) {
@@ -10777,7 +10777,7 @@ class ARAM {
 		}
 
 		let hero = DOM({ style: 'aram-briefing-left' }, DOM({ style: 'aram-random' }));
-
+		
 		hero.style.backgroundImage = `url(content/hero/empty.webp)`;
 
 		let lastRandomHero = 0, second = 17, timer = DOM({ style: 'aram-timer' }, 'Начало боя через 15...');
@@ -10842,21 +10842,62 @@ class ARAM {
 		
 		part.style.backdropFilter = 'blur(5vmax)';
 		
-		let text = DOM({style:'aram-text'},DOM({style:'aram-text-center'},DOM({tag:'div'},DOM({tag:'h1'},`Ваша роль — ${ARAM.role[roleId].name}`)),DOM({tag:'div'},ARAM.role[roleId].task)));
+		//let text = DOM({style:'aram-text'},DOM({style:'aram-text-center'},DOM({tag:'div'},DOM({tag:'h1'},`Ваша роль — ${ARAM.role[roleId].name}`)),DOM({tag:'div'},ARAM.role[roleId].task)));
+		let h1 = DOM({tag:'h1'},'Без права на ошибку');
+		let text = DOM({tag:'div'},'Одна ошибка в ARAM — равномерна гибели всей команды. Восстановить запас здоровья или энергии героя на главной базе нельзя.');
+		let bodyText = DOM({style:'aram-text'},DOM({style:'aram-text-center'},h1,text));
 		
 		setTimeout(() => {
 			
-			let animate = text.animate({ opacity: [0,1] }, { duration: 3000, fill: 'forwards'});
+			let animate = bodyText.animate({ opacity: [0,1] }, { duration: 1750, fill: 'forwards'});
 			
-			setTimeout(() => {
+			animate.onfinish = () => {
 				
-				animate.reverse();
+				setTimeout(() => {
+					
+					animate.reverse();
+					
+					animate.onfinish = () => {
+						
+						h1.innerText = `Ваша роль
+						${ARAM.role[roleId].name}`;
+						
+						text.innerText = '';
+						
+						animate.onfinish = () => {
+							
+							animate.onfinish = () => {
+								
+								h1.innerText = 'Ваша задача';
+								text.innerText = ARAM.role[roleId].task;
+								
+								animate.reverse();
+								
+								animate.onfinish = () => {
+									
+									animate.reverse();
+									
+									animate.onfinish = null;
+									
+								};
+								
+							};
+							
+							animate.reverse();
+							
+						};
+						
+						animate.reverse();
+						
+					};
+					
+				},1000);
 				
-			},7500);
+			}
 			
 		},1000);
 		
-		let background = DOM({ style: 'aram-background' },part,hero,text); // content
+		let background = DOM({ style: 'aram-background' },part,hero,bodyText); // content
 		
 		background.style.backgroundImage = `url(content/img/aram/bg.png)`;
 
@@ -10872,17 +10913,17 @@ class ARAM {
 				
 				setTimeout(() => {
 					
-					background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 2000, easing: 'ease-in-out', fill: 'forwards' });
+					background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 1500, easing: 'ease-in-out', fill: 'forwards' });
 					
 					setTimeout(() => {
 						
-						//Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
+						Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, true);
 						
-						//callback();
+						callback();
 						
-						//Splash.hide();
+						Splash.hide();
 						
-					},1000);
+					},4500);
 					
 					
 				},500);
