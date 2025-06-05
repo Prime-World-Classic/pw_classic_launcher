@@ -283,6 +283,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .castle-button-play-m6 {
     z-index: 1;
     background-image: url('img/m6.png');
+	background-size:130%;
     width: 4vh;
     aspect-ratio: 1/1;
     top: 3.9vh;
