@@ -8438,45 +8438,26 @@ class Castle {
 			id: 10,
 			rot: 0,
 			posX: 20,
-			posY: 1
+			posY: 18
 		},
 		{
 			id: 6,
 			rot: 0,
 			posX: 10,
-			posY: 10
-		},
-		{
-			id: 21,
-			rot: 0,
-			posX: 2,
-			posY: 2
-		},
-		{
-			id: 21,
-			rot: 1,
-			posX: 2,
-			posY: 5
-		},
-		{
-			id: 21,
-			rot: 2,
-			posX: 2,
-			posY: 8
-		},
-		{
-			id: 21,
-			rot: 3,
-			posX: 2,
-			posY: 11
-		},
+			posY: 27
+		}
 	];
+
 	static phantomBuilding = {
 			id: 0,
 			rot: 0,
 			posX: 0,
 			posY: 1000
 	};
+	static BUILDING_OUTLINE_BAD = [40, 0, 0, 2];
+	static BUILDING_OUTLINE_GOOD = [0, 40, 0, 2];
+	static BUILDING_OUTLINE_SELECTION = [40, 40, 0, 2];
+	static phantomBuildingIsAllowedToBuild = false;
 
 	static buildingsNames = [
 		["",""],
@@ -8612,16 +8593,48 @@ class Castle {
 
 		let shift = [Castle.gridTranslation[0], Castle.gridTranslation[1]];
 		if (Castle.phantomBuilding.id > 0 && Castle.gridCursorPosX && Castle.gridCursorPosX) {
-			Castle.phantomBuilding.posX = Math.floor((shift[0]-Castle.gridCursorPosX) / 7.0);
-			Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0);
+			const size = Castle.sceneBuildings[Castle.buildings[Castle.phantomBuilding.id]].size[0];
+			Castle.phantomBuilding.posX = Math.floor((shift[0]-Castle.gridCursorPosX) / 7.0 - size / 2.0);
+			Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0 - size / 2.0) + 17;
+
+			Castle.phantomBuildingIsAllowedToBuild = Castle.isBuildingAllowed(Castle.phantomBuilding.posX, Castle.phantomBuilding.posY, size);
 			//App.error(Castle.phantomBuilding.posX + " " + Castle.phantomBuilding.posY)
 		}
 
 	}
 
+	static isBuildingAllowed(posX, posY, size) {
+		if (posX < 0 || posY < 0) {
+			return false;
+		}
+		if (posX + size > 46 || posY + size > 38) {
+			return false;
+		}
+
+		let allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
+		for (const placedBuilding of Castle.placedBuildings) {
+			const pbSize = Castle.sceneBuildings[Castle.buildings[placedBuilding.id]].size[0];
+			for (let i = 0; i < pbSize; ++i) {
+				for (let j = 0; j < pbSize; ++j) {
+					allowedToBuildGrid[placedBuilding.posX + i][placedBuilding.posY + j] = 1;
+				}
+			}
+		}
+		for (let i = 0; i < size; ++i) {
+			for (let j = 0; j < size; ++j) {
+				if (allowedToBuildGrid[posX + i][posY + j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	static addPhantomBuildingToRender() {
-		Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
-		Castle.isStaticSMCached = false;
+		if (Castle.phantomBuildingIsAllowedToBuild) {
+			Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
+			Castle.isStaticSMCached = false;
+		}
 	}
 
 	static findAndRotateBuilding(posX, posY) {
@@ -9232,7 +9245,14 @@ class Castle {
 			var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
 			buildingsToDraw.push({
 				mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
-				translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (building.posY * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+				translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY-17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+			});
+		}
+		if (Castle.buildMode && Castle.phantomBuilding.id > 0) {
+			var mesh = Castle.sceneBuildings['grid'];
+			buildingsToDraw.push({
+				mesh: mesh, rotation: 0, position: [0, 0], name: 'grid',
+				translation: [Castle.zeroTranslation[0] + (mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (mesh.size[1] / 2.0 * 7.0)]
 			});
 		}
 
@@ -9246,7 +9266,7 @@ class Castle {
 				var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
 				buildingsToDraw.push({
 					outlined: true, mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
-					translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + (building.posY * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+					translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY-17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
 				});
 				outlinedBuilding = buildingsToDraw.length - 1;
 			} else {
@@ -9306,10 +9326,11 @@ class Castle {
 				Castle.gl.disable(Castle.gl.DEPTH_TEST);
 				Castle.gl.depthMask(false);
 				let buildingToDraw = buildingsToDraw[outlinedBuilding];
-				let outlineColor = [0, 20, 0 , 1];
+				let outlineColor = Castle.BUILDING_OUTLINE_GOOD;
 				if (Castle.buildMode) {
-					outlineColor = [20, 20, 0, 1];
+					outlineColor = Castle.BUILDING_OUTLINE_SELECTION;
 					if (Castle.phantomBuilding.id > 0) {
+						outlineColor =  Castle.phantomBuildingIsAllowedToBuild ? Castle.BUILDING_OUTLINE_GOOD : Castle.BUILDING_OUTLINE_BAD;;
 					}
 				}
 				for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
