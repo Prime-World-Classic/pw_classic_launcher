@@ -5622,9 +5622,6 @@ class Build {
 
 		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
 
-		if (data.id in Build.talents) {
-			App.error("fail")
-		}
 		Build.talents[data.id] = data;
 
 		talent.dataset.id = data.id;
@@ -8433,7 +8430,7 @@ class Castle {
 		"deco_32",
 	];
 
-	static placedBuildings = [
+	static defaultPlacedBuildings = [
 		{
 			id: 10,
 			rot: 0,
@@ -8447,6 +8444,8 @@ class Castle {
 			posY: 27
 		}
 	];
+
+	static placedBuildings = [];
 
 	static phantomBuilding = {
 			id: 0,
@@ -8659,7 +8658,74 @@ class Castle {
 		}
 	}
 
+	static GetLauncherFilePath(fileName) {
+		const homeDir = NativeAPI.os.homedir();
+		let pwcLauncherDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+		return NativeAPI.path.join(pwcLauncherDir, fileName);
+	}
+
+	static async ensureCastleFile() {
+		let castleFilePath = GetLauncherFilePath('castle.cfg');
+		try {
+			await NativeAPI.fileSystem.promises.mkdir(pwcLauncherDir, { recursive: true });
+			await NativeAPI.fileSystem.promises.access(castleFilePath);
+			return true;
+		} catch (e) {
+			App.error(e);
+			await this.WriteDefaultBuildings();
+			return false;
+		}
+	}
+
+	static async WriteDefaultBuildings() {
+		this.placedBuildings = JSON.parse(JSON.stringify(this.defaultPlacedBuildings));
+		await this.WriteBuildings();
+	}
+
+	static async ReadBuildings() {
+		if (!NativeAPI.status) {
+			this.placedBuildings = { ...this.defaultPlacedBuildings };
+			return;
+		}
+
+		let castleFilePath = GetLauncherFilePath('castle.cfg');
+		try {
+			if (await this.ensureCastleFile()) {
+				const data = await NativeAPI.fileSystem.promises.readFile(castleFilePath, 'utf-8');
+				this.placedBuildings = { ...this.defaultPlacedBuildings, ...JSON.parse(data) };
+			}
+		} catch (e) {
+			App.error(e);
+			this.placedBuildings = { ...this.defaultPlacedBuildings };
+		}
+	}
+
+    static async WriteBuildings() {
+        if (!NativeAPI.status) {
+            return;
+        }
+
+		let castleFilePath = GetLauncherFilePath('castle.cfg');
+        try {
+            await NativeAPI.fileSystem.promises.writeFile(
+                castleFilePath,
+                JSON.stringify(this.placedBuildings, null, 2),
+                'utf-8'
+            );
+        } catch (e) {
+            App.error(e);
+        }
+    }
+
+	static loadBuildings() {
+		
+
+
+	}
+
 	static async initDemo(sceneName, canvas) {
+
+		Castle.loadBuildings();
 
 		Castle.currentSceneName = sceneName;
 
