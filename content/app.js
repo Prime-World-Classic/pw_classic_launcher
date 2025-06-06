@@ -11032,7 +11032,7 @@ class ARAM {
 
 		setTimeout(() => {
 			
-			let animate = part.animate({ backdropFilter: ['blur(5vmax)', 'blur(0)'] }, { duration: 1000, fill: 'forwards' });
+			let animate = part.animate({ backdropFilter: ['blur(5vmax)', 'blur(0)'] }, { duration: 5000, fill: 'forwards', easing: 'ease-in-out' });
 			
 			animate.onfinish = () => {
 				
@@ -11040,7 +11040,7 @@ class ARAM {
 				
 				setTimeout(() => {
 					
-					background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 1500, easing: 'ease-in-out', fill: 'forwards' });
+					background.animate({ transform: ['scale(1)', 'scale(1.9)'] }, { duration: 1500, easing: 'ease-out', fill: 'forwards' });
 					
 					setTimeout(() => {
 						
@@ -11050,14 +11050,14 @@ class ARAM {
 						
 						Splash.hide();
 						
-					},4500);
+					},4000);
 					
 					
 				},500);
 				
 			}
 			
-		},12000);
+		},7500);
 
 		Castle.toggleMusic(Castle.MUSIC_LAYER_TAMBUR, false);
 
