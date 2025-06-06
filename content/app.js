@@ -8597,17 +8597,52 @@ class Castle {
 			Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0 - size / 2.0) + 17;
 
 			Castle.phantomBuildingIsAllowedToBuild = Castle.isBuildingAllowed(Castle.phantomBuilding.posX, Castle.phantomBuilding.posY, size);
-			//App.error(Castle.phantomBuilding.posX + " " + Castle.phantomBuilding.posY)
 		}
 
 	}
 
 	static isBuildingAllowed(posX, posY, size) {
+		const posXMax = posX + size - 1;
+		const posYMax = posY + size - 1;
 		if (posX < 0 || posY < 0) {
 			return false;
 		}
-		if (posX + size > 46 || posY + size > 38) {
+		if (posXMax > 45 || posYMax > 37) {
 			return false;
+		}
+		// Castle zone
+		if (posX < 31 && posY < 3) {
+			return false;
+		}
+		if (posX < 23 && posY < 8) {
+			return false;
+		}
+		if (posX < 22 && posY < 14) {
+			return false;
+		}
+		if (posX < 18 && posY < 17) {
+			return false;
+		}
+		if (posXMax > 9 && posX < 18 && posY == 17) {
+			return false;
+		}
+		// Bottom corner
+		if (posXMax > 28 || posYMax > 20) {
+			if (45 - posYMax + 37 - posXMax < 17) {
+				return false;
+			}
+		}
+		// Left corner
+		if (posXMax > 43 || posY < 2) {
+			if (45 - posXMax + posY < 2) {
+				return false;
+			}
+		}
+		// Right corner
+		if (posX < 2 || posYMax > 35) {
+			if (posX + 37 - posYMax < 2) {
+				return false;
+			}
 		}
 
 		let allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
@@ -8629,10 +8664,11 @@ class Castle {
 		return true;
 	}
 
-	static addPhantomBuildingToRender() {
+	static placePhantomBuilding() {
 		if (Castle.phantomBuildingIsAllowedToBuild) {
 			Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
 			Castle.isStaticSMCached = false;
+			Castle.WriteBuildings();
 		}
 	}
 
@@ -8642,6 +8678,7 @@ class Castle {
 			if (building.posX == posX && building.posY == posY) {
 				building.rot = (building.rot + 1) % 4;
 				Castle.isStaticSMCached = false;
+				Castle.WriteBuildings();
 				return;
 			}
 		}
@@ -8653,6 +8690,7 @@ class Castle {
 			if (building.posX == posX && building.posY == posY) {
 				Castle.placedBuildings.splice(b, 1);
 				Castle.isStaticSMCached = false;
+				Castle.WriteBuildings();
 				return;
 			}
 		}
@@ -8665,38 +8703,38 @@ class Castle {
 	}
 
 	static async ensureCastleFile() {
-		let castleFilePath = GetLauncherFilePath('castle.cfg');
+		const homeDir = NativeAPI.os.homedir();
+		let pwcLauncherDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+		let castleFilePath = Castle.GetLauncherFilePath('castle.cfg');
 		try {
 			await NativeAPI.fileSystem.promises.mkdir(pwcLauncherDir, { recursive: true });
 			await NativeAPI.fileSystem.promises.access(castleFilePath);
 			return true;
 		} catch (e) {
-			App.error(e);
-			await this.WriteDefaultBuildings();
+			await Castle.WriteDefaultBuildings();
 			return false;
 		}
 	}
 
 	static async WriteDefaultBuildings() {
-		this.placedBuildings = JSON.parse(JSON.stringify(this.defaultPlacedBuildings));
-		await this.WriteBuildings();
+		Castle.placedBuildings = JSON.parse(JSON.stringify(Castle.defaultPlacedBuildings));
+		await Castle.WriteBuildings();
 	}
 
 	static async ReadBuildings() {
 		if (!NativeAPI.status) {
-			this.placedBuildings = { ...this.defaultPlacedBuildings };
+			Castle.placedBuildings = Castle.defaultPlacedBuildings;
 			return;
 		}
 
-		let castleFilePath = GetLauncherFilePath('castle.cfg');
+		let castleFilePath = Castle.GetLauncherFilePath('castle.cfg');
 		try {
-			if (await this.ensureCastleFile()) {
+			if (await Castle.ensureCastleFile()) {
 				const data = await NativeAPI.fileSystem.promises.readFile(castleFilePath, 'utf-8');
-				this.placedBuildings = { ...this.defaultPlacedBuildings, ...JSON.parse(data) };
+				Castle.placedBuildings = JSON.parse(data);
 			}
 		} catch (e) {
-			App.error(e);
-			this.placedBuildings = { ...this.defaultPlacedBuildings };
+			Castle.placedBuildings = Castle.defaultPlacedBuildings;
 		}
 	}
 
@@ -8705,11 +8743,11 @@ class Castle {
             return;
         }
 
-		let castleFilePath = GetLauncherFilePath('castle.cfg');
+		let castleFilePath = Castle.GetLauncherFilePath('castle.cfg');
         try {
             await NativeAPI.fileSystem.promises.writeFile(
                 castleFilePath,
-                JSON.stringify(this.placedBuildings, null, 2),
+                JSON.stringify(Castle.placedBuildings, null, 2),
                 'utf-8'
             );
         } catch (e) {
@@ -8718,9 +8756,11 @@ class Castle {
     }
 
 	static loadBuildings() {
+        Castle.ReadBuildings();
 		
-
-
+        window.addEventListener('beforeunload', () => {
+            Castle.WriteBuildings();
+        });
 	}
 
 	static async initDemo(sceneName, canvas) {
@@ -8745,7 +8785,7 @@ class Castle {
 
 		canvas.addEventListener('click', function (event) {
 			if (Castle.phantomBuilding.id > 0) {
-				Castle.addPhantomBuildingToRender();
+				Castle.placePhantomBuilding();
 			} else {
 				if (Castle.outlinedBuilding && !Castle.wasMoved) {
 					if (Castle.buildMode) {
