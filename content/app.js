@@ -1031,8 +1031,7 @@ class Api {
 
 	}
 
-	async silent(
-	, object, method, data, infinity = false) {
+	async silent(callback, object, method, data, infinity = false) {
 
 		let identify = `${method}${Date.now()}`; // если у нас более одного silent, то они перебивают друг друга так как это не async
 
