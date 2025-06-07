@@ -8765,7 +8765,6 @@ class Castle {
 	static async ReadBuildings() {
 		if (!NativeAPI.status) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
-			Castle.isBuildingsLoaded = true;
 			Castle.UpdateAllowedToBuildGrid();
 			return;
 		}
@@ -8775,11 +8774,9 @@ class Castle {
 			if (await Castle.ensureCastleFile()) {
 				const data = await NativeAPI.fileSystem.promises.readFile(castleFilePath, 'utf-8');
 				Castle.placedBuildings = JSON.parse(data);
-				Castle.isBuildingsLoaded = true;
 			}
 		} catch (e) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
-			Castle.isBuildingsLoaded = true;
 		}
 		Castle.UpdateAllowedToBuildGrid();
 	}
@@ -8803,8 +8800,9 @@ class Castle {
 		Castle.UpdateAllowedToBuildGrid();
     }
 
-	static loadBuildings() {
-        Castle.ReadBuildings();
+	static async loadBuildings() {
+        await Castle.ReadBuildings();
+		Castle.isBuildingsLoaded = true;
 		
         window.addEventListener('beforeunload', () => {
             Castle.WriteBuildings();
