@@ -8801,6 +8801,7 @@ class Castle {
 
 	static loadBuildings() {
         Castle.ReadBuildings();
+		Castle.isStaticSMCached = false;
 		
         window.addEventListener('beforeunload', () => {
             Castle.WriteBuildings();
@@ -9453,7 +9454,6 @@ class Castle {
 		}
 
 		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects) {
-			Castle.isStaticSMCached = true;
 			Castle.gl.bindFramebuffer(Castle.gl.FRAMEBUFFER, Castle.depthFramebuffer);
 			Castle.gl.viewport(0, 0, Castle.depthTextureSize, Castle.depthTextureSize);
 			Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
@@ -9471,7 +9471,7 @@ class Castle {
 					}
 				}
 			}
-
+			Castle.isStaticSMCached = true;
 		}
 
 		Castle.gl.bindFramebuffer(Castle.gl.FRAMEBUFFER, null);
