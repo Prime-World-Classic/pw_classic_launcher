@@ -8285,6 +8285,7 @@ class Castle {
 
 	static isSMEnabled;
 
+	static isBuildingsLoaded = false;
 	static isStaticSMCached = false;
 
 	static lightViewProjMatrix;
@@ -8764,6 +8765,7 @@ class Castle {
 	static async ReadBuildings() {
 		if (!NativeAPI.status) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
+			Castle.isBuildingsLoaded = true;
 			Castle.UpdateAllowedToBuildGrid();
 			return;
 		}
@@ -8773,9 +8775,11 @@ class Castle {
 			if (await Castle.ensureCastleFile()) {
 				const data = await NativeAPI.fileSystem.promises.readFile(castleFilePath, 'utf-8');
 				Castle.placedBuildings = JSON.parse(data);
+				Castle.isBuildingsLoaded = true;
 			}
 		} catch (e) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
+			Castle.isBuildingsLoaded = true;
 		}
 		Castle.UpdateAllowedToBuildGrid();
 	}
@@ -8801,7 +8805,6 @@ class Castle {
 
 	static loadBuildings() {
         Castle.ReadBuildings();
-		Castle.isStaticSMCached = false;
 		
         window.addEventListener('beforeunload', () => {
             Castle.WriteBuildings();
@@ -9453,7 +9456,7 @@ class Castle {
 			}
 		}
 
-		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects) {
+		if (Castle.isSMEnabled && !Castle.isStaticSMCached && Castle.sceneObjects && Castle.isBuildingsLoaded) {
 			Castle.gl.bindFramebuffer(Castle.gl.FRAMEBUFFER, Castle.depthFramebuffer);
 			Castle.gl.viewport(0, 0, Castle.depthTextureSize, Castle.depthTextureSize);
 			Castle.gl.clear(Castle.gl.COLOR_BUFFER_BIT | Castle.gl.DEPTH_BUFFER_BIT);
