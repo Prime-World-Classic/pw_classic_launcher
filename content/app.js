@@ -8291,6 +8291,8 @@ class Castle {
 
 	static depthTexture;
 
+	static gridTexture;
+
 	static depthFramebuffer;
 
 	static depthTextureSize = 8192;
@@ -8321,17 +8323,17 @@ class Castle {
 
 	static maxFov = 55;
 
-	static fixedFovValues = [45, 35, 55, 45];
+	static fixedFovValues = [55, 45, 35, 25, 55, 45, 35];
 
-	static fixedRotationTiltValues = [0, 0, -0.8, -0.9];
+	static fixedRotationTiltValues = [0, 0, 0, 0, -0.8, -0.9, -0.8];
 
-	static fixedCameraHeightValues = [0, 0, 350, 350];
+	static fixedCameraHeightValues = [0, 0, 0, 0, 350, 350, 350];
 
-	static initialFixedValue = 0.0;
+	static initialFixedValue = 1.0;
 
-	static currentFixedValue = 0.0;
+	static currentFixedValue = 1.0;
 
-	static targetFixedValue = 0.0;
+	static targetFixedValue = 1.0;
 
 	static cameraAnimationSpeed = 4.0;
 
@@ -8348,7 +8350,7 @@ class Castle {
 
 	static camDeltaPos = [0.0, 0.0];
 
-	static camDeltaPosMinMax = [[-10, 10], [-10, 10]];
+	static camDeltaPosMinMax = [[-50, 10], [-50, 10]];
 
 	static loadTime = Date.now();
 
@@ -8447,6 +8449,10 @@ class Castle {
 
 	static placedBuildings = [];
 
+	static allowedToBuildGridTex = new Uint8Array(64 * 64 * 4).fill(0);
+	static allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
+
+	static phantomBuildingSize = 0;
 	static phantomBuilding = {
 			id: 0,
 			rot: 0,
@@ -8595,6 +8601,7 @@ class Castle {
 			const size = Castle.sceneBuildings[Castle.buildings[Castle.phantomBuilding.id]].size[0];
 			Castle.phantomBuilding.posX = Math.floor((shift[0]-Castle.gridCursorPosX) / 7.0 - size / 2.0);
 			Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0 - size / 2.0) + 17;
+			Castle.phantomBuildingSize = size;
 
 			Castle.phantomBuildingIsAllowedToBuild = Castle.isBuildingAllowed(Castle.phantomBuilding.posX, Castle.phantomBuilding.posY, size);
 		}
@@ -8602,6 +8609,7 @@ class Castle {
 	}
 
 	static isBuildingAllowed(posX, posY, size) {
+		Castle.UpdateGridImage();
 		const posXMax = posX + size - 1;
 		const posYMax = posY + size - 1;
 		if (posX < 0 || posY < 0) {
@@ -8644,25 +8652,57 @@ class Castle {
 				return false;
 			}
 		}
-
-		let allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
-		for (const placedBuilding of Castle.placedBuildings) {
-			const pbSize = Castle.sceneBuildings[Castle.buildings[placedBuilding.id]].size[0];
-			for (let i = 0; i < pbSize; ++i) {
-				for (let j = 0; j < pbSize; ++j) {
-					allowedToBuildGrid[placedBuilding.posX + i][placedBuilding.posY + j] = 1;
-				}
-			}
-		}
 		for (let i = 0; i < size; ++i) {
 			for (let j = 0; j < size; ++j) {
-				if (allowedToBuildGrid[posX + i][posY + j]) {
+				if (Castle.allowedToBuildGrid[posX + i][posY + j]) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
+
+	static UpdateGridImage() {
+		let data = Castle.allowedToBuildGridTex;
+		for (let i = 0; i < data.length / 4; ++i) {
+			let posX = i % 64;
+			let posY = Math.floor(i / 64);
+			data[i * 4] = 0;     // R (красный)
+			data[i * 4 + 1] = 0;   // G (зеленый)
+			data[i * 4 + 2] = 0;   // B (синий)
+			data[i * 4 + 3] = 0; // A (альфа, непрозрачность)
+			if (posX < 47 && posY < 38) {
+				if (Castle.phantomBuilding.id && 
+					posX >= Castle.phantomBuilding.posX && posY >= Castle.phantomBuilding.posY &&
+					posX < Castle.phantomBuilding.posX + Castle.phantomBuildingSize && posY < Castle.phantomBuilding.posY + Castle.phantomBuildingSize
+				) {
+					data[i * 4] = Castle.phantomBuildingIsAllowedToBuild ? 0 : 255;     // R (красный)
+					data[i * 4 + 1] = Castle.phantomBuildingIsAllowedToBuild ? 255 : 106;   // G (зеленый)
+					data[i * 4 + 2] = 0;   // B (синий)
+					data[i * 4 + 3] = 255; // A (альфа, непрозрачность)
+				}
+				if (Castle.allowedToBuildGrid[posX][posY]) {
+					data[i * 4] = 255;     // R (красный)
+					data[i * 4 + 1] = 0;   // G (зеленый)
+					data[i * 4 + 2] = 0;   // B (синий)
+					data[i * 4 + 3] = 255; // A (альфа, непрозрачность)
+				}
+			}
+		}
+	}
+
+	static UpdateAllowedToBuildGrid() {
+		Castle.allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
+		for (const placedBuilding of Castle.placedBuildings) {
+			const pbSize = Castle.sceneBuildings[Castle.buildings[placedBuilding.id]].size[0];
+			for (let i = 0; i < pbSize; ++i) {
+				for (let j = 0; j < pbSize; ++j) {
+					Castle.allowedToBuildGrid[placedBuilding.posX + i][placedBuilding.posY + j] = 1;
+				}
+			}
+		}
+		}
+
 
 	static placePhantomBuilding() {
 		if (Castle.phantomBuildingIsAllowedToBuild) {
@@ -8724,6 +8764,7 @@ class Castle {
 	static async ReadBuildings() {
 		if (!NativeAPI.status) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
+			Castle.UpdateAllowedToBuildGrid();
 			return;
 		}
 
@@ -8736,10 +8777,12 @@ class Castle {
 		} catch (e) {
 			Castle.placedBuildings = Castle.defaultPlacedBuildings;
 		}
+		Castle.UpdateAllowedToBuildGrid();
 	}
 
     static async WriteBuildings() {
         if (!NativeAPI.status) {
+			Castle.UpdateAllowedToBuildGrid();
             return;
         }
 
@@ -8753,6 +8796,7 @@ class Castle {
         } catch (e) {
             App.error(e);
         }
+		Castle.UpdateAllowedToBuildGrid();
     }
 
 	static loadBuildings() {
@@ -8764,8 +8808,6 @@ class Castle {
 	}
 
 	static async initDemo(sceneName, canvas) {
-
-		Castle.loadBuildings();
 
 		Castle.currentSceneName = sceneName;
 
@@ -8903,6 +8945,23 @@ class Castle {
 			mat4.translate(lightViewMatrix, lightViewMatrix, smCam.camPos);
 			mat4.multiply(lightViewMatrix2, Castle.flipMatr, lightViewMatrix);
 			mat4.multiply(Castle.lightViewProjMatrix, lightProjMatrix, lightViewMatrix2);
+			
+			Castle.gridTexture = Castle.gl.createTexture();
+			Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, Castle.gridTexture);
+			Castle.gl.texImage2D(
+				Castle.gl.TEXTURE_2D,      // target
+				0,                  // mip level
+				Castle.gl.RGBA, // internal format
+				64,   // width
+				64,   // height
+				0,                  // border
+				Castle.gl.RGBA,
+				Castle.gl.UNSIGNED_BYTE,
+				null);              // data
+			Castle.gl.texParameteri(Castle.gl.TEXTURE_2D, Castle.gl.TEXTURE_MAG_FILTER, Castle.gl.NEAREST);
+			Castle.gl.texParameteri(Castle.gl.TEXTURE_2D, Castle.gl.TEXTURE_MIN_FILTER, Castle.gl.NEAREST);
+			Castle.gl.texParameteri(Castle.gl.TEXTURE_2D, Castle.gl.TEXTURE_WRAP_S, Castle.gl.CLAMP_TO_EDGE);
+			Castle.gl.texParameteri(Castle.gl.TEXTURE_2D, Castle.gl.TEXTURE_WRAP_T, Castle.gl.CLAMP_TO_EDGE);
 
 			// Setup textures
 			Castle.depthTexture = Castle.gl.createTexture();
@@ -9048,6 +9107,8 @@ class Castle {
 			}
 			playCastleMusic();
 		}
+
+		Castle.loadBuildings();
 
 		Castle.MainLoop(Castle.sceneObjects, Castle.sceneBuildings, Castle.sceneShaders, Castle.sceneTextures);
 
@@ -9587,7 +9648,6 @@ class Castle {
 		Castle.gridCursorPosZ = camPos[2] + t * camForwNew[2] + (Castle.zeroTranslation[1] + Castle.gridTranslation[1]);
 
 	}
-
 	static setupMainCam(program) {
 
 		let matViewProjUniformLocation = Castle.gl.getUniformLocation(program, 'mViewProj');
@@ -9803,13 +9863,21 @@ class Castle {
 
 		}
 
+		if (!isSMPass) {
+			Castle.gl.activeTexture(Castle.gl.TEXTURE0 + textures.length + 1);
+
+			Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, Castle.gridTexture);
+			Castle.gl.texImage2D(Castle.gl.TEXTURE_2D, 0, Castle.gl.RGBA, 64, 64, 0, Castle.gl.RGBA, Castle.gl.UNSIGNED_BYTE, Castle.allowedToBuildGridTex);
+
+			let attribNameSM = "gridTex";
+
+			let texLocationSM = Castle.gl.getUniformLocation(program, attribNameSM);
+
+			Castle.gl.uniform1i(texLocationSM, textures.length + 1);
+			
+		}
+
 		Castle.gl.drawArrays(strip ? Castle.gl.TRIANGLE_STRIP : Castle.gl.TRIANGLES, 0, indexCount);
-
-	}
-
-	static lerp(a, b, alpha) {
-
-		return a + alpha * (b - a);
 
 	}
 
