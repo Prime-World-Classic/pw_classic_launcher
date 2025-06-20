@@ -31,6 +31,18 @@ class ParentEvent {
 		View.show('castle');
 		
 	}
+
+	static async bind(body){
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		App.error(body);
+		
+	}
 	
 }
 
@@ -3520,6 +3532,12 @@ class Window {
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-v' },
 				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
+			DOM({ style: 'castle-menu-item-v' },
+				DOM({ event: ['click', () => {
+					
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`,'123','popup');
+					
+				}] }, 'Привязать STEAM')),
 			DOM({
 				style: 'castle-menu-item-v', event: ['click', async () => {
 					App.exit();
