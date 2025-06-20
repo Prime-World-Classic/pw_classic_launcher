@@ -4,6 +4,36 @@ PW_VERSION = '2.5.3';
 
 CURRENT_MM = 'mmtest'
 
+class ParentEvent {
+	
+	static children;
+	
+	static async authorization(body){
+		
+		if(!body.id){
+			
+			if(ParentEvent.children){
+				
+				ParentEvent.children.close();
+				
+			}
+			
+		}
+		
+		await App.storage.set({ id: body.id, token: body.token, login: body.login, fraction: body.fraction });
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		View.show('castle');
+		
+	}
+	
+}
+
 class Lang {
 
 	static target = 'ru'; // TODO get from the system
@@ -225,6 +255,24 @@ class News {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+	
+	window.addEventListener('message',(event) => {
+		
+		if( !('action' in event.data) ){
+			
+			return;
+			
+		}
+		
+		if(event.data.action in ParentEvent){
+			
+			ParentEvent[event.data.action](event.data.body);
+			
+		}
+		
+		console.log('event.data',event.data);
+		
+	});
 
 	Splash.init();
 
@@ -1429,7 +1477,7 @@ class View {
 		}
 
 	}
-
+	
 	static authorization() {
 		let numEnterEvent = ['keyup', async (event) => {
 			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -1451,7 +1499,11 @@ class View {
 
 					}]
 				}, 'Регистрация'))
-			)), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
+			)), DOM({event:['click',() => {
+				
+				ParentEvent.children = window.open('https://api2.26rus-game.ru:2087','123','popup');
+				
+			}]},'ВОЙТИ ЧЕРЕЗ STEAM'), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 
 		return authorizationForm;
 	}
