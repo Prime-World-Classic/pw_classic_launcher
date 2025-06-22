@@ -322,15 +322,8 @@ window.addEventListener('DOMContentLoaded', () => {
 			PWGame.radminHasConnection = true;
 		}
 	}
-	let testProxyConnection = async () => {
-		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.PROXY_GAME_SERVER_IP]);
-		if (hasConnection) {
-			PWGame.proxyHasConnection = true;
-		}
-	}
 	setTimeout(_ => {
 		testRadminConnection();
-		testProxyConnection();
 	}, 3000);
 });
 
