@@ -4,6 +4,48 @@ PW_VERSION = '2.5.4';
 
 CURRENT_MM = 'mmtest'
 
+class ParentEvent {
+	
+	static children;
+	
+	static async authorization(body){
+		
+		if(!body.id){
+			
+			if(ParentEvent.children){
+				
+				ParentEvent.children.close();
+				
+			}
+			
+		}
+		
+		await App.storage.set({ id: body.id, token: body.token, login: body.login, fraction: body.fraction });
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		View.show('castle');
+		
+	}
+
+	static async bind(body){
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		App.error(body);
+		
+	}
+	
+}
+
 class Lang {
 
 	static target = 'ru'; // TODO get from the system
@@ -227,6 +269,24 @@ class News {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+	
+	window.addEventListener('message',(event) => {
+		
+		if( !('action' in event.data) ){
+			
+			return;
+			
+		}
+		
+		if(event.data.action in ParentEvent){
+			
+			ParentEvent[event.data.action](event.data.body);
+			
+		}
+		
+		console.log('event.data',event.data);
+		
+	});
 
 	Splash.init();
 
@@ -1438,7 +1498,7 @@ class View {
 		}
 
 	}
-
+	
 	static authorization() {
 		let numEnterEvent = ['keyup', async (event) => {
 			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -1460,7 +1520,11 @@ class View {
 
 					}]
 				}, 'Регистрация'))
-			)), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
+			)), DOM({event:['click',() => {
+				
+				ParentEvent.children = window.open('https://api2.26rus-game.ru:2087','123','popup');
+				
+			}]},'ВОЙТИ ЧЕРЕЗ STEAM'), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 
 		return authorizationForm;
 	}
@@ -3477,6 +3541,12 @@ class Window {
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-v' },
 				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
+			DOM({ style: 'castle-menu-item-v' },
+				DOM({ event: ['click', () => {
+					
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`,'123','popup');
+					
+				}] }, 'Привязать STEAM')),
 			DOM({
 				style: 'castle-menu-item-v', event: ['click', async () => {
 					App.exit();
@@ -7099,7 +7169,7 @@ class App {
 
 	static async init() {
 		
-		App.api = new Api(['wss://api.playpw.fun:8443', 'wss://pw.26rus-game.ru:8443'], Events);
+		App.api = new Api(['wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443'], Events);
 		
 		await News.init();
 		
@@ -10980,26 +11050,18 @@ class MM {
 }
 
 class ARAM {
-
-	static role = [
-		{ name: 'Защитник', task: 'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.', hero: [46,30,35,17,42,36,15] },
-		{ name: 'Боец ближнего боя', task: 'Поддержать прорыв обороны противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.', hero: [48,33,4,10,49,1,23,60,51,22,11,56,53,39,45,64] },
-		{ name: 'Боец дальнего боя', task: 'Нанести урон по более уязвимым героям вражеской команды и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [52,47,63,24,40,32,31,55,7,57,44,21,5,54,65,43,18,62,58,9,25,50] },
-		{ name: 'Поддержка', task: 'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.', hero: [19,38,13,59] },
-		{ name: 'Заклинатель', task: 'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [26,34,28,8,2,12,29] }
-	];
 	
-	// { name: 'Ассасин', task: 'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
-
+	static role = {
+		1:{name:'Защитник',description:'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.'},
+		2:{name:'Штурмовик',description:'Поддержать прорыв обороны противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.'},
+		3:{name:'Верховный повелитель',description:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'},
+		4:{name:'Младший повелитель',description:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'},
+		5:{name:'Поддержка',description:'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.'},
+		6:{name:'Преследователь',description:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.'},
+		7:{name:'Стрелок',description:'Нанести урон по более уязвимым героям вражеской команды и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'}	
+	};
+	
 	static briefing(heroId, roleId, callback) {
-		
-		let heroAll = new Array();
-		
-		for(let item of ARAM.role){
-			
-			heroAll = heroAll.concat(item.hero);
-			
-		}
 
 		let hero = DOM({ style: 'aram-briefing-left' }, DOM({ style: 'aram-random' }));
 		
@@ -11029,7 +11091,7 @@ class ARAM {
 
 			while (true) {
 
-				heroRandom = heroAll[Math.floor(Math.random() * heroAll.length)];
+				heroRandom = App.getRandomInt(1,65);
 
 				if (heroRandom != lastRandomHero) {
 
@@ -11094,7 +11156,7 @@ class ARAM {
 							animate.onfinish = () => {
 								
 								h1.innerText = 'Ваша задача';
-								text.innerText = ARAM.role[roleId].task;
+								text.innerText = ARAM.role[roleId].description;
 								
 								animate.reverse();
 								
