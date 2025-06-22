@@ -123,12 +123,14 @@ class Lang {
 
 	};
 
-	static text(word) {
+	static text(word, placeholder) {
 		if (word in Lang.list[Lang.target]) {
 			return Lang.list[Lang.target][word];
 		}
-
+		if (word in Lang.list[Lang.default]) {
 		return Lang.list[Lang.default][word];
+		}
+		return placeholder;
 	}
 
 }
@@ -253,6 +255,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	App.init();
 
 	Settings.init();
+	
 
 	let testRadminConnection = async () => {
 		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
@@ -264,6 +267,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		testRadminConnection();
 	}, 3000);
 });
+
 
 class DataBase {
 
@@ -3150,141 +3154,141 @@ class View {
 
 
 	static async talents() {
-    let body = DOM({ style: 'main' });
-    
-    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
-    let header = DOM({ style: 'adm-header' });
-    
-    // Кнопка закрытия
-    let closeBtn = DOM({ 
-        style: 'close-btn',
-        event: ['click', () => View.show('castle')] 
-    }, '[X]');
-    
-    // Строка поиска
-    let searchInput = DOM({
-        tag: 'input',
-        placeholder: 'Поиск талантов...',
-        style: 'search-input'
-    });
-    
-    header.append(closeBtn, searchInput);
-    
-    let adm = DOM({ style: 'adm' }, header);
-    let result = await App.api.request('build', 'talentAll');
-    let talentContainers = [];
-    let talentsContainer = DOM({ style: 'talents-container' });
+	let body = DOM({ style: 'main' });
+	
+	// Создаем контейнер для заголовка (кнопка закрытия + поиск)
+	let header = DOM({ style: 'adm-header' });
+	
+	// Кнопка закрытия
+	let closeBtn = DOM({ 
+		style: 'close-btn',
+		event: ['click', () => View.show('castle')] 
+	}, '[X]');
+	
+	// Строка поиска
+	let searchInput = DOM({
+		tag: 'input',
+		placeholder: 'Поиск талантов...',
+		style: 'search-input'
+	});
+	
+	header.append(closeBtn, searchInput);
+	
+	let adm = DOM({ style: 'adm' }, header);
+	let result = await App.api.request('build', 'talentAll');
+	let talentContainers = [];
+	let talentsContainer = DOM({ style: 'talents-container' });
 
-    for (let item of result) {
-        let div = DOM({ tag: 'div', class: 'talent-item' });
-        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
+	for (let item of result) {
+		let div = DOM({ tag: 'div', class: 'talent-item' });
+		div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
 
-        for (let key in item) {
-            if (key == 'id') continue;
-            div.append(
-                DOM({ tag: 'div' }, key),
-                App.input(async (value) => {
-                    let object = new Object();
-                    object[key] = value;
-                    await App.api.request('build', 'talentEdit', { id: item.id, object: object });
-                }, { value: item[key] })
-            );
-        }
-        
-        talentContainers.push({ element: div, data: item });
-        talentsContainer.append(div);
-    }
-    
-    const filterTalents = (searchText) => {
-        searchText = searchText.toLowerCase();
-        talentContainers.forEach(({ element, data }) => {
-            let matches = false;
-            for (let key in data) {
-                if (String(data[key]).toLowerCase().includes(searchText)) {
-                    matches = true;
-                    break;
-                }
-            }
-            element.style.display = matches ? 'flex' : 'none';
-        });
-    };
-    
-    searchInput.addEventListener('input', (e) => {
-        filterTalents(e.target.value);
-    });
-    
-    adm.append(talentsContainer);
-    body.append(adm);
-    return body;
+		for (let key in item) {
+			if (key == 'id') continue;
+			div.append(
+				DOM({ tag: 'div' }, key),
+				App.input(async (value) => {
+					let object = new Object();
+					object[key] = value;
+					await App.api.request('build', 'talentEdit', { id: item.id, object: object });
+				}, { value: item[key] })
+			);
+		}
+		
+		talentContainers.push({ element: div, data: item });
+		talentsContainer.append(div);
+	}
+	
+	const filterTalents = (searchText) => {
+		searchText = searchText.toLowerCase();
+		talentContainers.forEach(({ element, data }) => {
+			let matches = false;
+			for (let key in data) {
+				if (String(data[key]).toLowerCase().includes(searchText)) {
+					matches = true;
+					break;
+				}
+			}
+			element.style.display = matches ? 'flex' : 'none';
+		});
+	};
+	
+	searchInput.addEventListener('input', (e) => {
+		filterTalents(e.target.value);
+	});
+	
+	adm.append(talentsContainer);
+	body.append(adm);
+	return body;
 }
 
 static async talents2() {
-    let body = DOM({ style: 'main' });
-    
-    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
-    let header = DOM({ style: 'adm-header' });
-    
-    // Кнопка закрытия
-    let closeBtn = DOM({ 
-        style: 'close-btn',
-        event: ['click', () => View.show('castle')] 
-    }, '[X]');
-    
-    // Строка поиска
-    let searchInput = DOM({
-        tag: 'input',
-        placeholder: 'Поиск геройских талантов...',
-        style: 'search-input'
-    });
-    
-    header.append(closeBtn, searchInput);
-    
-    let adm = DOM({ style: 'adm' }, header);
-    let result = await App.api.request('build', 'talentHeroAll');
-    let talentContainers = [];
-    let talentsContainer = DOM({ style: 'talents-container' });
+	let body = DOM({ style: 'main' });
+	
+	// Создаем контейнер для заголовка (кнопка закрытия + поиск)
+	let header = DOM({ style: 'adm-header' });
+	
+	// Кнопка закрытия
+	let closeBtn = DOM({ 
+		style: 'close-btn',
+		event: ['click', () => View.show('castle')] 
+	}, '[X]');
+	
+	// Строка поиска
+	let searchInput = DOM({
+		tag: 'input',
+		placeholder: 'Поиск геройских талантов...',
+		style: 'search-input'
+	});
+	
+	header.append(closeBtn, searchInput);
+	
+	let adm = DOM({ style: 'adm' }, header);
+	let result = await App.api.request('build', 'talentHeroAll');
+	let talentContainers = [];
+	let talentsContainer = DOM({ style: 'talents-container' });
 
-    for (let item of result) {
-        let div = DOM({ tag: 'div', class: 'talent-item' });
-        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
+	for (let item of result) {
+		let div = DOM({ tag: 'div', class: 'talent-item' });
+		div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
 
-        for (let key in item) {
-            if (key == 'id') continue;
-            div.append(
-                DOM({ tag: 'div' }, key),
-                App.input(async (value) => {
-                    let object = new Object();
-                    object[key] = value;
-                    await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
-                }, { value: item[key] })
-            );
-        }
-        
-        talentContainers.push({ element: div, data: item });
-        talentsContainer.append(div);
-    }
-    
-    const filterTalents = (searchText) => {
-        searchText = searchText.toLowerCase();
-        talentContainers.forEach(({ element, data }) => {
-            let matches = false;
-            for (let key in data) {
-                if (String(data[key]).toLowerCase().includes(searchText)) {
-                    matches = true;
-                    break;
-                }
-            }
-            element.style.display = matches ? 'flex' : 'none';
-        });
-    };
-    
-    searchInput.addEventListener('input', (e) => {
-        filterTalents(e.target.value);
-    });
-    
-    adm.append(talentsContainer);
-    body.append(adm);
-    return body;
+		for (let key in item) {
+			if (key == 'id') continue;
+			div.append(
+				DOM({ tag: 'div' }, key),
+				App.input(async (value) => {
+					let object = new Object();
+					object[key] = value;
+					await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
+				}, { value: item[key] })
+			);
+		}
+		
+		talentContainers.push({ element: div, data: item });
+		talentsContainer.append(div);
+	}
+	
+	const filterTalents = (searchText) => {
+		searchText = searchText.toLowerCase();
+		talentContainers.forEach(({ element, data }) => {
+			let matches = false;
+			for (let key in data) {
+				if (String(data[key]).toLowerCase().includes(searchText)) {
+					matches = true;
+					break;
+				}
+			}
+			element.style.display = matches ? 'flex' : 'none';
+		});
+	};
+	
+	searchInput.addEventListener('input', (e) => {
+		filterTalents(e.target.value);
+	});
+	
+	adm.append(talentsContainer);
+	body.append(adm);
+	return body;
 }
 
 	static async users() {
@@ -3512,36 +3516,36 @@ class Window {
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
 			DOM({ style: 'castle-menu-item' },
-            	DOM({
-                	tag: 'input',
-                	type: 'checkbox',
-                	id: 'render-toggle',
-                	checked: Settings.settings.render,
-                	event: ['change', (e) => {
-                    	Settings.settings.render = e.target.checked;
-                    	Settings.ApplySettings({audio: false, window: false});
-                	}]
-            	}),
-            	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
-        	),
+				DOM({
+					tag: 'input',
+					type: 'checkbox',
+					id: 'render-toggle',
+					checked: Settings.settings.render,
+					event: ['change', (e) => {
+						Settings.settings.render = e.target.checked;
+						Settings.ApplySettings({audio: false, window: false});
+					}]
+				}),
+				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
+			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
-            	DOM({
-                	tag: 'input',
-                	type: 'range',
-                	value: Settings.settings.globalVolume * 100,
-                	min: '0',
-                	max: '100',
-                	step: '1',
-                	style: 'castle-menu-slider',
-                	event: ['input', (e) => {
-                    	Settings.settings.globalVolume = parseFloat(e.target.value) / 100;
-                    	Settings.ApplySettings({render: false, window: false});
+				DOM({
+					tag: 'input',
+					type: 'range',
+					value: Settings.settings.globalVolume * 100,
+					min: '0',
+					max: '100',
+					step: '1',
+					style: 'castle-menu-slider',
+					event: ['input', (e) => {
+						Settings.settings.globalVolume = parseFloat(e.target.value) / 100;
+						Settings.ApplySettings({render: false, window: false});
 																	  
 																		  
-                    	document.getElementById('global-volume-percentage').textContent = 
-                        	`${Math.round(Settings.settings.globalVolume * 100)}%`;
-                	}]
-            	}),
+						document.getElementById('global-volume-percentage').textContent = 
+							`${Math.round(Settings.settings.globalVolume * 100)}%`;
+					}]
+				}),
 				DOM({ 
 					tag: 'span', 
 					id: 'global-volume-percentage', 
@@ -3605,188 +3609,145 @@ class Window {
 				}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
 			),
 			// Добавленная кнопка "Клавиши"
-			/*DOM({ 
+			DOM({ 
 				style: 'castle-menu-item-v',
 				event: ['click', () => {
-					console.log("Клавиши clicked"); // Для отладки
 					Window.show('main','keybindings'); 
 				}]
 			}, Lang.text('keys') || 'Клавиши'), // Fallback на текст, если перевод отсутствует
-			*/
+			
 			// Кнопка "Назад"
 			DOM({ 
 				style: 'castle-menu-item-v', 
 				event: ['click', () => Window.show('main', 'menu')] 
 			}, Lang.text('back')),
 			
-			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
+			DOM(/*{ style: 'castle-menu-label-description' }, Lang.text('soundHelp')*/)
 		);
 	}
 
 	static async keybindings() {
-    async function findConfigFile() {
-        const possiblePaths = [
-            `${nw.App.getDataPath('documents')}/My Games/Prime World Classic/input_new.cfg`,
-            `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/input_new.cfg`,
-            `${process.env.USERPROFILE}/OneDrive/Documents/My Games/Prime World Classic/input_new.cfg`
-        ];
-        
-        for (const path of possiblePaths) {
-            try {
-                await fs.access(path);
-                return path;
-            } catch (e) {
-                continue;
-            }
-        }
-        return null;
-    }
 
-    const configPath = await findConfigFile();
-    
-    if (!configPath) {
-        console.error("Не удалось найти файл конфигурации ни по одному из путей");
-        return DOM({ id: 'wcastle-keybindings' },
-            DOM({ style: 'castle-menu-error' }, 
-                Lang.text('keybindings_error', 'Не удалось найти файл конфигурации клавиш')
-            ),
-            DOM({ 
-                class: 'castle-menu-item-v',
-                event: ['click', () => Window.show('settings', 'menu')]
-            }, Lang.text('back', 'Назад'))
-        );
-    }
+		const currentBindsFromSettings = Settings.inputs['adventure_screen']['bind'];
+		let currentBinds = new Array();
+		for (let bind in currentBindsFromSettings) {
+			if (bind.startsWith('cmd_action_bar_slot')) {
+				let object = new Object();
+				object[bind] = currentBindsFromSettings[bind][0];
+				currentBinds.push(object);
+			}
+		}
 
-    const defaultKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-    
-    let currentBinds = {};
-    let configReadError = false;
-    
-    try {
-        const configContent = await fs.readFile(configPath, 'utf-8');
-        const bindRegex = /bind cmd_action_bar_slot(\d+) '(.+?)'/g;
-        let match;
-        
-        while ((match = bindRegex.exec(configContent)) !== null) {
-            currentBinds[`slot${match[1]}`] = match[2];
-        }
-    } catch (e) {
-        console.error("Ошибка чтения конфига:", e);
-        configReadError = true;
-    }
+		let bindsDom = DOM({});
 
-    return DOM({ id: 'wcastle-keybindings' },
-        DOM({ style: 'castle-menu-title' }, Lang.text('keybindings_title', 'Настройка клавиш')),
-        
-        configReadError 
-            ? DOM({ style: 'castle-menu-error' }, 
-                Lang.text('keybindings_error', 'Не удалось прочитать файл конфигурации клавиш. Проверьте путь:') + ' ' + configPath
-              )
-            : DOM({},
-                ...Array.from({ length: 10 }, (_, i) => {
-                    const slotNum = i + 1;
-                    const slotKey = `slot${slotNum}`;
-                    const currentKey = currentBinds[slotKey] || defaultKeys[i];
-                    
-                    return DOM({ style: 'castle-menu-label keybinding-row' }, 
-                        DOM({ style: 'keybinding-label' }, 
-                            Lang.text(`talent_slot_${slotNum}`, `Талант ${slotNum}`)
-                        ),
-                        DOM({
-                            tag: 'input',
-                            type: 'text',
-                            value: currentKey,
-                            class: 'castle-keybinding-input',
-                            maxLength: 1,
-                            event: [
-                                'keydown',
-                                (e) => {
-                                    if (e.key === 'Backspace' || e.key === 'Delete') {
-                                        e.target.value = '';
-                                        currentBinds[slotKey] = '';
-                                        return;
-                                    }
-                                    
-                                    if (e.ctrlKey || e.altKey || e.metaKey || e.key.length > 1) {
-                                        return;
-                                    }
-                                    
-                                    e.preventDefault();
-                                    const key = e.key.toUpperCase();
-                                    
-                                    if (/^[0-9A-Z]$/.test(key)) {
-                                        e.target.value = key;
-                                        currentBinds[slotKey] = key;
-                                        e.target.classList.add('input-success');
-                                        setTimeout(() => e.target.classList.remove('input-success'), 200);
-                                    } else {
-                                        e.target.classList.add('input-error');
-                                        setTimeout(() => e.target.classList.remove('input-error'), 200);
-                                    }
-                                }
-                            ]
-                        })
-                    );
-                }),
-                
-                DOM({ 
-                    class: 'castle-menu-item-v reset-btn',
-                    event: ['click', () => {
-                        document.querySelectorAll('.castle-keybinding-input').forEach((input, i) => {
-                            input.value = defaultKeys[i];
-                            currentBinds[`slot${i+1}`] = defaultKeys[i];
-                        });
-                        
-                        const btn = document.querySelector('.reset-btn');
-                        btn.classList.add('action-success');
-                        btn.textContent = Lang.text('reset_complete', 'Сброшено!');
-                        setTimeout(() => {
-                            btn.classList.remove('action-success');
-                            btn.textContent = Lang.text('reset_defaults', 'Сбросить на 1-0');
-                        }, 1000);
-                    }]
-                }, Lang.text('reset_defaults', 'Сбросить на 1-0')),
-                
-                DOM({ 
-                    class: 'castle-menu-item-v save-btn',
-                    event: ['click', async () => {
-                        try {
-                            let newConfig = '';
-                            for (let i = 1; i <= 10; i++) {
-                                const key = currentBinds[`slot${i}`] || defaultKeys[i-1];
-                                newConfig += `bind cmd_action_bar_slot${i} '${key}'\n`;
-                            }
-                            
-                            await fs.writeFile(configPath, newConfig);
-                            
-                            const btn = document.querySelector('.save-btn');
-                            btn.classList.add('action-success');
-                            btn.textContent = Lang.text('saved', 'Сохранено!');
-                            setTimeout(() => {
-                                btn.classList.remove('action-success');
-                                btn.textContent = Lang.text('save', 'Сохранить');
-                            }, 1000);
-                            
-                        } catch (e) {
-                            console.error("Ошибка сохранения:", e);
-                            const btn = document.querySelector('.save-btn');
-                            btn.classList.add('action-error');
-                            btn.textContent = Lang.text('save_error', 'Ошибка!');
-                            setTimeout(() => {
-                                btn.classList.remove('action-error');
-                                btn.textContent = Lang.text('save', 'Сохранить');
-                            }, 1000);
-                        }
-                    }]
-                }, Lang.text('save', 'Сохранить'))
-            ),
-        
-        DOM({ 
-            class: 'castle-menu-item-v',
-            event: ['click', () => Window.show('settings', 'menu')]
-        }, Lang.text('back', 'Назад'))
-    );
-}
+		for (const bind of currentBinds) {
+			bindsDom.appendChild(DOM({ style: 'castle-menu-label keybinding-row' }));
+			continue;
+			return DOM({ style: 'castle-menu-label keybinding-row' }, 
+				DOM({ style: 'keybinding-label' }, 
+					Lang.text(`talent_slot_${slotNum}`, `Талант ${slotNum}`)
+				),
+				DOM({
+					tag: 'input',
+					type: 'text',
+					value: currentKey,
+					class: 'castle-keybinding-input',
+					maxLength: 1,
+					event: [
+						'keydown',
+						(e) => {
+							if (e.key === 'Backspace' || e.key === 'Delete') {
+								e.target.value = '';
+								currentBinds[slotKey] = '';
+								return;
+							}
+							
+							if (e.ctrlKey || e.altKey || e.metaKey || e.key.length > 1) {
+								return;
+							}
+							
+							e.preventDefault();
+							const key = e.key.toUpperCase();
+							
+							if (/^[0-9A-Z]$/.test(key)) {
+								e.target.value = key;
+								currentBinds[slotKey] = key;
+								e.target.classList.add('input-success');
+								setTimeout(() => e.target.classList.remove('input-success'), 200);
+							} else {
+								e.target.classList.add('input-error');
+								setTimeout(() => e.target.classList.remove('input-error'), 200);
+							}
+						}
+					]
+				})
+			);
+		}
+		
+		let result = DOM({ id: 'wcastle-keybindings' },
+			DOM({ style: 'castle-menu-title' }, Lang.text('keybindings_title', 'Настройка клавиш')),
+			bindsDom, // Настройки
+			DOM({ 
+				style: 'castle-menu-item-v',
+				event: ['click', () => {
+					/*
+					document.querySelectorAll('.castle-keybinding-input').forEach((input, i) => {
+						input.value = defaultKeys[i];
+						currentBinds[`slot${i+1}`] = defaultKeys[i];
+					});
+					
+					const btn = document.querySelector('.reset-btn');
+					btn.classList.add('action-success');
+					btn.textContent = Lang.text('reset_complete', 'Сброшено!');
+					setTimeout(() => {
+						btn.classList.remove('action-success');
+						btn.textContent = Lang.text('reset_defaults', 'Сбросить на 1-0');
+					}, 1000);
+					*/
+				}]
+			}, Lang.text('reset_defaults', 'Сбросить на 1-0')),
+			DOM({ 
+				style: 'castle-menu-item-v',
+				event: ['click', async () => {
+					/*
+					try {
+						let newConfig = '';
+						for (let i = 1; i <= 10; i++) {
+							const key = currentBinds[`slot${i}`] || defaultKeys[i-1];
+							newConfig += `bind cmd_action_bar_slot${i} '${key}'\n`;
+						}
+						
+						await fs.writeFile(configPath, newConfig);
+						
+						const btn = document.querySelector('.save-btn');
+						btn.classList.add('action-success');
+						btn.textContent = Lang.text('saved', 'Сохранено!');
+						setTimeout(() => {
+							btn.classList.remove('action-success');
+							btn.textContent = Lang.text('save', 'Сохранить');
+						}, 1000);
+						
+					} catch (e) {
+						console.error("Ошибка сохранения:", e);
+						const btn = document.querySelector('.save-btn');
+						btn.classList.add('action-error');
+						btn.textContent = Lang.text('save_error', 'Ошибка!');
+						setTimeout(() => {
+							btn.classList.remove('action-error');
+							btn.textContent = Lang.text('save', 'Сохранить');
+						}, 1000);
+					}
+						*/
+				}]
+			}, Lang.text('save', 'Сохранить')),
+			DOM({ 
+				style: 'castle-menu-item-v',
+				event: ['click', () => Window.show('main', 'settings')]
+			}, Lang.text('back', 'Назад'))
+		);
+
+		return result;
+	}
 	
 	static async support() {
 		return DOM({ id: 'wcastle-support' },
@@ -4677,55 +4638,55 @@ class Build {
 	}
 	
 	static list(builds, isWindow) {
-    const buildButtonsWrapper = DOM({ style: 'build-list' });
+	const buildButtonsWrapper = DOM({ style: 'build-list' });
 
-    for (let build of builds) {
-        const item = DOM(
-            {
-                tag: 'button', style: ['build-tab-item', 'btn-hover'], event: [
-                    'click', () => {
-                        isWindow ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build', Build.heroId, build.id);
-                    }]
-            },
-            DOM({}, `${build.name}`),
-        );
-        item.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            Build.buildSelectName('rename', 'Переименовать билд', { id: build.id }, isWindow);
-        });
+	for (let build of builds) {
+		const item = DOM(
+			{
+				tag: 'button', style: ['build-tab-item', 'btn-hover'], event: [
+					'click', () => {
+						isWindow ? Window.show('main', 'build', Build.heroId, build.id, true) : View.show('build', Build.heroId, build.id);
+					}]
+			},
+			DOM({}, `${build.name}`),
+		);
+		item.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+			Build.buildSelectName('rename', 'Переименовать билд', { id: build.id }, isWindow);
+		});
 
-        const div = DOM({ tag: 'div', style: 'button-build--wrapper' }, item);
+		const div = DOM({ tag: 'div', style: 'button-build--wrapper' }, item);
 
-        if (build.target) {
-            item.classList.add('list-highlight');
-        } else {
-            item.classList.add('list-not-highlight');
-        }
+		if (build.target) {
+			item.classList.add('list-highlight');
+		} else {
+			item.classList.add('list-not-highlight');
+		}
 
-        Build.listView.append(div);
-    }
+		Build.listView.append(div);
+	}
 
-    // Добавляем обработчик колесика мыши после создания списка
-    setTimeout(() => {
-        const buildList = document.querySelector('.build-list');
-        if (buildList) {
-            buildList.addEventListener('wheel', function(e) {
-                e.preventDefault();
-                this.scrollLeft += e.deltaY;
-                
-                // Опционально: можно добавить множитель для скорости прокрутки
-                // this.scrollLeft += e.deltaY * 2;
-            });
-        }
-    }, 0);
+	// Добавляем обработчик колесика мыши после создания списка
+	setTimeout(() => {
+		const buildList = document.querySelector('.build-list');
+		if (buildList) {
+			buildList.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				this.scrollLeft += e.deltaY;
+				
+				// Опционально: можно добавить множитель для скорости прокрутки
+				// this.scrollLeft += e.deltaY * 2;
+			});
+		}
+	}, 0);
 
-    /*
-    setTimeout(_ => {
-        if (!document.querySelector('.build-list.list-highlight')) {
-            document.querySelector('.build-list').classList.add('list-highlight');
-        }
-    }, 300);
-    */
+	/*
+	setTimeout(_ => {
+		if (!document.querySelector('.build-list.list-highlight')) {
+			document.querySelector('.build-list').classList.add('list-highlight');
+		}
+	}, 300);
+	*/
 }
 
 	static totalStat(stat) {
@@ -6083,98 +6044,98 @@ class Build {
 	}
 
 	static move(element, fromActiveBar) {
-    let elementFromPoint = (x, y) => {
-        let elems = document.elementsFromPoint(x, y);
-        return elems[0].className == 'build-level' ? elems[1] : elems[0];
-    };
+	let elementFromPoint = (x, y) => {
+		let elems = document.elementsFromPoint(x, y);
+		return elems[0].className == 'build-level' ? elems[1] : elems[0];
+	};
 
-    let elementSetDisplay = (element, display) => {
-        if (element.parentElement.classList == 'build-talent-item-container') {
-            element.parentElement.style.display = display;
-        }
-        element.style.display = display;
-    };
+	let elementSetDisplay = (element, display) => {
+		if (element.parentElement.classList == 'build-talent-item-container') {
+			element.parentElement.style.display = display;
+		}
+		element.style.display = display;
+	};
 
-    element.onmousedown = (event) => {
-        if (event.button != 0) return;
+	element.onmousedown = (event) => {
+		if (event.button != 0) return;
 
-        let moveStart = Date.now();
-        Build.descriptionView.style.display = 'none';
+		let moveStart = Date.now();
+		Build.descriptionView.style.display = 'none';
 
-        let data = Build.talents[element.dataset.id];
-        let fieldRow = document.getElementById(`bfr${data.level}`);
+		let data = Build.talents[element.dataset.id];
+		let fieldRow = document.getElementById(`bfr${data.level}`);
 
-        if (!fromActiveBar) {
-            fieldRow.style.background = 'rgba(255,255,255,0.5)';
-            fieldRow.style.borderRadius = '1cqh';
-        }
+		if (!fromActiveBar) {
+			fieldRow.style.background = 'rgba(255,255,255,0.5)';
+			fieldRow.style.borderRadius = '1cqh';
+		}
 
-        // Фикс для transform
-        element.style.transformOrigin = 'center center';
-        element.style.willChange = 'transform';
-        element.style.setProperty('transform', 'scale(1.1)', 'important');
-        element.style.transition = 'transform 0.1s ease';
+		// Фикс для transform
+		element.style.transformOrigin = 'center center';
+		element.style.willChange = 'transform';
+		element.style.setProperty('transform', 'scale(1.1)', 'important');
+		element.style.transition = 'transform 0.1s ease';
 
-        let rect = element.getBoundingClientRect();
-        let shiftX = event.pageX - rect.left-5;
-        let shiftY = event.pageY - rect.top-5;
+		let rect = element.getBoundingClientRect();
+		let shiftX = event.pageX - rect.left-5;
+		let shiftY = event.pageY - rect.top-5;
 
-        let offsetParent = element;
-        do {
-            shiftX += offsetParent.offsetParent.offsetLeft;
-            shiftY += offsetParent.offsetParent.offsetTop;
-            offsetParent = offsetParent.offsetParent;
-        } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
+		let offsetParent = element;
+		do {
+			shiftX += offsetParent.offsetParent.offsetLeft;
+			shiftY += offsetParent.offsetParent.offsetTop;
+			offsetParent = offsetParent.offsetParent;
+		} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
 
-        element.style.zIndex = '9999';
-        element.style.position = 'absolute';
-        element.style.left = event.pageX - shiftX - 1 + 'px';
-        element.style.top = event.pageY - shiftY - 1 + 'px';
+		element.style.zIndex = '9999';
+		element.style.position = 'absolute';
+		element.style.left = event.pageX - shiftX - 1 + 'px';
+		element.style.top = event.pageY - shiftY - 1 + 'px';
 
-        elementSetDisplay(element, 'none');
-        let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
-        elementSetDisplay(element, 'block');
+		elementSetDisplay(element, 'none');
+		let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
+		elementSetDisplay(element, 'block');
 
-        document.onmousemove = (e) => {
-            element.style.left = e.pageX - shiftX - 1 + 'px';
-            element.style.top = e.pageY - shiftY - 1 + 'px';
-        };
+		document.onmousemove = (e) => {
+			element.style.left = e.pageX - shiftX - 1 + 'px';
+			element.style.top = e.pageY - shiftY - 1 + 'px';
+		};
 
-        element.onmouseup = async (event) => {
-            // Возвращаем исходный размер
-            element.style.setProperty('transform', 'scale(1)', 'important');
+		element.onmouseup = async (event) => {
+			// Возвращаем исходный размер
+			element.style.setProperty('transform', 'scale(1)', 'important');
 
-            let moveEnd = Date.now();
-            let isClick = moveEnd - moveStart < 200;
+			let moveEnd = Date.now();
+			let isClick = moveEnd - moveStart < 200;
 
-            document.onmousemove = null;
-            element.onmouseup = null;
+			document.onmousemove = null;
+			element.onmouseup = null;
 
-            let field = Build.fieldView.getBoundingClientRect();
-            let inventory = Build.inventoryView.getBoundingClientRect();
-            let bar = Build.activeBarView.getBoundingClientRect();
-            let target = element.getBoundingClientRect();
+			let field = Build.fieldView.getBoundingClientRect();
+			let inventory = Build.inventoryView.getBoundingClientRect();
+			let bar = Build.activeBarView.getBoundingClientRect();
+			let target = element.getBoundingClientRect();
 
-            let left = parseInt(element.style.left) + target.width / 2;
-            let top = parseInt(element.style.top) + target.height / 2;
+			let left = parseInt(element.style.left) + target.width / 2;
+			let top = parseInt(element.style.top) + target.height / 2;
 
-            let offsetParent = element;
-            do {
-                left += offsetParent.offsetParent.offsetLeft;
-                top += offsetParent.offsetParent.offsetTop;
-                offsetParent = offsetParent.offsetParent;
-            } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
+			let offsetParent = element;
+			do {
+				left += offsetParent.offsetParent.offsetLeft;
+				top += offsetParent.offsetParent.offsetTop;
+				offsetParent = offsetParent.offsetParent;
+			} while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
 
-            let isFieldTarget = left > field.x && left < field.x + field.width && top > field.y && top < field.y + field.height;
-            let isInventoryTarget = left > inventory.x && left < inventory.x + inventory.width && top > inventory.y && top < inventory.y + inventory.height;
-            let isActiveBarTarget = left > bar.x && left < bar.x + bar.width && top > bar.y && top < bar.y + bar.height;
+			let isFieldTarget = left > field.x && left < field.x + field.width && top > field.y && top < field.y + field.height;
+			let isInventoryTarget = left > inventory.x && left < inventory.x + inventory.width && top > inventory.y && top < inventory.y + inventory.height;
+			let isActiveBarTarget = left > bar.x && left < bar.x + bar.width && top > bar.y && top < bar.y + bar.height;
 
-            if (isClick && (isFieldTarget || (isActiveBarTarget && fromActiveBar))) {
-                elementSetDisplay(element, 'none');
-                let elemBelow = elementFromPoint(event.clientX, event.clientY);
-                elementSetDisplay(element, 'block');
-                isClick = elemBelow == startingElementBelow;
-            }
+			if (isClick && (isFieldTarget || (isActiveBarTarget && fromActiveBar))) {
+				elementSetDisplay(element, 'none');
+				let elemBelow = elementFromPoint(event.clientX, event.clientY);
+				elementSetDisplay(element, 'block');
+				isClick = elemBelow == startingElementBelow;
+			}
 				if (isClick) {
 					if (element.dataset.state == 2) {
 						isFieldTarget = false;
@@ -8008,14 +7969,14 @@ class NativeAPI {
 					this.updated = this.lastBranchV != o;
 				}
 			}
-            
-            if (o.startsWith('Receiving objects:')) {
-                let percent = parseInt(o.substring(19, o.indexOf('%')));
+			
+			if (o.startsWith('Receiving objects:')) {
+				let percent = parseInt(o.substring(19, o.indexOf('%')));
 					
 				callback({update:true,title:this.title,total:percent});
 				
 				NativeAPI.progress(percent / 100);
-            }
+			}
 		}
 
 	}
@@ -8781,32 +8742,32 @@ class Castle {
 		Castle.UpdateAllowedToBuildGrid();
 	}
 
-    static async WriteBuildings() {
-        if (!NativeAPI.status) {
+	static async WriteBuildings() {
+		if (!NativeAPI.status) {
 			Castle.UpdateAllowedToBuildGrid();
-            return;
-        }
+			return;
+		}
 
 		let castleFilePath = Castle.GetLauncherFilePath('castle.cfg');
-        try {
-            await NativeAPI.fileSystem.promises.writeFile(
-                castleFilePath,
-                JSON.stringify(Castle.placedBuildings, null, 2),
-                'utf-8'
-            );
-        } catch (e) {
-            App.error(e);
-        }
+		try {
+			await NativeAPI.fileSystem.promises.writeFile(
+				castleFilePath,
+				JSON.stringify(Castle.placedBuildings, null, 2),
+				'utf-8'
+			);
+		} catch (e) {
+			App.error(e);
+		}
 		Castle.UpdateAllowedToBuildGrid();
-    }
+	}
 
 	static async loadBuildings() {
-        await Castle.ReadBuildings();
+		await Castle.ReadBuildings();
 		Castle.isBuildingsLoaded = true;
 		
-        window.addEventListener('beforeunload', () => {
-            Castle.WriteBuildings();
-        });
+		window.addEventListener('beforeunload', () => {
+			Castle.WriteBuildings();
+		});
 	}
 
 	static async initDemo(sceneName, canvas) {
@@ -9885,75 +9846,215 @@ class Castle {
 }
 
 class Settings {
-    static defaultSettings = {
-        fullscreen: true,
-        render: true,
-        globalVolume: 0.5,
-        musicVolume: 0.7,
-        soundsVolume: 0.7
-    };
+	static defaultSettings = {
+		fullscreen: true,
+		render: true,
+		globalVolume: 0.5,
+		musicVolume: 0.7,
+		soundsVolume: 0.7,
+	};
+	static defaultInputs = {
+		global: {},
+		adventure_screen: {
+			bind: {
+				cmd_action_bar_slot1: ["'1'"],
+				cmd_action_bar_slot2: ["'2'"],
+				cmd_action_bar_slot3: ["'3'"],
+				cmd_action_bar_slot4: ["'4'"],
+				cmd_action_bar_slot5: ["'5'"],
+				cmd_action_bar_slot6: ["'6'"],
+				cmd_action_bar_slot7: ["'7'"],
+				cmd_action_bar_slot8: ["'8'"],
+				cmd_action_bar_slot9: ["'9'"],
+				cmd_action_bar_slot10: ["'0'"],
+			},
+			bind_command: {},
+		}
+	};
 
-    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
-    static pwcLauncherSettingsDir;
-    static settingsFilePath;
+	static settings = JSON.parse(JSON.stringify(this.defaultSettings));
+	static pwcLauncherSettingsDir;
+	static settingsFilePath;
 
-    static async ensureSettingsFile() {
-        const homeDir = NativeAPI.os.homedir();
-        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
-        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
+	static inputs = JSON.parse(JSON.stringify(this.defaultInputs));
+	static pwcGameSettingsDir;
+	static inputsFilePath;
 
-        try {
-            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
-            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
-            return true;
-        } catch (e) {
-            App.error('Ошибка доступа к файлу настроек: ' + e);
-            await this.writeDefaultSettings();
-            return false;
-        }
-    }
+	static async ensureSettingsFile() {
+		const homeDir = NativeAPI.os.homedir();
+		this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+		this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
 
-    static async writeDefaultSettings() {
-        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
-        await this.WriteSettings();
-    }
+		try {
+			await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
+			await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
+			return true;
+		} catch (e) {
+			App.error('Ошибка доступа к файлу настроек: ' + e);
+			await this.writeDefaultSettings();
+			return false;
+		}
+	}
 
-    static async ReadSettings() {
-        if (!NativeAPI.status) {
-            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
-            this.settings = { ...this.defaultSettings };
-            return;
-        }
+	static async ensureGameSettingsFile() {
+		// TODO: user.cfg
+		const desktopPath = this.readUserShellFoldersSync('Personal');
+		this.pwcGameSettingsDir = NativeAPI.path.join(desktopPath, 'My Games\\Prime World Classic');
+		this.inputsFilePath = NativeAPI.path.join(this.pwcGameSettingsDir, 'input_new.cfg');
 
-        try {
-            if (await this.ensureSettingsFile()) {
-                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
-                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
-            }
-        } catch (e) {
-            App.error('Ошибка чтения настроек: ' + e);
-            this.settings = { ...this.defaultSettings };
-        }
-    }
+		try {
+			await NativeAPI.fileSystem.promises.mkdir(this.pwcGameSettingsDir, { recursive: true });
+			await NativeAPI.fileSystem.promises.access(this.inputsFilePath);
+			return true;
+		} catch (e) {
+			App.error('Ошибка доступа к файлам игровых настроек: ' + e);
+			await this.writeDefaultInputs();
+			return false;
+		}
+	}
 
-    static async WriteSettings() {
-        if (!this.settingsFilePath || !NativeAPI.status) {
-            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
-            return;
-        }
-        
-        try {
-            await NativeAPI.fileSystem.promises.writeFile(
-                this.settingsFilePath,
-                JSON.stringify(this.settings, null, 2),
-                'utf-8'
-            );
-        } catch (e) {
-            App.error('Ошибка сохранения настроек: ' + e);
-        }
-    }
+	static async writeDefaultSettings() {
+		this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
+		await this.WriteSettings();
+	}
 
-    static async ApplySettings(options = {}) {
+	static async writeDefaultInputs() {
+		this.inputs = JSON.parse(JSON.stringify(this.defaultInputs));
+		await this.WriteInputs();
+	}
+
+	static async ReadSettings() {
+		if (!NativeAPI.status) {
+			this.settings = { ...this.defaultSettings };
+			return;
+		}
+
+		try {
+			if (await this.ensureSettingsFile()) {
+				const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
+				this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
+			}
+		} catch (e) {
+			App.error('Ошибка чтения настроек: ' + e);
+			this.settings = { ...this.defaultSettings };
+		}
+	}
+
+	static async ReadInputs() {
+		if (!NativeAPI.status) {
+			this.inputs = { ...this.defaultInputs };
+			return;
+		}
+
+		try {
+			if (await this.ensureGameSettingsFile()) {
+				const data = await NativeAPI.fileSystem.promises.readFile(this.inputsFilePath, 'utf-8');
+				this.readInputs(data);
+			}
+		} catch (err) {
+			App.error('Ошибка чтения настроек клавиш:' + err, 10000);
+			this.inputs = { ...this.defaultInputs };
+		}	
+	}
+
+	static readInputs(data) {
+		this.inputs = { ...this.defaultInputs }
+
+		const inputsValues = data.split(NativeAPI.os.EOL);
+		const globalSection = 'global';
+		let currentSection = globalSection;
+		for (const inputValue of inputsValues) {
+			if (inputValue.startsWith('unbindall') || inputValue.length == 0) {
+				continue;
+			}
+			if (inputValue.startsWith('bindsection')) {
+				const sectionSplit = inputValue.split(' ');
+				currentSection = sectionSplit.length == 2 ? sectionSplit[1] : globalSection;
+
+				if (!(currentSection in this.inputs)) {
+					this.inputs[currentSection] = new Object();
+				}
+				continue;
+			} 
+			if (inputValue.startsWith('bind') || inputValue.startsWith('bind_command')) {
+				const commandType = inputValue.substring(0, inputValue.indexOf(' '));
+				const commandObject = inputValue.substring(inputValue.indexOf(' ') + 1);
+				if (commandType.length == 0 || commandObject.length == 0) {
+					App.error("Ошибка bind:" + inputValue);
+				}
+				const bindingType = commandType;
+				if (!(bindingType in this.inputs[currentSection])) {
+					this.inputs[currentSection][bindingType] = new Object();
+				}
+				
+				const bindObject = commandObject;
+				const bindName = bindObject.substring(0, bindObject.indexOf(' '));
+				const bindValue = bindObject.substring(bindObject.indexOf(' ') + 1);
+				if (!(bindName in this.inputs[currentSection][bindingType])) {
+					this.inputs[currentSection][bindingType][bindName] = new Array();
+				}
+				if (!this.inputs[currentSection][bindingType][bindName].includes(bindValue)) {
+					this.inputs[currentSection][bindingType][bindName].push(bindValue);
+				}
+				continue;
+			}
+			App.error("Необработанное значение: " + inputValue);
+		}
+	}
+
+	static stringifyInputs() {
+		const EOL = NativeAPI.status ? NativeAPI.os.EOL : "\n";
+		let output = 'unbindall' + EOL;
+		for (let section in this.inputs) {
+			const curSection = section == 'global' ? '' : section;
+			output += 'bindsection ' + curSection + EOL;
+			for (let bindType in this.inputs[section]) {
+				for (let bindName in this.inputs[section][bindType]) {
+					for (const bindValue of this.inputs[section][bindType][bindName]) {
+						output += bindType + ' ' + bindName + ' ' + bindValue + EOL;
+					}
+				}
+			}
+		}
+		App.error(output, 100000);
+		return output;
+	}
+
+	static async WriteSettings() {
+		if (!this.settingsFilePath || !NativeAPI.status) {
+			App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
+			return;
+		}
+		
+		try {
+			await NativeAPI.fileSystem.promises.writeFile(
+				this.settingsFilePath,
+				JSON.stringify(this.settings, null, 2),
+				'utf-8'
+			);
+		} catch (e) {
+			App.error('Ошибка сохранения настроек: ' + e);
+		}
+	}
+
+	static async WriteInputs() {
+		if (!this.inputsFilePath || !NativeAPI.status) {
+			App.error('Не могу сохранить настройки клавиш: путь или NativeAPI недоступны');
+			return;
+		}
+		
+		try {
+			await NativeAPI.fileSystem.promises.writeFile(
+				this.inputsFilePath,
+				this.stringifyInputs(),
+				'utf-8'
+			);
+		} catch (e) {
+			App.error('Ошибка сохранения настроек клавиш: ' + e);
+		}
+	}
+
+	static async ApplySettings(options = {}) {
 		// Установка значений по умолчанию для options
 		options = {
 			render: true,    // Применять настройки рендеринга по умолчанию
@@ -9999,14 +10100,45 @@ class Settings {
 		}
 	}
 
-    static async init() {
-        await this.ReadSettings();
-        await this.ApplySettings();
-        
-        window.addEventListener('beforeunload', () => {
-            this.WriteSettings();
-        });
-    }
+	static readUserShellFoldersSync(valueName = null) {
+		
+		const { execSync } = require('child_process');
+		const regPath = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
+		const command = `chcp 65001 > nul && reg query "${regPath}" /v "${valueName}"`;
+
+		try {
+			const stdout = execSync(command, { encoding: 'utf-8' });
+			const result = {};
+
+			const lines = stdout.split('\n').filter(line => line.trim());
+			for (const line of lines) {
+				if (!line.includes('REG_')) continue;
+
+				const parts = line.trim().split(/\s{2,}/);
+				if (parts.length >= 3) {
+					const name = parts[0].replace(regPath + '\\', '');
+					const value = parts[2];
+					result[name] = value;
+				}
+			}
+
+			return valueName ? (result[valueName] || null) : result;
+		} catch (err) {
+			App.error(`Ошибка чтения реестра: ${err.stderr || err.message}`);
+		}
+	}
+
+	static async init() {
+		await this.ReadSettings();
+		await this.ApplySettings();
+		
+		await this.ReadInputs();
+		
+		window.addEventListener('beforeunload', () => {
+			this.WriteSettings();
+			this.WriteInputs();
+		});
+	}
 }
 
 class MM {
