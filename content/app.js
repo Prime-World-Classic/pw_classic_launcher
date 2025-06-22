@@ -7151,7 +7151,7 @@ class App {
 
 	static async init() {
 		
-		App.api = new Api(['wss://api.playpw.fun:8443', 'wss://pw.26rus-game.ru:8443'], Events);
+		App.api = new Api(['wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443'], Events);
 		
 		await News.init();
 		
