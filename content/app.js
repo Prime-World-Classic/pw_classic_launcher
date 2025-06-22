@@ -20,6 +20,7 @@ class Lang {
 			menu: 'Меню',
 			preferences: 'Preferences',
 			windowMode: 'Window mode',
+			radminPriority: 'RadminVPN priority',
 			threeD: '3D',
 			volume: 'Volume',
 			volumeMusic: 'Volume of music',
@@ -56,6 +57,7 @@ class Lang {
 			menu: 'Меню',
 			preferences: 'Настройки',
 			windowMode: 'Оконный режим',
+			radminPriority: 'Приоритет RadminVPN',
 			threeD: '3D графика',
 			volume: 'Общая громкость',
 			volumeMusic: 'Громкость музыки',
@@ -260,8 +262,15 @@ window.addEventListener('DOMContentLoaded', () => {
 			PWGame.radminHasConnection = true;
 		}
 	}
+	let testProxyConnection = async () => {
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.PROXY_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.proxyHasConnection = true;
+		}
+	}
 	setTimeout(_ => {
 		testRadminConnection();
+		testProxyConnection();
 	}, 3000);
 });
 
@@ -3524,6 +3533,15 @@ class Window {
             	}),
             	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
         	),
+			DOM({ style: 'castle-menu-item' },
+				DOM({
+					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: !Settings.settings.radminPriority, event: ['change', (e) => {
+						Settings.settings.radminPriority = !e.target.checked;
+					}]
+				},
+					{ checked: Settings.settings.radminPriority }),
+				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
+			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
             	DOM({
                 	tag: 'input',
@@ -7637,6 +7655,8 @@ class PWGame {
 
 	static radminHasConnection = false;
 
+	static proxyHasConnection = false;
+
 	static gameConnectionTestIsActive = false;
 
 	static isUpToDate = false;
@@ -7680,7 +7700,11 @@ class PWGame {
 	}
 
 	static GetPlayPwProtocol(id) {
-		return `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
+		let chosenServer = PWGame.gameServerHasConnection ? 0 : 2;
+		if (Settings.settings.radminPriority && PWGame.radminHasConnection) {
+			chosenServer = 1;
+		}
+		return `pwclassic://runGame/${id}/${PW_VERSION}/${chosenServer}`;
 	}
 
 	static async start(id, callback) {
@@ -7739,10 +7763,12 @@ class PWGame {
 
 	static gameServerIps = [
 		'http://81.88.210.30:27302/api',
-		'http://26.133.141.83:27302/api' // test connection to Radmin IP
+		'http://26.133.141.83:27302/api', // test connection to Radmin IP
+		'http://95.164.91.124:27302/api',
 	];
 	static MAIN_GAME_SERVER_IP = 0
 	static RADMIN_GAME_SERVER_IP = 1;
+	static PROXY_GAME_SERVER_IP = 2;
 
 	static async testServerConnection(serverIp) {
 		const data = {
@@ -9890,7 +9916,8 @@ class Settings {
         render: true,
         globalVolume: 0.5,
         musicVolume: 0.7,
-        soundsVolume: 0.7
+        soundsVolume: 0.7,
+		radminPriority: false
     };
 
     static settings = JSON.parse(JSON.stringify(this.defaultSettings));
