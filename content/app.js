@@ -210,11 +210,11 @@ class News {
 	static async update(){
 		
 		//let request = await App.api.request('user','news');
-		let request = [{id:'Привет мир!',text:'Тестовая новость с сервера'}]; // демо данные
+		let request = [{id:'1',text:'2025.06.24.htm'}]; // демо данные
 		
 		for(let item of request){
 			
-			News.create(item.id,item.text);
+			News.create(item.text, item.id);
 			
 		}
 		
@@ -1355,11 +1355,11 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[13].style.display = 'block';
 
 		CastleNAVBAR.body.children[14].style.display = 'block';
-		
+
 		CastleNAVBAR.body.children[15].style.display = 'block';
 		
 		CastleNAVBAR.body.children[16].style.display = 'block';
-		
+
 	}
 
 	static setMode(type) {
@@ -1381,9 +1381,9 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[12].style.display = 'none';
 
 		CastleNAVBAR.body.children[13].style.display = 'none';
-		
+
 		CastleNAVBAR.body.children[14].style.display = 'none';
-		
+
 		CastleNAVBAR.body.children[15].style.display = 'none';
 		
 		CastleNAVBAR.body.children[16].style.display = 'none';
@@ -1489,7 +1489,7 @@ class View {
 		}
 
 	}
-	
+
 	static authorization() {
 		let numEnterEvent = ['keyup', async (event) => {
 			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -1947,6 +1947,8 @@ class View {
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
+		let news = DOM({ style: ['castle-news-has', 'button-outline'], title: 'Новости', event: ['click', () => Window.show('main', 'newsItem')] });
+
 
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
@@ -1956,7 +1958,7 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history);
+		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history, news);
 
 		return body;
 
@@ -3564,6 +3566,45 @@ class Window {
 				)
 			)
 		)
+	}
+
+	// Вывод окна с новостью
+	static async newsItem()
+	{
+		await News.update();
+		var newsView = await News.view();
+		var item = newsView.list[newsView.notifications - 1];
+		console.log(item);
+		return DOM({ id: 'news-item'},
+			DOM({ style: 'news-item-title'}, 'Последняя новость'),
+			//DOM({ style: 'news-item-text'}, item.text),
+			DOM( {tag: 'iframe', src: 'content/news/' + item.text, style: 'news-item-frame'}),
+			DOM({ style: 'news-item-footer'}),
+		);
+	}
+	
+	// Вывод списка новостей сверху самые свежие
+	static async newsList()
+	{
+		var news = await News.view();
+		return DOM({ id: 'news-list' },
+			DOM({ style: 'news-list-title'}, Lang.text('Последние новости')),
+			DOM({},...Array.from({ length: news.length }, (_, i) =>
+			{
+				var reverseIndex = news.length - i - 1;
+				var item = news[reverseIndex];
+				return DOM({ style: 'news-list-item',
+					// Window.show('main', 'newsItem', item)
+					 event: ['click', () => Invoker.newsItem(item)] }, item.title
+				);
+			})),
+
+			DOM({ style: 'news-item-back',
+				// Window.show('main', 'newsIcon')
+				event: ['click', () => Invoker.newsIcon()]
+			}, DOM({ tag: 'img', src: "content/icons/close-cropped.svg", alt: 'Закрыть', style: 'close-image-style' })),
+		
+		);
 	}
 
 	static async settings() {
@@ -7101,9 +7142,9 @@ class Events {
 	static PMMActive(data) {
 		
 		CastleNAVBAR.setMode(data.mode + 1);
-		
+
 		MM.searchActive(data.status);
-		
+
 	}
 
 	static MMQueue(value) {
@@ -11056,11 +11097,11 @@ class ARAM {
 		6:{name:'Преследователь',description:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.'},
 		7:{name:'Стрелок',description:'Нанести урон по более уязвимым героям вражеской команды и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'}	
 	};
-	
+
 	static briefing(heroId, roleId, callback) {
 
 		let hero = DOM({ style: 'aram-briefing-left' }, DOM({ style: 'aram-random' }));
-		
+
 		hero.style.backgroundImage = `url(content/hero/empty.webp)`;
 
 		let lastRandomHero = 0, second = 17, timer = DOM({ style: 'aram-timer' }, 'Начало боя через 15...');
@@ -11110,15 +11151,15 @@ class ARAM {
 				clearInterval(timerId);
 
 				return;
-				
+
 			}
 
 			second--;
 
 			timer.innerText = (second == 0) ? Lang.text('fight') : `Начало боя через ${second}...`;
-			
+
 		}, 1000);
-		
+
 		let part = DOM({style:'aram-background-part'});
 		
 		part.style.backgroundImage = `url(content/img/aram/part.png)`;
