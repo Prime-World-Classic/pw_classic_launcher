@@ -7159,8 +7159,10 @@ class Events {
 class App {
 
 	static async init() {
-		
-		App.api = new Api(['wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443', 'wss://relay.26rus-game.ru:8443'], Events);
+		// wss://api2.26rus-game.ru:8443 - Москва (основа)
+		// wss://relay.26rus-game.ru:8443 - Рига (Прокси)
+		// wss://api.26rus-game.ru:8443 - США (прокси)
+		App.api = new Api(['wss://relay.26rus-game.ru:8443', 'wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443' ], Events);
 		
 		await News.init();
 		
