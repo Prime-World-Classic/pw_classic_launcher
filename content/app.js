@@ -943,19 +943,17 @@ class Api {
 			
 		}
 		
-		for(let host of this.host){
+		let currentHost = 0;
+		for (let i = 0; i < this.host.length; ++i) {
 			
-			if(this.MAIN_HOST == host){
-				
-				continue;
+			if(this.MAIN_HOST == this.host[i]){
+				i = currentHost;
+				break;
+			}
 				
 			}
 			
-			this.MAIN_HOST = host;
-			
-			break;
-			
-		}
+		this.MAIN_HOST = this.host[(currentHost + 1) % this.host.length];
 		
 	}
 
@@ -7162,7 +7160,7 @@ class App {
 
 	static async init() {
 		
-		App.api = new Api(['wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443'], Events);
+		App.api = new Api(['wss://api2.26rus-game.ru:8443', 'wss://api.26rus-game.ru:8443', 'wss://relay.26rus-game.ru:8443'], Events);
 		
 		await News.init();
 		
