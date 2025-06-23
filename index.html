@@ -17,3 +17,16 @@
 <body>
 </body>
 </html>
+<script>
+  function resizeIframe() {
+    const iframe = document.getElementsByClassName('news-item-frame')[0];
+    const parent = document.getElementById('news-item');
+    console.log(iframe);
+    iframe.style.width = parent.innerWidth + 'px';
+    iframe.style.height = parent.innerHeight + 'px';
+  }
+
+  // Инициализация и обработка изменения размеров окна
+  window.addEventListener('load', resizeIframe);
+  window.addEventListener('resize', resizeIframe);
+</script>

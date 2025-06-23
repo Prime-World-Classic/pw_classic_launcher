@@ -3574,7 +3574,7 @@ class Window {
 		await News.update();
 		var newsView = await News.view();
 		var item = newsView.list[newsView.notifications - 1];
-		console.log(item);
+
 		return DOM({ id: 'news-item'},
 			DOM({ style: 'news-item-title'}, 'Последняя новость'),
 			//DOM({ style: 'news-item-text'}, item.text),
