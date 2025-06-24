@@ -62,7 +62,7 @@ class Lang {
 			menu: 'Меню',
 			preferences: 'Preferences',
 			windowMode: 'Window mode',
-			radminPriority: 'RadminVPN priority',
+			radminPriority: 'RadminVPN Priority',
 			threeD: '3D',
 			volume: 'Volume',
 			volumeMusic: 'Volume of music',
@@ -90,6 +90,8 @@ class Lang {
 			defencePsys: 'Defence Psysical',
 			defenceMagic: 'Defence Magic',
 			skins: 'Skins',
+			steamauthTitle: 'Login with Steam',
+			steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
 		},
 		ru: {
 			fight: 'В бой!',
@@ -127,6 +129,8 @@ class Lang {
 			defencePsys: 'Защита тела',
 			defenceMagic: 'Защита духа',
 			skins: 'Скины',
+			steamauthTitle: 'Вход через Steam',
+			steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
 		},
 		be: {
 			fight: 'У бой!',
@@ -136,6 +140,7 @@ class Lang {
 			menu: 'Мяню',
 			preferences: 'Прылады',
 			windowMode: 'Аконны рэжым',
+			radminPriority: 'Прыярытэт RadminVPN',
 			threeD: '3D графіка',
 			volume: 'Агульная гучнасць',
 			volumeMusic: 'Гучнасць музыкі',
@@ -163,6 +168,8 @@ class Lang {
 			defencePsys: 'Абарона цела',
 			defenceMagic: 'Абарона духу',
 			skins: 'Абалонкі',
+			steamauthTitle: 'Увайсці праз steam',
+			steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
 		},
 
 	};
@@ -1528,18 +1535,14 @@ class View {
 			DOM({ style: 'login-box-forma-inputs' },
 				login,
 				password,
-				DOM({ style: 'login-box-forma-buttons' }, DOM({ tag: 'div', style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, 'Войти'), DOM({
-					tag: 'div', style: 'login-box-forma-button', event: ['click', () => {
-
-						View.show('registration');
-
-					}]
-				}, 'Регистрация'))
-			)), DOM({event:['click',() => {
-				
-				ParentEvent.children = window.open('https://api2.26rus-game.ru:2087','123','popup');
-				
-			}]},'ВОЙТИ ЧЕРЕЗ STEAM'), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
+				DOM({ style: 'login-box-forma-buttons' }, 
+					DOM({ style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, 'Войти'), 
+					DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('registration')]}, 'Регистрация')
+				),
+				DOM({ style: 'login-box-forma-buttons' }, 
+					DOM({style: ['login-box-forma-button', 'steamauth'], event:['click',() => Window.show('main', 'steamauth')]},'Вход через Steam')
+				),
+			)), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 
 		return authorizationForm;
 	}
@@ -3526,7 +3529,15 @@ class Window {
 		}
 		return false;
 	}
-
+	static async steamauth() {
+		return DOM({ id: 'wsteamauth' },
+			DOM({ style: 'castle-menu-title' }, Lang.text('steamauthTitle')),
+			DOM({ style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-text' }, Lang.text('steamauth')),
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => window.open('https://api2.26rus-game.ru:2087', 'SteamAuth', 'popup')]}, "Продолжить")			
+			)
+		);
+	}
 	static async build(heroId, targetId = 0, isWindow = false) {
 		let viewBuild = await View.build(heroId, targetId, isWindow);
 		return DOM({ id: 'wbuild' }, viewBuild);
@@ -3550,26 +3561,27 @@ class Window {
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
-			App.isAdmin() ? DOM({ style: 'castle-menu-item-v' },
+			DOM({style: 'castle-menu-items'},
+			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
-			DOM({ style: 'castle-menu-item-v' },
+			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
-			DOM({ style: 'castle-menu-item-v' },
+			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
-			DOM({ style: 'castle-menu-item-v' },
+			DOM({ style: ['castle-menu-item-button'] },
 				DOM({ event: ['click', () => {
 					
-					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`,'123','popup');
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'popup');
 					
-				}] }, 'Привязать STEAM')),
+				}] }, 'Привязать Steam')),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', async () => {
+				style: 'castle-menu-item-button', event: ['click', async () => {
 					App.exit();
 					Splash.hide();
 				}]
 			}, Lang.text('accountSwitch')),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					if (NativeAPI.status) {
 						NativeAPI.exit();
 					}
@@ -3585,8 +3597,12 @@ class Window {
 				),
 				DOM({ tag: 'a', href: 'https://discord.gg/MueeP3aAzh', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'menu-icons' })
+				),
+				DOM({ tag: 'a', href: 'https://store.steampowered.com/app/3684820/Prime_World_Classic', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
+					DOM({ tag: 'img', src: 'content/icons/steam2.webp', alt: 'Steam', style: 'menu-icons' })
 				)
 			)
+		)
 		)
 	}
 
@@ -3595,7 +3611,8 @@ class Window {
 	
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
-			DOM({ style: 'castle-menu-item' },
+			DOM({style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-item-checkbox' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 						Settings.settings.fullscreen = !e.target.checked;
@@ -3605,7 +3622,7 @@ class Window {
 					{ checked: Settings.settings.fullscreen }),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
-			DOM({ style: 'castle-menu-item' },
+			DOM({ style: 'castle-menu-item-checkbox' },
             	DOM({
                 	tag: 'input',
                 	type: 'checkbox',
@@ -3618,7 +3635,7 @@ class Window {
             	}),
             	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
         	),
-			DOM({ style: 'castle-menu-item' },
+			DOM({ style: 'castle-menu-item-checkbox' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: !Settings.settings.radminPriority, event: ['change', (e) => {
 						Settings.settings.radminPriority = !e.target.checked;
@@ -3709,7 +3726,7 @@ class Window {
 			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
-				style: 'castle-menu-item-v',
+				style: 'castle-menu-item-button',
 				event: ['click', () => {
 					console.log("Клавиши clicked"); // Для отладки
 					Window.show('main','keybindings'); 
@@ -3718,11 +3735,13 @@ class Window {
 			*/
 			// Кнопка "Назад"
 			DOM({ 
-				style: 'castle-menu-item-v', 
+				style: 'castle-menu-item-button', 
 				event: ['click', () => Window.show('main', 'menu')] 
-			}, Lang.text('back')),
+			}, Lang.text('back'))/*,
 			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
+			*/
+		)
 		);
 	}
 
@@ -3754,7 +3773,7 @@ class Window {
                 Lang.text('keybindings_error', 'Не удалось найти файл конфигурации клавиш')
             ),
             DOM({ 
-                class: 'castle-menu-item-v',
+                class: 'castle-menu-item-button',
                 event: ['click', () => Window.show('settings', 'menu')]
             }, Lang.text('back', 'Назад'))
         );
@@ -3833,7 +3852,7 @@ class Window {
                 }),
                 
                 DOM({ 
-                    class: 'castle-menu-item-v reset-btn',
+                    class: 'castle-menu-item-button reset-btn',
                     event: ['click', () => {
                         document.querySelectorAll('.castle-keybinding-input').forEach((input, i) => {
                             input.value = defaultKeys[i];
@@ -3851,7 +3870,7 @@ class Window {
                 }, Lang.text('reset_defaults', 'Сбросить на 1-0')),
                 
                 DOM({ 
-                    class: 'castle-menu-item-v save-btn',
+                    class: 'castle-menu-item-button save-btn',
                     event: ['click', async () => {
                         try {
                             let newConfig = '';
@@ -3885,17 +3904,18 @@ class Window {
             ),
         
         DOM({ 
-            class: 'castle-menu-item-v',
+            class: 'castle-menu-item-button',
             event: ['click', () => Window.show('settings', 'menu')]
         }, Lang.text('back', 'Назад'))
     );
 }
 	
 	static async support() {
-		return DOM({ id: 'wcastle-support' },
+		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('support')),
-			DOM({ style: 'support-text' }, Lang.text('supportDesk')),
-			DOM({ style: 'support-icons' },
+			DOM({style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-text' }, Lang.text('supportDesk')),
+			DOM({ style: 'menu-icons' },
 				DOM({ tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon' })
 				),
@@ -3906,28 +3926,29 @@ class Window {
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'support-icon' })
 				)
 			),
-			DOM({ style: 'castle-menu-item-s', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+		)
 		);
 	}
 	static async adminPanel() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, 'Админ Панель'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents'); // Логика для отображения обычных талантов
 				}]
 			}, 'Таланты (обычные)'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents2'); // Логика для отображения классовых талантов
 				}]
 			}, 'Таланты (классовые)'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('users'); // Логика для управления пользователями
 				}]
 			}, 'Пользователи'),
-			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
 }
@@ -7257,7 +7278,7 @@ class App {
 
 		}
 
-		}
+	}
 
 	static ShowCurrentView() {
 		if (App.storage.data.login) {
@@ -7269,6 +7290,14 @@ class App {
 
 			View.show('authorization');
 
+		}
+	}
+
+	static OpenExternalLink(url) {
+		if (NativeAPI.status) {
+			nw.Shell.openExternal(url);
+		} else {
+			window.open(url, url, 'popup');
 		}
 	}
 
@@ -8332,7 +8361,7 @@ class NativeAPI {
 			if (evt.currentTarget.href) {
 				url = evt.currentTarget.href;
 			}
-			nw.Shell.openExternal(url);
+			App.OpenExternalLink(url);
 		}
 	}
 
