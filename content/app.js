@@ -322,8 +322,15 @@ window.addEventListener('DOMContentLoaded', () => {
 			PWGame.radminHasConnection = true;
 		}
 	}
+	let testMainConnection = async () => {
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.mainServerHasConnection = true;
+		}
+	}
 	setTimeout(_ => {
 		testRadminConnection();
+		testMainConnection();
 	}, 3000);
 });
 
@@ -7729,6 +7736,8 @@ class PWGame {
 
 	static gameServerHasConnection = false;
 
+	static mainServerHasConnection = false;
+
 	static radminHasConnection = false;
 
 	static proxyHasConnection = false;
@@ -7776,7 +7785,7 @@ class PWGame {
 	}
 
 	static GetPlayPwProtocol(id) {
-		let chosenServer = PWGame.gameServerHasConnection ? 0 : 2;
+		let chosenServer = PWGame.mainServerHasConnection ? 0 : 2;
 		if (Settings.settings.radminPriority && PWGame.radminHasConnection) {
 			chosenServer = 1;
 		}
