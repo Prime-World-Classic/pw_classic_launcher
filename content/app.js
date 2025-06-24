@@ -7182,7 +7182,7 @@ class App {
 		// wss://api2.26rus-game.ru:8443 - Москва (основа)
 		// wss://relay.26rus-game.ru:8443 - Рига (Прокси)
 		// wss://api.26rus-game.ru:8443 - США (прокси)
-		App.api = new Api([RIGA, MOSCOW, CLOUDFLARE ], Events);
+		App.api = new Api([MOSCOW, RIGA, CLOUDFLARE ], Events);
 		
 		await News.init();
 		
