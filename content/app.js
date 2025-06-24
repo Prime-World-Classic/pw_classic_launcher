@@ -888,7 +888,10 @@ class Api {
 				
 				this.WebSocket.onmessage = (event) => this.message(event.data);
 				
-				this.WebSocket.onerror = (event) => console.log(`Разрыв соединения ${this.MAIN_HOST}...`,event);
+				this.WebSocket.onerror = (event) => {
+					console.log(`Разрыв соединения ${this.MAIN_HOST}...`,event);
+					App.error(`Разрыв соединения, подождите... [${this.DISCONNECT_TOTAL}]`,event);
+				};
 				
 				this.WebSocket.onclose = () => {
 					
@@ -904,6 +907,10 @@ class Api {
 					
 					console.log(`Успешно подключились к ${this.MAIN_HOST}...`);
 					
+					if (this.MAIN_HOST != this.host[0]) {
+						App.ShowCurrentView();
+					}
+					
 					resolve();
 					
 				};
@@ -918,6 +925,7 @@ class Api {
 	
 	async disconnect(){
 		console.log(`Закрываем соединение ${this.MAIN_HOST}...`);
+		App.error(`Закрыто соедниение... Выполняется переподключение, подождите... [${this.DISCONNECT_TOTAL}]`);
 		if(!this.WebSocket){
 			
 			return;
@@ -962,13 +970,12 @@ class Api {
 		
 		let currentHost = 0;
 		for (let i = 0; i < this.host.length; ++i) {
-			
 			if(this.MAIN_HOST == this.host[i]){
-				i = currentHost;
+				currentHost = i;
 				break;
 			}
-				
 			}
+		App.error(`Подождите, подключение восстанавливается [${currentHost}]`);
 			
 		this.MAIN_HOST = this.host[(currentHost + 1) % this.host.length];
 		
@@ -7240,27 +7247,29 @@ class App {
 			
 		}
 
-		if (App.storage.data.login) {
-
-			View.show('castle');
-
-			//View.show('build', 1);
-
-		}
-		else {
-
-			View.show('authorization');
-
-		}
+		App.ShowCurrentView();
 
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 
 		if (App.isAdmin()) {
 
 			document.body.append(DOM({ id: 'ADMStat' }));
-			
+
 		}
 
+		}
+
+	static ShowCurrentView() {
+		if (App.storage.data.login) {
+
+			View.show('castle');
+			
+		}
+		else {
+
+			View.show('authorization');
+
+		}
 	}
 
 	static async authorization(login, password) {
