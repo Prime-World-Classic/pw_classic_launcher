@@ -3446,6 +3446,7 @@ border-radius:5px;
 	container-type: inline-size;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 }
 .castle-menu-text {
 	width: 80cqw;
@@ -3498,6 +3499,7 @@ border-radius:5px;
 }
 
 .castle-menu-item-button {
+	width: 90cqw;
 	height: 8cqw;
 	color:rgba(255,255,255,0.9);
 	text-shadow:rgba(0,0,0,0.3) 0 0 1cqw;
