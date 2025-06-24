@@ -828,10 +828,14 @@ class Api {
 		this.host = host;
 
 		this.MAIN_HOST = this.host[0];
+		
+		this.DISCONNECT_LAST_DATE_LIMIT_MS = 30000; // плюсуем неудачное соединение в указанном диапазоне времени
+		
+		this.DISCONNECT_LAST_DATE = Date.now(); // метка времени с последнего неудачного соединения 
 
 		this.DISCONNECT_TOTAL = 0; // количество неудачных соединений
 		
-		this.DISCONNECT_LIMIT = 15; // лимит неудачных соединений, чтобы перейти на другой хост (DISCONNECT_LIMIT * RECONNECT_TIME)
+		this.DISCONNECT_LIMIT = 3; // лимит неудачных соединений, чтобы перейти на другой хост (DISCONNECT_LIMIT * RECONNECT_TIME)
 		
 		this.RECONNECT_TIME = 1000; // через сколько делаем повторное соединение (1000 = 1 секунда)
 
@@ -859,7 +863,7 @@ class Api {
 					
 					if(this.WebSocket.readyState == 1){
 						
-						resolve();
+						return resolve();
 						
 					}
 					
@@ -913,13 +917,19 @@ class Api {
 			
 		}
 		
-		this.DISCONNECT_TOTAL++;
+		if( (Date.now() - this.DISCONNECT_LAST_DATE) < this.DISCONNECT_LAST_DATE_LIMIT_MS){
+			
+			this.DISCONNECT_TOTAL++;
+			
+		}
+		
+		this.DISCONNECT_LAST_DATE = Date.now();
 		
 		return new Promise((resolve,reject) => {
 			
 			if(this.WebSocket.readyState == 3){
 				
-				resolve();
+				return resolve();
 				
 			}
 			
