@@ -1604,7 +1604,7 @@ class View {
 	}
 
 	static async castle() {
-
+		
 		document.body.classList.add('noselect');
 
 		View.setCss('content/castle.css');
@@ -1628,15 +1628,45 @@ class View {
 			App.error(error);
 
 		}
-
-		body.append(backgroundImage, Castle.canvas, await View.castlePlay(), View.castleChat(), await View.castleHeroes(), View.castleSettings());
-
+		
+		body.append(backgroundImage,Castle.canvas);
+		
+		try{
+			
+			let castlePlay = await View.castlePlay();
+			
+			body.append(castlePlay);
+			
+		}
+		catch(e){
+			
+			console.log(e);
+			
+		}
+		
+		body.append(View.castleChat());
+		
+		try{
+			
+			let castleHeroes = await View.castleHeroes();
+			
+			body.append(castleHeroes);
+			
+		}
+		catch(e){
+			
+			console.log(e);
+			
+		}
+		
+		body.append(View.castleSettings());
+		
 		setTimeout(() => {
 
 			Chat.scroll();
 
 		}, 1500);
-
+		
 		return body;
 
 	}
@@ -1997,7 +2027,7 @@ class View {
 
 	}
 
-	static async castleHeroes() {
+	static castleHeroes() {
 
 		let tab = 1;
 
@@ -3534,7 +3564,7 @@ class Window {
 			DOM({ style: 'castle-menu-title' }, Lang.text('steamauthTitle')),
 			DOM({ style: 'castle-menu-items'},
 			DOM({ style: 'castle-menu-text' }, Lang.text('steamauth')),
-			DOM({ style: 'castle-menu-item-button', event: ['click', () => window.open('https://api2.26rus-game.ru:2087', 'SteamAuth', 'popup')]}, "Продолжить")			
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => window.open('https://api2.26rus-game.ru:2087', 'SteamAuth', 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no')]}, "Продолжить")			
 			)
 		);
 	}
@@ -3571,7 +3601,7 @@ class Window {
 			DOM({ style: ['castle-menu-item-button'] },
 				DOM({ event: ['click', () => {
 					
-					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'popup');
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
 					
 				}] }, 'Привязать Steam')),
 			DOM({
@@ -7282,7 +7312,7 @@ class App {
 
 	static ShowCurrentView() {
 		if (App.storage.data.login) {
-
+			
 			View.show('castle');
 			
 		}
