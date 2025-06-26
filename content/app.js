@@ -3667,7 +3667,7 @@ class Window {
         	),
 			DOM({ style: 'castle-menu-item-checkbox' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: !Settings.settings.radminPriority, event: ['change', (e) => {
+					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: Settings.settings.radminPriority, event: ['change', (e) => {
 						Settings.settings.radminPriority = e.target.checked;
 					}]
 				},
