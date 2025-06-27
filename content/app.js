@@ -7240,7 +7240,7 @@ class App {
 		// wss://api2.26rus-game.ru:8443 - Москва (основа)
 		// wss://relay.26rus-game.ru:8443 - Рига (Прокси)
 		// wss://api.26rus-game.ru:8443 - США (прокси)
-		App.api = new Api([MOSCOW, RIGA, CLOUDFLARE ], Events);
+		App.api = new Api([RIGA, MOSCOW, CLOUDFLARE ], Events);
 		
 		await News.init();
 		
@@ -7906,10 +7906,10 @@ class PWGame {
 			throw 'Файлы игры повреждены! Обратитесь в поддержку PWClassic';
 		}
 		if (!PWGame.isUpToDate) {
-			throw 'Проверка обновления не завершена! Подождите';
+			//throw 'Проверка обновления не завершена! Подождите';
 		}
 		if (!PWGame.isValidated) {
-			throw 'Проверка файлов не завершена! Подождите';
+			//throw 'Проверка файлов не завершена! Подождите';
 		}
 	}
 
