@@ -9757,7 +9757,7 @@ class Castle {
 			textures, meshData.vertices, meshData.indexCount,
 			meshData.vertStride, Castle.sceneShaders[obj.shaderId].attributes,
 			obj.strip, obj.transform, isSMPass,
-			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride);
+			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride, obj.meshName == 'grid_9_01.bin');
 
 	}
 
@@ -9912,7 +9912,7 @@ class Castle {
 
 	}
 
-	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride) {
+	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride, isGrid) {
 
 		if (blend) {
 
@@ -10059,7 +10059,7 @@ class Castle {
 
 		}
 
-		if (!isSMPass) {
+		if (!isSMPass && isGrid) {
 			Castle.gl.activeTexture(Castle.gl.TEXTURE0 + textures.length + 1);
 
 			Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, Castle.gridTexture);
