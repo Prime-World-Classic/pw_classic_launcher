@@ -9321,6 +9321,20 @@ class Castle {
 
 	}
 
+	static uniformLocationCache = new Object();
+	static getUniformLocation(program, name) {
+		if (program.progId in this.uniformLocationCache) {
+			if (name in this.uniformLocationCache[program.progId]) {
+				return this.uniformLocationCache[program.progId][name];
+			}
+		} else {
+			this.uniformLocationCache[program.progId] = new Object();
+		}
+		let uniformLocation = Castle.gl.getUniformLocation(program.prog, name);
+		this.uniformLocationCache[program.progId][name] = uniformLocation;
+		return uniformLocation;
+	}
+
 	static async loadResources(sceneObjects, sceneBuildings, notUniqeShaderNames, notUniqeTexNames) {
 		let shaderNames = [...new Set(notUniqeShaderNames)];
 		let texNames = [...new Set(notUniqeTexNames)];
@@ -9415,6 +9429,8 @@ class Castle {
 
 	}
 
+	static uniqueProgCounter = 0;
+
 	static prepareShader(renderPassDefine, definesText, vsText, fsText) {
 
 		let vertexShader = Castle.gl.createShader(Castle.gl.VERTEX_SHADER), fragmentShader = Castle.gl.createShader(Castle.gl.FRAGMENT_SHADER);
@@ -9443,27 +9459,27 @@ class Castle {
 
 		}
 		//console.log('Loaded shader ' + shaderNames[shaderId]);
-		let program = Castle.gl.createProgram();
+		let program = {prog: Castle.gl.createProgram(), progId: this.uniqueProgCounter++};
 
-		Castle.gl.attachShader(program, vertexShader);
+		Castle.gl.attachShader(program.prog, vertexShader);
 
-		Castle.gl.attachShader(program, fragmentShader);
+		Castle.gl.attachShader(program.prog, fragmentShader);
 
-		Castle.gl.linkProgram(program);
+		Castle.gl.linkProgram(program.prog);
 
-		if (!Castle.gl.getProgramParameter(program, Castle.gl.LINK_STATUS)) {
+		if (!Castle.gl.getProgramParameter(program.prog, Castle.gl.LINK_STATUS)) {
 
-			console.error('ERROR linking program!', Castle.gl.getProgramInfoLog(program));
+			console.error('ERROR linking program!', Castle.gl.getProgramInfoLog(program.prog));
 
 			return 1;
 
 		}
 
-		Castle.gl.validateProgram(program);
+		Castle.gl.validateProgram(program.prog);
 
-		if (!Castle.gl.getProgramParameter(program, Castle.gl.VALIDATE_STATUS)) {
+		if (!Castle.gl.getProgramParameter(program.prog, Castle.gl.VALIDATE_STATUS)) {
 
-			console.error('ERROR validating program!', Castle.gl.getProgramInfoLog(program));
+			console.error('ERROR validating program!', Castle.gl.getProgramInfoLog(program.prog));
 
 			return 1;
 
@@ -9830,19 +9846,19 @@ class Castle {
 	}
 	static setupMainCam(program) {
 
-		let matViewProjUniformLocation = Castle.gl.getUniformLocation(program, 'mViewProj');
+		let matViewProjUniformLocation = Castle.getUniformLocation(program, 'mViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjUniformLocation, Castle.gl.FALSE, Castle.viewProjMatr);
 
-		let matViewProjSMUniformLocation = Castle.gl.getUniformLocation(program, 'lightViewProj');
+		let matViewProjSMUniformLocation = Castle.getUniformLocation(program, 'lightViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjSMUniformLocation, Castle.gl.FALSE, Castle.lightViewProjMatrix);
 
-		let zNearFar = Castle.gl.getUniformLocation(program, 'zNear_zFar');
+		let zNearFar = Castle.getUniformLocation(program, 'zNear_zFar');
 
 		Castle.gl.uniform4f(zNearFar, Castle.zNear, Castle.zFar, Castle.zNearSM, Castle.zFarSM);
 
-		let cursorGridPosition = Castle.gl.getUniformLocation(program, 'cursorGridPosition');
+		let cursorGridPosition = Castle.getUniformLocation(program, 'cursorGridPosition');
 
 		Castle.gl.uniform2f(cursorGridPosition, -Castle.gridCursorPosX, -Castle.gridCursorPosZ);
 
@@ -9850,7 +9866,7 @@ class Castle {
 
 	static setupSMCam(program) {
 
-		let matViewProjUniformLocation = Castle.gl.getUniformLocation(program, 'mViewProj');
+		let matViewProjUniformLocation = Castle.getUniformLocation(program, 'mViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjUniformLocation, Castle.gl.FALSE, Castle.lightViewProjMatrix);
 
@@ -9920,7 +9936,7 @@ class Castle {
 
 		for (let attribute of attributes) {
 
-			let attribLocation = Castle.gl.getAttribLocation(program, attribute.name);
+			let attribLocation = Castle.gl.getAttribLocation(program.prog, attribute.name);
 
 			let attribType = attribute.sizeElem == 4 ? Castle.gl.FLOAT : (attribute.sizeElem == 2 ? Castle.gl.UNSIGNED_SHORT : Castle.gl.UNSIGNED_BYTE);
 
@@ -9941,19 +9957,19 @@ class Castle {
 
 		Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, null);
 		// Tell OpenGL state machine which program should be active.
-		Castle.gl.useProgram(program);
+		Castle.gl.useProgram(program.prog);
 
 		isSMPass ? Castle.setupSMCam(program) : Castle.setupMainCam(program);
 
 		let tintColorValue = tintOverride ? tintOverride : (tintColor ? tintColor : [1, 1, 1, 1]);
 
-		let tintColorLocation = Castle.gl.getUniformLocation(program, 'tintColor');
+		let tintColorLocation = Castle.getUniformLocation(program, 'tintColor');
 
 		Castle.gl.uniform4fv(tintColorLocation, tintColorValue);
 
 		let uvScaleValue = uvScale ? uvScale : [1, 1, 1, 1];
 
-		let uvScaleLocation = Castle.gl.getUniformLocation(program, 'uvScale');
+		let uvScaleLocation = Castle.getUniformLocation(program, 'uvScale');
 
 		Castle.gl.uniform4fv(uvScaleLocation, uvScaleValue);
 
@@ -9965,7 +9981,7 @@ class Castle {
 
 		let uvScrollValue = uvScroll ? uvScroll : [0, 0];
 
-		let uvScrollLocation = Castle.gl.getUniformLocation(program, 'uvScroll');
+		let uvScrollLocation = Castle.getUniformLocation(program, 'uvScroll');
 
 		Castle.gl.uniform2fv(uvScrollLocation, uvScrollValue);
 
@@ -10007,7 +10023,7 @@ class Castle {
 
 		}
 
-		let matWorldUniformLocation = Castle.gl.getUniformLocation(program, 'mWorld');
+		let matWorldUniformLocation = Castle.getUniformLocation(program, 'mWorld');
 
 		Castle.gl.uniformMatrix4fv(matWorldUniformLocation, Castle.gl.FALSE, worldMatrix2);
 
@@ -10021,7 +10037,7 @@ class Castle {
 
 				let attribName = "tex" + i;
 
-				let texLocation = Castle.gl.getUniformLocation(program, attribName);
+				let texLocation = Castle.getUniformLocation(program, attribName);
 
 				Castle.gl.uniform1i(texLocation, i);
 
@@ -10037,7 +10053,7 @@ class Castle {
 
 			let attribNameSM = "smTexture";
 
-			let texLocationSM = Castle.gl.getUniformLocation(program, attribNameSM);
+			let texLocationSM = Castle.getUniformLocation(program, attribNameSM);
 
 			Castle.gl.uniform1i(texLocationSM, textures.length);
 
@@ -10051,7 +10067,7 @@ class Castle {
 
 			let attribNameSM = "gridTex";
 
-			let texLocationSM = Castle.gl.getUniformLocation(program, attribNameSM);
+			let texLocationSM = Castle.getUniformLocation(program, attribNameSM);
 
 			Castle.gl.uniform1i(texLocationSM, textures.length + 1);
 			
