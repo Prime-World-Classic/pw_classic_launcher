@@ -7469,7 +7469,7 @@ class App {
 
     const factions = [
 			{id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp'},
-			{id: 2, name: 'Докты', icon: 'Human_logo_over.webp'}
+			{id: 2, name: 'Докты', icon: 'Human_logo_over2.webp'}
 		];
 		
 	
