@@ -3604,6 +3604,12 @@ class Window {
 					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
 					
 				}] }, 'Привязать Steam')),
+			DOM({ style: ['castle-menu-item-button'] },
+				DOM({ event: ['click', () => {
+					
+					App.setNickname();
+					
+				}] }, 'Изменить никнейм')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', async () => {
 					App.exit();
@@ -7377,6 +7383,42 @@ class App {
 
 		View.show('castle');
 
+	}
+
+	static setNickname(){
+
+		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+		
+		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+		
+		let template = document.createDocumentFragment();
+		
+		let name = DOM({tag:'input',placeholder:'Никнейм',value:App.storage.data.login});
+
+		let button = DOM({style:'splash-content-button',event:['click', async () => {
+
+				if(!name.value){
+					
+					Splash.hide();
+					
+				}
+
+				await App.api.request('user','set',{nickname:name.value});
+				
+				await App.storage.set({login:name.value});
+				
+				View.show('castle');
+				
+				Splash.hide();
+				
+			}
+			
+		]},'Применить');
+
+		template.append(name,button,close);
+
+		Splash.show(template);
+		
 	}
 
 	static async registration(fraction, invite, login, password, password2) {
