@@ -40,7 +40,7 @@ class ParentEvent {
 			
 		}
 		
-		App.error(body);
+		App.notify(body);
 		
 	}
 	
