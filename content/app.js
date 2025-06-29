@@ -7392,12 +7392,13 @@ class App {
 	}
 
 	static setNickname(){
-
 		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
 		
 		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 		
 		let template = document.createDocumentFragment();
+			
+		let title = DOM({tag: 'div', style: 'castle-menu-text'}, 'Сменить никнейм можно один раз в две недели');
 		
 		let name = DOM({tag:'input',placeholder:'Никнейм',value:App.storage.data.login});
 
@@ -7430,81 +7431,155 @@ class App {
 			
 		]},'Применить');
 
-		template.append(name,button,close);
+		template.append(title, name, button, close);
 
 		Splash.show(template);
 		
 	}
 	
-	static setFraction(){
+	static setFraction() {
+    const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+    close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+    
+    let template = document.createDocumentFragment();
+    
+ 
+    const title = DOM({tag: 'h2', style: 'faction-title'}, 'Выбор Фракции');
+    Object.assign(title.style, {
+        textAlign: 'center',
+        color: '#fff',
+        textShadow: '0 0 5px rgba(0,0,0,0.5)',
+        marginBottom: '30px',
+        fontSize: '24px'
+    });
+    
+  
+    const factionsContainer = DOM({tag: 'div', style: 'factions-container'});
+    Object.assign(factionsContainer.style, {
+        display: 'flex',
+        gap: '5%',  
+        justifyContent: 'center',
+        marginBottom: '30px',
+        flexWrap: 'wrap',
+        width: '90%',
+        maxWidth: '600px',
+        margin: '0 auto'
+    });
+    
 
-		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+    const factions = [
+			{id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp'},
+			{id: 2, name: 'Докты', icon: 'Human_logo_over.webp'}
+		];
 		
-		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+	
+		const calculateIconSize = () => {
+			const windowWidth = window.innerWidth;
+			if (windowWidth < 500) return '20vw';  
+			if (windowWidth < 768) return '15vw';  
+			return '120px';  
+		};
 		
-		let template = document.createDocumentFragment();
-		
-		let name = DOM({tag:'select'});
-		
-		for(let item of [{id:0,name:'Сторона'},{id:1,name:'Адорнийцы'},{id:2,name:'Докты'}]){
-			
-			let option = DOM({tag:'option',value:item.id},item.name);
-			
-			if(item.id == 0){
-				
-				option.disabled = true;
-				
-				if(App.storage.data.fraction == 0){
-					
-					option.selected = true;
-					
-				}
-				
-			}
-			
-			if(App.storage.data.fraction == item.id){
-				
-				option.selected = true;
-				
-			}
-			
-			name.append(option);
-			
-		}
 
-		let button = DOM({style:'splash-content-button',event:['click', async () => {
+		let selectedFaction = App.storage.data.fraction;
+		
 
-				if(!name.value){
-					
+		factions.forEach(faction => {
+			const factionElement = DOM({
+				tag: 'div',
+				style: 'faction-item',
+				event: ['click', () => {
+					selectedFaction = faction.id;
+
+					factionsContainer.querySelectorAll('.faction-item').forEach(item => {
+						item.style.transform = 'scale(1)';
+						item.style.filter = 'brightness(0.7)';
+						item.style.boxShadow = 'none';
+					});
+
+					factionElement.style.transform = 'scale(1.05)';
+					factionElement.style.filter = 'brightness(1)';
+					factionElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.7)';
+				}]
+			});
+			
+			const iconSize = calculateIconSize();
+			Object.assign(factionElement.style, {
+				width: iconSize,
+				height: iconSize,
+				minWidth: '80px',
+				minHeight: '80px',
+				maxWidth: '150px',
+				maxHeight: '150px',
+				backgroundImage: `url(content/icons/${faction.icon})`,
+				backgroundSize: 'contain',
+				backgroundRepeat: 'no-repeat',
+				backgroundPosition: 'center',
+				cursor: 'pointer',
+				transition: 'all 0.3s ease',
+				transform: selectedFaction === faction.id ? 'scale(1.05)' : 'scale(1)',
+				filter: selectedFaction === faction.id ? 'brightness(1)' : 'brightness(0.7)',
+				boxShadow: selectedFaction === faction.id ? '0 0 15px rgba(255,215,0,0.7)' : 'none',
+				borderRadius: '10px'
+			});
+			
+			const nameLabel = DOM({tag: 'div', style: 'faction-name'}, faction.name);
+			Object.assign(nameLabel.style, {
+				textAlign: 'center',
+				color: '#fff',
+				marginTop: '10px',
+				textShadow: '0 0 3px #000',
+				fontSize: '16px'
+			});
+			
+			const wrapper = DOM({tag: 'div', style: 'faction-wrapper'});
+			Object.assign(wrapper.style, {
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				margin: '10px'
+			});
+			
+			wrapper.append(factionElement, nameLabel);
+			factionsContainer.append(wrapper);
+		});
+		
+		const button = DOM({
+			style: 'splash-content-button',
+			event: ['click', async () => {
+				if (!selectedFaction) {
 					Splash.hide();
-					
+					return;
 				}
 				
-				try{
-					
-					await App.api.request('user','set',{fraction:name.value});
-					
-				}
-				catch(error){
-					
+				try {
+					await App.api.request('user', 'set', {fraction: selectedFaction});
+				} catch(error) {
 					return App.error(error);
-					
 				}
 				
-				await App.storage.set({fraction:name.value});
-				
+				await App.storage.set({fraction: selectedFaction});
 				View.show('castle');
-				
 				Splash.hide();
-				
-			}
-			
-		]},'Применить');
-
-		template.append(name,button,close);
-
-		Splash.show(template);
+			}]
+		}, 'Применить');
 		
+		const resizeHandler = () => {
+			const iconSize = calculateIconSize();
+			factionsContainer.querySelectorAll('.faction-item').forEach(icon => {
+				icon.style.width = iconSize;
+				icon.style.height = iconSize;
+			});
+		};
+		
+		window.addEventListener('resize', resizeHandler);
+		
+		close.addEventListener('click', () => {
+			window.removeEventListener('resize', resizeHandler);
+		});
+		
+		template.append(title, factionsContainer, button, close);
+		Splash.show(template);
 	}
 
 	static async registration(fraction, invite, login, password, password2) {
