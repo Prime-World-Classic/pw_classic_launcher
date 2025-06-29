@@ -7402,7 +7402,18 @@ class App {
 					Splash.hide();
 					
 				}
-
+				
+				try{
+					
+					await App.api.request('user','set',{nickname:name.value});
+					
+				}
+				catch(error){
+					
+					return App.error(error);
+					
+				}
+				
 				await App.api.request('user','set',{nickname:name.value});
 				
 				await App.storage.set({login:name.value});
