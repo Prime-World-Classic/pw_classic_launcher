@@ -278,6 +278,10 @@ class News {
 window.addEventListener('DOMContentLoaded', () => {
 	
 	window.addEventListener('message',(event) => {
+
+		if (event.data == '') {
+			return;
+		}
 		
 		if( !('action' in event.data) ){
 			
@@ -319,7 +323,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	});
 
-	App.init();
+	App.findBestHostAndInit();
 
 	Settings.init();
 
@@ -817,7 +821,7 @@ class Store {
 
 class Api {
 
-	constructor(host, events) {
+	constructor(host, bestHost, events) {
 
 		if( !('WebSocket' in window) ) {
 
@@ -841,7 +845,7 @@ class Api {
 
 		this.host = host;
 
-		this.MAIN_HOST = this.host[0];
+		this.MAIN_HOST = this.host[bestHost];
 		
 		this.DISCONNECT_LAST_DATE_LIMIT_MS = 30000; // плюсуем неудачное соединение в указанном диапазоне времени
 		
@@ -7232,15 +7236,60 @@ class Events {
 }
 
 class App {
+	static RIGA = 'wss://pw-classic.ddns.net:443';
+	static MOSCOW = 'wss://api2.26rus-game.ru:8443';
+	static CLOUDFLARE = 'wss://api.26rus-game.ru:8443';
+	static hostList = [this.RIGA, this.MOSCOW, this.CLOUDFLARE ];
+	static bestHost = -1;
+
+	static async findBestHostAndInit() {
+		const sockets = [];
+		let resolved = false;
+
+		const handleOpen = (index) => {
+			return () => {
+				if (!resolved) {
+					resolved = true;
+					this.bestHost = index;
+					
+					sockets.forEach((socket, i) => {
+						if (i !== index && socket) {
+							socket.close();
+						}
+					});
+
+					this.init();
+				}
+			};
+		};
+
+		for (let i = 0; i < this.hostList.length; i++) {
+			try {
+				const socket = new WebSocket(this.hostList[i]);
+				sockets[i] = socket;
+				
+				socket.onopen = handleOpen(i);
+				
+				socket.onerror = () => {
+					socket.close();
+				};
+			} catch (error) {
+				console.error(`Error creating WebSocket for ${this.hostList[i]}:`, error);
+			}
+		}
+
+		setTimeout(() => {
+			if (this.bestHost == -1) {
+				App.error("Нет соединения с API сервером Prime World Classic");
+			}				 
+		},30000);
+	}
 
 	static async init() {
-		const MOSCOW = 'wss://api2.26rus-game.ru:8443';
-		const RIGA = 'wss://relay.26rus-game.ru:8443';
-		const CLOUDFLARE = 'wss://api.26rus-game.ru:8443';
 		// wss://api2.26rus-game.ru:8443 - Москва (основа)
 		// wss://relay.26rus-game.ru:8443 - Рига (Прокси)
 		// wss://api.26rus-game.ru:8443 - США (прокси)
-		App.api = new Api([RIGA, MOSCOW, CLOUDFLARE ], Events);
+		App.api = new Api(this.hostList, this.bestHost, Events);
 		
 		await News.init();
 		
