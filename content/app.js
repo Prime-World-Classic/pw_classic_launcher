@@ -3610,6 +3610,12 @@ class Window {
 					App.setNickname();
 					
 				}] }, 'Изменить никнейм')),
+			DOM({ style: ['castle-menu-item-button'] },
+				DOM({ event: ['click', () => {
+					
+					App.setFraction();
+					
+				}] }, 'Изменить сторону')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', async () => {
 					App.exit();
@@ -7414,9 +7420,78 @@ class App {
 					
 				}
 				
-				await App.api.request('user','set',{nickname:name.value});
-				
 				await App.storage.set({login:name.value});
+				
+				View.show('castle');
+				
+				Splash.hide();
+				
+			}
+			
+		]},'Применить');
+
+		template.append(name,button,close);
+
+		Splash.show(template);
+		
+	}
+	
+	static setFraction(){
+
+		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+		
+		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+		
+		let template = document.createDocumentFragment();
+		
+		let name = DOM({tag:'select'});
+		
+		for(let item of [{id:0,name:'Сторона'},{id:1,name:'Адорнийцы'},{id:2,name:'Докты'}]){
+			
+			let option = DOM({tag:'option',value:item.id},item.name);
+			
+			if(item.id == 0){
+				
+				option.disabled = true;
+				
+				if(App.storage.data.fraction == 0){
+					
+					option.selected = true;
+					
+				}
+				
+			}
+			
+			if(App.storage.data.fraction == item.id){
+				
+				option.selected = true;
+				
+			}
+			
+			name.append(option);
+			
+		}
+
+		let button = DOM({style:'splash-content-button',event:['click', async () => {
+
+				if(!name.value){
+					
+					Splash.hide();
+					
+				}
+				
+				try{
+					
+					await App.api.request('user','set',{fraction:name.value});
+					
+				}
+				catch(error){
+					
+					return App.error(error);
+					
+				}
+				
+				await App.storage.set({fraction:name.value});
 				
 				View.show('castle');
 				
