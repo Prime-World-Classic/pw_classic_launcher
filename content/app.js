@@ -55,6 +55,7 @@ class Lang {
 	static list = {
 		en: {
 			locale:['en_US'],
+			name:'English',
 			word: {
 				fight: 'Fight!',
 				enterTextAndPressEnter: 'Enter the text and press Enter',
@@ -97,6 +98,7 @@ class Lang {
 		},
 		ru: {
 			locale:['ru_RU'],
+			name:'Русский',
 			word: {
 				fight: 'В бой!',
 				enterTextAndPressEnter: 'Введите текст и нажмите Enter',
@@ -139,6 +141,7 @@ class Lang {
 		},
 		be: {
 			locale:['be_BY'],
+			name:'Беларускі',
 			word: {
 				fight: 'У бой!',
 				enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
