@@ -50,136 +50,165 @@ class Lang {
 
 	static target = 'ru'; // TODO get from the system
 	// TODO add UI dropdown?
-
 	static default = 'ru';
 
 	static list = {
 		en: {
-			fight: 'Fight!',
-			enterTextAndPressEnter: 'Enter the text and press Enter',
-			ready: 'Ready',
-			library: 'Library',
-			menu: 'Меню',
-			preferences: 'Preferences',
-			windowMode: 'Window mode',
-			radminPriority: 'RadminVPN Priority',
-			threeD: '3D',
-			volume: 'Volume',
-			volumeMusic: 'Volume of music',
-			volumeSound: 'Volume of sounds',
-			back: 'Back',
-			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
-			support: 'Support',
-			supportDesk: 'Questions? Feel free to contact us:',
-			accountSwitch: 'Switch account',
-			exit: 'Exit from Prime World',
-			version: 'Version',
-			health: 'Health',
-			energy: 'Energy',
-			speed: 'Speed',
-			strength: 'Strength',
-			intelligence: 'Intelligence',
-			agility: 'Agility',
-			dexterity: 'Dexterity',
-			stamina: 'Stamina',
-			will: 'Will',
-			damage: 'Damage',
-			criticalHit: 'Critical Hit',
-			attacksPerSecond: 'Attacks per second',
-			penetration: 'Penetration',
-			defencePsys: 'Defence Psysical',
-			defenceMagic: 'Defence Magic',
-			skins: 'Skins',
-			steamauthTitle: 'Login with Steam',
-			steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
+			locale:['en_US'],
+			word: {
+				fight: 'Fight!',
+				enterTextAndPressEnter: 'Enter the text and press Enter',
+				ready: 'Ready',
+				library: 'Library',
+				menu: 'Меню',
+				preferences: 'Preferences',
+				windowMode: 'Window mode',
+				radminPriority: 'RadminVPN Priority',
+				threeD: '3D',
+				volume: 'Volume',
+				volumeMusic: 'Volume of music',
+				volumeSound: 'Volume of sounds',
+				back: 'Back',
+				soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
+				support: 'Support',
+				supportDesk: 'Questions? Feel free to contact us:',
+				accountSwitch: 'Switch account',
+				exit: 'Exit from Prime World',
+				version: 'Version',
+				health: 'Health',
+				energy: 'Energy',
+				speed: 'Speed',
+				strength: 'Strength',
+				intelligence: 'Intelligence',
+				agility: 'Agility',
+				dexterity: 'Dexterity',
+				stamina: 'Stamina',
+				will: 'Will',
+				damage: 'Damage',
+				criticalHit: 'Critical Hit',
+				attacksPerSecond: 'Attacks per second',
+				penetration: 'Penetration',
+				defencePsys: 'Defence Psysical',
+				defenceMagic: 'Defence Magic',
+				skins: 'Skins',
+				steamauthTitle: 'Login with Steam',
+				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.'
+			}
 		},
 		ru: {
-			fight: 'В бой!',
-			enterTextAndPressEnter: 'Введите текст и нажмите Enter',
-			ready: 'Готов',
-			library: 'Библиотека',
-			menu: 'Меню',
-			preferences: 'Настройки',
-			windowMode: 'Оконный режим',
-			radminPriority: 'Приоритет RadminVPN',
-			threeD: '3D графика',
-			volume: 'Общая громкость',
-			volumeMusic: 'Громкость музыки',
-			volumeSound: 'Громкость звуков',
-			back: 'Назад',
-			soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
-			support: 'Поддержка',
-			supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
-			accountSwitch: 'Сменить аккаунт',
-			exit: 'Выйти из Prime World',
-			version: 'Версия',
-			health: 'Здоровье',
-			energy: 'Энергия',
-			speed: 'Скорость',
-			strength: 'Сила',
-			intelligence: 'Разум',
-			agility: 'Проворство',
-			dexterity: 'Хитрость',
-			stamina: 'Стойкость',
-			will: 'Воля',
-			damage: 'Урон',
-			criticalHit: 'Шанс крита',
-			attacksPerSecond: 'Скорость атаки',
-			penetration: 'Пробивание',
-			defencePsys: 'Защита тела',
-			defenceMagic: 'Защита духа',
-			skins: 'Скины',
-			steamauthTitle: 'Вход через Steam',
-			steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
+			locale:['ru_RU'],
+			word: {
+				fight: 'В бой!',
+				enterTextAndPressEnter: 'Введите текст и нажмите Enter',
+				ready: 'Готов',
+				library: 'Библиотека',
+				menu: 'Меню',
+				preferences: 'Настройки',
+				windowMode: 'Оконный режим',
+				radminPriority: 'Приоритет RadminVPN',
+				threeD: '3D графика',
+				volume: 'Общая громкость',
+				volumeMusic: 'Громкость музыки',
+				volumeSound: 'Громкость звуков',
+				back: 'Назад',
+				soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
+				support: 'Поддержка',
+				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
+				accountSwitch: 'Сменить аккаунт',
+				exit: 'Выйти из Prime World',
+				version: 'Версия',
+				health: 'Здоровье',
+				energy: 'Энергия',
+				speed: 'Скорость',
+				strength: 'Сила',
+				intelligence: 'Разум',
+				agility: 'Проворство',
+				dexterity: 'Хитрость',
+				stamina: 'Стойкость',
+				will: 'Воля',
+				damage: 'Урон',
+				criticalHit: 'Шанс крита',
+				attacksPerSecond: 'Скорость атаки',
+				penetration: 'Пробивание',
+				defencePsys: 'Защита тела',
+				defenceMagic: 'Защита духа',
+				skins: 'Скины',
+				steamauthTitle: 'Вход через Steam',
+				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.'
+			}
 		},
 		be: {
-			fight: 'У бой!',
-			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
-			ready: 'Гатоў',
-			library: 'Бібліятэка',
-			menu: 'Мяню',
-			preferences: 'Прылады',
-			windowMode: 'Аконны рэжым',
-			radminPriority: 'Прыярытэт RadminVPN',
-			threeD: '3D графіка',
-			volume: 'Агульная гучнасць',
-			volumeMusic: 'Гучнасць музыкі',
-			volumeSound: 'Гучнасць гукаў',
-			back: 'Назад',
-			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
-			support: 'Падтрымка',
-			supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
-			accountSwitch: 'Змяніць улiковы запiс',
-			exit: 'Выйсці з Prime World',
-			version: 'Версія',
-			health: 'Здароўе',
-			energy: 'Энергія',
-			speed: 'Хуткасць',
-			strength: 'Сіла',
-			intelligence: 'Розум',
-			agility: 'Шпаркасць',
-			dexterity: 'Хітрасць',
-			stamina: 'Цягавітасьць',
-			will: 'Воля',
-			damage: 'Шкода',
-			criticalHit: 'Шанец крытычнага траплення',
-			attacksPerSecond: 'Хуткасць атакі',
-			penetration: 'Прабіванне',
-			defencePsys: 'Абарона цела',
-			defenceMagic: 'Абарона духу',
-			skins: 'Абалонкі',
-			steamauthTitle: 'Увайсці праз steam',
-			steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
-		},
-
+			locale:['be_BY'],
+			word: {
+				fight: 'У бой!',
+				enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
+				ready: 'Гатоў',
+				library: 'Бібліятэка',
+				menu: 'Мяню',
+				preferences: 'Прылады',
+				windowMode: 'Аконны рэжым',
+				radminPriority: 'Прыярытэт RadminVPN',
+				threeD: '3D графіка',
+				volume: 'Агульная гучнасць',
+				volumeMusic: 'Гучнасць музыкі',
+				volumeSound: 'Гучнасць гукаў',
+				back: 'Назад',
+				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
+				support: 'Падтрымка',
+				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
+				accountSwitch: 'Змяніць улiковы запiс',
+				exit: 'Выйсці з Prime World',
+				version: 'Версія',
+				health: 'Здароўе',
+				energy: 'Энергія',
+				speed: 'Хуткасць',
+				strength: 'Сіла',
+				intelligence: 'Розум',
+				agility: 'Шпаркасць',
+				dexterity: 'Хітрасць',
+				stamina: 'Цягавітасьць',
+				will: 'Воля',
+				damage: 'Шкода',
+				criticalHit: 'Шанец крытычнага траплення',
+				attacksPerSecond: 'Хуткасць атакі',
+				penetration: 'Прабіванне',
+				defencePsys: 'Абарона цела',
+				defenceMagic: 'Абарона духу',
+				skins: 'Абалонкі',
+				steamauthTitle: 'Увайсці праз steam',
+				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.'
+			}	
+		}
 	};
+	
+	static init(){
+		
+		if( !('language' in navigator) ){
+			
+			return App.error(`Невозможно определить локаль пользователя`);
+			
+		}
+		
+		for(let key in Lang.list){
+			
+			if(Lang.list[key].locale.includes(navigator.language)){
+				
+				Lang.target = key;
+				
+				break;
+				
+			}
+			
+		}
+		
+	}
 
 	static text(word) {
-		if (word in Lang.list[Lang.target]) {
-			return Lang.list[Lang.target][word];
+		if (word in Lang.list[Lang.target].word) {
+			return Lang.list[Lang.target].word[word];
 		}
 
-		return Lang.list[Lang.default][word];
+		return Lang.list[Lang.default].word[word];
 	}
 
 }
@@ -298,6 +327,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		console.log('event.data',event.data);
 		
 	});
+	
+	Lang.init();
 
 	Splash.init();
 
