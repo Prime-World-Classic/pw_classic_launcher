@@ -1317,25 +1317,33 @@ class CastleNAVBAR {
 
 		}
 
-		CastleNAVBAR.body.children[9].append(DOM({ title: 'Очередь игроков матчмейкинга на данный режим игры' }));
-
+		CastleNAVBAR.body.children[9].append(DOM({ style: 'castle-button-play-queue', title: 'Очередь игроков матчмейкинга на данный режим игры' }));
+		
+		CastleNAVBAR.body.children[11].append(DOM({style:'castle-button-play-queue-mode'}));
+		
 		CastleNAVBAR.body.children[11].onclick = () => {
 
 			CastleNAVBAR.setMode(1);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[12].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[12].onclick = () => {
 
 			CastleNAVBAR.setMode(2);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[13].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[13].onclick = () => {
 
 			CastleNAVBAR.setMode(3);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[14].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[14].onclick = () => {
 
@@ -1343,11 +1351,15 @@ class CastleNAVBAR {
 			
 		};
 		
+		CastleNAVBAR.body.children[15].append(DOM({style:'castle-button-play-queue-mode'}));
+		
 		CastleNAVBAR.body.children[15].onclick = () => {
 
 			CastleNAVBAR.setMode(5);
 			
 		};
+		
+		CastleNAVBAR.body.children[16].append(DOM({style:'castle-button-play-queue-mode'}));
 		
 		CastleNAVBAR.body.children[16].onclick = () => {
 
@@ -1356,7 +1368,7 @@ class CastleNAVBAR {
 		};
 		
 		return CastleNAVBAR.body.children[5];
-
+		
 	}
 
 	static play() {
@@ -1432,10 +1444,16 @@ class CastleNAVBAR {
 	}
 
 	static setMode(type) {
+		
+		let modeSelect = (type - 1);
+		
+		if(CastleNAVBAR.mode != modeSelect){
+			
+			CastleNAVBAR.body.children[9].firstChild.innerText = '';
+			
+		}
 
-		CastleNAVBAR.body.children[9].firstChild.innerText = '';
-
-		CastleNAVBAR.mode = (type - 1);
+		CastleNAVBAR.mode = modeSelect;
 
 		CastleNAVBAR.body.children[5].style.display = 'block';
 
@@ -1468,13 +1486,19 @@ class CastleNAVBAR {
 			if (data.mode[CastleNAVBAR.mode]) {
 
 				queue = data.mode[CastleNAVBAR.mode];
-
+				
 			}
-
+			
 		}
 
 		CastleNAVBAR.body.children[9].firstChild.innerText = ((queue) ? queue : '');
-
+		
+		for(let item of [{child:11,mode:0},{child:12,mode:1},{child:13,mode:2},{child:14,mode:3},{child:15,mode:4},{child:16,mode:5}]){
+			
+			CastleNAVBAR.body.children[item.child].firstChild.innerText = ( ( (item.mode in data.mode) && (data.mode[item.mode]) ) ? data.mode[item.mode] : '');
+			
+		}
+		
 	}
 
 }
