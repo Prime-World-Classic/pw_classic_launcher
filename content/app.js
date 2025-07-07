@@ -18,6 +18,14 @@ class ParentEvent {
 				
 			}
 			
+			if('error' in body){
+				
+				App.error(body.error);
+				
+			}
+			
+			return;
+			
 		}
 		
 		await App.storage.set({ id: body.id, token: body.token, login: body.login, fraction: body.fraction });
