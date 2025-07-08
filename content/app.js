@@ -3669,27 +3669,11 @@ class Window {
 			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
 			DOM({ style: 'castle-menu-item-button' },
+				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, 'Аккаунт')),
+			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
-			DOM({ style: ['castle-menu-item-button'] },
-				DOM({ event: ['click', () => {
-					
-					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
-					
-				}] }, 'Привязать Steam')),
-			DOM({ style: ['castle-menu-item-button'] },
-				DOM({ event: ['click', () => {
-					
-					App.setNickname();
-					
-				}] }, 'Изменить никнейм')),
-			DOM({ style: ['castle-menu-item-button'] },
-				DOM({ event: ['click', () => {
-					
-					App.setFraction();
-					
-				}] }, 'Изменить сторону')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', async () => {
 					App.exit();
@@ -4067,6 +4051,34 @@ class Window {
 			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
+	static async accountPanel() {
+		return DOM({ id: 'wcastle-menu' },
+			DOM({ style: 'castle-menu-title' }, 'Аккаунт'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
+					
+				}]
+			}, 'Привязать Steam'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					App.setNickname();
+					
+				}]
+			}, 'Изменить никнейм'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					App.setFraction();
+					
+				}]
+			}, 'Сменить сторону'),
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+		);
+	}
+	
 }
 
 // Функция для обработки нажатия клавиш
@@ -7511,6 +7523,7 @@ class App {
 	}
 
 	static setNickname(){
+		
 		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
 		
 		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
@@ -7526,6 +7539,16 @@ class App {
 				if(!name.value){
 					
 					Splash.hide();
+					
+					return;
+					
+				}
+				
+				if(App.storage.data.login == name.value){
+					
+					Splash.hide();
+					
+					return;
 					
 				}
 				
