@@ -1259,6 +1259,10 @@ class CastleNAVBAR {
 	static state = false;
 
 	static mode = 0;
+	
+	static karma = 0;
+	
+	static division = 0;
 
 	static init() {
 
@@ -1279,7 +1283,10 @@ class CastleNAVBAR {
 			'castle-button-play-m3',
 			'castle-button-play-m4',
 			'castle-button-play-m5',
-			'castle-button-play-m6'
+			'castle-button-play-m6',
+			'castle-button-play-division',
+			'castle-button-play-karma'
+
 		];
 
 		CastleNAVBAR.body = DOM({ style: 'castle-button-play' });
@@ -1375,6 +1382,12 @@ class CastleNAVBAR {
 			
 		};
 		
+		CastleNAVBAR.body.children[17].title = 'Дивизия';
+		
+		CastleNAVBAR.body.children[18].title = 'Уровень кармы вашего аккаунта';
+		
+		CastleNAVBAR.body.children[18].append(DOM({tag:'div'}));
+		
 		return CastleNAVBAR.body.children[5];
 		
 	}
@@ -1402,7 +1415,40 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[3].style.filter = 'grayscale(70%)';
 
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(70%)';
-
+		
+		if(CastleNAVBAR.karma){
+			
+			CastleNAVBAR.body.children[18].style.display = 'flex';
+			
+			CastleNAVBAR.body.children[18].firstChild.innerText = `${CastleNAVBAR.karma}%`;
+			
+		}
+		
+		if(CastleNAVBAR.division){
+			
+			let division = 0;
+			
+			if(CastleNAVBAR.division <= 50){
+				
+				division = 3;
+				
+			}
+			else if(CastleNAVBAR.division <= 100){
+				
+				division = 11;
+				
+			}
+			
+			if(division){
+				
+				CastleNAVBAR.body.children[17].style.backgroundImage =  `url(content/ranks/${division}.webp)`;
+				
+				CastleNAVBAR.body.children[17].style.display = 'block';
+				
+			}
+			
+		}
+		
 	}
 
 	static cancel() {
@@ -1428,6 +1474,10 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[3].style.filter = 'grayscale(0)';
 
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(0)';
+		
+		CastleNAVBAR.body.children[17].style.display = 'none';
+		
+		CastleNAVBAR.body.children[18].style.display = 'none';
 
 	}
 
@@ -10837,7 +10887,11 @@ class MM {
 			try {
 
 				let request = await App.api.request(CURRENT_MM, 'start', { hero: MM.activeSelectHero, version: PW_VERSION, mode: CastleNAVBAR.mode });
-
+				
+				CastleNAVBAR.division = request.division;
+				
+				CastleNAVBAR.karma = request.karma;
+				
 				if (request.type == 'reconnect') {
 
 					MM.searchActive(false);
