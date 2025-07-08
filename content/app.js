@@ -11464,7 +11464,7 @@ class MM {
 
 		let message = DOM(`${data.message}`);
 
-		if (data.id == 1) {
+		if (App.isAdmin(data.id)) {
 
 			message.style.color = 'rgba(255, 50, 0, 0.9)';
 			
