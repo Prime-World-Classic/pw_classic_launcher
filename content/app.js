@@ -8780,6 +8780,64 @@ class NativeAPI {
 		};
 
 	}
+	
+	static getMACAdress(){
+		
+		let result = new Array();
+		
+		if(!NativeAPI.status){
+			
+			return result;
+			
+		}
+		
+		try{
+			
+			let networkInterfaces = NativeAPI.os.networkInterfaces();
+			
+			for(let key in networkInterfaces){
+				
+				if(['Radmin VPN'].includes(`${key}`)){
+					
+					continue;
+					
+				}
+				
+				for(let networkInterface of networkInterfaces[key]){
+					
+					if(networkInterface.internal){
+						
+						continue;
+						
+					}
+					
+					if( !('mac' in networkInterface) || (!networkInterface.mac) || (networkInterface.mac == '00:00:00:00:00:00') ){
+						
+						continue;
+						
+					}
+					
+					if(!result.includes(`${networkInterface.mac}`)){
+						
+						result.push(`${networkInterface.mac}`);
+						
+					}
+					
+				}
+				
+			}
+			
+			
+		}
+		catch(error){
+			
+			console.log(error);
+			
+		}
+		
+		return result;
+		
+	}
 
 	static async ping(hostname, port = 80, timeout = 3000) {
 
@@ -10933,7 +10991,7 @@ class MM {
 
 			try {
 
-				let request = await App.api.request(CURRENT_MM, 'start', { hero: MM.activeSelectHero, version: PW_VERSION, mode: CastleNAVBAR.mode });
+				let request = await App.api.request(CURRENT_MM, 'start', { hero: MM.activeSelectHero, version: PW_VERSION, mode: CastleNAVBAR.mode, mac: NativeAPI.getMACAdress() });
 				
 				CastleNAVBAR.division = request.division;
 				
