@@ -4657,7 +4657,7 @@ class Build {
 
 						await App.api.request(CURRENT_MM, 'heroParty', { id: MM.partyId, hero: Build.heroId });
 
-						await App.api.request(CURRENT_MM, 'start', { version: PW_VERSION, mode: 99 });
+						await App.api.request(CURRENT_MM, 'start', { version: PW_VERSION, mode: 99, mac: NativeAPI.getMACAdress() });
 
 					}
 					else {
