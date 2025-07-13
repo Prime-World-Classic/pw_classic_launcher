@@ -224,15 +224,23 @@ class Lang {
 	
 	static init(){
 		
-		if( !('language' in navigator) ){
+		let locale = NativeAPI.getLocale();
+		
+		if(!locale){
 			
-			return App.error(`Невозможно определить локаль пользователя`);
+			if( !('language' in navigator) ){
+				
+				return;
+				
+			}
+			
+			locale = navigator.language;
 			
 		}
 		
 		for(let key in Lang.list){
 			
-			if(Lang.list[key].locale.includes(navigator.language)){
+			if(Lang.list[key].locale.includes(locale)){
 				
 				Lang.target = key;
 				
@@ -369,11 +377,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		
 	});
 	
-	Lang.init();
-
 	Splash.init();
 
 	NativeAPI.init();
+	
+	Lang.init();
 
 	NativeAPI.update((data) => {
 
@@ -8832,6 +8840,31 @@ class NativeAPI {
 		catch(error){
 			
 			console.log(error);
+			
+		}
+		
+		return result;
+		
+	}
+	
+	static getLocale(){
+		
+		let result = '';
+		
+		if(!NativeAPI.status){
+			
+			return result;
+			
+		}
+		
+		try{
+			
+			result = Intl.DateTimeFormat().resolvedOptions().locale;
+			
+		}
+		catch(error){
+			
+			
 			
 		}
 		
