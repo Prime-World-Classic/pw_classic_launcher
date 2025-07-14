@@ -7862,7 +7862,7 @@ class App {
 
 		try {
 
-			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim(), analysis: analysis});
+			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim(), analysis: analysis, mac: NativeAPI.getMACAdress() });
 
 		}
 		catch (error) {
