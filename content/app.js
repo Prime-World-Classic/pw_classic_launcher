@@ -7452,9 +7452,9 @@ class App {
 					this.bestHost = index;
 					
 					sockets.forEach((socket, i) => {
-						if (i !== index && socket) {
+						//if (i !== index && socket) {
 							socket.close();
-						}
+						//}
 					});
 
 					this.init();
