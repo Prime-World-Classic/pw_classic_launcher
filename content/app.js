@@ -1450,16 +1450,16 @@ class CastleNAVBAR {
 		
 	}
 	
-	static karma(){
+	static karma(id){
 		
 		let karma = 0;
 		
-		if(CastleNAVBAR.karma >= 75){
+		if(id >= 75){
 			
 			karma = 75;
 			
 		}
-		else if(CastleNAVBAR.karma >= 50){
+		else if(id >= 50){
 			
 			karma = 50;
 			
@@ -7507,7 +7507,7 @@ class App {
 		await News.init();
 		
 		await Store.init();
-
+		
 		App.storage = new Store('u3');
 
 		await App.storage.init({ id: 0, token: '', login: '' });
