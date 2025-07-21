@@ -7049,7 +7049,7 @@ class Build {
 					
 					case 4: dataTemp = 4; break;
 					
-					default: dataTemp = 0; break; //Классовые и красные
+					default: dataTemp = 0; break; 
 
 				}
 				let starOrange = window.innerHeight*0.02;
