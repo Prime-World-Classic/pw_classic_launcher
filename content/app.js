@@ -159,6 +159,7 @@ class Lang {
 				defencePsys: 'Defence Psysical',
 				defenceMagic: 'Defence Magic',
 				skins: 'Skins',
+				training: 'Training',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -214,6 +215,7 @@ class Lang {
 				defencePsys: 'Защита тела',
 				defenceMagic: 'Защита духа',
 				skins: 'Скины',
+				training: 'Тренировка',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -269,6 +271,7 @@ class Lang {
 				defencePsys: 'Абарона цела',
 				defenceMagic: 'Абарона духу',
 				skins: 'Абалонкі',
+				training: 'Трэніроўка',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -4774,7 +4777,7 @@ class Build {
 
 			}]
 		},
-			'Тренировка'
+			Lang.text('training')
 		);
 
 		Build.inventoryView.append(buildTalents);
