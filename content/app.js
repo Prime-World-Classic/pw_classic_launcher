@@ -3862,7 +3862,7 @@ class Window {
                 	}]
             	}),
             	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
-        	).getItem,
+        	),
 
 			DOM({ style: 'castle-menu-item' },
 				DOM({
