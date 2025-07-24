@@ -141,6 +141,7 @@ class Lang {
 				supportDesk: 'Questions? Feel free to contact us:',
 				account: 'Account',
 				accountSwitch: 'Switch account',
+				steamConnect: 'Connect Steam',
 				exit: 'Exit from Prime World',
 				version: 'Version',
 				health: 'Health',
@@ -197,6 +198,7 @@ class Lang {
 				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
 				account: 'Аккаунт',
 				accountSwitch: 'Сменить аккаунт',
+				steamConnect: 'Привязать Steam',
 				exit: 'Выйти из Prime World',
 				version: 'Версия',
 				health: 'Здоровье',
@@ -253,6 +255,7 @@ class Lang {
 				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
 				account: 'Рахунак',
 				accountSwitch: 'Змяніць улiковы запiс',
+				steamConnect: 'Прывязаць Steam',
 				exit: 'Выйсці з Prime World',
 				version: 'Версія',
 				health: 'Здароўе',
@@ -4210,7 +4213,7 @@ class Window {
 					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
 					
 				}]
-			}, 'Привязать Steam'),
+			}, Lang.text('steamConnect')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', () => {
 					
