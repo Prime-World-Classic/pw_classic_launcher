@@ -54,15 +54,138 @@ class ParentEvent {
 	
 }
 
-class Lang {
+class Settings {
+    static defaultSettings = {
+		language:'ru',
+        fullscreen: true,
+        render: true,
+        globalVolume: 0.5,
+        musicVolume: 0.7,
+        soundsVolume: 0.7,
+		radminPriority: false
+    };
 
-	static target = 'ru'; // TODO get from the system
-	// TODO add UI dropdown?
-	static default = 'ru';
+    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
+    static pwcLauncherSettingsDir;
+    static settingsFilePath;
+
+    static async ensureSettingsFile() {
+        const homeDir = NativeAPI.os.homedir();
+        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
+        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
+
+        try {
+            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
+            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
+            return true;
+        } catch (e) {
+            App.error('Ошибка доступа к файлу настроек: ' + e);
+            await this.writeDefaultSettings();
+            return false;
+        }
+    }
+
+    static async writeDefaultSettings() {
+        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
+        await this.WriteSettings();
+    }
+
+    static async ReadSettings() {
+        if (!NativeAPI.status) {
+            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
+            this.settings = { ...this.defaultSettings };
+            return;
+        }
+
+        try {
+            if (await this.ensureSettingsFile()) {
+                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
+                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
+            }
+        } catch (e) {
+            App.error('Ошибка чтения настроек: ' + e);
+            this.settings = { ...this.defaultSettings };
+        }
+    }
+
+    static async WriteSettings() {
+        if (!this.settingsFilePath || !NativeAPI.status) {
+            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
+            return;
+        }
+        
+        try {
+            await NativeAPI.fileSystem.promises.writeFile(
+                this.settingsFilePath,
+                JSON.stringify(this.settings, null, 2),
+                'utf-8'
+            );
+        } catch (e) {
+            App.error('Ошибка сохранения настроек: ' + e);
+        }
+    }
+
+    static async ApplySettings(options = {}) {
+		// Установка значений по умолчанию для options
+		options = {
+			render: true,    // Применять настройки рендеринга по умолчанию
+			audio: true,     // Применять настройки звука по умолчанию
+			window: true,    // Применять настройки окна по умолчанию
+			...options       // Переопределение дефолтных значений
+		};
+	
+		try {
+			// 1. Применение настроек рендеринга (если не отключено в options)
+			if (options.render !== false && typeof Castle !== 'undefined') {
+				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, this.settings.render);
+			}
+	
+			// 2. Применение настроек окна (если не отключено в options)
+			if (options.window !== false && NativeAPI.status && NativeAPI.window) {
+				const currentMode = await NativeAPI.window.isFullscreen;
+				if (this.settings.fullscreen && !currentMode) {
+					await NativeAPI.window.enterFullscreen();
+				} else if (!this.settings.fullscreen && currentMode) {
+					await NativeAPI.window.leaveFullscreen();
+					NativeAPI.window.resizeTo(1280, 720);
+					NativeAPI.window.setPosition('center');
+				}
+			}
+
+			// 3. Применение настроек звука (если не отключено в options)
+			if (options.audio !== false && typeof Sound !== 'undefined') {
+				// Обновляем громкость для всех звуков
+				for (const soundId in Sound.all) {
+					const type = soundId === 'castle' ? Castle.AUDIO_MUSIC : Castle.AUDIO_SOUNDS;
+					Sound.setVolume(soundId, Castle.GetVolume(type));
+				}
+				
+				// Специальная обработка тестового звука (если используется)
+				if (Castle.testSoundIsPlaying && Sound.all.sound_test) {
+					Sound.setVolume('sound_test', Castle.GetVolume(Castle.AUDIO_SOUNDS));
+				}
+			}
+	
+		} catch (e) {
+			App.error('Ошибка применения настроек: ' + e);
+		}
+	}
+
+    static async init() {
+        await this.ReadSettings();
+        await this.ApplySettings();
+        
+        window.addEventListener('beforeunload', () => {
+            this.WriteSettings();
+        });
+    }
+}
+
+class Lang {
 
 	static list = {
 		en: {
-			locale:['en_US'],
+			locale:['en'],
 			name:'English',
 			word: {
 				nickname: 'login/Nickname',
@@ -116,7 +239,7 @@ class Lang {
 			}
 		},
 		ru: {
-			locale:['ru_RU'],
+			locale:['ru'],
 			name:'Русский',
 			word: {
 				nickname: 'Логин/Никнейм',
@@ -170,7 +293,7 @@ class Lang {
 			}
 		},
 		be: {
-			locale:['be_BY'],
+			locale:['be'],
 			name:'Беларускі',
 			word: {
 				nickname: 'Лагін/Нікнейм',
@@ -240,27 +363,15 @@ class Lang {
 			locale = navigator.language;
 			
 		}
-		
-		for(let key in Lang.list){
-			
-			if(Lang.list[key].locale.includes(locale)){
-				
-				Lang.target = key;
-				
-				break;
-				
-			}
-			
-		}
-		
 	}
 
 	static text(word) {
-		if (word in Lang.list[Lang.target].word) {
-			return Lang.list[Lang.target].word[word];
+		const w = Lang.list[Settings.settings.language].word
+		if (word in w) {
+			return w[word];
 		}
 
-		return Lang.list[Lang.default].word[word];
+		return Lang.list['en'].word[word];
 	}
 
 }
@@ -380,6 +491,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		
 	});
 	
+	Settings.init();
+
 	Splash.init();
 
 	NativeAPI.init();
@@ -407,8 +520,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	});
 
 	App.findBestHostAndInit();
-
-	Settings.init();
 
 	let testRadminConnection = async () => {
 		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
@@ -3800,18 +3911,19 @@ class Window {
 	
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
+
 			DOM({style: 'castle-menu-items'},
-			DOM({ style: 'castle-menu-item-checkbox' },
+			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 						Settings.settings.fullscreen = !e.target.checked;
 						Settings.ApplySettings({render: false, audio: false});
 					}]
-				},
-					{ checked: Settings.settings.fullscreen }),
+				}),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
-			DOM({ style: 'castle-menu-item-checkbox' },
+
+			DOM({ style: 'castle-menu-item' },
             	DOM({
                 	tag: 'input',
                 	type: 'checkbox',
@@ -3824,15 +3936,35 @@ class Window {
             	}),
             	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
         	),
-			DOM({ style: 'castle-menu-item-checkbox' },
+
+			DOM({ style: 'castle-menu-item' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: Settings.settings.radminPriority, event: ['change', (e) => {
 						Settings.settings.radminPriority = e.target.checked;
 					}]
-				},
-					{ checked: Settings.settings.radminPriority }),
+				}),
 				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
 			),
+
+			DOM({style: 'castle-menu-item'},
+				((() => {
+					const select = DOM({
+						tag: 'select', id: 'language', event: ['change', e => {
+							Settings.settings.language = e.target.value;
+						}]
+					});
+					select.append(
+						DOM({tag: 'option', value: 'en'}, 'English'),
+						DOM({tag: 'option', value: 'ru'}, 'Русский'),
+						DOM({tag: 'option', value: 'be'}, 'Беларускі')
+					);
+					select.value = Settings.settings.language;
+					Settings.WriteSettings();
+					return select;
+				})()),
+				DOM({tag: 'label', for: 'language'}, 'Language')
+			),
+
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
             	DOM({
                 	tag: 'input',
@@ -10697,132 +10829,6 @@ class Castle {
 
 	}
 
-}
-
-class Settings {
-    static defaultSettings = {
-        fullscreen: true,
-        render: true,
-        globalVolume: 0.5,
-        musicVolume: 0.7,
-        soundsVolume: 0.7,
-		radminPriority: false
-    };
-
-    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
-    static pwcLauncherSettingsDir;
-    static settingsFilePath;
-
-    static async ensureSettingsFile() {
-        const homeDir = NativeAPI.os.homedir();
-        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
-        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
-
-        try {
-            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
-            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
-            return true;
-        } catch (e) {
-            App.error('Ошибка доступа к файлу настроек: ' + e);
-            await this.writeDefaultSettings();
-            return false;
-        }
-    }
-
-    static async writeDefaultSettings() {
-        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
-        await this.WriteSettings();
-    }
-
-    static async ReadSettings() {
-        if (!NativeAPI.status) {
-            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
-            this.settings = { ...this.defaultSettings };
-            return;
-        }
-
-        try {
-            if (await this.ensureSettingsFile()) {
-                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
-                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
-            }
-        } catch (e) {
-            App.error('Ошибка чтения настроек: ' + e);
-            this.settings = { ...this.defaultSettings };
-        }
-    }
-
-    static async WriteSettings() {
-        if (!this.settingsFilePath || !NativeAPI.status) {
-            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
-            return;
-        }
-        
-        try {
-            await NativeAPI.fileSystem.promises.writeFile(
-                this.settingsFilePath,
-                JSON.stringify(this.settings, null, 2),
-                'utf-8'
-            );
-        } catch (e) {
-            App.error('Ошибка сохранения настроек: ' + e);
-        }
-    }
-
-    static async ApplySettings(options = {}) {
-		// Установка значений по умолчанию для options
-		options = {
-			render: true,    // Применять настройки рендеринга по умолчанию
-			audio: true,     // Применять настройки звука по умолчанию
-			window: true,    // Применять настройки окна по умолчанию
-			...options       // Переопределение дефолтных значений
-		};
-	
-		try {
-			// 1. Применение настроек рендеринга (если не отключено в options)
-			if (options.render !== false && typeof Castle !== 'undefined') {
-				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, this.settings.render);
-			}
-	
-			// 2. Применение настроек окна (если не отключено в options)
-			if (options.window !== false && NativeAPI.status && NativeAPI.window) {
-				const currentMode = await NativeAPI.window.isFullscreen;
-				if (this.settings.fullscreen && !currentMode) {
-					await NativeAPI.window.enterFullscreen();
-				} else if (!this.settings.fullscreen && currentMode) {
-					await NativeAPI.window.leaveFullscreen();
-					NativeAPI.window.resizeTo(1280, 720);
-					NativeAPI.window.setPosition('center');
-				}
-			}
-	
-			// 3. Применение настроек звука (если не отключено в options)
-			if (options.audio !== false && typeof Sound !== 'undefined') {
-				// Обновляем громкость для всех звуков
-				for (const soundId in Sound.all) {
-					const type = soundId === 'castle' ? Castle.AUDIO_MUSIC : Castle.AUDIO_SOUNDS;
-					Sound.setVolume(soundId, Castle.GetVolume(type));
-				}
-				
-				// Специальная обработка тестового звука (если используется)
-				if (Castle.testSoundIsPlaying && Sound.all.sound_test) {
-					Sound.setVolume('sound_test', Castle.GetVolume(Castle.AUDIO_SOUNDS));
-				}
-			}
-	
-		} catch (e) {
-			App.error('Ошибка применения настроек: ' + e);
-		}
-	}
-
-    static async init() {
-        await this.ReadSettings();
-        await this.ApplySettings();
-        
-        window.addEventListener('beforeunload', () => {
-            this.WriteSettings();
-        });
-    }
 }
 
 class MM {
