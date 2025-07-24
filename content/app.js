@@ -55,75 +55,6 @@ class ParentEvent {
 }
 
 class Settings {
-    static defaultSettings = {
-		language:'ru',
-        fullscreen: true,
-        render: true,
-        globalVolume: 0.5,
-        musicVolume: 0.7,
-        soundsVolume: 0.7,
-		radminPriority: false
-    };
-
-    static settings = JSON.parse(JSON.stringify(this.defaultSettings));
-    static pwcLauncherSettingsDir;
-    static settingsFilePath;
-
-    static async ensureSettingsFile() {
-        const homeDir = NativeAPI.os.homedir();
-        this.pwcLauncherSettingsDir = NativeAPI.path.join(homeDir, 'Prime World Classic');
-        this.settingsFilePath = NativeAPI.path.join(this.pwcLauncherSettingsDir, 'launcher.cfg');
-
-        try {
-            await NativeAPI.fileSystem.promises.mkdir(this.pwcLauncherSettingsDir, { recursive: true });
-            await NativeAPI.fileSystem.promises.access(this.settingsFilePath);
-            return true;
-        } catch (e) {
-            App.error('Ошибка доступа к файлу настроек: ' + e);
-            await this.writeDefaultSettings();
-            return false;
-        }
-    }
-
-    static async writeDefaultSettings() {
-        this.settings = JSON.parse(JSON.stringify(this.defaultSettings));
-        await this.WriteSettings();
-    }
-
-    static async ReadSettings() {
-        if (!NativeAPI.status) {
-            App.error('NativeAPI не инициализирован! Используются настройки по умолчанию');
-            this.settings = { ...this.defaultSettings };
-            return;
-        }
-
-        try {
-            if (await this.ensureSettingsFile()) {
-                const data = await NativeAPI.fileSystem.promises.readFile(this.settingsFilePath, 'utf-8');
-                this.settings = { ...this.defaultSettings, ...JSON.parse(data) };
-            }
-        } catch (e) {
-            App.error('Ошибка чтения настроек: ' + e);
-            this.settings = { ...this.defaultSettings };
-        }
-    }
-
-    static async WriteSettings() {
-        if (!this.settingsFilePath || !NativeAPI.status) {
-            App.error('Не могу сохранить настройки: путь или NativeAPI недоступны');
-            return;
-        }
-        
-        try {
-            await NativeAPI.fileSystem.promises.writeFile(
-                this.settingsFilePath,
-                JSON.stringify(this.settings, null, 2),
-                'utf-8'
-            );
-        } catch (e) {
-            App.error('Ошибка сохранения настроек: ' + e);
-        }
-    }
 
     static async ApplySettings(options = {}) {
 		// Установка значений по умолчанию для options
@@ -137,15 +68,15 @@ class Settings {
 		try {
 			// 1. Применение настроек рендеринга (если не отключено в options)
 			if (options.render !== false && typeof Castle !== 'undefined') {
-				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, this.settings.render);
+				Castle.toggleRender(Castle.RENDER_LAYER_PLAYER, localStorage.getItem('render'));
 			}
 	
 			// 2. Применение настроек окна (если не отключено в options)
 			if (options.window !== false && NativeAPI.status && NativeAPI.window) {
 				const currentMode = await NativeAPI.window.isFullscreen;
-				if (this.settings.fullscreen && !currentMode) {
+				if (localStorage.getItem('fullscreen') == true && !currentMode) {
 					await NativeAPI.window.enterFullscreen();
-				} else if (!this.settings.fullscreen && currentMode) {
+				} else if (localStorage.getItem('fullscreen') != true && currentMode) {
 					await NativeAPI.window.leaveFullscreen();
 					NativeAPI.window.resizeTo(1280, 720);
 					NativeAPI.window.setPosition('center');
@@ -172,12 +103,7 @@ class Settings {
 	}
 
     static async init() {
-        await this.ReadSettings();
         await this.ApplySettings();
-        
-        window.addEventListener('beforeunload', () => {
-            this.WriteSettings();
-        });
     }
 }
 
@@ -204,7 +130,7 @@ class Lang {
 				menu: 'Меню',
 				preferences: 'Preferences',
 				windowMode: 'Window mode',
-				radminPriority: 'RadminVPN Priority',
+				radmin: 'RadminVPN Priority',
 				threeD: '3D',
 				volume: 'Volume',
 				volumeMusic: 'Volume of music',
@@ -213,6 +139,7 @@ class Lang {
 				soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
 				support: 'Support',
 				supportDesk: 'Questions? Feel free to contact us:',
+				account: 'Account',
 				accountSwitch: 'Switch account',
 				exit: 'Exit from Prime World',
 				version: 'Version',
@@ -258,7 +185,7 @@ class Lang {
 				menu: 'Меню',
 				preferences: 'Настройки',
 				windowMode: 'Оконный режим',
-				radminPriority: 'Приоритет RadminVPN',
+				radmin: 'Приоритет RadminVPN',
 				threeD: '3D графика',
 				volume: 'Общая громкость',
 				volumeMusic: 'Громкость музыки',
@@ -267,6 +194,7 @@ class Lang {
 				soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
 				support: 'Поддержка',
 				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
+				account: 'Аккаунт',
 				accountSwitch: 'Сменить аккаунт',
 				exit: 'Выйти из Prime World',
 				version: 'Версия',
@@ -312,7 +240,7 @@ class Lang {
 				menu: 'Мяню',
 				preferences: 'Прылады',
 				windowMode: 'Аконны рэжым',
-				radminPriority: 'Прыярытэт RadminVPN',
+				radmin: 'Прыярытэт RadminVPN',
 				threeD: '3D графіка',
 				volume: 'Агульная гучнасць',
 				volumeMusic: 'Гучнасць музыкі',
@@ -321,6 +249,7 @@ class Lang {
 				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
 				support: 'Падтрымка',
 				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
+				account: 'Рахунак',
 				accountSwitch: 'Змяніць улiковы запiс',
 				exit: 'Выйсці з Prime World',
 				version: 'Версія',
@@ -366,12 +295,10 @@ class Lang {
 	}
 
 	static text(word) {
-		const w = Lang.list[Settings.settings.language].word
+		const w = Lang.list[localStorage.getItem('lang') || 'en'].word
 		if (word in w) {
 			return w[word];
 		}
-
-		return Lang.list['en'].word[word];
 	}
 
 }
@@ -3869,7 +3796,7 @@ class Window {
 			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
 			DOM({ style: 'castle-menu-item-button' },
-				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, 'Аккаунт')),
+				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account'))),
 			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-button' },
@@ -3915,8 +3842,8 @@ class Window {
 			DOM({style: 'castle-menu-items'},
 			DOM({ style: 'castle-menu-item' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
-						Settings.settings.fullscreen = !e.target.checked;
+					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: localStorage.getItem('fullscreen') != true, event: ['change', (e) => {
+						localStorage.setItem('fullscreen', !e.target.checked);
 						Settings.ApplySettings({render: false, audio: false});
 					}]
 				}),
@@ -3928,29 +3855,29 @@ class Window {
                 	tag: 'input',
                 	type: 'checkbox',
                 	id: 'render-toggle',
-                	checked: Settings.settings.render,
+                	checked: localStorage.getItem('render'),
                 	event: ['change', (e) => {
-                    	Settings.settings.render = e.target.checked;
+                    	localStorage.setItem('render', e.target.checked)
                     	Settings.ApplySettings({audio: false, window: false});
                 	}]
             	}),
             	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
-        	),
+        	).getItem,
 
 			DOM({ style: 'castle-menu-item' },
 				DOM({
-					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: Settings.settings.radminPriority, event: ['change', (e) => {
-						Settings.settings.radminPriority = e.target.checked;
+					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: localStorage.getItem('radmin') == 'true', event: ['change', (e) => {
+						localStorage.setItem('radmin', e.target.checked)
 					}]
 				}),
-				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
+				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radmin'))
 			),
 
 			DOM({style: 'castle-menu-item'},
 				((() => {
 					const select = DOM({
 						tag: 'select', id: 'language', event: ['change', e => {
-							Settings.settings.language = e.target.value;
+							localStorage.setItem('lang', e.target.value);
 						}]
 					});
 					select.append(
@@ -3958,8 +3885,7 @@ class Window {
 						DOM({tag: 'option', value: 'ru'}, 'Русский'),
 						DOM({tag: 'option', value: 'be'}, 'Беларускі')
 					);
-					select.value = Settings.settings.language;
-					Settings.WriteSettings();
+					select.value = localStorage.getItem('lang') || 'en';
 					return select;
 				})()),
 				DOM({tag: 'label', for: 'language'}, 'Language')
@@ -3969,60 +3895,60 @@ class Window {
             	DOM({
                 	tag: 'input',
                 	type: 'range',
-                	value: Settings.settings.globalVolume * 100,
+                	value: (localStorage.getItem('globalVolume') || 1.0) * 100,
                 	min: '0',
                 	max: '100',
                 	step: '1',
                 	style: 'castle-menu-slider',
                 	event: ['input', (e) => {
-                    	Settings.settings.globalVolume = parseFloat(e.target.value) / 100;
+                    	localStorage.setItem('globalVolume', parseFloat(e.target.value) / 100);
                     	Settings.ApplySettings({render: false, window: false});
 																	  
 																		  
                     	document.getElementById('global-volume-percentage').textContent = 
-                        	`${Math.round(Settings.settings.globalVolume * 100)}%`;
+                        	`${Math.round((localStorage.getItem('globalVolume') || 1.0) * 100)}%`;
                 	}]
             	}),
 				DOM({ 
 					tag: 'span', 
 					id: 'global-volume-percentage', 
 					style: 'volume-percentage' 
-				}, `${Math.round(Settings.settings.globalVolume * 100)}%`)
+				}, `${Math.round((localStorage.getItem('globalVolume') || 1.0) * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeMusic'),
 				DOM({
 					tag: 'input', 
 					type: 'range', 
-					value: Settings.settings.musicVolume * 100, 
+					value: (localStorage.getItem('musicVolume') || 0.5) * 100,
 					min: '0', 
 					max: '100', 
 					step: '1',
 					style: 'castle-menu-slider', 
 					event: ['input', (e) => {
-						Settings.settings.musicVolume = parseFloat(e.target.value) / 100;
+						localStorage.setItem('musicVolume', parseFloat(e.target.value) / 100);
 						Settings.ApplySettings({render: false, window: false});
 																	  
 						document.getElementById('music-volume-percentage').textContent = 
-							`${Math.round(Settings.settings.musicVolume * 100)}%`;
+							`${Math.round((localStorage.getItem('musicVolume') || 0.5) * 100)}%`;
 					}]
 				}),
 				DOM({ 
 					tag: 'span', 
 					id: 'music-volume-percentage', 
 					style: 'volume-percentage' 
-				}, `${Math.round(Settings.settings.musicVolume * 100)}%`)
+				}, `${Math.round((localStorage.getItem('musicVolume') || 0.5) * 100)}%`)
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volumeSound'),
 				DOM({
 					tag: 'input', 
 					type: 'range', 
-					value: Settings.settings.soundsVolume * 100, 
+					value: (localStorage.getItem('soundsVolume') || 0.3) * 100,
 					min: '0', 
 					max: '100', 
 					step: '1',
 					style: 'castle-menu-slider', 
 					event: ['input', (e) => {
-						Settings.settings.soundsVolume = parseFloat(e.target.value) / 100;
+						localStorage.setItem('soundsVolume', parseFloat(e.target.value) / 100);
 						Settings.ApplySettings({render: false, window: false});
 						
 						if (!Castle.testSoundIsPlaying) {
@@ -4036,14 +3962,14 @@ class Window {
 						}
 																		  
 						document.getElementById('sounds-volume-percentage').textContent = 
-							`${Math.round(Settings.settings.soundsVolume * 100)}%`;
+							`${Math.round((localStorage.getItem('soundsVolume') || 0.3) * 100)}%`;
 					}]
 				}),
 				DOM({ 
 					tag: 'span', 
 					id: 'sounds-volume-percentage', 
 					style: 'volume-percentage' 
-				}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
+				}, `${Math.round((localStorage.getItem('soundsVolume') || 0.3) * 100)}%`)
 			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
@@ -8523,7 +8449,7 @@ class PWGame {
 
 	static GetPlayPwProtocol(id) {
 		let chosenServer = PWGame.mainServerHasConnection ? 0 : 2;
-		if (Settings.settings.radminPriority && PWGame.radminHasConnection) {
+		if (localStorage.getItem('radmin') && PWGame.radminHasConnection) {
 			chosenServer = 1;
 		}
 		return `pwclassic://runGame/${id}/${PW_VERSION}/${chosenServer}`;
@@ -8700,7 +8626,7 @@ class NativeAPI {
 
 		NativeAPI.altEnterShortcut = new nw.Shortcut({
 			key: 'Alt+Enter', active: () => {
-				Settings.settings.fullscreen = !Settings.settings.fullscreen;
+				localStorage.setItem('fullscreen', localStorage.getItem('fullscreen') != true);
 				Settings.ApplySettings();
 			}
 		});
@@ -9167,10 +9093,9 @@ class Castle {
 	static AUDIO_MUSIC = 0;
 	static AUDIO_SOUNDS = 1;
 	static GetVolume(type) {
-		// Используем настройки из Settings вместо внутренних переменных
-		const global = Settings.settings.globalVolume ?? 1.0;
-		const music = Settings.settings.musicVolume ?? 0.5;
-		const sounds = Settings.settings.soundsVolume ?? 0.3;
+		const global = localStorage.getItem('globalVolume') ?? 1.0;
+		const music = localStorage.getItem('musicVolume') ?? 0.5;
+		const sounds = localStorage.getItem('soundsVolume') ?? 0.3;
 	
 		if (type == Castle.AUDIO_MUSIC) {
 			return global * music;
