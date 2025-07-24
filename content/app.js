@@ -4203,7 +4203,7 @@ class Window {
 	}
 	static async accountPanel() {
 		return DOM({ id: 'wcastle-menu' },
-			DOM({ style: 'castle-menu-title' }, 'Аккаунт'),
+			DOM({ style: 'castle-menu-title' }, Lang.text('account')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', () => {
 					
