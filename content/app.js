@@ -116,6 +116,7 @@ class Lang {
 			word: {
 				nickname: 'login/Nickname',
 				nicknameChange: 'Nickname change',
+				sideChange: 'Side change',
 				code: 'code/Telegram bot',
 				password: 'password',
 				passwordAgain: 'password again',
@@ -174,6 +175,7 @@ class Lang {
 			word: {
 				nickname: 'Логин/Никнейм',
 				nicknameChange: 'Изменить никнейм',
+				sideChange: 'Изменить сторону',
 				code: 'Инвайт-код',
 				password: 'Пароль',
 				passwordAgain: 'Еще раз пароль',
@@ -232,6 +234,7 @@ class Lang {
 			word: {
 				nickname: 'Лагін/Нікнейм',
 				nicknameChange: 'Змяніць імя',
+				sideChange: 'Змяніць старану',
 				code: 'Код/бот тэлеграм',
 				password: 'Пароль',
 				passwordAgain: 'Яшчэ раз пароль',
@@ -4230,7 +4233,7 @@ class Window {
 					App.setFraction();
 					
 				}]
-			}, 'Сменить сторону'),
+			}, Lang.text('sideChange')),
 			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
