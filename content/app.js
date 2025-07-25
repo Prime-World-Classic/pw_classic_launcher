@@ -115,6 +115,7 @@ class Lang {
 			name:'English',
 			word: {
 				nickname: 'login/Nickname',
+				nicknameChange: 'Nickname change',
 				code: 'code/Telegram bot',
 				password: 'password',
 				passwordAgain: 'password again',
@@ -172,6 +173,7 @@ class Lang {
 			name:'Русский',
 			word: {
 				nickname: 'Логин/Никнейм',
+				nicknameChange: 'Изменить никнейм',
 				code: 'Инвайт-код',
 				password: 'Пароль',
 				passwordAgain: 'Еще раз пароль',
@@ -229,6 +231,7 @@ class Lang {
 			name:'Беларускі',
 			word: {
 				nickname: 'Лагін/Нікнейм',
+				nicknameChange: 'Змяніць імя',
 				code: 'Код/бот тэлеграм',
 				password: 'Пароль',
 				passwordAgain: 'Яшчэ раз пароль',
@@ -4220,7 +4223,7 @@ class Window {
 					App.setNickname();
 					
 				}]
-			}, 'Изменить никнейм'),
+			}, Lang.text('nicknameChange'),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', () => {
 					
