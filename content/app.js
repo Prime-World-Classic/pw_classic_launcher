@@ -4223,7 +4223,7 @@ class Window {
 					App.setNickname();
 					
 				}]
-			}, Lang.text('nicknameChange'),
+			}, Lang.text('nicknameChange')),
 			DOM({
 				style: 'castle-menu-item-button', event: ['click', () => {
 					
