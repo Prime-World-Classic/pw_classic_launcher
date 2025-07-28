@@ -490,7 +490,7 @@ class Lang {
 				warlord: 'Ваявода',
 				thundergod: 'Маланкавы',
 				invisible: 'Цень',
-				mowgly: 'Егерь',
+				mowgly: 'Егер',
 				inventor: 'Вынаходнік',
 				artist: 'Мастачка',
 				highlander: 'Гаравік',
