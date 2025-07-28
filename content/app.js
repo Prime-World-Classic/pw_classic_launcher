@@ -108,6 +108,7 @@ class Settings {
 }
 
 const idToName = [
+	'',
 	'prince',
 	'snowqueen',
 	'faceless',
