@@ -486,7 +486,7 @@ class Lang {
 				classTalent: 'Класавы',
 				prince: 'Дуэлянт',
 				snowqueen: 'Крыё',
-				faceless: 'Бязьлікі',
+				faceless: 'Безаблічны',
 				warlord: 'Ваявода',
 				thundergod: 'Маланкавы',
 				invisible: 'Цень',
@@ -496,18 +496,18 @@ class Lang {
 				highlander: 'Гаравік',
 				marine: 'Камбат',
 				firefox: 'Агнявая ліса',
-				healer: 'Лекаўніца',
+				healer: 'Ацаляльніца',
 				night: 'Каралева ночы',
 				rockman: 'Чалавек-гора',
 				assassin: 'Чысьціцель',
 				unicorn: 'Дзева',
 				hunter: 'Стралок',
-				ghostlord: 'Жнец душаў',
+				ghostlord: 'Жняца душаў',
 				ratcatcher: 'Шчуралоў',
 				archeress: 'Лучніца',
 				werewolf: 'Іклан',
 				frogenglut: 'Жабін вершнік',
-				witchdoctor: 'Ведзьмак',
+				witchdoctor: 'Чараўнік',
 				manawyrm: 'Чаразмей',
 				bard: 'Бард',
 				naga: 'Майстар клінкоў',
@@ -4945,7 +4945,7 @@ class Build {
 
 	static async init(heroId, targetId, isWindow) {
 
-		Build.talents = new Object();
+		Build.talents = await fetch('content/talent_hero.json').then(resp => resp.json());
 
 		Build.descriptionView = document.createElement('div');
 
@@ -6345,8 +6345,6 @@ class Build {
 		}
 
 		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
-
-		Build.talents[data.id] = data;
 
 		talent.dataset.id = data.id;
 
