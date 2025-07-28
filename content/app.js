@@ -498,7 +498,7 @@ class Lang {
 				firefox: 'Агнявая ліса',
 				healer: 'Ацаляльніца',
 				night: 'Каралева ночы',
-				rockman: 'Чалавек-гора',
+				rockman: 'Чалавек-гара',
 				assassin: 'Чысьціцель',
 				unicorn: 'Дзева',
 				hunter: 'Стралок',
