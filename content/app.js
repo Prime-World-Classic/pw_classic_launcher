@@ -198,7 +198,6 @@ class Lang {
 				enterTextAndPressEnter: 'Enter the text and press Enter',
 				ready: 'Ready',
 				library: 'Library',
-				menu: 'Меню',
 				preferences: 'Preferences',
 				windowMode: 'Window mode',
 				radmin: 'RadminVPN Priority',
@@ -322,7 +321,6 @@ class Lang {
 				enterTextAndPressEnter: 'Введите текст и нажмите Enter',
 				ready: 'Готов',
 				library: 'Библиотека',
-				menu: 'Меню',
 				preferences: 'Настройки',
 				windowMode: 'Оконный режим',
 				radmin: 'Приоритет RadminVPN',
@@ -446,7 +444,6 @@ class Lang {
 				enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
 				ready: 'Гатоў',
 				library: 'Бібліятэка',
-				menu: 'Мяню',
 				preferences: 'Прылады',
 				windowMode: 'Аконны рэжым',
 				radmin: 'Прыярытэт RadminVPN',
@@ -2471,7 +2468,7 @@ class View {
 
 		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-		let menu = DOM({ style: ['castle-menu', 'button-outline'], title: Lang.text('menu'), event: ['click', () => Window.show('main', 'menu')] });
+		let menu = DOM({ style: ['castle-menu', 'button-outline'], event: ['click', () => Window.show('main', 'menu')] });
 
 		let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });
 
@@ -4067,7 +4064,6 @@ class Window {
 	}
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
-			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
 			DOM({style: 'castle-menu-items'},
 			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
