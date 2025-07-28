@@ -231,6 +231,7 @@ class Lang {
 				defenceMagic: 'Defence Magic',
 				skins: 'Skins',
 				training: 'Training',
+				newBuildTab: 'New build tab',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -355,6 +356,7 @@ class Lang {
 				defenceMagic: 'Защита духа',
 				skins: 'Скины',
 				training: 'Тренировка',
+				newBuildTab: 'Создать новую вкладку билда',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -479,6 +481,7 @@ class Lang {
 				defenceMagic: 'Абарона духу',
 				skins: 'Абалонкі',
 				training: 'Трэніроўка',
+				newBuildTab: 'Стварыць новую ўкладку білда',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -5214,7 +5217,7 @@ class Build {
 		if (builds.length < 6) {
 			const create = DOM({
 				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Создать новую вкладку билда',
+				title: Lang.text('newBuildTab'),
 				event: ['click', () => Build.buildSelectName('create', 'Создать билд', { heroId: Build.heroId }, isWindow)]
 			});
 
