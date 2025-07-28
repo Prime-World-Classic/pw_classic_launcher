@@ -501,7 +501,7 @@ class Lang {
 				rockman: 'Чалавек-гара',
 				assassin: 'Чысьціцель',
 				unicorn: 'Дзева',
-				hunter: 'Стралок',
+				hunter: 'Паляўнічы',
 				ghostlord: 'Жняца душаў',
 				ratcatcher: 'Шчуралоў',
 				archeress: 'Лучніца',
