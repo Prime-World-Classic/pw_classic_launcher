@@ -276,7 +276,7 @@ class Lang {
 				angel: 'Angel',
 				freeze: 'Freeze',
 				gunslinger: 'Gunslinger',
-				reaper: 'Reaper',
+				reaper: "Tu'Rekhu",
 				fluffy: 'Fluffy',
 				rifleman: 'Rifleman',
 				magicgirl: 'Magicgirl',
