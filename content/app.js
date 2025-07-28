@@ -235,6 +235,7 @@ class Lang {
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
 				classTalent: 'Class Talent',
+				stealBuild: 'Steal build?',
 				prince: 'Prince',
 				snowqueen: 'Snowqueen',
 				faceless: 'Faceless',
@@ -358,6 +359,7 @@ class Lang {
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
 				classTalent: 'Классовый',
+				stealBuild: 'Украть билд?',
 				prince: 'Дуэлянт',
 				snowqueen: 'Крио',
 				faceless: 'Безликий',
@@ -481,6 +483,7 @@ class Lang {
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
 				classTalent: 'Класавы',
+				stealBuild: 'Cкрасці білд?',
 				prince: 'Дуэлянт',
 				snowqueen: 'Крыё',
 				faceless: 'Безаблічны',
@@ -4799,7 +4802,7 @@ class Build {
 				Splash.hide();
 
 			}]
-		}, `Украсть билд?`);
+		}, Lang.text('stealBuild'));
 
 		let bottom = DOM({ style: 'build-bottom' }, get, DOM({ event: ['click', () => Splash.hide()] }, `[Х]`));
 
