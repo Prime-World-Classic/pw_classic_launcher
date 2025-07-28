@@ -107,6 +107,74 @@ class Settings {
     }
 }
 
+const idToName = [
+	'prince',
+	'snowqueen',
+	'faceless',
+	'warlord',
+	'thundergod',
+	'invisible',
+	'mowgly',
+	'inventor',
+	'artist',
+	'highlander',
+	'marine',
+	'firefox',
+	'healer',
+	'night',
+	'rockman',
+	'assassin',
+	'unicorn',
+	'hunter',
+	'ghostlord',
+	'ratcatcher',
+	'archeress',
+	'werewolf',
+	'frogenglut',
+	'witchdoctor',
+	'manawyrm',
+	'bard',
+	'naga',
+	'mage',
+	'fairy',
+	'witcher',
+	'alchemist',
+	'demonolog',
+	'vampire',
+	'witch',
+	'crusader_A',
+	'crusader_B',
+	'monster',
+	'angel',
+	'freeze',
+	'gunslinger',
+	'reaper',
+	'fluffy',
+	'rifleman',
+	'magicgirl',
+	'pinkgirl',
+	'ironknight',
+	'fallenangel',
+	'bladedancer',
+	'ent',
+	'plaguedoctor',
+	'katana',
+	'plane',
+	'zealot',
+	'wraithking',
+	'dryad',
+	'stalker',
+	'gunner',
+	'chronicle',
+	'brewer',
+	'shadow',
+	'wendigo',
+	'trickster',
+	'banshee',
+	'shaman',
+	'bomber',
+]
+
 class Lang {
 
 	static list = {
@@ -2569,7 +2637,7 @@ class View {
 
 			for (let item of result) {
 
-				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, item.name));
+				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, Lang.text(idToName[item.id])));
 
 				if (item.name.length > 10) {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
