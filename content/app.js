@@ -496,7 +496,7 @@ class Lang {
 				highlander: 'Гаравік',
 				marine: 'Камбат',
 				firefox: 'Агнявая ліса',
-				healer: 'Лекаўніца',
+				healer: 'Ацаляльніца',
 				night: 'Каралева ночы',
 				rockman: 'Чалавек-гора',
 				assassin: 'Чысьціцель',
