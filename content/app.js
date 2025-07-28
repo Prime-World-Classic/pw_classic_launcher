@@ -4945,7 +4945,7 @@ class Build {
 
 	static async init(heroId, targetId, isWindow) {
 
-		Build.talents = new Object();
+		Build.talents = await fetch('content/talent_hero.json').then(resp => resp.json());
 
 		Build.descriptionView = document.createElement('div');
 
@@ -6345,8 +6345,6 @@ class Build {
 		}
 
 		data.params = data.txtNum ? data.txtNum : data.params; //"all,8,74,num,razum";
-
-		Build.talents[data.id] = data;
 
 		talent.dataset.id = data.id;
 
