@@ -513,7 +513,7 @@ class Lang {
 				naga: 'Майстар клінкоў',
 				mage: 'Заклінальнік',
 				fairy: 'Фіксі',
-				witcher: 'Ведзьмар',
+				witcher: 'Вядзьмар',
 				alchemist: 'Дактрына',
 				demonolog: 'Дэманолаг',
 				vampire: 'Вампір',
