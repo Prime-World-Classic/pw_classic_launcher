@@ -516,7 +516,7 @@ class Lang {
 				witcher: 'Вядзьмар',
 				alchemist: 'Дактрына',
 				demonolog: 'Дэманолаг',
-				vampire: 'Вампір',
+				vampire: 'Вупыр',
 				witch: 'Вядзьмарка',
 				crusader_A: "Да'Ка",
 				crusader_B: "Ха'Ка",
