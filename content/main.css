@@ -2302,15 +2302,6 @@ border-radius:5px;
 	
 }
 
-.top-filter:after {
-	content: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям';
-	position: absolute;
-	width:100%;
-	text-align:center;
-	margin-top: 8cqw;
-	font-size: small;
-}
-
 .top-item{
 	
 	width:20cqw;
