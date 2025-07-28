@@ -270,8 +270,8 @@ class Lang {
 				demonolog: 'Demonolog',
 				vampire: 'Vampire',
 				witch: 'Witch',
-				crusader_A: 'Crusader_A',
-				crusader_B: 'Crusader_B',
+				crusader_A: "Da'ka",
+				crusader_B: "Kha'ka",
 				monster: 'Monster',
 				angel: 'Angel',
 				freeze: 'Freeze',
@@ -7360,8 +7360,8 @@ class Build {
 						let statValue = parseFloat(data.stats[key]);
 
 						if ('statsRefine' in data && 'rarity' in data) {
-							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-							let refineMul = parseFloat(data.statsRefine[key]);
+							let refineMul = Build.getTalentRefineByRarity(data.rarity);
+							let refineBonus = parseFloat(data.statsRefine[key]);
 							statValue += refineBonus * refineMul;
 						}
 
