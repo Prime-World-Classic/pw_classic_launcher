@@ -497,7 +497,7 @@ class Lang {
 				marine: 'Камбат',
 				firefox: 'Агнявая ліса',
 				healer: 'Ацаляльніца',
-				night: 'Каралева ночы',
+				night: 'Царыца ночы',
 				rockman: 'Чалавек-гара',
 				assassin: 'Чысьціцель',
 				unicorn: 'Дзева',
