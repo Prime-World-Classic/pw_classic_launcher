@@ -232,6 +232,7 @@ class Lang {
 				skins: 'Skins',
 				training: 'Training',
 				newBuildTab: 'New build tab',
+				buildDuplicate: 'Duplicate build',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -357,6 +358,7 @@ class Lang {
 				skins: 'Скины',
 				training: 'Тренировка',
 				newBuildTab: 'Создать новую вкладку билда',
+				buildDuplicate: 'Дублировать текущий билд',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -482,6 +484,7 @@ class Lang {
 				skins: 'Абалонкі',
 				training: 'Трэніроўка',
 				newBuildTab: 'Стварыць новую ўкладку білда',
+				buildDuplicate: 'Дубляваць бягучы білд',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -5232,7 +5235,7 @@ class Build {
 		const duplicate = DOM({
 		tag: 'button', 
 		style: ['build-action-item', 'btn-hover', 'color-1'],
-		title: 'Дублировать текущий билд',
+		title: Lang.text('buildDuplicate'),
 		event: ['click', async () => {
 			// Сохраняем ID текущего билда до любых действий
 			const currentBuildId = Build.id;
