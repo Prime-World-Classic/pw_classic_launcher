@@ -185,6 +185,7 @@ class Lang {
 			word: {
 				nickname: 'login/Nickname',
 				nicknameChange: 'Nickname change',
+				nickOfPlayer: 'Nickname of a player',
 				sideChange: 'Side change',
 				code: 'code/Telegram bot',
 				password: 'password',
@@ -314,6 +315,7 @@ class Lang {
 			word: {
 				nickname: 'Логин/Никнейм',
 				nicknameChange: 'Изменить никнейм',
+				nickOfPlayer: 'Ник игрока',
 				sideChange: 'Изменить сторону',
 				code: 'Инвайт-код',
 				password: 'Пароль',
@@ -443,6 +445,7 @@ class Lang {
 			word: {
 				nickname: 'Лагін/Нікнейм',
 				nicknameChange: 'Змяніць імя',
+				nickOfPlayer: 'Імя гульца',
 				sideChange: 'Змяніць старану',
 				code: 'Код/бот тэлеграм',
 				password: 'Пароль',
@@ -2698,7 +2701,7 @@ class View {
 			let buttonAdd = DOM({
 			style: 'castle-friend-item',
 			onclick: () => {
-				let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+				let input = DOM({ tag: 'input', style: 'search-input', placeholder: Lang.text('nickOfPlayer') });
 				let body = DOM({ style: 'search-body' });
 
 				// Создаём крестик для закрытия (как в buildSelectName)
