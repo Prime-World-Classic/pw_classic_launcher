@@ -242,6 +242,7 @@ class Lang {
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
 				classTalent: 'Class Talent',
 				stealBuild: 'Steal build?',
+				pressToSeeRating: 'Press to see the rating by hero',
 				prince: 'Prince',
 				snowqueen: 'Snowqueen',
 				faceless: 'Faceless',
@@ -372,6 +373,7 @@ class Lang {
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
 				classTalent: 'Классовый',
 				stealBuild: 'Украть билд?',
+				pressToSeeRating: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям',
 				prince: 'Дуэлянт',
 				snowqueen: 'Крио',
 				faceless: 'Безликий',
@@ -502,6 +504,7 @@ class Lang {
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
 				classTalent: 'Класавы',
 				stealBuild: 'Cкрасці білд?',
+				pressToSeeRating: 'Націсніце, каб паглядзець рэйтынг па асобных героям',
 				prince: 'Дуэлянт',
 				snowqueen: 'Крыё',
 				faceless: 'Безаблічны',
@@ -3425,7 +3428,7 @@ class View {
 
 		let top = DOM({ style: isSplah ? 'wtop-scroll' : 'top-scroll' },
 			DOM({
-				style: 'top-filter', title: 'Выберите героя, чтобы отсортировать игроков зала славы', event: ['click', async () => {
+				style: 'top-filter', event: ['click', async () => {
 
 					let request = await App.api.request('build', 'heroAll');
 
@@ -3469,7 +3472,7 @@ class View {
 					Splash.show(bodyHero, false);
 
 				}]
-			}, DOM({ tag: 'div' }), DOM({ tag: 'div' })));
+			}, DOM({ tag: 'div' }), DOM({ tag: 'div' })), DOM({style: 'help'}, Lang.text('pressToSeeRating')));
 
 		top.firstChild.classList.add('animation1');
 
