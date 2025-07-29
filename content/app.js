@@ -234,6 +234,7 @@ class Lang {
 				newBuildTab: 'New build tab',
 				buildDuplicate: 'Duplicate build',
 				generateRandomBuild: 'Generate random build',
+				resetTalents: 'Reset talents in this build',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -361,6 +362,7 @@ class Lang {
 				newBuildTab: 'Создать новую вкладку билда',
 				buildDuplicate: 'Дублировать текущий билд',
 				generateRandomBuild: 'Сгенерировать случайный билд',
+				resetTalents: 'Сбросить таланты в этом билде',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -488,6 +490,7 @@ class Lang {
 				newBuildTab: 'Стварыць новую ўкладку білда',
 				buildDuplicate: 'Дубляваць бягучы білд',
 				generateRandomBuild: 'Згенераваць выпадковы білд',
+				resetTalents: 'Скінуць таленты ў гэтым білдзе',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -5360,10 +5363,10 @@ class Build {
 			const resetBuild = DOM({
 				tag: 'button', 
 				style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Сбросить таланты в этом билде',
+				title: Lang.text('resetTalents'),
 				event: ['click', async () => {
 					const fragment = document.createDocumentFragment();
-					const title = DOM({ style: 'splash-text' }, 'Сбросить таланты в этом билде?');
+					const title = DOM({ style: 'splash-text' }, Lang.text('resetTalents') + '?');
 					fragment.append(title);
 					
 					// Красная кнопка сброса
