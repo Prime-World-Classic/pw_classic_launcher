@@ -238,6 +238,7 @@ class Lang {
 				resetTalents: 'Reset talents in this build',
 				reset: 'Reset',
 				cancel: 'Cancel',
+				wait: 'Waiting',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -378,6 +379,7 @@ class Lang {
 				resetTalents: 'Сбросить таланты в этом билде',
 				reset: 'Сбросить',
 				cancel: 'Отменить',
+				wait: 'Ожидание',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -518,6 +520,7 @@ class Lang {
 				resetTalents: 'Скінуць таленты ў гэтым білдзе',
 				reset: 'Скінуць',
 				cancel: 'Адмяняць',
+				wait: 'Чаканне',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -2963,7 +2966,7 @@ class View {
 				}
 				else if (item.status == 3) {
 
-					friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, 'Ожидание')));
+					friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('wait'))));
 
 					friend.style.filter = 'grayscale(1)';
 
