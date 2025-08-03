@@ -238,6 +238,7 @@ class Lang {
 				resetTalents: 'Reset talents in this build',
 				reset: 'Reset',
 				cancel: 'Cancel',
+				accept: 'Accept',
 				wait: 'Waiting',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
@@ -379,6 +380,7 @@ class Lang {
 				resetTalents: 'Сбросить таланты в этом билде',
 				reset: 'Сбросить',
 				cancel: 'Отменить',
+				accept: 'Принять',
 				wait: 'Ожидание',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
@@ -520,6 +522,7 @@ class Lang {
 				resetTalents: 'Скінуць таленты ў гэтым білдзе',
 				reset: 'Скінуць',
 				cancel: 'Адмяняць',
+				accept: 'Прыняць',
 				wait: 'Чаканне',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
@@ -2953,7 +2956,7 @@ class View {
 							}, 'Группа'));
 
 						}]
-					}, 'Принять'), DOM({
+					}, Lang.text('accept')), DOM({
 						style: 'castle-friend-cancel', event: ['click', async () => {
 
 							await App.api.request('friend', 'remove', { id: item.id });
@@ -7809,7 +7812,7 @@ class Events {
 				Splash.hide();
 
 			}]
-		}, 'Принять');
+		}, Lang.text('accept'));
 
 		let b2 = DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, 'Отмена');
 
