@@ -243,6 +243,14 @@ class Lang {
 				classTalent: 'Class Talent',
 				stealBuild: 'Steal build?',
 				pressToSeeRating: 'Press to see the rating by hero',
+
+				border: 'Borderlands',
+				forpost: 'Forpost',
+				dragonvald: 'Dragonvald',
+				arm: 'ARM',
+				challenge: 'Challenge',
+				duel: 'Duel',
+
 				prince: 'Prince',
 				snowqueen: 'Snowqueen',
 				faceless: 'Faceless',
@@ -374,6 +382,14 @@ class Lang {
 				classTalent: 'Классовый',
 				stealBuild: 'Украть билд?',
 				pressToSeeRating: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям',
+
+				border: 'Пограничье',
+				forpost: 'Форпост',
+				dragonvald: 'Драгонвальд',
+				arm: 'ARM',
+				challenge: 'Испытание',
+				duel: 'Дуэль',
+
 				prince: 'Дуэлянт',
 				snowqueen: 'Крио',
 				faceless: 'Безликий',
@@ -505,6 +521,14 @@ class Lang {
 				classTalent: 'Класавы',
 				stealBuild: 'Cкрасці білд?',
 				pressToSeeRating: 'Націсніце, каб паглядзець рэйтынг па асобных героям',
+
+				border: 'Памежжа',
+				forpost: 'Фарпост',
+				dragonvald: 'Цмокіта',
+				arm: 'ARM',
+				challenge: 'Выпрабаванне',
+				duel: 'Cутычка',
+
 				prince: 'Дуэлянт',
 				snowqueen: 'Крыё',
 				faceless: 'Безаблічны',
@@ -1706,7 +1730,10 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[9].append(DOM({ style: 'castle-button-play-queue', title: 'Очередь игроков матчмейкинга на данный режим игры' }));
 		
-		CastleNAVBAR.body.children[11].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[11].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('border'))
+		);
 		
 		CastleNAVBAR.body.children[11].onclick = () => {
 
@@ -1714,7 +1741,10 @@ class CastleNAVBAR {
 			
 		};
 		
-		CastleNAVBAR.body.children[12].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[12].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('forpost'))
+		);
 
 		CastleNAVBAR.body.children[12].onclick = () => {
 
@@ -1722,7 +1752,10 @@ class CastleNAVBAR {
 			
 		};
 		
-		CastleNAVBAR.body.children[13].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[13].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('dragonvald'))
+		);
 
 		CastleNAVBAR.body.children[13].onclick = () => {
 
@@ -1730,7 +1763,10 @@ class CastleNAVBAR {
 			
 		};
 		
-		CastleNAVBAR.body.children[14].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[14].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('arm'))
+		);
 
 		CastleNAVBAR.body.children[14].onclick = () => {
 
@@ -1738,7 +1774,10 @@ class CastleNAVBAR {
 			
 		};
 		
-		CastleNAVBAR.body.children[15].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[15].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('challenge'))
+		);
 		
 		CastleNAVBAR.body.children[15].onclick = () => {
 
@@ -1746,7 +1785,10 @@ class CastleNAVBAR {
 			
 		};
 		
-		CastleNAVBAR.body.children[16].append(DOM({style:'castle-button-play-queue-mode'}));
+		CastleNAVBAR.body.children[16].append(
+			DOM({style:'castle-button-play-queue-mode'}),
+			DOM({style: 'text'}, Lang.text('duel'))
+		);
 		
 		CastleNAVBAR.body.children[16].onclick = () => {
 
