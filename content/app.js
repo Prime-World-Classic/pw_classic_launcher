@@ -240,6 +240,7 @@ class Lang {
 				cancel: 'Cancel',
 				accept: 'Accept',
 				party: 'Party',
+				offline: 'Offline',
 				reject: 'Reject',
 				wait: 'Waiting',
 				authorizationSteam: 'Login with Steam',
@@ -385,6 +386,7 @@ class Lang {
 				accept: 'Принять',
 				reject: 'Отклонить',
 				party: 'Группа',
+				offline: 'Не в сети',
 				wait: 'Ожидание',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
@@ -529,6 +531,7 @@ class Lang {
 				accept: 'Прыняць',
 				reject: 'Адхіліць',
 				party: 'Гурт',
+				offline: 'Не ў сеціве',
 				wait: 'Чаканне',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
@@ -2890,7 +2893,7 @@ class View {
 
 				if (item.status == 1) {
 
-					let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? Lang.text('party') : 'Не в сети');
+					let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? Lang.text('party') : Lang.text('offline'));
 
 					if (!item.online) {
 
