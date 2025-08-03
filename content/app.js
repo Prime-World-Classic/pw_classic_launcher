@@ -237,6 +237,7 @@ class Lang {
 				generateRandomBuild: 'Generate random build',
 				resetTalents: 'Reset talents in this build',
 				reset: 'Reset',
+				cancel: 'Cancel',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
@@ -376,6 +377,7 @@ class Lang {
 				generateRandomBuild: 'Сгенерировать случайный билд',
 				resetTalents: 'Сбросить таланты в этом билде',
 				reset: 'Сбросить',
+				cancel: 'Отменить',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
@@ -515,6 +517,7 @@ class Lang {
 				generateRandomBuild: 'Згенераваць выпадковы білд',
 				resetTalents: 'Скінуць таленты ў гэтым білдзе',
 				reset: 'Скінуць',
+				cancel: 'Адмяняць',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
@@ -1816,7 +1819,7 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[0].style.display = 'block';
 
-		CastleNAVBAR.body.children[5].innerText = 'Отменить';
+		CastleNAVBAR.body.children[5].innerText = Lang.text('cancel');
 
 		//CastleNAVBAR.body.children[5].style.fontSize = '1.1vw';
 
@@ -2972,7 +2975,7 @@ class View {
 							friend.remove();
 
 						}]
-					}, 'Отменить'));
+					}, Lang.text('cancel')));
 
 				}
 
