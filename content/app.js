@@ -239,6 +239,8 @@ class Lang {
 				reset: 'Reset',
 				cancel: 'Cancel',
 				accept: 'Accept',
+				party: 'Party',
+				reject: 'Reject',
 				wait: 'Waiting',
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
@@ -381,6 +383,8 @@ class Lang {
 				reset: 'Сбросить',
 				cancel: 'Отменить',
 				accept: 'Принять',
+				reject: 'Отклонить',
+				party: 'Группа',
 				wait: 'Ожидание',
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
@@ -523,6 +527,8 @@ class Lang {
 				reset: 'Скінуць',
 				cancel: 'Адмяняць',
 				accept: 'Прыняць',
+				reject: 'Адхіліць',
+				party: 'Гурт',
 				wait: 'Чаканне',
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
@@ -2884,7 +2890,7 @@ class View {
 
 				if (item.status == 1) {
 
-					let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? 'Группа' : 'Не в сети');
+					let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? Lang.text('party') : 'Не в сети');
 
 					if (!item.online) {
 
@@ -2953,7 +2959,7 @@ class View {
 									App.notify(`Приглашение отправлено игроку ${item.nickname}`);
 
 								}]
-							}, 'Группа'));
+							}, Lang.text('party')));
 
 						}]
 					}, Lang.text('accept')), DOM({
@@ -2964,7 +2970,7 @@ class View {
 							friend.remove();
 
 						}]
-					}, 'Отклонить'));
+					}, Lang.text('reject')));
 
 				}
 				else if (item.status == 3) {
