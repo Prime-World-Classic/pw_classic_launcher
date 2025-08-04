@@ -2305,9 +2305,7 @@ border-radius:5px;
 .top-filter + .help
 {
 	position: absolute;
-	width: 100%;
-	text-align: center;
-	margin-top: 8cqw;
+	top: 8cqw;
 	font-size: small;
 }
 
