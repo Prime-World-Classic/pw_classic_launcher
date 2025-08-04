@@ -857,7 +857,7 @@ class Lang {
 
 			}
 		},
-		tr: {
+		ua: {
 			locale:['uk'],
 			name:'Ukraine',
 			word: {
