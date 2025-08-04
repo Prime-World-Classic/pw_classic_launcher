@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.6.5';
+PW_VERSION = '2.6.6';
 
 CURRENT_MM = 'mmtest'
 
@@ -9329,6 +9329,15 @@ class Chat {
 			nickname.style.fontWeight = 600;
 
 			nickname.classList.add('owner-text');
+
+		}
+		else if (data.id == -2) {
+
+			nickname.style.color = 'transparent';
+
+			nickname.style.fontWeight = 600;
+
+			nickname.classList.add('telegrambot-text');
 
 		}
 		else if (App.isAdmin(data.id)) {
