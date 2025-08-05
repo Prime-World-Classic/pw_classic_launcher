@@ -4929,8 +4929,8 @@ class Window {
 						}]
 					});
 					select.append(
-						DOM({tag: 'option', value: 'en'}, 'English'),
 						DOM({tag: 'option', value: 'ru'}, 'Русский'),
+						DOM({tag: 'option', value: 'en'}, 'English'),
 						DOM({tag: 'option', value: 'be'}, 'Беларуская'),
 						DOM({tag: 'option', value: 'ua'}, 'Українська'),
 						DOM({tag: 'option', value: 'tr'}, 'Turkey')
