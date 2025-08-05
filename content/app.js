@@ -1326,7 +1326,7 @@ class Lang {
 	}
 
 	static text(word) {
-		const w = Lang.list[localStorage.getItem('lang') || 'en'].word
+		const w = Lang.list[localStorage.getItem('lang') || 'ru'].word
 		if (word in w) {
 			return w[word];
 		}
@@ -4925,7 +4925,20 @@ class Window {
 				((() => {
 					const select = DOM({
 						tag: 'select', id: 'language', event: ['change', e => {
+							
 							localStorage.setItem('lang', e.target.value);
+							
+							if(NativeAPI.status){
+								
+								NativeAPI.reset();
+								
+							}
+							else{
+								
+								window.location.reload();
+								
+							}
+							
 						}]
 					});
 					select.append(
@@ -4935,7 +4948,7 @@ class Window {
 						DOM({tag: 'option', value: 'ua'}, 'Українська'),
 						DOM({tag: 'option', value: 'tr'}, 'Turkey')
 					);
-					select.value = localStorage.getItem('lang') || 'en';
+					select.value = localStorage.getItem('lang') || 'ru';
 					return select;
 				})()),
 				DOM({tag: 'label', for: 'language'}, 'Language')
