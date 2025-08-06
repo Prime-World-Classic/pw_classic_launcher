@@ -61,8 +61,8 @@ class Settings {
 		options = {
 			render: true,    // Применять настройки рендеринга по умолчанию
 			audio: true,     // Применять настройки звука по умолчанию
-			window: true,    // Применять настройки окна по умолчанию
-			...options       // Переопределение дефолтных значений
+			window: true    // Применять настройки окна по умолчанию
+   // Переопределение дефолтных значений
 		};
 	
 		try {
@@ -1449,11 +1449,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		
 	});
 	
+	NativeAPI.init();
+	
 	Settings.init();
 
 	Splash.init();
-
-	NativeAPI.init();
 	
 	Lang.init();
 
@@ -5731,9 +5731,18 @@ class Build {
 	}
 
 	static async init(heroId, targetId, isWindow) {
-
-		Build.talents = await fetch('content/talent_hero.json').then(resp => resp.json());
-
+		
+		if(NativeAPI.status){
+			
+			//Build.talents = await NativeAPI.fileSystem.promises.readFile('content/talent_hero.json','utf-8');
+			
+		}
+		else{
+			
+			//Build.talents = await fetch('content/talent_hero.json').then(resp => resp.json());
+			
+		}
+		
 		Build.descriptionView = document.createElement('div');
 
 		Build.CleanInvalidDescriptions();
@@ -5852,7 +5861,7 @@ class Build {
 		let request = await App.api.request('build', 'data', { heroId: heroId, target: targetId });
 
 		Build.dataRequest = request;
-
+		
 		Build.id = request.id;
 
 		Build.heroId = heroId;
@@ -9674,14 +9683,14 @@ class NativeAPI {
 		try {
 
 			if (!nw) {
-
+				
 				return;
 
 			}
-
+			
 		}
 		catch (e) {
-
+			
 			return;
 
 		}
