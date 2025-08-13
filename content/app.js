@@ -7598,7 +7598,7 @@ class App {
 				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
 				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858]};
+				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0};
 
 			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:49,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
 				
@@ -11506,7 +11506,7 @@ class MM {
 
 		});
 
-		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap() : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
+		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap(data.users[App.storage.data.id].team) : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
 
 		Sound.play('content/sounds/tambur.ogg', { id: 'tambur', volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop: true });
 
@@ -11538,9 +11538,9 @@ class MM {
 
 	}
 
-	static renderMap() {
+	static renderMap(team) {
 
-		MM.renderBody = DOM({ style: 'map' });
+		MM.renderBody = DOM({ style: (team == 1) ? 'map' : 'map-reverse' });
 
 		let container = DOM({ tag: 'div' }, MM.renderBody);
 
