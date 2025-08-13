@@ -11657,7 +11657,7 @@ class MM {
 		} catch (e) {
 			App.error(e);
 		}
-	
+		/*
 		if (data.mode == 3) {
 			ARAM.briefing(data.hero, data.role, () => {
 				MM.gameRunEvent();
@@ -11667,6 +11667,12 @@ class MM {
 			MM.gameRunEvent();
 			PWGame.start(data.key, MM.gameStopEvent);
 		}
+		*/
+		
+		MM.gameRunEvent();
+		
+		PWGame.start(data.key, MM.gameStopEvent);
+		
 	}
 
 	static eventChangeHero(data) {
