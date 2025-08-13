@@ -2898,6 +2898,8 @@ border-radius:5px;
 	background-size:107%;
 	border-radius:50%;
 	
+	
+	
 }
 
 .map{
@@ -2945,6 +2947,17 @@ border-radius:5px;
 
 .map-item-6{ left:11%; top:62%; }
 
+.map-reverse .map-item-1{ left:25%; top:14%; }
+
+.map-reverse .map-item-2{ left:44%; bottom:43%; }
+
+.map-reverse .map-item-3{ left:64%; bottom:12%; }
+
+.map-reverse .map-item-4{ left:20%; top:39%; }
+
+.map-reverse .map-item-5{ left:39%; bottom:19%; }
+
+.map-reverse .map-item-6{ left:11%; top:63%; }
 
 @keyframes borderRotate {
 	100% {
