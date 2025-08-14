@@ -2547,8 +2547,8 @@ border-radius:5px;
 #ADMStat{
 	
 	position:fixed;
-	top:9cqh;
-	right:2cqh;
+	top:0;
+	right:0;
 	z-index:9999;
     font: 1cqw / 1 Arial;
 	padding:0.3vw;
