@@ -7682,7 +7682,7 @@ class App {
 				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
 				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0};
+				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0,hero:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']};
 
 			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:48,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
 				
@@ -11550,6 +11550,22 @@ class MM {
 		let activeRankName = '';
 
 		for (let item of MM.hero) {
+			
+			if(!item.id){
+				
+				continue;
+				
+			}
+			
+			if( ('hero' in data) && (data.hero.length) ){
+				
+				if(!data.hero.includes(`${item.id}`)){
+					
+					continue;
+					
+				}
+				
+			}
 
 			let getRankName = Rank.getName(item.rating);
 
