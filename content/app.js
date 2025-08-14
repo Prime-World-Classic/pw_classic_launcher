@@ -7684,7 +7684,7 @@ class App {
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
 				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0};
 
-			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:49,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
+			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:48,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
 				
 			  MM.lobby(obj);
 			
@@ -11371,13 +11371,29 @@ class MM {
 			
 			let build = await App.api.request('build', 'rebuild', { id: target });
 			
+			if (MM.lobbyBuildField.firstChild) {
+				
+				MM.lobbyBuildField.firstChild.remove();
+				
+			}
+			
 			MM.lobbyBuildField.append(Build.viewModel(build.body, false, false));
 			
 			notify = true;
 			
-			random.innerText = 'Сгенерировать билд';
+			for (let item of builds) {
+				
+				if(item.id == target){
+					
+					item.body = build.body;
+					
+				}
+				
+			}
 			
-		}]},'Сгенерировать билд');
+			random.innerText = 'Случайный билд';
+			
+		}]},'Случайный билд');
 		
 		random.style.width = 'auto';
 		
