@@ -11304,6 +11304,8 @@ class MM {
 		}
 
 		let builds = await App.api.request('build', 'my', { hero: heroId });
+		
+		let target = 0;
 
 		for (let build of builds) {
 
@@ -11311,6 +11313,8 @@ class MM {
 				event: ['click', async () => {
 
 					await App.api.request('build', 'target', { id: build.id });
+					
+					target = build.id;
 
 					for (let child of MM.lobbyBuildTab.children) {
 
@@ -11332,6 +11336,8 @@ class MM {
 			}, build.name);
 
 			if (build.target) {
+				
+				target = build.id;
 
 				tab.style.background = 'rgba(255,255,255,0.3)';
 
@@ -11348,7 +11354,35 @@ class MM {
 			MM.lobbyBuildTab.append(tab);
 
 		}
-
+		
+		let notify = true, random = DOM({style:'ready-button',event:['click', async () => {
+			
+			if(notify){
+				
+				random.innerText = 'Перезаписать текущий билд?';
+				
+				notify = false;
+				
+				return;
+				
+			}
+			
+			random.innerText = 'Генерация...';
+			
+			let build = await App.api.request('build', 'rebuild', { id: target });
+			
+			MM.lobbyBuildField.append(Build.viewModel(build.body, false, false));
+			
+			notify = true;
+			
+			random.innerText = 'Сгенерировать билд';
+			
+		}]},'Сгенерировать билд');
+		
+		random.style.width = 'auto';
+		
+		MM.lobbyBuildTab.append(random);
+		
 	}
 
 	static async lobby(data) {
