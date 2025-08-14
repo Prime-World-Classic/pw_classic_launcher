@@ -7670,7 +7670,7 @@ class App {
 		await App.storage.init({ id: 0, token: '', login: '' });
 
 		await MM.init();
-		
+		/*
 		setTimeout(() => {
 			let obj = {id:1, users:{
 				10:{nickname:'Nesh',hero:15,ready:1,rating:1300,select:false,team:1},
@@ -7696,7 +7696,7 @@ class App {
 			MM.chat({id:7,message:'тестовое сообщение'});
 			
 		},2000);
-		
+		*/
 		/*
 		setTimeout(() => {
 			
