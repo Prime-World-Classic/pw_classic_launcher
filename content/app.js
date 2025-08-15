@@ -1300,6 +1300,8 @@ class CastleNAVBAR {
 	static state = false;
 
 	static mode = 0;
+	
+	static stateDefaultMode = 0;
 
 	static init() {
 
@@ -1336,14 +1338,14 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[3].onclick = () => {
 
-			App.error('Привет от ifst 😎');
-
+			// App.error('Привет от ifst 😎');
+			
 		}
 
 		CastleNAVBAR.body.children[4].onclick = () => {
 
-			App.error('Товарищеские матчи в процессе разработки...');
-
+			// App.error('Товарищеские матчи в процессе разработки...');
+			
 		}
 
 		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
@@ -1424,6 +1426,26 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[18].append(DOM({tag:'div'}));
 		
 		return CastleNAVBAR.body.children[5];
+		
+	}
+	
+	static defaultMode(id){
+		
+		if( (CastleNAVBAR.stateDefaultMode) && (CastleNAVBAR.stateDefaultMode == id) ){
+			
+			return;
+			
+		}
+		
+		if(CastleNAVBAR.state){
+			
+			return;
+			
+		}
+		
+		CastleNAVBAR.setMode(id);
+		
+		CastleNAVBAR.stateDefaultMode = id;
 		
 	}
 
@@ -7486,7 +7508,13 @@ class Events {
 	static MMQueueV2(data) {
 
 		CastleNAVBAR.queue(data);
-
+		
+		if( ('default' in data) && (data.default) ){
+			
+			CastleNAVBAR.defaultMode(data.default);
+			
+		}
+		
 	}
 
 	static ADMStat(data) {
