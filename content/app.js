@@ -1431,6 +1431,18 @@ class CastleNAVBAR {
 	
 	static defaultMode(id){
 		
+		if(!id){
+			
+			if(CastleNAVBAR.stateDefaultMode){
+				
+				CastleNAVBAR.stateDefaultMode = 0;
+				
+			}
+			
+			return;
+			
+		}
+		
 		if( (CastleNAVBAR.stateDefaultMode) && (CastleNAVBAR.stateDefaultMode == id) ){
 			
 			return;
