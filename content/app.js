@@ -4497,8 +4497,8 @@ class Build {
 				}
 
 				await App.api.request('build', 'steal', { user: user, hero: hero });
-
-				View.show('build', hero);
+				
+				await Window.show('main', 'build', hero, 0, true);
 
 				Splash.hide();
 
