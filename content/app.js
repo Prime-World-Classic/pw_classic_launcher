@@ -2233,13 +2233,37 @@ class View {
 
 		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-		let menu = DOM({ style: ['castle-menu', 'button-outline'], title: Lang.text('menu'), event: ['click', () => Window.show('main', 'menu')] });
+		let menu = DOM({ style: ['castle-menu', 'button-outline'], event: ['click', () => Window.show('main', 'menu')] });
 
 		let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
+		let stats = DOM({style: ['castle-stats', 'button-outline'], title: 'Статистика', event: ['click', () => {
+    const onEsc = (e) => {
+		if (e.key === 'Escape') {
+        Splash.hide();
+        document.removeEventListener('keydown', onEsc);
+      }
+    };
+    document.addEventListener('keydown', onEsc, { once: true });
 
+    Splash.show(
+      DOM(
+        {
+          style: 'iframe-stats',
+          
+          event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }]
+        },
+        
+        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+        
+        DOM({ tag: 'iframe', src: 'https://stat.26rus-game.ru', style: 'iframe-stats-frame' })
+      ),
+      false
+    );
+  }]
+});
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
 		input.type = 'range';
@@ -2248,7 +2272,7 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history);
+		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history, stats);
 
 		return body;
 
