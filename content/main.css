@@ -54,9 +54,30 @@ overflow: hidden;
 container-type: inline-size;
 }
 
-input,button,img {
+input,button,img,iframe {
 	padding: 0;
 	margin: 0;
+	border:none;
+}
+
+.iframe-stats iframe{
+	
+	width:100vw;
+	height:100vh;
+	
+}
+
+.iframe-stats-navbar{
+	
+	width:3vw;
+	height:3vw;
+	border-radius:50%;
+	position:fixed;
+	z-index:999;
+	background:rgba(255,255,255,0.1);
+	padding:1vw;
+	text-align:center;
+	
 }
 
 .noselect {
