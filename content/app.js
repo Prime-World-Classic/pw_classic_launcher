@@ -7660,6 +7660,13 @@ class App {
 			
 		},3000);
 		*/
+		/*
+		setTimeout(() => {
+			
+			Splash.show(DOM({style:'iframe-stats'},DOM({style:'iframe-stats-navbar',event:['click',() => Splash.hide()]},'X'),DOM({tag:'iframe',src:'https://stat.26rus-game.ru'})),false);
+			
+		},3000);
+		*/
 		Chat.init();
 		
 		try{
