@@ -106,167 +106,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   height: 100%;
 }
 
-
-
-/* === РУНЫ (иконки поверх разделителя) === */
-
-/* Руна «мечи» */
-.banner-icon--rune-swords {
-    background-image: url('./img/queue/Rune.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 0s;
-}
-
-/* Руна «дракон» */
-.banner-icon--rune-dragon {
-    background-image: url('./img/queue/Rune2.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 0.3s;
-}
-
-/* Руна «роза» */
-.banner-icon--rune-rose {
-    background-image: url('./img/queue/Rune3.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 0.6s;
-}
-
-/* Руна «свиток» */
-.banner-icon--rune-scroll {
-    background-image: url('./img/queue/Rune_4.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 0.9s;
-}
-
-/* Руна «VS» */
-.banner-icon--rune-vs {
-    background-image: url('./img/queue/Rune7.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 1.2s;
-}
-
-/* Руна «свитки» */
-.banner-icon--rune-scrolls {
-    background-image: url('./img/queue/Rune6.png');
-    z-index: 4;
-    animation: pulse 2s infinite ease-in-out 1.5s;
-}
-
-
-
-/* Иконка разделителя */
-.banner-icon--razdel {
-    background-image: url('./img/queue/razdel.png');
-    height: 16px;
-    width: 16px;
-}
-
-/* позиционка рун */
-.banner-separator-wrap {
-    position: relative;
-    display: inline-block;
-    height: 40px; 
-}
-
-
-
-.banner-item {
-    display: inline-block;
-    vertical-align: top;
-}
-
-.banner-icon {
-    background-repeat: no-repeat;
-    background-size: contain;
-    display: block;
-}
-
-.banner-count {
-    margin-top: 2px; 
-}
-
-/* Позиционирование иконок рун поверх разделителя */
-.banner-separator-wrap .banner-icon--razdel {
-    position: relative; 
-}
-
-.banner-separator-wrap .banner-icon--rune-swords,
-.banner-separator-wrap .banner-icon--rune-dragon,
-.banner-separator-wrap .banner-icon--rune-rose,
-.banner-separator-wrap .banner-icon--rune-scroll,
-.banner-separator-wrap .banner-icon--rune-vs,
-.banner-separator-wrap .banner-icon--rune-scrolls {
-    position: absolute;
-    top: 20px; 
-    z-index: 4;
-}
-
-
-
-/* Пульсация рун с желтым свечением */
-@keyframes pulse {
-    0%   { filter: drop-shadow(0 0 0px #ffd700) brightness(1); }
-    50%  { filter: drop-shadow(0 0 10px #ffd700) brightness(1.2); }
-    100% { filter: drop-shadow(0 0 0px #ffd700) brightness(1); }
-}
-
-
-
-/* При наведение + фонарик */
-.banner-separator-wrap .banner-icon--rune-swords:hover,
-.banner-separator-wrap .banner-icon--rune-dragon:hover,
-.banner-separator-wrap .banner-icon--rune-rose:hover,
-.banner-separator-wrap .banner-icon--rune-scroll:hover,
-.banner-separator-wrap .banner-icon--rune-vs:hover,
-.banner-separator-wrap .banner-icon--rune-scrolls:hover {
-    filter: drop-shadow(0 0 15px #ffd700) brightness(1.2); /* Enhanced yellow glow on hover */
-    transform: scale(1.2); 
-    transition: filter 0.3s ease, transform 0.3s ease; 
-}
-
-
-
-.castle-banner-online .banner-item .tooltip-bubble-img--icon {
-  display: none;
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 0.6cqh);
-  transform: translateX(-50%) !important; 
-  width: auto;
-  height: auto;
-  background: none !important;
-  padding: 0;
-  border: 0;
-  box-shadow: none;
-  pointer-events: none;
-  z-index: 60;
-  opacity: 0;
-  transition: opacity .12s ease-out, transform .12s ease-out;
-}
-.castle-banner-online .banner-item .tooltip-bubble-img--icon::after { content: none !important; }
-
-.castle-banner-online .banner-item .tooltip-bubble-img--icon .tooltip-text {
-  position: static;
-  transform: none !important;
-  margin: 0;
-  color: #fff;
-  font: bold 1.2cqh/1.6cqh 'Tahoma', sans-serif;
-  text-align: center;
-  white-space: nowrap;
-  /* при желании можно добавить читаемость: */
-   text-shadow: 0 .1cqh .2cqh rgba(0,0,0,.6); 
-}
-
-.castle-banner-online .banner-item:hover .tooltip-bubble-img--icon,
-.castle-banner-online .banner-item:focus-within .tooltip-bubble-img--icon {
-  display: block;
-  opacity: 1;
-  transform: translateX(-50%) translateY(0.1cqh) !important;
-}
-
-
-
-
+/* castle.css */
 
 .castle-banner-online {
   position: relative;
@@ -327,10 +167,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .castle-banner-online .question-icon {
-    width: 75%;
-    height: 75%;
+    width: 90%;
+    height: 90%;
     background: url('./img/queue/Spravka.png') no-repeat center/contain;
-    opacity: 30%;
+    opacity: 50%;
 }
 
 .castle-banner-online .question-icon:hover {
@@ -374,10 +214,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .banner-icon--cte { background-image: url('./img/m3.png'); }
 .banner-icon--m4 { background-image: url('./img/m4.png'); height: 2.4cqh; width: 2.2cqh; }
 .banner-icon--pve-ep2-red { background-image: url('./img/m6.png'); }
-.banner-icon--custom-battle { background-image: url('./img/m5.png'); height: 3.7cqh !important; }
+.banner-icon--custom-battle { background-image: url('./img/m5.png'); }
 .banner-icon--stat { background-image: url('./img/queue/stat.png'); }
-
-
 
 .castle-banner-online .banner-count {
     margin-top: 0.4cqh;

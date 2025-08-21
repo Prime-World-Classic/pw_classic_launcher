@@ -2155,10 +2155,11 @@ class View {
 
 	}
 	
-static castleBannerOnline() {
+	static castleBannerOnline() {
+		
     const modeMap = {
         pvp: 0,
-        anderkrug: 1,
+        anderkrug: 1,	
         cte: 2,
         m4: 3,
         'pve-ep2-red': 4,
@@ -2170,55 +2171,44 @@ static castleBannerOnline() {
         label: () => View.getQueue(cssKey)
     }));
 
-    const runeIcons = [
-        'rune-swords',
-        'rune-dragon',
-        'rune-rose',
-        'rune-scroll',
-        'rune-vs',
-        'rune-scrolls'
-    ];
-
     const banner = DOM({ style: ['castle-banner-online'] });
 
-    
+    // Украшение слева
     banner.append(DOM({ style: ['banner-ornament'] }));
 
-    
+    // Основные иконки режимов + подписи
     bannerItems.forEach((item, idx) => {
         const wrap = DOM({ style: ['banner-item'] });
         const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
         const lbl = DOM({ tag: 'div', style: ['banner-count'] });
+
         lbl.textContent = item.label();
 
         wrap.append(icon, lbl);
         banner.append(wrap);
 
-        
         if (idx < bannerItems.length - 1) {
-            const separatorWrap = DOM({ style: ['banner-separator-wrap'] });
-            const runeIcon = DOM({ style: ['banner-icon', `banner-icon--${runeIcons[idx]}`] });
-            const razdelIcon = DOM({ style: ['banner-icon', 'banner-icon--razdel'] }); 
-
-            separatorWrap.append(runeIcon, razdelIcon);
-            banner.append(separatorWrap);
+            banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
         }
     });
 
-    
+    // Правый блок статистики (прямоугольник + круг + иконка)
     const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
     const statRect = DOM({ style: ['banner-stat-rect'] });
     const statCircle = DOM({ style: ['banner-stat-circle'] });
     const statIcon = DOM({ style: ['banner-icon', 'banner-icon--stat'] });
+
     statCircle.append(statIcon);
     statWrapper.append(statRect, statCircle);
 
-    
+    // Вопросительный знак и тултип
     const tooltipWrap = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
     const questionIcon = DOM({ tag: 'div', style: ['question-icon'] });
     const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
     const tooltipText = DOM({ tag: 'div', style: ['tooltip-text'] });
+
     tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+
     tooltipBubble.append(tooltipText);
     tooltipWrap.append(questionIcon, tooltipBubble);
     banner.append(tooltipWrap);
@@ -2227,7 +2217,6 @@ static castleBannerOnline() {
 
     return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
-
 
 	static castleSettings() {
 
