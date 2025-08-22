@@ -357,76 +357,84 @@ class News {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-	
-	window.addEventListener('message',(event) => {
 
-		if (event.data == '') {
-			return;
-		}
-		
-		if( !('action' in event.data) ){
-			
-			return;
-			
-		}
-		
-		if(event.data.action in ParentEvent){
-			
-			ParentEvent[event.data.action](event.data.body);
-			
-		}
-		
-		console.log('event.data',event.data);
-		
-	});
-	
-	Splash.init();
+  window.addEventListener('message', (event) => {
+    if (event.data == '') return;
+    if (!('action' in event.data)) return;
+    if (event.data.action in ParentEvent) {
+      ParentEvent[event.data.action](event.data.body);
+    }
+    console.log('event.data', event.data);
+  });
 
-	NativeAPI.init();
-	
-	Lang.init();
+  Splash.init();
+  NativeAPI.init();
+  Lang.init();
 
-	NativeAPI.update((data) => {
+  NativeAPI.update((data) => {
+    if (View.updateProgress) {
+      Splash.hide();
+    }
+    if (data.update) {
+      View.updateProgress = View.progress();
+      View.updateProgress.firstChild.style.width = data.total + '%';
+      View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
+    }
+  });
 
-		if (View.updateProgress) {
+  App.findBestHostAndInit();
+  Settings.init();
 
-			Splash.hide();
+  // === ▼▼▼ ДОБАВЬ ЭТО ▼▼▼ ===
+  // Универсально достаём divisionId из того, что у тебя есть.
+  function getDivisionId() {
+    // подставь своё реальное поле, если оно есть
+    return (
+      (window.User && (User.divisionId || User.rank || User.rating)) ||
+      (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+      10 // безопасный дефолт «Рядовой»
+    );
+  }
 
-		}
+  // Ждём появления .castle-button-play-division в DOM и только затем рендерим
+  function ensureDivisionRendered(id) {
+    const el = document.querySelector('.castle-button-play-division');
+    if (el) {
+      Division.render(id);
+      return;
+    }
+    // если баннер строится позже — наблюдаем за DOM
+    const mo = new MutationObserver(() => {
+      const el2 = document.querySelector('.castle-button-play-division');
+      if (el2) {
+        mo.disconnect();
+        Division.render(id);
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
 
-		if (data.update) {
+  ensureDivisionRendered(getDivisionId());
+  // === ▲▲▲ ДОБАВЬ ЭТО ▲▲▲ ===
 
-			View.updateProgress = View.progress();
-
-			View.updateProgress.firstChild.style.width = data.total + '%';
-
-			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
-
-		}
-
-	});
-
-	App.findBestHostAndInit();
-
-	Settings.init();
-
-	let testRadminConnection = async () => {
-		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
-		if (hasConnection) {
-			PWGame.radminHasConnection = true;
-		}
-	}
-	let testMainConnection = async () => {
-		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
-		if (hasConnection) {
-			PWGame.mainServerHasConnection = true;
-		}
-	}
-	setTimeout(_ => {
-		testRadminConnection();
-		testMainConnection();
-	}, 3000);
+  let testRadminConnection = async () => {
+    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
+    if (hasConnection) {
+      PWGame.radminHasConnection = true;
+    }
+  }
+  let testMainConnection = async () => {
+    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
+    if (hasConnection) {
+      PWGame.mainServerHasConnection = true;
+    }
+  }
+  setTimeout(_ => {
+    testRadminConnection();
+    testMainConnection();
+  }, 3000);
 });
+
 
 class DataBase {
 
@@ -2154,69 +2162,141 @@ class View {
 		return body;
 
 	}
-	
+
+
+
 	static castleBannerOnline() {
-		
-    const modeMap = {
-        pvp: 0,
-        anderkrug: 1,	
-        cte: 2,
-        m4: 3,
-        'pve-ep2-red': 4,
-        'custom-battle': 5
-    };
 
-    const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
-        cssKey,
-        label: () => View.getQueue(cssKey)
-    }));
+	const getDivisionId = () =>
+    (window.User && (User.divisionId || User.rank || User.rating)) ||
+    (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+    10;
 
-    const banner = DOM({ style: ['castle-banner-online'] });
+  const modeMap = {
+    pvp: 0,
+    anderkrug: 1,
+    cte: 2,
+    m4: 3,
+    'pve-ep2-red': 4,
+    'custom-battle': 5
+  };
 
-    // Украшение слева
-    banner.append(DOM({ style: ['banner-ornament'] }));
+  const medalMap = {
+    pvp: 'gold',
+    anderkrug: 'gold',
+    cte: 'gold',
+    m4: 'gold',
+    'pve-ep2-red': 'gold',
+    'custom-battle': 'silver'
+  };
 
-    // Основные иконки режимов + подписи
-    bannerItems.forEach((item, idx) => {
-        const wrap = DOM({ style: ['banner-item'] });
-        const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
-        const lbl = DOM({ tag: 'div', style: ['banner-count'] });
+  const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
+    cssKey,
+    label: () => View.getQueue(cssKey)
+  }));
 
-        lbl.textContent = item.label();
+  const banner = DOM({ style: ['castle-banner-online'] });
+  banner.append(DOM({ style: ['banner-ornament'] }));
 
-        wrap.append(icon, lbl);
-        banner.append(wrap);
+  
+  bannerItems.forEach((item, idx) => {
+    const wrap = DOM({ style: ['banner-item'] });
 
-        if (idx < bannerItems.length - 1) {
-            banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
-        }
+    
+    const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
+    wrap.append(icon);
+
+   
+    const lbl = DOM({ tag: 'div', style: ['banner-count'] });
+    lbl.textContent = item.label();
+    wrap.append(lbl);
+
+    // медаль
+    const type = medalMap[item.cssKey] || 'gold';
+    const disabled = (type === 'silver');
+
+    const medal = DOM({
+      tag: 'span',
+      style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
     });
 
-    // Правый блок статистики (прямоугольник + круг + иконка)
-    const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
-    const statRect = DOM({ style: ['banner-stat-rect'] });
-    const statCircle = DOM({ style: ['banner-stat-circle'] });
-    const statIcon = DOM({ style: ['banner-icon', 'banner-icon--stat'] });
+    if (disabled) {
+      medal.title = 'Режим временно недоступен';
+    } else {
+      medal.title = 'Посмотреть статистику по режиму';
+      medal.setAttribute('role', 'button');
+      medal.tabIndex = 0;
+      const openStats = () => {
+        if (typeof View?.openModeStats === 'function') View.openModeStats(item.cssKey);
+      };
+      medal.addEventListener('click', openStats);
+      medal.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
+      });
+    }
 
-    statCircle.append(statIcon);
-    statWrapper.append(statRect, statCircle);
+    wrap.append(medal);
+    banner.append(wrap);
 
-    // Вопросительный знак и тултип
-    const tooltipWrap = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
-    const questionIcon = DOM({ tag: 'div', style: ['question-icon'] });
-    const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
-    const tooltipText = DOM({ tag: 'div', style: ['tooltip-text'] });
+    if (idx < bannerItems.length - 1) {
+      banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
+    }
+  });
 
-    tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+  
+  const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
+  const statRect    = DOM({ style: ['banner-stat-rect'] });
+  const statCircle  = DOM({ style: ['banner-stat-circle'] });
 
-    tooltipBubble.append(tooltipText);
-    tooltipWrap.append(questionIcon, tooltipBubble);
-    banner.append(tooltipWrap);
+  // Кнопка Stat
+  const statsBtn = DOM({
+    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+    title: 'Статистика',
+    event: ['click', () => {
+      const onEsc = (e) => {
+        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+      };
+      document.addEventListener('keydown', onEsc, { once: true });
+      Splash.show(
+        DOM(
+          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+          DOM({ tag: 'iframe', src: 'https://pw2.26rus-game.ru/stats/?tab=info&q=&user_id=0', style: 'iframe-stats-frame' })
+        ),
+        false
+      );
+    }]
+  });
 
-    banner.append(statWrapper);
+  // ► Бейдж дивизии ПОД кнопкой Stat
+  const divId = getDivisionId();
+  const divInfo = typeof Division?.get === 'function'
+    ? Division.get(divId)
+    : { name: 'Дивизион', icon: 1 };
 
-    return DOM({ style: 'castle-banner-online-wrapper' }, banner);
+  const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
+  divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
+  divisionBadgeUnderStat.title = divInfo.name;
+
+  
+  statCircle.append(statsBtn, divisionBadgeUnderStat);
+  statWrapper.append(statRect, statCircle);
+
+  const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
+  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
+  const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
+  const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
+  tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+  tooltipBubble.append(tooltipText);
+  tooltipWrap.append(questionIcon, tooltipBubble);
+
+  banner.append(tooltipWrap, statWrapper);
+
+  return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
+
+
+
 
 	static castleSettings() {
 
@@ -2239,31 +2319,7 @@ class View {
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
-		let stats = DOM({style: ['castle-stats', 'button-outline'], title: 'Статистика', event: ['click', () => {
-    const onEsc = (e) => {
-		if (e.key === 'Escape') {
-        Splash.hide();
-        document.removeEventListener('keydown', onEsc);
-      }
-    };
-    document.addEventListener('keydown', onEsc, { once: true });
-
-    Splash.show(
-      DOM(
-        {
-          style: 'iframe-stats',
-          
-          event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }]
-        },
-        
-        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
-        
-        DOM({ tag: 'iframe', src: 'https://stat.26rus-game.ru', style: 'iframe-stats-frame' })
-      ),
-      false
-    );
-  }]
-});
+		
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
 		input.type = 'range';
@@ -2272,7 +2328,7 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history, stats);
+		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history);
 
 		return body;
 
@@ -4427,37 +4483,28 @@ class Rank {
 }
 
 class Division {
-	
-	static list = {
-	10:{name:'Рядовой',icon:3}, 
-	20:{name:'Капрал',icon:4},  
-	30:{name:'Сержант',icon:5}, 
-	40:{name:'Лейтенант',icon:6}, 
-	50:{name:'Капитан',icon:7},  
-	60:{name:'Майор',icon:8},  
-	70:{name:'Подполковник',icon:9}, 
-	80:{name:'Полковник',icon:10},  
-	90:{name:'Генерал',icon:11}, 
-	100:{name:'Маршал',icon:12} 
-	};
-	
-	static get(id){
-		
-		for(let key in Division.list){
-			
-			if(id <= key){
-				
-				return Division.list[key];
-				
-			}
-			
-		}
-		
-		return {name:'Не определено',icon:1};
-		
-	}
-	
+  static list = {
+    10:{name:'Рядовой',icon:3}, 
+    20:{name:'Капрал',icon:4},  
+    30:{name:'Сержант',icon:5}, 
+    40:{name:'Лейтенант',icon:6},
+    50:{name:'Капитан',icon:7}
+  };
+
+  static get(id){
+    return this.list[id] || {name:'Неизвестно',icon:0};
+  }
+
+  static show(id, container){
+    const div = this.get(id);
+    const icon = DOM({ style:['division-icon'] });
+    icon.style.backgroundImage = `url(content/ranks/${div.icon}.webp)`;
+    icon.title = div.name;
+    container.append(icon);
+  }
 }
+
+
 
 class Build {
 
