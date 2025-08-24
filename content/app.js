@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.6.12';
+PW_VERSION = '2.6.10';
 
 CURRENT_MM = 'mmtest'
 
@@ -357,76 +357,84 @@ class News {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-	
-	window.addEventListener('message',(event) => {
 
-		if (event.data == '') {
-			return;
-		}
-		
-		if( !('action' in event.data) ){
-			
-			return;
-			
-		}
-		
-		if(event.data.action in ParentEvent){
-			
-			ParentEvent[event.data.action](event.data.body);
-			
-		}
-		
-		console.log('event.data',event.data);
-		
-	});
-	
-	Splash.init();
+  window.addEventListener('message', (event) => {
+    if (event.data == '') return;
+    if (!('action' in event.data)) return;
+    if (event.data.action in ParentEvent) {
+      ParentEvent[event.data.action](event.data.body);
+    }
+    console.log('event.data', event.data);
+  });
 
-	NativeAPI.init();
-	
-	Lang.init();
+  Splash.init();
+  NativeAPI.init();
+  Lang.init();
 
-	NativeAPI.update((data) => {
+  NativeAPI.update((data) => {
+    if (View.updateProgress) {
+      Splash.hide();
+    }
+    if (data.update) {
+      View.updateProgress = View.progress();
+      View.updateProgress.firstChild.style.width = data.total + '%';
+      View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
+    }
+  });
 
-		if (View.updateProgress) {
+  App.findBestHostAndInit();
+  Settings.init();
 
-			Splash.hide();
+  // === ▼▼▼ ДОБАВЬ ЭТО ▼▼▼ ===
+  // Универсально достаём divisionId из того, что у тебя есть.
+  function getDivisionId() {
+    // подставь своё реальное поле, если оно есть
+    return (
+      (window.User && (User.divisionId || User.rank || User.rating)) ||
+      (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+      10 // безопасный дефолт «Рядовой»
+    );
+  }
 
-		}
+  // Ждём появления .castle-button-play-division в DOM и только затем рендерим
+  function ensureDivisionRendered(id) {
+    const el = document.querySelector('.castle-button-play-division');
+    if (el) {
+      Division.render(id);
+      return;
+    }
+    // если баннер строится позже — наблюдаем за DOM
+    const mo = new MutationObserver(() => {
+      const el2 = document.querySelector('.castle-button-play-division');
+      if (el2) {
+        mo.disconnect();
+        Division.render(id);
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
 
-		if (data.update) {
+  ensureDivisionRendered(getDivisionId());
+  // === ▲▲▲ ДОБАВЬ ЭТО ▲▲▲ ===
 
-			View.updateProgress = View.progress();
-
-			View.updateProgress.firstChild.style.width = data.total + '%';
-
-			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
-
-		}
-
-	});
-
-	App.findBestHostAndInit();
-
-	Settings.init();
-
-	let testRadminConnection = async () => {
-		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
-		if (hasConnection) {
-			PWGame.radminHasConnection = true;
-		}
-	}
-	let testMainConnection = async () => {
-		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
-		if (hasConnection) {
-			PWGame.mainServerHasConnection = true;
-		}
-	}
-	setTimeout(_ => {
-		testRadminConnection();
-		testMainConnection();
-	}, 3000);
+  let testRadminConnection = async () => {
+    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
+    if (hasConnection) {
+      PWGame.radminHasConnection = true;
+    }
+  }
+  let testMainConnection = async () => {
+    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
+    if (hasConnection) {
+      PWGame.mainServerHasConnection = true;
+    }
+  }
+  setTimeout(_ => {
+    testRadminConnection();
+    testMainConnection();
+  }, 3000);
 });
+
 
 class DataBase {
 
@@ -1300,8 +1308,6 @@ class CastleNAVBAR {
 	static state = false;
 
 	static mode = 0;
-	
-	static stateDefaultMode = 0;
 
 	static init() {
 
@@ -1338,14 +1344,14 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[3].onclick = () => {
 
-			// App.error('Привет от ifst 😎');
-			
+			App.error('Привет от ifst 😎');
+
 		}
 
 		CastleNAVBAR.body.children[4].onclick = () => {
 
-			// App.error('Товарищеские матчи в процессе разработки...');
-			
+			App.error('Товарищеские матчи в процессе разработки...');
+
 		}
 
 		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
@@ -1426,38 +1432,6 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[18].append(DOM({tag:'div'}));
 		
 		return CastleNAVBAR.body.children[5];
-		
-	}
-	
-	static defaultMode(id){
-		
-		if(!id){
-			
-			if(CastleNAVBAR.stateDefaultMode){
-				
-				CastleNAVBAR.stateDefaultMode = 0;
-				
-			}
-			
-			return;
-			
-		}
-		
-		if( (CastleNAVBAR.stateDefaultMode) && (CastleNAVBAR.stateDefaultMode == id) ){
-			
-			return;
-			
-		}
-		
-		if(CastleNAVBAR.state){
-			
-			return;
-			
-		}
-		
-		CastleNAVBAR.setMode(id);
-		
-		CastleNAVBAR.stateDefaultMode = id;
 		
 	}
 
@@ -1635,7 +1609,20 @@ class CastleNAVBAR {
 }
 
 class View {
+	static mmQueueMap = {};
 
+	static getQueue(cssKey) {
+  		const map = {
+    		pvp: 0,
+    		anderkrug: 1,
+   		 	cte: 2,
+    		m4: 3,
+    		'pve-ep2-red': 4,
+    		'custom-battle': 5
+  		};
+  			const index = map[cssKey];
+  			return (View.mmQueueMap.mode && View.mmQueueMap.mode[index]) || '-';
+		}
 	static activeTemplate = false;
 
 	static activeAnimation = false;
@@ -1852,7 +1839,7 @@ class View {
 			
 		}
 		
-		body.append(View.castleSettings());
+		body.append(View.castleSettings(), View.castleBannerOnline());
 		
 		setTimeout(() => {
 
@@ -2176,6 +2163,141 @@ class View {
 
 	}
 
+
+
+	static castleBannerOnline() {
+
+	const getDivisionId = () =>
+    (window.User && (User.divisionId || User.rank || User.rating)) ||
+    (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+    10;
+
+  const modeMap = {
+    pvp: 0,
+    anderkrug: 1,
+    cte: 2,
+    m4: 3,
+    'pve-ep2-red': 4,
+    'custom-battle': 5
+  };
+
+  const medalMap = {
+    pvp: 'gold',
+    anderkrug: 'gold',
+    cte: 'gold',
+    m4: 'gold',
+    'pve-ep2-red': 'gold',
+    'custom-battle': 'silver'
+  };
+
+  const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
+    cssKey,
+    label: () => View.getQueue(cssKey)
+  }));
+
+  const banner = DOM({ style: ['castle-banner-online'] });
+  banner.append(DOM({ style: ['banner-ornament'] }));
+
+  
+  bannerItems.forEach((item, idx) => {
+    const wrap = DOM({ style: ['banner-item'] });
+
+    
+    const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
+    wrap.append(icon);
+
+   
+    const lbl = DOM({ tag: 'div', style: ['banner-count'] });
+    lbl.textContent = item.label();
+    wrap.append(lbl);
+
+    // медаль
+    const type = medalMap[item.cssKey] || 'gold';
+    const disabled = (type === 'silver');
+
+    const medal = DOM({
+      tag: 'span',
+      style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
+    });
+
+    if (disabled) {
+      medal.title = 'Режим временно недоступен';
+    } else {
+      medal.title = 'Посмотреть статистику по режиму';
+      medal.setAttribute('role', 'button');
+      medal.tabIndex = 0;
+      const openStats = () => {
+        if (typeof View?.openModeStats === 'function') View.openModeStats(item.cssKey);
+      };
+      medal.addEventListener('click', openStats);
+      medal.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
+      });
+    }
+
+    wrap.append(medal);
+    banner.append(wrap);
+
+    if (idx < bannerItems.length - 1) {
+      banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
+    }
+  });
+
+  
+  const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
+  const statRect    = DOM({ style: ['banner-stat-rect'] });
+  const statCircle  = DOM({ style: ['banner-stat-circle'] });
+
+  // Кнопка Stat
+  const statsBtn = DOM({
+    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+    title: 'Статистика',
+    event: ['click', () => {
+      const onEsc = (e) => {
+        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+      };
+      document.addEventListener('keydown', onEsc, { once: true });
+      Splash.show(
+        DOM(
+          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+          DOM({ tag: 'iframe', src: 'https://pw2.26rus-game.ru/stats/?tab=info&q=&user_id=0', style: 'iframe-stats-frame' })
+        ),
+        false
+      );
+    }]
+  });
+
+  // ► Бейдж дивизии ПОД кнопкой Stat
+  const divId = getDivisionId();
+  const divInfo = typeof Division?.get === 'function'
+    ? Division.get(divId)
+    : { name: 'Дивизион', icon: 1 };
+
+  const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
+  divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
+  divisionBadgeUnderStat.title = divInfo.name;
+
+  
+  statCircle.append(statsBtn, divisionBadgeUnderStat);
+  statWrapper.append(statRect, statCircle);
+
+  const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
+  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
+  const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
+  const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
+  tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+  tooltipBubble.append(tooltipText);
+  tooltipWrap.append(questionIcon, tooltipBubble);
+
+  banner.append(tooltipWrap, statWrapper);
+
+  return DOM({ style: 'castle-banner-online-wrapper' }, banner);
+}
+
+
+
+
 	static castleSettings() {
 
 		let builds = DOM({ style: ['castle-builds', 'button-outline'], title: "Рейтинг", event: ['click', () => View.show('top')] });
@@ -2191,13 +2313,13 @@ class View {
 
 		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-		let menu = DOM({ style: ['castle-menu', 'button-outline'], title: Lang.text('menu'), event: ['click', () => Window.show('main', 'menu')] });
+		let menu = DOM({ style: ['castle-menu', 'button-outline'], event: ['click', () => Window.show('main', 'menu')] });
 
 		let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
-
+		
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
 		input.type = 'range';
@@ -4361,37 +4483,28 @@ class Rank {
 }
 
 class Division {
-	
-	static list = {
-	10:{name:'Рядовой',icon:3}, 
-	20:{name:'Капрал',icon:4},  
-	30:{name:'Сержант',icon:5}, 
-	40:{name:'Лейтенант',icon:6}, 
-	50:{name:'Капитан',icon:7},  
-	60:{name:'Майор',icon:8},  
-	70:{name:'Подполковник',icon:9}, 
-	80:{name:'Полковник',icon:10},  
-	90:{name:'Генерал',icon:11}, 
-	100:{name:'Маршал',icon:12} 
-	};
-	
-	static get(id){
-		
-		for(let key in Division.list){
-			
-			if(id <= key){
-				
-				return Division.list[key];
-				
-			}
-			
-		}
-		
-		return {name:'Не определено',icon:1};
-		
-	}
-	
+  static list = {
+    10:{name:'Рядовой',icon:3}, 
+    20:{name:'Капрал',icon:4},  
+    30:{name:'Сержант',icon:5}, 
+    40:{name:'Лейтенант',icon:6},
+    50:{name:'Капитан',icon:7}
+  };
+
+  static get(id){
+    return this.list[id] || {name:'Неизвестно',icon:0};
+  }
+
+  static show(id, container){
+    const div = this.get(id);
+    const icon = DOM({ style:['division-icon'] });
+    icon.style.backgroundImage = `url(content/ranks/${div.icon}.webp)`;
+    icon.title = div.name;
+    container.append(icon);
+  }
 }
+
+
 
 class Build {
 
@@ -4497,8 +4610,8 @@ class Build {
 				}
 
 				await App.api.request('build', 'steal', { user: user, hero: hero });
-				
-				await Window.show('main', 'build', hero, 0, true);
+
+				View.show('build', hero);
 
 				Splash.hide();
 
@@ -7518,16 +7631,18 @@ class Events {
 	}
 
 	static MMQueueV2(data) {
-
-		CastleNAVBAR.queue(data);
-		
-		if( ('default' in data) && (data.default) ){
-			
-			CastleNAVBAR.defaultMode(data.default);
-			
-		}
-		
-	}
+  		console.log('[MMQueueV2] пришли данные:', data);
+  		View.mmQueueMap = data;
+		document.querySelectorAll('.banner-count').forEach((el, idx) => {
+    	const keys = ['pvp', 'anderkrug', 'cte', 'm4', 'pve-ep2-red', 'custom-battle'];
+    	const cssKey = keys[idx];
+    		if (cssKey) {
+     	 const val = View.getQueue(cssKey);
+		 console.log(`[${cssKey}] => ${val}`);
+		 el.textContent = val;
+    }
+  });
+}
 
 	static ADMStat(data) {
 
@@ -7638,9 +7753,9 @@ class App {
 				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
 				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
 				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0,hero:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']};
+				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858]};
 
-			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:48,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
+			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:49,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
 				
 			  MM.lobby(obj);
 			
@@ -7657,13 +7772,6 @@ class App {
 		setTimeout(() => {
 			
 			ARAM.briefing(6,1,() => alert(1));
-			
-		},3000);
-		*/
-		/*
-		setTimeout(() => {
-			
-			Splash.show(DOM({style:'iframe-stats'},DOM({style:'iframe-stats-navbar',event:['click',() => Splash.hide()]},'X'),DOM({tag:'iframe',src:'https://stat.26rus-game.ru'})),false);
 			
 		},3000);
 		*/
@@ -11267,8 +11375,6 @@ class MM {
 		}
 
 		let builds = await App.api.request('build', 'my', { hero: heroId });
-		
-		let target = 0;
 
 		for (let build of builds) {
 
@@ -11276,8 +11382,6 @@ class MM {
 				event: ['click', async () => {
 
 					await App.api.request('build', 'target', { id: build.id });
-					
-					target = build.id;
 
 					for (let child of MM.lobbyBuildTab.children) {
 
@@ -11299,8 +11403,6 @@ class MM {
 			}, build.name);
 
 			if (build.target) {
-				
-				target = build.id;
 
 				tab.style.background = 'rgba(255,255,255,0.3)';
 
@@ -11317,51 +11419,7 @@ class MM {
 			MM.lobbyBuildTab.append(tab);
 
 		}
-		
-		let notify = true, random = DOM({style:'ready-button',event:['click', async () => {
-			
-			if(notify){
-				
-				random.innerText = 'Перезаписать текущий билд?';
-				
-				notify = false;
-				
-				return;
-				
-			}
-			
-			random.innerText = 'Генерация...';
-			
-			let build = await App.api.request('build', 'rebuild', { id: target });
-			
-			if (MM.lobbyBuildField.firstChild) {
-				
-				MM.lobbyBuildField.firstChild.remove();
-				
-			}
-			
-			MM.lobbyBuildField.append(Build.viewModel(build.body, false, false));
-			
-			notify = true;
-			
-			for (let item of builds) {
-				
-				if(item.id == target){
-					
-					item.body = build.body;
-					
-				}
-				
-			}
-			
-			random.innerText = 'Случайный билд';
-			
-		}]},'Случайный билд');
-		
-		random.style.width = 'auto';
-		
-		MM.lobbyBuildTab.append(random);
-		
+
 	}
 
 	static async lobby(data) {
@@ -11513,22 +11571,6 @@ class MM {
 		let activeRankName = '';
 
 		for (let item of MM.hero) {
-			
-			if(!item.id){
-				
-				continue;
-				
-			}
-			
-			if( ('hero' in data) && (data.hero.length) ){
-				
-				if(!data.hero.includes(`${item.id}`)){
-					
-					continue;
-					
-				}
-				
-			}
 
 			let getRankName = Rank.getName(item.rating);
 
@@ -11619,7 +11661,7 @@ class MM {
 
 		});
 
-		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap(data.users[App.storage.data.id].team) : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
+		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap() : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
 
 		Sound.play('content/sounds/tambur.ogg', { id: 'tambur', volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop: true });
 
@@ -11651,9 +11693,9 @@ class MM {
 
 	}
 
-	static renderMap(team) {
+	static renderMap() {
 
-		MM.renderBody = DOM({ style: (team == 1) ? 'map' : 'map-reverse' });
+		MM.renderBody = DOM({ style: 'map' });
 
 		let container = DOM({ tag: 'div' }, MM.renderBody);
 
@@ -11665,15 +11707,14 @@ class MM {
 				style: `map-item-${number}`, data: { player: 0, position: number }, event: ['click', async () => {
 
 					await App.api.request(CURRENT_MM, 'position', { id: MM.id, position: (item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position });
-					
 
 				}]
 			})
 
 			MM.renderBody.append(item);
-			
+
 		}
-		
+
 		return container;
 
 	}
@@ -11771,7 +11812,7 @@ class MM {
 		} catch (e) {
 			App.error(e);
 		}
-		/*
+	
 		if (data.mode == 3) {
 			ARAM.briefing(data.hero, data.role, () => {
 				MM.gameRunEvent();
@@ -11781,12 +11822,6 @@ class MM {
 			MM.gameRunEvent();
 			PWGame.start(data.key, MM.gameStopEvent);
 		}
-		*/
-		
-		MM.gameRunEvent();
-		
-		PWGame.start(data.key, MM.gameStopEvent);
-		
 	}
 
 	static eventChangeHero(data) {
