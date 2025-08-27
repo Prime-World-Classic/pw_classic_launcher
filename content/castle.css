@@ -27,8 +27,6 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 		transform:rotate(360deg) scale(1);
 	}
 }
-
-
 /* Общий контейнер: баннер сверху, кнопки снизу */
 .castle-settings-container {
   position: absolute;
@@ -64,7 +62,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   border: none;
   width: 100%;
   height: 100%;
-  overflow: hidden;   /* <── убирает скроллбар */
+  overflow: hidden; 
 }
 
 /* Скрываем скроллбар во всех браузерах */
@@ -225,6 +223,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .banner-icon {
     position: relative;
     top: 0.5cqh;
+	
 }
 
 .castle-banner-online .banner-icon {
@@ -235,6 +234,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     background-size: contain;
     display: block;
     margin-top: auto;
+	
 }
 
 .castle-banner-online .tooltip-wrap-left {
@@ -245,6 +245,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     width: 3.5cqh;
     height: 3.5cqh;
     z-index: 9;
+}
+
+.main {
+  z-index: 2;
 }
 
 .question-icon {
@@ -309,12 +313,22 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .banner-icon--custom-battle { background-image: url('./img/m5.png');height: 4.6cqh !important; width: 3.6cqh !important; }
 .banner-icon--stat { background-image: url('./img/queue/stat.png'); height: 3.6cqh !important; width: 3.6cqh !important;}
 
-
+.castle-stats{
+  width: 7cqh;
+  height: 7cqh;
+  background: url('./talents/21.webp') no-repeat center/contain;
+  object-fit: cover;
+}
 
 .castle-banner-online .banner-count {
     margin-top: 0.4cqh;
     font-size: 1.3cqh;
     color: #fff;
+}
+.banner-count {
+  white-space: nowrap;
+  text-align: center;
+  line-height: 1.9cqh;
 }
 
 .castle-banner-online .banner-separator {
@@ -371,7 +385,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    z-index: 100;
+    z-index: 1;
+
 }
 
 
@@ -414,8 +429,6 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     opacity: 100%;
     transition: all 0.3s ease-out;
 }
-
-
 
 .castle-close{
     width: 7cqh;
@@ -807,16 +820,6 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     width: 21vh; /* Изменено с vw на vh */
     aspect-ratio: 371/76;
 }
-
-.castle-button-play-l1 {
-    animation: search 1.3s linear infinite;
-    z-index: 7;
-    background-image: url('img/l1.png');
-    aspect-ratio: 1/1;
-    width: 4vh; /* Изменено с vw на vh */
-    display: none;
-}
-
 .banner-icon.banner-icon--stat.button-outline {
   position: relative;
 }
@@ -833,31 +836,29 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   pointer-events: none;
   z-index: 5;
 }
-
-
-
-
-
-.banner-division-badge--stat {
-  position: absolute;
-  left: 50%;
-  bottom: -2.6cqh;          
-  transform: translateX(-50%);
-  width: 2.4cqh;
-  height: 2.4cqh;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;      
+.castle-button-play-l1 {
+    animation: search 1.3s linear infinite;
+    z-index: 7;
+    background-image: url('img/l1.png');
+    aspect-ratio: 1/1;
+    width: 4vh; /* Изменено с vw на vh */
+    display: none;
 }
-
-
-
 .division-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.5cqh;   
+  margin-top: 0.5cqh;  
+  
+}
+
+.banner-division-badge--stat {
+  pointer-events: auto !important;
+  z-index: 4;                 
+}
+
+.banner-stat-circle .banner-icon--stat {
+  z-index: 3;
 }
 
 
@@ -869,6 +870,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   background-position: center;
   border-radius: 50%;
   box-shadow: 0 0 0.8cqh rgba(0,0,0,0.5);
+  
 }
 
 
@@ -882,7 +884,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  display: block;   /* ← всегда показывать */
+  display: block;   
 }
 
 
@@ -1362,7 +1364,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	margin-top:19cqh;
 	max-height:62cqh;
 	width:50cqh;
-	z-index: 9;
+	z-index: 5;
 }
 
 .castle-chat .chat{
