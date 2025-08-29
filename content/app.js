@@ -2236,8 +2236,9 @@ class View {
     ); 
     lbl.textContent = `${playerCount} (${partyCount})`;
     lbl.title =
-      '• Число БЕЗ скобок — это игроки в поиске\n' +
-      '• Число В СКОБКАХ — это группы (пати)';
+      'Отображение очереди игроков по режимам игры.\n' +
+      '10 – количество человек в поиске боя;\n' +
+      '(2) – количество пати в поиске боя.';
     wrap.append(lbl);
 
     // медаль
@@ -2277,24 +2278,47 @@ class View {
   const statCircle  = DOM({ style: ['banner-stat-circle'] });
 
   // Кнопка Stat
-  const statsBtn = DOM({
-    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
-    title: 'Статистика',
-    event: ['click', () => {
-      const onEsc = (e) => {
-        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
-      };
-      document.addEventListener('keydown', onEsc, { once: true });
-      Splash.show(
-        DOM(
-          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
-          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
-          DOM({ tag: 'iframe', src: 'https://pw2.26rus-game.ru/stats/?tab=info&q=&user_id=0', style: 'iframe-stats-frame' })
-        ),
-        false
-      );
-    }]
-  });
+const statsBtn = DOM({
+  style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+  title: 'Статистика',
+  event: ['click', () => {
+    const onEsc = (e) => {
+      if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+    };
+    document.addEventListener('keydown', onEsc, { once: true });
+
+    // ---------- формируем src для iframe ----------
+    const BASE = 'https://pw2.26rus-game.ru/stats/';
+    const id    = Number(App?.storage?.data?.id) || 0;
+    const login = String(App?.storage?.data?.login || '').trim();
+
+    const qs = new URLSearchParams();
+    // приоритет — user_id;
+    if (id > 0) {
+      qs.set('user_id', String(id));
+    } else if (login) {
+      qs.set('login', login);
+    } else {
+      qs.set('user_id', '0');
+    }
+    qs.set('tab', 'info');
+    qs.set('q', '');
+    
+    qs.set('_', Date.now().toString());
+
+    const src = `${BASE}?${qs.toString()}`;
+
+    Splash.show(
+      DOM(
+        { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+        DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
+      ),
+      false
+    );
+  }]
+});
+
 
   // ► Бейдж дивизии ПОД кнопкой Stat
   const divId = getDivisionId();
@@ -2305,7 +2329,6 @@ class View {
   const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
   divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
 
-  
   divisionBadgeUnderStat.title =
     'Дивизия — группа игроков под одним званием,\n' +
     'которая играет примерно на равно винрейте матчмейкинга.';
