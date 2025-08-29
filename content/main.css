@@ -54,9 +54,30 @@ overflow: hidden;
 container-type: inline-size;
 }
 
-input,button,img {
+input,button,img,iframe {
 	padding: 0;
 	margin: 0;
+	border:none;
+}
+
+.iframe-stats iframe{
+	
+	width:100vw;
+	height:100vh;
+	
+}
+
+.iframe-stats-navbar{
+	
+	width:3vw;
+	height:3vw;
+	border-radius:50%;
+	position:fixed;
+	z-index:999;
+	background:rgba(255,255,255,0.1);
+	padding:1vw;
+	text-align:center;
+	
 }
 
 .noselect {
@@ -2322,10 +2343,12 @@ border-radius:5px;
 	
 }
 
-.top-filter + .help
-{
+.top-filter:after {
+	content: 'Нажмите, чтобы посмотреть рейтинг по отдельным героям';
 	position: absolute;
-	top: 8cqw;
+	width:100%;
+	text-align:center;
+	margin-top: 8cqw;
 	font-size: small;
 }
 
@@ -2543,10 +2566,9 @@ border-radius:5px;
 }
 
 #ADMStat{
-	
 	position:fixed;
-	top:0;
-	right:0;
+	top:10vh;
+	right:2vh;
 	z-index:9999;
     font: 1cqw / 1 Arial;
 	padding:0.3vw;
@@ -2885,18 +2907,30 @@ border-radius:5px;
 	
 }
 
-
-.map{
+.map,.map-reverse{
 	
 	width:100%;
 	height:100%;
 	position:relative;
 	box-shadow: 0 0 0.5cqw rgba(0,0,0, 0.9);
-	background-image:url('img/map.png');
 	background-position:center;
 	background-repeat:no-repeat;
 	background-size:107%;
 	border-radius:50%;
+	
+	
+	
+}
+
+.map{
+	
+	background-image:url('img/map.png');
+	
+}
+
+.map-reverse{
+	
+	background-image:url('img/map.png');
 	
 }
 
@@ -2911,7 +2945,6 @@ border-radius:5px;
 	background-size:110%;
 	border-radius:50%;
 	backdrop-filter:blur(0.2cqw);
-	
 }
 
 .map-item-1:hover,.map-item-2:hover,.map-item-3:hover,.map-item-4:hover,.map-item-5:hover, .map-item-6:hover {
@@ -2919,6 +2952,8 @@ border-radius:5px;
 	background-color:rgba(255,255,255,0.7);
 	
 }
+
+
 
 .map-item-1{ left:25%; top:12%; }
 
@@ -2932,6 +2967,17 @@ border-radius:5px;
 
 .map-item-6{ left:11%; top:62%; }
 
+.map-reverse .map-item-1{ left:25%; top:12%;}
+
+.map-reverse .map-item-2{ left:44%; bottom:46%;}
+
+.map-reverse .map-item-3{ left:64%; bottom:15%;}
+
+.map-reverse .map-item-4{ left:51%; top:19%;}
+
+.map-reverse .map-item-5{ left:68%; bottom:40%;}
+
+.map-reverse .map-item-6{ left:79%; top:25%;}
 
 @keyframes borderRotate {
 	100% {
@@ -3230,6 +3276,7 @@ border-radius:5px;
 	text-align: center;
 	width: calc(min(150cqh, 95cqw));
 	height: 80cqh;
+	z-index: 9;
 	/*background-color: #8d8b8b;*/
 	border-radius: 2cqh;
 	border: 0.1cqh solid rgb(158, 155, 104);
@@ -3478,7 +3525,7 @@ border-radius:5px;
 	align-self: center;
 }
 
-.castle-menu-item {
+.castle-menu-item-checkbox {
 	width: 90cqw;
 	color:rgba(255,255,255,0.9);
 	text-shadow:rgba(0,0,0,0.3) 0 0 1cqw;
@@ -3489,9 +3536,7 @@ border-radius:5px;
 	position: relative;
 }
 
-.castle-menu-item input[type='checkbox'],
-.castle-menu-item select
-{
+.castle-menu-item-checkbox input[type="checkbox"] {
 	appearance: none;
 	width: 10cqw;
 	height: 10cqw;
@@ -3502,8 +3547,7 @@ border-radius:5px;
 	transform: translateY(-50%);
 }
 
-.castle-menu-item input[type='checkbox']::before
-{
+.castle-menu-item-checkbox input[type="checkbox"]::before {
 	content: '';
 	width: 100%;
 	height: 100%;
@@ -3515,7 +3559,7 @@ border-radius:5px;
 	left: 0;
 }
 
-.castle-menu-item input[type='checkbox']:checked::before {
+.castle-menu-item-checkbox input[type="checkbox"]:checked::before {
 	background-image: url('icons/checkbox.webp');
 }
 
