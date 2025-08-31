@@ -1685,15 +1685,9 @@ class View {
 			var template = await View[method](value, value2, value3);
 
 		}
-		catch (error) { // session is not valid (когда выдали бан), при любой ошибке рендера выкидываем с учетки
+		catch (error) {
 
 			App.error(error);
-
-			if (String(error).search(new RegExp(`session is not valid`, 'i')) != -1) {
-
-				App.exit();
-
-			}
 
 			return;
 
@@ -1845,9 +1839,19 @@ class View {
 			body.append(castlePlay);
 			
 		}
-		catch(e){
+		catch(error){
 			
-			console.log(e);
+			if(String(error).search(new RegExp(`session is not valid`, 'i')) != -1){
+				
+				await App.exit();
+				
+				NativeAPI.reset();
+				
+				return;
+				
+			}
+			
+			console.log(error);
 			
 		}
 		
