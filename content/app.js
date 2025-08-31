@@ -11685,7 +11685,7 @@ class MM {
 
 		}
 
-		MM.lobbyHeroes = DOM({ style: 'mm-lobby-middle-hero' });
+		MM.lobbyHeroes = DOM({ style: 'mm-lobby-middle-hero' },DOM({style:'mm-lobby-middle-hero-prompt'},'ЛКМ (ВЫБРАТЬ) / ПКМ (ЗАБЛОКИРОВАТЬ)'));
 
 		//let preload = new PreloadImages(MM.lobbyHeroes);
 
