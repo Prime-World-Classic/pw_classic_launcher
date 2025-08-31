@@ -2211,8 +2211,8 @@ class View {
     anderkrug: 'gold',
     cte: 'gold',
     m4: 'gold',
-    'pve-ep2-red': 'silver',
-    'custom-battle': 'gold'
+    'pve-ep2-red': 'gold',
+    'custom-battle': 'silver'
   };
 
   const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
@@ -2230,14 +2230,15 @@ class View {
     wrap.append(icon);
 
     const lbl = DOM({ tag: 'div', style: ['banner-count'] });
-
-	const current = item.label(); 
-	const total = (typeof View?.getTotalQueue === 'function')
-	? View.getTotalQueue(item.cssKey)
-	: 0;
-
-	lbl.textContent = `${total}/${current}`;
-	
+    const partyCount  = Number(typeof item.label === 'function' ? item.label() : 0); 
+    const playerCount = Number(
+      typeof View?.getTotalQueue === 'function' ? (View.getTotalQueue(item.cssKey) ?? 0) : 0
+    ); 
+    lbl.textContent = `${playerCount} (${partyCount})`;
+    lbl.title =
+      'Отображение очереди игроков по режимам игры.\n' +
+      '10 – количество человек в поиске боя;\n' +
+      '(2) – количество пати в поиске боя.';
     wrap.append(lbl);
 
     // медаль
@@ -2277,24 +2278,47 @@ class View {
   const statCircle  = DOM({ style: ['banner-stat-circle'] });
 
   // Кнопка Stat
-  const statsBtn = DOM({
-    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
-    title: 'Статистика',
-    event: ['click', () => {
-      const onEsc = (e) => {
-        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
-      };
-      document.addEventListener('keydown', onEsc, { once: true });
-      Splash.show(
-        DOM(
-          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
-          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
-          DOM({ tag: 'iframe', src: 'https://pw2.26rus-game.ru/stats/?tab=info&q=&user_id=0', style: 'iframe-stats-frame' })
-        ),
-        false
-      );
-    }]
-  });
+const statsBtn = DOM({
+  style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+  title: 'Статистика',
+  event: ['click', () => {
+    const onEsc = (e) => {
+      if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+    };
+    document.addEventListener('keydown', onEsc, { once: true });
+
+    // ---------- формируем src для iframe ----------
+    const BASE = 'https://pw2.26rus-game.ru/stats/';
+    const id    = Number(App?.storage?.data?.id) || 0;
+    const login = String(App?.storage?.data?.login || '').trim();
+
+    const qs = new URLSearchParams();
+    // приоритет — user_id;
+    if (id > 0) {
+      qs.set('user_id', String(id));
+    } else if (login) {
+      qs.set('login', login);
+    } else {
+      qs.set('user_id', '0');
+    }
+    qs.set('tab', 'info');
+    qs.set('q', '');
+    
+    qs.set('_', Date.now().toString());
+
+    const src = `${BASE}?${qs.toString()}`;
+
+    Splash.show(
+      DOM(
+        { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+        DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
+      ),
+      false
+    );
+  }]
+});
+
 
   // ► Бейдж дивизии ПОД кнопкой Stat
   const divId = getDivisionId();
@@ -2305,7 +2329,6 @@ class View {
   const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
   divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
 
-  
   divisionBadgeUnderStat.title =
     'Дивизия — группа игроков под одним званием,\n' +
     'которая играет примерно на равно винрейте матчмейкинга.';
@@ -2330,7 +2353,7 @@ class View {
 
 		let builds = DOM({ style: ['castle-builds', 'button-outline'], title: "Рейтинг", event: ['click', () => View.show('top')] });
 
-		let ratings = DOM({ style: ['castle-top', 'button-outline'], title: "Рейтинг", event: ['click', () => Window.show('main', 'top')] });
+		/*let ratings = DOM({ style: ['castle-top', 'button-outline'], title: "Рейтинг", event: ['click', () => Window.show('main', 'top')] });*/
 
 		let settings = DOM({
 			style: ['castle-settings-btn', 'button-outline'], title: "Вкл/Выкл графики замка", event: ['click', () => {
@@ -2356,7 +2379,7 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu, ratings);
+		let body = DOM({ style: ['castle-settings'] }, menu);
 		let container = DOM({ style: ['castle-settings-container'] }, View.castleBannerOnline(), body);
 		return container;
 	}
