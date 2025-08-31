@@ -2191,21 +2191,44 @@ class View {
 	}
 
 	static castleBannerOnline() {
-
   const getDivisionId = () =>
     (window.User && (User.divisionId || User.rank || User.rating)) ||
     (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
     10;
 
+	const isFiniteNumber = (v) => Number.isFinite(v) && !Number.isNaN(v);
+
+	const safeQueueCounts = (cssKey) => {
+    let party = 0, players = 0;
+
+    try {
+		if (typeof View?.getQueue === 'function') {
+        const v = Number(View.getQueue(cssKey));
+        if (isFiniteNumber(v)) party = v;
+    }
+    } catch (_) {}
+
+    try {
+		if (typeof View?.getTotalQueue === 'function') {
+        const t = Number(View.getTotalQueue(cssKey));
+        if (isFiniteNumber(t)) players = t;
+    }
+    } catch (_) {}
+
+    return { players, party };
+  };
+
+  // карта режимов
   const modeMap = {
     pvp: 0,
     anderkrug: 1,
     cte: 2,
     m4: 3,
-	'custom-battle': 4,
+    'custom-battle': 4,
     'pve-ep2-red': 5
   };
 
+  // тип медалей
   const medalMap = {
     pvp: 'gold',
     anderkrug: 'gold',
@@ -2217,31 +2240,55 @@ class View {
 
   const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
     cssKey,
-    label: () => View.getQueue(cssKey)
+    label: () => (typeof View?.getQueue === 'function' ? View.getQueue(cssKey) : 0)
   }));
 
   const banner = DOM({ style: ['castle-banner-online'] });
   banner.append(DOM({ style: ['banner-ornament'] }));
-  
+
+  // --- элементы по режимам ---
   bannerItems.forEach((item, idx) => {
     const wrap = DOM({ style: ['banner-item'] });
 
+    // иконка режима
     const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
     wrap.append(icon);
 
-    const lbl = DOM({ tag: 'div', style: ['banner-count'] });
-    const partyCount  = Number(typeof item.label === 'function' ? item.label() : 0); 
-    const playerCount = Number(
-      typeof View?.getTotalQueue === 'function' ? (View.getTotalQueue(item.cssKey) ?? 0) : 0
-    ); 
-    lbl.textContent = `${playerCount} (${partyCount})`;
+    // счётчик: всегда стартует с "0/0"
+    const lbl = DOM({ tag: 'div', style: ['banner-count', 'is-loading'] });
+    lbl.textContent = '0/0';
     lbl.title =
-      'Отображение очереди игроков по режимам игры.\n' +
-      '10 – количество человек в поиске боя;\n' +
-      '(2) – количество пати в поиске боя.';
+      'Отображение очереди по режимам:\n' +
+      'слева — игроков в поиске,\n' +
+      'справа — количество групп (пати).';
     wrap.append(lbl);
 
-    // медаль
+
+    const onQueuesUpdated = () => {
+      const { players, party } = safeQueueCounts(item.cssKey);
+      lbl.textContent = `${players}/${party}`;
+      if (players || party) lbl.classList.remove('is-loading');
+    };
+    window.addEventListener?.('queues:updated', onQueuesUpdated);
+
+    let ticks = 0;
+    const iv = setInterval(() => {
+      ticks++;
+      const { players, party } = safeQueueCounts(item.cssKey);
+      const current = lbl.textContent;
+      const next = `${players}/${party}`;
+      if (current !== next) {
+        lbl.textContent = next;
+      }
+      if (players || party) {
+        lbl.classList.remove('is-loading');
+      }
+      if ((players || party) || ticks >= 30) {
+        clearInterval(iv);
+      }
+    }, 500);
+
+    // медаль/кнопка
     const type = medalMap[item.cssKey] || 'gold';
     const disabled = (type === 'silver');
 
@@ -2256,9 +2303,7 @@ class View {
       medal.title = 'Посмотреть статистику по режиму';
       medal.setAttribute('role', 'button');
       medal.tabIndex = 0;
-      const openStats = () => {
-		Window.show('main','top',0,idx);
-      };
+      const openStats = () => { Window.show('main', 'top', 0, idx); };
       medal.addEventListener('click', openStats);
       medal.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
@@ -2273,69 +2318,58 @@ class View {
     }
   });
 
+  // --- блок статистики/кнопка Stat ---
   const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
   const statRect    = DOM({ style: ['banner-stat-rect'] });
   const statCircle  = DOM({ style: ['banner-stat-circle'] });
 
-  // Кнопка Stat
-const statsBtn = DOM({
-  style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
-  title: 'Статистика',
-  event: ['click', () => {
-    const onEsc = (e) => {
-      if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
-    };
-    document.addEventListener('keydown', onEsc, { once: true });
+  const statsBtn = DOM({
+    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+    title: 'Статистика',
+    event: ['click', () => {
+      const onEsc = (e) => {
+        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+      };
+      document.addEventListener('keydown', onEsc, { once: true });
 
-    // ---------- формируем src для iframe ----------
-    const BASE = 'https://pw2.26rus-game.ru/stats/';
-    const id    = Number(App?.storage?.data?.id) || 0;
-    const login = String(App?.storage?.data?.login || '').trim();
+      const BASE  = 'https://pw2.26rus-game.ru/stats/';
+      const id    = Number(App?.storage?.data?.id) || 0;
+      const login = String(App?.storage?.data?.login || '').trim();
 
-    const qs = new URLSearchParams();
-    // приоритет — user_id;
-    if (id > 0) {
-      qs.set('user_id', String(id));
-    } else if (login) {
-      qs.set('login', login);
-    } else {
-      qs.set('user_id', '0');
-    }
-    qs.set('tab', 'info');
-    qs.set('q', '');
-    
-    qs.set('_', Date.now().toString());
+      const qs = new URLSearchParams();
+      if (id > 0) qs.set('user_id', String(id));
+      else if (login) qs.set('login', login);
+      else qs.set('user_id', '0');
+      qs.set('tab', 'info');
+      qs.set('q', '');
+      qs.set('_', Date.now().toString());
 
-    const src = `${BASE}?${qs.toString()}`;
+      const src = `${BASE}?${qs.toString()}`;
 
-    Splash.show(
-      DOM(
-        { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
-        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
-        DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
-      ),
-      false
-    );
-  }]
-});
+      Splash.show(
+        DOM(
+          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+          DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
+        ),
+        false
+      );
+    }]
+  });
 
-
-  // ► Бейдж дивизии ПОД кнопкой Stat
-  const divId = getDivisionId();
-  const divInfo = typeof Division?.get === 'function'
-    ? Division.get(divId)
-    : { name: 'Дивизион', icon: 1 };
+  // бейдж дивизии под кнопкой Stat
+  const divId   = getDivisionId();
+  const divInfo = typeof Division?.get === 'function' ? Division.get(divId) : { name: 'Дивизион', icon: 1 };
 
   const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
   divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
-
   divisionBadgeUnderStat.title =
-    'Дивизия — группа игроков под одним званием,\n' +
-    'которая играет примерно на равно винрейте матчмейкинга.';
+    'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.';
 
   statCircle.append(statsBtn, divisionBadgeUnderStat);
   statWrapper.append(statRect, statCircle);
 
+  // подсказка слева
   const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
   const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
   const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
@@ -2345,9 +2379,9 @@ const statsBtn = DOM({
   tooltipWrap.append(questionIcon, tooltipBubble);
 
   banner.append(tooltipWrap, statWrapper);
-
   return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
+
 
 	static castleSettings() {
 

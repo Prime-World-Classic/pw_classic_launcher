@@ -852,6 +852,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   margin-top: 0.5cqh;  
   
 }
+.banner-count.is-loading {
+  opacity: .7;
+  filter: saturate(.7);
+}
 
 
 .banner-division-badge--stat {
