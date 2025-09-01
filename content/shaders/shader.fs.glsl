@@ -74,8 +74,8 @@ vec3 neutral(vec3 color) {
 
 void main()
 {
-  const vec3 lightColor = vec3(1.0, 1.0, 1.0) * 1.6;
-  const float shadowContrast = 0.6;
+  const vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.2;
+  const float shadowContrast = 0.9;
 
   const float gridFalloffDistance = 50.0;
 
