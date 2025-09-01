@@ -1,134 +1,266 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.5.1';
+PW_VERSION = '2.7.1';
 
 CURRENT_MM = 'mmtest'
+
+class ParentEvent {
+	
+	static children;
+	
+	static async authorization(body){
+		
+		if(!body.id){
+			
+			if(ParentEvent.children){
+				
+				ParentEvent.children.close();
+				
+			}
+			
+			if('error' in body){
+				
+				App.error(body.error);
+				
+			}
+			
+			return;
+			
+		}
+		
+		await App.storage.set({ id: body.id, token: body.token, login: body.login, fraction: body.fraction });
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		View.show('castle');
+		
+	}
+
+	static async bind(body){
+		
+		if(ParentEvent.children){
+			
+			ParentEvent.children.close();
+			
+		}
+		
+		App.notify(body);
+		
+	}
+	
+}
 
 class Lang {
 
 	static target = 'ru'; // TODO get from the system
 	// TODO add UI dropdown?
-
 	static default = 'ru';
 
 	static list = {
 		en: {
-			fight: 'Fight!',
-			enterTextAndPressEnter: 'Enter the text and press Enter',
-			ready: 'Ready',
-			library: 'Library',
-			menu: 'Меню',
-			preferences: 'Preferences',
-			windowMode: 'Window mode',
-			threeD: '3D',
-			volume: 'Volume',
-			volumeMusic: 'Volume of music',
-			volumeSound: 'Volume of sounds',
-			back: 'Back',
-			soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
-			support: 'Support',
-			supportDesk: 'Questions? Feel free to contact us:',
-			accountSwitch: 'Switch account',
-			exit: 'Exit from Prime World',
-			version: 'Version',
-			health: 'Health',
-			energy: 'Energy',
-			speed: 'Speed',
-			strength: 'Strength',
-			intelligence: 'Intelligence',
-			agility: 'Agility',
-			dexterity: 'Dexterity',
-			stamina: 'Stamina',
-			will: 'Will',
-			damage: 'Damage',
-			criticalHit: 'Critical Hit',
-			attacksPerSecond: 'Attacks per second',
-			penetration: 'Penetration',
-			defencePsys: 'Defence Psysical',
-			defenceMagic: 'Defence Magic',
-			skins: 'Skins',
+			locale:['en_US'],
+			name:'English',
+			word: {
+				nickname: 'login/Nickname',
+				code: 'code/Telegram bot',
+				password: 'password',
+				passwordAgain: 'password again',
+				login: 'Login',
+				registration: 'Registration',
+				fraction: 'Select a faction',
+				adornia: 'Kingdom of Adornia',
+				docts: 'Empire of the Docts',
+				fight: 'Fight!',
+				enterTextAndPressEnter: 'Enter the text and press Enter',
+				ready: 'Ready',
+				library: 'Library',
+				menu: 'Меню',
+				preferences: 'Preferences',
+				windowMode: 'Window mode',
+				radminPriority: 'RadminVPN Priority',
+				threeD: '3D',
+				volume: 'Volume',
+				volumeMusic: 'Volume of music',
+				volumeSound: 'Volume of sounds',
+				back: 'Back',
+				soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
+				support: 'Support',
+				supportDesk: 'Questions? Feel free to contact us:',
+				accountSwitch: 'Switch account',
+				exit: 'Exit from Prime World',
+				version: 'Version',
+				health: 'Health',
+				energy: 'Energy',
+				speed: 'Speed',
+				strength: 'Strength',
+				intelligence: 'Intelligence',
+				agility: 'Agility',
+				dexterity: 'Dexterity',
+				stamina: 'Stamina',
+				will: 'Will',
+				damage: 'Damage',
+				criticalHit: 'Critical Hit',
+				attacksPerSecond: 'Attacks per second',
+				penetration: 'Penetration',
+				defencePsys: 'Defence Psysical',
+				defenceMagic: 'Defence Magic',
+				skins: 'Skins',
+				authorizationSteam: 'Login with Steam',
+				steamauthTitle: 'Login with Steam',
+				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
+				classTalent: 'Class Talent'
+			}
 		},
 		ru: {
-			fight: 'В бой!',
-			enterTextAndPressEnter: 'Введите текст и нажмите Enter',
-			ready: 'Готов',
-			library: 'Библиотека',
-			menu: 'Меню',
-			preferences: 'Настройки',
-			windowMode: 'Оконный режим',
-			threeD: '3D графика',
-			volume: 'Общая громкость',
-			volumeMusic: 'Громкость музыки',
-			volumeSound: 'Громкость звуков',
-			back: 'Назад',
-			soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
-			support: 'Поддержка',
-			supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
-			accountSwitch: 'Сменить аккаунт',
-			exit: 'Выйти из Prime World',
-			version: 'Версия',
-			health: 'Здоровье',
-			energy: 'Энергия',
-			speed: 'Скорость',
-			strength: 'Сила',
-			intelligence: 'Разум',
-			agility: 'Проворство',
-			dexterity: 'Хитрость',
-			stamina: 'Стойкость',
-			will: 'Воля',
-			damage: 'Урон',
-			criticalHit: 'Шанс крита',
-			attacksPerSecond: 'Скорость атаки',
-			penetration: 'Пробивание',
-			defencePsys: 'Защита тела',
-			defenceMagic: 'Защита духа',
-			skins: 'Скины',
+			locale:['ru_RU'],
+			name:'Русский',
+			word: {
+				nickname: 'Логин/Никнейм',
+				code: 'Инвайт-код',
+				password: 'Пароль',
+				passwordAgain: 'Еще раз пароль',
+				login: 'Войти',
+				registration: 'Регистрация',
+				fraction: 'Выберите фракцию',
+				adornia: 'Королевство Адорния',
+				docts: 'Империя Доктов',
+				fight: 'В бой!',
+				enterTextAndPressEnter: 'Введите текст и нажмите Enter',
+				ready: 'Готов',
+				library: 'Библиотека',
+				menu: 'Меню',
+				preferences: 'Настройки',
+				windowMode: 'Оконный режим',
+				radminPriority: 'Приоритет RadminVPN',
+				threeD: '3D графика',
+				volume: 'Общая громкость',
+				volumeMusic: 'Громкость музыки',
+				volumeSound: 'Громкость звуков',
+				back: 'Назад',
+				soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
+				support: 'Поддержка',
+				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
+				accountSwitch: 'Сменить аккаунт',
+				exit: 'Выйти из Prime World',
+				version: 'Версия',
+				health: 'Здоровье',
+				energy: 'Энергия',
+				speed: 'Скорость',
+				strength: 'Сила',
+				intelligence: 'Разум',
+				agility: 'Проворство',
+				dexterity: 'Хитрость',
+				stamina: 'Стойкость',
+				will: 'Воля',
+				damage: 'Урон',
+				criticalHit: 'Шанс крита',
+				attacksPerSecond: 'Скорость атаки',
+				penetration: 'Пробивание',
+				defencePsys: 'Защита тела',
+				defenceMagic: 'Защита духа',
+				skins: 'Скины',
+				authorizationSteam: 'Вход через Steam',
+				steamauthTitle: 'Вход через Steam',
+				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
+				classTalent: 'Классовый'
+			}
 		},
 		be: {
-			fight: 'У бой!',
-			enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
-			ready: 'Гатоў',
-			library: 'Бібліятэка',
-			menu: 'Мяню',
-			preferences: 'Прылады',
-			windowMode: 'Аконны рэжым',
-			threeD: '3D графіка',
-			volume: 'Агульная гучнасць',
-			volumeMusic: 'Гучнасць музыкі',
-			volumeSound: 'Гучнасць гукаў',
-			back: 'Назад',
-			soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
-			support: 'Падтрымка',
-			supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
-			accountSwitch: 'Змяніць улiковы запiс',
-			exit: 'Выйсці з Prime World',
-			version: 'Версія',
-			health: 'Здароўе',
-			energy: 'Энергія',
-			speed: 'Хуткасць',
-			strength: 'Сіла',
-			intelligence: 'Розум',
-			agility: 'Шпаркасць',
-			dexterity: 'Хітрасць',
-			stamina: 'Цягавітасьць',
-			will: 'Воля',
-			damage: 'Шкода',
-			criticalHit: 'Шанец крытычнага траплення',
-			attacksPerSecond: 'Хуткасць атакі',
-			penetration: 'Прабіванне',
-			defencePsys: 'Абарона цела',
-			defenceMagic: 'Абарона духу',
-			skins: 'Абалонкі',
-		},
-
+			locale:['be_BY'],
+			name:'Беларускі',
+			word: {
+				nickname: 'Лагін/Нікнейм',
+				code: 'Код/бот тэлеграм',
+				password: 'Пароль',
+				passwordAgain: 'Яшчэ раз пароль',
+				login: 'Увайсці',
+				registration: 'Рэгістрацыя',
+				fraction: 'Абярыце фракцыю',
+				adornia: 'Каралеўства Адорнія',
+				docts: 'Імперыя Доктаў',
+				fight: 'У бой!',
+				enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
+				ready: 'Гатоў',
+				library: 'Бібліятэка',
+				menu: 'Мяню',
+				preferences: 'Прылады',
+				windowMode: 'Аконны рэжым',
+				radminPriority: 'Прыярытэт RadminVPN',
+				threeD: '3D графіка',
+				volume: 'Агульная гучнасць',
+				volumeMusic: 'Гучнасць музыкі',
+				volumeSound: 'Гучнасць гукаў',
+				back: 'Назад',
+				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
+				support: 'Падтрымка',
+				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
+				accountSwitch: 'Змяніць улiковы запiс',
+				exit: 'Выйсці з Prime World',
+				version: 'Версія',
+				health: 'Здароўе',
+				energy: 'Энергія',
+				speed: 'Хуткасць',
+				strength: 'Сіла',
+				intelligence: 'Розум',
+				agility: 'Шпаркасць',
+				dexterity: 'Хітрасць',
+				stamina: 'Цягавітасьць',
+				will: 'Воля',
+				damage: 'Шкода',
+				criticalHit: 'Шанец крытычнага траплення',
+				attacksPerSecond: 'Хуткасць атакі',
+				penetration: 'Прабіванне',
+				defencePsys: 'Абарона цела',
+				defenceMagic: 'Абарона духу',
+				skins: 'Абалонкі',
+				authorizationSteam: 'Увайсці праз steam',
+				steamauthTitle: 'Увайсці праз steam',
+				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
+				classTalent: 'Класавы'
+			}	
+		}
 	};
+	
+	static init(){
+		
+		let locale = NativeAPI.getLocale();
+		
+		if(!locale){
+			
+			if( !('language' in navigator) ){
+				
+				return;
+				
+			}
+			
+			locale = navigator.language;
+			
+		}
+		
+		for(let key in Lang.list){
+			
+			if(Lang.list[key].locale.includes(locale)){
+				
+				Lang.target = key;
+				
+				break;
+				
+			}
+			
+		}
+		
+	}
 
 	static text(word, placeholder) {
-		if (word in Lang.list[Lang.target]) {
-			return Lang.list[Lang.target][word];
+		if (word in Lang.list[Lang.target].word) {
+			return Lang.list[Lang.target].word[word];
 		}
-		if (word in Lang.list[Lang.default]) {
-		return Lang.list[Lang.default][word];
+		if (word in Lang.list[Lang.default].word) {
+			return Lang.list[Lang.default].word[word];
 		}
 		return placeholder;
 	}
@@ -227,10 +359,34 @@ class News {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+	
+	window.addEventListener('message',(event) => {
 
+		if (event.data == '') {
+			return;
+		}
+		
+		if( !('action' in event.data) ){
+			
+			return;
+			
+		}
+		
+		if(event.data.action in ParentEvent){
+			
+			ParentEvent[event.data.action](event.data.body);
+			
+		}
+		
+		console.log('event.data',event.data);
+		
+	});
+	
 	Splash.init();
 
 	NativeAPI.init();
+	
+	Lang.init();
 
 	NativeAPI.update((data) => {
 
@@ -252,7 +408,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	});
 
-	App.init();
+	App.findBestHostAndInit();
 
 	Settings.init();
 	
@@ -263,8 +419,15 @@ window.addEventListener('DOMContentLoaded', () => {
 			PWGame.radminHasConnection = true;
 		}
 	}
+	let testMainConnection = async () => {
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.mainServerHasConnection = true;
+		}
+	}
 	setTimeout(_ => {
 		testRadminConnection();
+		testMainConnection();
 	}, 3000);
 });
 
@@ -745,7 +908,7 @@ class Store {
 
 class Api {
 
-	constructor(host, events) {
+	constructor(host, bestHost, events) {
 
 		if( !('WebSocket' in window) ) {
 
@@ -769,11 +932,15 @@ class Api {
 
 		this.host = host;
 
-		this.MAIN_HOST = this.host[0];
+		this.MAIN_HOST = this.host[bestHost];
+		
+		this.DISCONNECT_LAST_DATE_LIMIT_MS = 30000; // плюсуем неудачное соединение в указанном диапазоне времени
+		
+		this.DISCONNECT_LAST_DATE = Date.now(); // метка времени с последнего неудачного соединения 
 
 		this.DISCONNECT_TOTAL = 0; // количество неудачных соединений
 		
-		this.DISCONNECT_LIMIT = 15; // лимит неудачных соединений, чтобы перейти на другой хост (DISCONNECT_LIMIT * RECONNECT_TIME)
+		this.DISCONNECT_LIMIT = 3; // лимит неудачных соединений, чтобы перейти на другой хост (DISCONNECT_LIMIT * RECONNECT_TIME)
 		
 		this.RECONNECT_TIME = 1000; // через сколько делаем повторное соединение (1000 = 1 секунда)
 
@@ -801,7 +968,7 @@ class Api {
 					
 					if(this.WebSocket.readyState == 1){
 						
-						resolve();
+						return resolve();
 						
 					}
 					
@@ -819,7 +986,10 @@ class Api {
 				
 				this.WebSocket.onmessage = (event) => this.message(event.data);
 				
-				this.WebSocket.onerror = (event) => console.log(`Разрыв соединения ${this.MAIN_HOST}...`,event);
+				this.WebSocket.onerror = (event) => {
+					console.log(`Разрыв соединения ${this.MAIN_HOST}...`,event);
+					App.error(`Разрыв соединения, подождите... [${this.DISCONNECT_TOTAL}]`,event);
+				};
 				
 				this.WebSocket.onclose = () => {
 					
@@ -835,6 +1005,10 @@ class Api {
 					
 					console.log(`Успешно подключились к ${this.MAIN_HOST}...`);
 					
+					if (this.MAIN_HOST != this.host[0]) {
+						App.ShowCurrentView();
+					}
+					
 					resolve();
 					
 				};
@@ -849,19 +1023,26 @@ class Api {
 	
 	async disconnect(){
 		console.log(`Закрываем соединение ${this.MAIN_HOST}...`);
+		App.error(`Закрыто соедниение... Выполняется переподключение, подождите... [${this.DISCONNECT_TOTAL}]`);
 		if(!this.WebSocket){
 			
 			return;
 			
 		}
 		
-		this.DISCONNECT_TOTAL++;
+		if( (Date.now() - this.DISCONNECT_LAST_DATE) < this.DISCONNECT_LAST_DATE_LIMIT_MS){
+			
+			this.DISCONNECT_TOTAL++;
+			
+		}
+		
+		this.DISCONNECT_LAST_DATE = Date.now();
 		
 		return new Promise((resolve,reject) => {
 			
 			if(this.WebSocket.readyState == 3){
 				
-				resolve();
+				return resolve();
 				
 			}
 			
@@ -885,19 +1066,16 @@ class Api {
 			
 		}
 		
-		for(let host of this.host){
-			
-			if(this.MAIN_HOST == host){
-				
-				continue;
-				
+		let currentHost = 0;
+		for (let i = 0; i < this.host.length; ++i) {
+			if(this.MAIN_HOST == this.host[i]){
+				currentHost = i;
+				break;
 			}
+			}
+		App.error(`Подождите, подключение восстанавливается [${currentHost}]`);
 			
-			this.MAIN_HOST = host;
-			
-			break;
-			
-		}
+		this.MAIN_HOST = this.host[(currentHost + 1) % this.host.length];
 		
 	}
 
@@ -1126,6 +1304,8 @@ class CastleNAVBAR {
 	static state = false;
 
 	static mode = 0;
+	
+	static stateDefaultMode = 0;
 
 	static init() {
 
@@ -1146,7 +1326,10 @@ class CastleNAVBAR {
 			'castle-button-play-m3',
 			'castle-button-play-m4',
 			'castle-button-play-m5',
-			'castle-button-play-m6'
+			'castle-button-play-m6',
+			'castle-button-play-division',
+			'castle-button-play-karma'
+
 		];
 
 		CastleNAVBAR.body = DOM({ style: 'castle-button-play' });
@@ -1159,14 +1342,14 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[3].onclick = () => {
 
-			App.error('Привет от ifst 😎');
-
+			// App.error('Привет от ifst 😎');
+			
 		}
 
 		CastleNAVBAR.body.children[4].onclick = () => {
 
-			App.error('Товарищеские матчи в процессе разработки...');
-
+			// App.error('Товарищеские матчи в процессе разработки...');
+			
 		}
 
 		CastleNAVBAR.body.children[5].innerText = Lang.text('fight');
@@ -1192,25 +1375,33 @@ class CastleNAVBAR {
 
 		}
 
-		CastleNAVBAR.body.children[9].append(DOM({ title: 'Очередь игроков матчмейкинга на данный режим игры' }));
-
+		CastleNAVBAR.body.children[9].append(DOM({ style: 'castle-button-play-queue', title: 'Очередь игроков матчмейкинга на данный режим игры' }));
+		
+		CastleNAVBAR.body.children[11].append(DOM({style:'castle-button-play-queue-mode'}));
+		
 		CastleNAVBAR.body.children[11].onclick = () => {
 
 			CastleNAVBAR.setMode(1);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[12].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[12].onclick = () => {
 
 			CastleNAVBAR.setMode(2);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[13].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[13].onclick = () => {
 
 			CastleNAVBAR.setMode(3);
-
+			
 		};
+		
+		CastleNAVBAR.body.children[14].append(DOM({style:'castle-button-play-queue-mode'}));
 
 		CastleNAVBAR.body.children[14].onclick = () => {
 
@@ -1218,11 +1409,15 @@ class CastleNAVBAR {
 			
 		};
 		
+		CastleNAVBAR.body.children[15].append(DOM({style:'castle-button-play-queue-mode'}));
+		
 		CastleNAVBAR.body.children[15].onclick = () => {
 
 			CastleNAVBAR.setMode(5);
 			
 		};
+		
+		CastleNAVBAR.body.children[16].append(DOM({style:'castle-button-play-queue-mode'}));
 		
 		CastleNAVBAR.body.children[16].onclick = () => {
 
@@ -1230,8 +1425,47 @@ class CastleNAVBAR {
 			
 		};
 		
+		CastleNAVBAR.body.children[18].title =
+      		'Карма — поведение игрока и его "полезность" в бою.\n' +
+      		'Она может повышаться и понижаться, в зависимости от боёв.';
+    	CastleNAVBAR.body.children[18].style.pointerEvents = 'auto';
+    	CastleNAVBAR.body.children[18].style.zIndex = '4';
+    	CastleNAVBAR.body.children[18].append(DOM({ tag: 'div' }));
+		
 		return CastleNAVBAR.body.children[5];
-
+		
+	}
+	
+	static defaultMode(id){
+		
+		if(!id){
+			
+			if(CastleNAVBAR.stateDefaultMode){
+				
+				CastleNAVBAR.stateDefaultMode = 0;
+				
+			}
+			
+			return;
+			
+		}
+		
+		if( (CastleNAVBAR.stateDefaultMode) && (CastleNAVBAR.stateDefaultMode == id) ){
+			
+			return;
+			
+		}
+		
+		if(CastleNAVBAR.state){
+			
+			return;
+			
+		}
+		
+		CastleNAVBAR.setMode(id);
+		
+		CastleNAVBAR.stateDefaultMode = id;
+		
 	}
 
 	static play() {
@@ -1239,7 +1473,7 @@ class CastleNAVBAR {
 		if (CastleNAVBAR.state) {
 
 			return;
-
+			
 		}
 
 		CastleNAVBAR.state = true;
@@ -1257,7 +1491,42 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[3].style.filter = 'grayscale(70%)';
 
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(70%)';
+		
+	}
+	
+	static karma(id) {
 
+    let karma = 0;
+
+    if (id >= 75) {
+      karma = 75;
+    } else if (id >= 50) {
+      karma = 50;
+    }
+
+    if (karma) {
+      const el = CastleNAVBAR.body.children[18];
+      el.style.display = 'flex';
+      el.firstChild.innerText = `>${karma}`;
+
+      
+      el.title =
+        'Карма — поведение игрока и его "полезность" в бою.\n' +
+        'Она может повышаться и понижаться, в зависимости от боёв.\n' +
+        `Текущий порог: >${karma}`;
+    }
+  }
+	
+	static division(id) {
+		
+		let division = Division.get(id);
+		
+		CastleNAVBAR.body.children[17].style.backgroundImage =  `url(content/ranks/${division.icon}.webp)`;
+		
+		CastleNAVBAR.body.children[17].title = division.name;
+		
+		CastleNAVBAR.body.children[17].style.display = 'block';
+		
 	}
 
 	static cancel() {
@@ -1283,6 +1552,10 @@ class CastleNAVBAR {
 		CastleNAVBAR.body.children[3].style.filter = 'grayscale(0)';
 
 		CastleNAVBAR.body.children[4].style.filter = 'grayscale(0)';
+		
+		CastleNAVBAR.body.children[17].style.display = 'none';
+		
+		CastleNAVBAR.body.children[18].style.display = 'none';
 
 	}
 
@@ -1307,10 +1580,16 @@ class CastleNAVBAR {
 	}
 
 	static setMode(type) {
+		
+		let modeSelect = (type - 1);
+		
+		if(CastleNAVBAR.mode != modeSelect){
+			
+			CastleNAVBAR.body.children[9].firstChild.innerText = '';
+			
+		}
 
-		CastleNAVBAR.body.children[9].firstChild.innerText = '';
-
-		CastleNAVBAR.mode = (type - 1);
+		CastleNAVBAR.mode = modeSelect;
 
 		CastleNAVBAR.body.children[5].style.display = 'block';
 
@@ -1343,19 +1622,38 @@ class CastleNAVBAR {
 			if (data.mode[CastleNAVBAR.mode]) {
 
 				queue = data.mode[CastleNAVBAR.mode];
-
+				
 			}
-
+			
 		}
 
 		CastleNAVBAR.body.children[9].firstChild.innerText = ((queue) ? queue : '');
-
+		
+		for(let item of [{child:11,mode:0},{child:12,mode:1},{child:13,mode:2},{child:14,mode:3},{child:15,mode:4},{child:16,mode:5}]){
+			
+			CastleNAVBAR.body.children[item.child].firstChild.innerText = ( ( (item.mode in data.mode) && (data.mode[item.mode]) ) ? data.mode[item.mode] : '');
+			
+		}
+		
 	}
 
 }
 
 class View {
+	static mmQueueMap = {};
 
+	static getQueue(cssKey) {
+  		const map = {
+    		pvp: 0,
+    		anderkrug: 1,
+   		 	cte: 2,
+    		m4: 3,
+    		'pve-ep2-red': 4,
+    		'custom-battle': 5
+  		};
+  			const index = map[cssKey];
+  			return (View.mmQueueMap.mode && View.mmQueueMap.mode[index]) || '-';
+		}
 	static activeTemplate = false;
 
 	static activeAnimation = false;
@@ -1391,15 +1689,9 @@ class View {
 			var template = await View[method](value, value2, value3);
 
 		}
-		catch (error) { // session is not valid (когда выдали бан), при любой ошибке рендера выкидываем с учетки
+		catch (error) {
 
 			App.error(error);
-
-			if (String(error).search(new RegExp(`session is not valid`, 'i')) != -1) {
-
-				App.exit();
-
-			}
 
 			return;
 
@@ -1433,7 +1725,7 @@ class View {
 		}
 
 	}
-
+	
 	static authorization() {
 		let numEnterEvent = ['keyup', async (event) => {
 			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -1441,20 +1733,20 @@ class View {
 			}
 		}];
 
-		let login = DOM({ tag: 'input', placeholder: 'Никнейм', event: numEnterEvent }), password = DOM({ tag: 'input', placeholder: 'Пароль', type: 'password', event: numEnterEvent });
+		let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
 
 		let authorizationForm = DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' }, DOM({ tag: 'div' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' })),
 
 			DOM({ style: 'login-box-forma-inputs' },
 				login,
 				password,
-				DOM({ style: 'login-box-forma-buttons' }, DOM({ tag: 'div', style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, 'Войти'), DOM({
-					tag: 'div', style: 'login-box-forma-button', event: ['click', () => {
-
-						View.show('registration');
-
-					}]
-				}, 'Регистрация'))
+				DOM({ style: 'login-box-forma-buttons' }, 
+					DOM({ style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, Lang.text('login')), 
+					DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('registration')]}, Lang.text('registration'))
+				),
+				DOM({ style: 'login-box-forma-buttons' }, 
+					DOM({style: ['login-box-forma-button', 'steamauth'], event:['click',() => Window.show('main', 'steamauth')]}, Lang.text('authorizationSteam'))
+				),
 			)), DOM({ style: 'author' }, `Prime World: Classic v.${PW_VERSION}.${APP_VERSION}`));
 
 		return authorizationForm;
@@ -1468,24 +1760,24 @@ class View {
 		}];
 
 		let fraction = DOM({ tag: 'select' },
-			DOM({ tag: 'option', value: 0, disabled: true, selected: true }, 'Сторона'),
-			DOM({ tag: 'option', value: 1 }, 'Адорнийцы'),
-			DOM({ tag: 'option', value: 2 }, 'Докты')
+			DOM({ tag: 'option', value: 0, disabled: true, selected: true }, Lang.text('fraction')),
+			DOM({ tag: 'option', value: 1 }, Lang.text('adornia')),
+			DOM({ tag: 'option', value: 2 }, Lang.text('docts'))
 		);
 
 		let tgBotUrl = 'https://t.me/primeworldclassic_bot';
 
 		let telegramBotLink = DOM({ style: 'telegram-bot' , tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)]});
 
-		let invite = DOM({ tag: 'input', placeholder: 'Инвайт-код', event: numEnterEvent });
+		let invite = DOM({ tag: 'input', placeholder: Lang.text('code'), event: numEnterEvent });
 
 		let inviteContainer = DOM({ style: 'invite-input' }, invite, telegramBotLink)
 
-		let login = DOM({ tag: 'input', placeholder: 'Никнейм', event: numEnterEvent });
+		let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent });
 
-		let password = DOM({ tag: 'input', placeholder: 'Пароль', type: 'password', event: numEnterEvent });
+		let password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
 
-		let password2 = DOM({ tag: 'input', placeholder: 'Еще раз пароль', type: 'password', event: numEnterEvent });
+		let password2 = DOM({ tag: 'input', placeholder: Lang.text('passwordAgain'), type: 'password', event: numEnterEvent });
 
 		return DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' },
 
@@ -1517,7 +1809,7 @@ class View {
 	}
 
 	static async castle() {
-
+		
 		document.body.classList.add('noselect');
 
 		View.setCss('content/castle.css');
@@ -1541,15 +1833,55 @@ class View {
 			App.error(error);
 
 		}
-
-		body.append(backgroundImage, Castle.canvas, await View.castlePlay(), View.castleChat(), await View.castleHeroes(), View.castleSettings());
-
+		
+		body.append(backgroundImage,Castle.canvas);
+		
+		try{
+			
+			let castlePlay = await View.castlePlay();
+			
+			body.append(castlePlay);
+			
+		}
+		catch(error){
+			
+			if(String(error).search(new RegExp(`session is not valid`, 'i')) != -1){
+				
+				await App.exit();
+				
+				NativeAPI.reset();
+				
+				return;
+				
+			}
+			
+			console.log(error);
+			
+		}
+		
+		body.append(View.castleChat());
+		
+		try{
+			
+			let castleHeroes = await View.castleHeroes();
+			
+			body.append(castleHeroes);
+			
+		}
+		catch(e){
+			
+			console.log(e);
+			
+		}
+		
+		body.append(View.castleSettings());
+		
 		setTimeout(() => {
 
 			Chat.scroll();
 
 		}, 1500);
-
+		
 		return body;
 
 	}
@@ -1866,11 +2198,204 @@ class View {
 
 	}
 
+	static castleBannerOnline() {
+  const getDivisionId = () =>
+    (window.User && (User.divisionId || User.rank || User.rating)) ||
+    (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+    10;
+
+	const isFiniteNumber = (v) => Number.isFinite(v) && !Number.isNaN(v);
+
+	const safeQueueCounts = (cssKey) => {
+    let party = 0, players = 0;
+
+    try {
+		if (typeof View?.getQueue === 'function') {
+        const v = Number(View.getQueue(cssKey));
+        if (isFiniteNumber(v)) party = v;
+    }
+    } catch (_) {}
+
+    try {
+		if (typeof View?.getTotalQueue === 'function') {
+        const t = Number(View.getTotalQueue(cssKey));
+        if (isFiniteNumber(t)) players = t;
+    }
+    } catch (_) {}
+
+    return { players, party };
+  };
+
+  // карта режимов
+  const modeMap = {
+    pvp: 0,
+    anderkrug: 1,
+    cte: 2,
+    m4: 3,
+    'custom-battle': 4,
+    'pve-ep2-red': 5
+  };
+
+  // тип медалей
+  const medalMap = {
+    pvp: 'gold',
+    anderkrug: 'gold',
+    cte: 'gold',
+    m4: 'gold',
+    'pve-ep2-red': 'gold',
+    'custom-battle': 'silver'
+  };
+
+  const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
+    cssKey,
+    label: () => (typeof View?.getQueue === 'function' ? View.getQueue(cssKey) : 0)
+  }));
+
+  const banner = DOM({ style: ['castle-banner-online'] });
+  banner.append(DOM({ style: ['banner-ornament'] }));
+
+  // --- элементы по режимам ---
+  bannerItems.forEach((item, idx) => {
+    const wrap = DOM({ style: ['banner-item'] });
+
+    // иконка режима
+    const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
+    wrap.append(icon);
+
+    // счётчик: всегда стартует с "0/0"
+    const lbl = DOM({ tag: 'div', style: ['banner-count', 'is-loading'] });
+    lbl.textContent = '0/0';
+    lbl.title =
+      'Отображение очереди по режимам:\n' +
+      'слева — игроков в поиске,\n' +
+      'справа — количество групп (пати).';
+    wrap.append(lbl);
+
+
+    const onQueuesUpdated = () => {
+      const { players, party } = safeQueueCounts(item.cssKey);
+      lbl.textContent = `${players}/${party}`;
+      if (players || party) lbl.classList.remove('is-loading');
+    };
+    window.addEventListener?.('queues:updated', onQueuesUpdated);
+
+    let ticks = 0;
+    const iv = setInterval(() => {
+      ticks++;
+      const { players, party } = safeQueueCounts(item.cssKey);
+      const current = lbl.textContent;
+      const next = `${players}/${party}`;
+      if (current !== next) {
+        lbl.textContent = next;
+      }
+      if (players || party) {
+        lbl.classList.remove('is-loading');
+      }
+      if ((players || party) || ticks >= 30) {
+        clearInterval(iv);
+      }
+    }, 500);
+
+    // медаль/кнопка
+    const type = medalMap[item.cssKey] || 'gold';
+    const disabled = (type === 'silver');
+
+    const medal = DOM({
+      tag: 'span',
+      style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
+    });
+
+    if (disabled) {
+      medal.title = 'Режим временно недоступен';
+    } else {
+      medal.title = 'Посмотреть статистику по режиму';
+      medal.setAttribute('role', 'button');
+      medal.tabIndex = 0;
+      const openStats = () => { Window.show('main', 'top', 0, idx); };
+      medal.addEventListener('click', openStats);
+      medal.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
+      });
+    }
+
+    wrap.append(medal);
+    banner.append(wrap);
+
+    if (idx < bannerItems.length - 1) {
+      banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
+    }
+  });
+
+  // --- блок статистики/кнопка Stat ---
+  const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
+  const statRect    = DOM({ style: ['banner-stat-rect'] });
+  const statCircle  = DOM({ style: ['banner-stat-circle'] });
+
+  const statsBtn = DOM({
+    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+    title: 'Статистика',
+    event: ['click', () => {
+      const onEsc = (e) => {
+        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+      };
+      document.addEventListener('keydown', onEsc, { once: true });
+
+      const BASE  = 'https://pw2.26rus-game.ru/stats/';
+      const id    = Number(App?.storage?.data?.id) || 0;
+      const login = String(App?.storage?.data?.login || '').trim();
+
+      const qs = new URLSearchParams();
+      if (id > 0) qs.set('user_id', String(id));
+      else if (login) qs.set('login', login);
+      else qs.set('user_id', '0');
+      qs.set('tab', 'info');
+      qs.set('q', '');
+      qs.set('_', Date.now().toString());
+
+      const src = `${BASE}?${qs.toString()}`;
+
+      Splash.show(
+        DOM(
+          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+          DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
+        ),
+        false
+      );
+    }]
+  });
+
+  // бейдж дивизии под кнопкой Stat
+  const divId   = getDivisionId();
+  const divInfo = typeof Division?.get === 'function' ? Division.get(divId) : { name: 'Дивизион', icon: 1 };
+
+  const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
+  divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
+  divisionBadgeUnderStat.title =
+    'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.';
+
+  statCircle.append(statsBtn, divisionBadgeUnderStat);
+  statWrapper.append(statRect, statCircle);
+
+  // подсказка слева
+  const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
+  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
+  const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
+  const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
+  tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+  tooltipBubble.append(tooltipText);
+  tooltipWrap.append(questionIcon, tooltipBubble);
+
+  banner.append(tooltipWrap, statWrapper);
+  return DOM({ style: 'castle-banner-online-wrapper' }, banner);
+}
+
+
 	static castleSettings() {
 
 		let builds = DOM({ style: ['castle-builds', 'button-outline'], title: "Рейтинг", event: ['click', () => View.show('top')] });
 
-		let ratings = DOM({ style: ['castle-top', 'button-outline'], title: "Рейтинг", event: ['click', () => Window.show('main', 'top')] });
+		/*let ratings = DOM({ style: ['castle-top', 'button-outline'], title: "Рейтинг", event: ['click', () => Window.show('main', 'top')] });*/
 
 		let settings = DOM({
 			style: ['castle-settings-btn', 'button-outline'], title: "Вкл/Выкл графики замка", event: ['click', () => {
@@ -1881,13 +2406,13 @@ class View {
 
 		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-		let menu = DOM({ style: ['castle-menu', 'button-outline'], title: Lang.text('menu'), event: ['click', () => Window.show('main', 'menu')] });
+		let menu = DOM({ style: ['castle-menu', 'button-outline'], event: ['click', () => Window.show('main', 'menu')] });
 
-		let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });
+		/*let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });*/
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
-
+		
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
 		input.type = 'range';
@@ -1896,10 +2421,9 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu, ratings, history);
-
-		return body;
-
+		let body = DOM({ style: ['castle-settings'] }, menu);
+		let container = DOM({ style: ['castle-settings-container'] }, View.castleBannerOnline(), body);
+		return container;
 	}
 
 	static castleChat() {
@@ -1910,7 +2434,7 @@ class View {
 
 	}
 
-	static async castleHeroes() {
+	static castleHeroes() {
 
 		let tab = 1;
 
@@ -2424,7 +2948,7 @@ class View {
 		menu.append(
 			DOM({ style: 'main-header-item', event: ['click', () => View.show('castle')] }, Castle.gl ? 'Замок' : 'Лобби'),
 			DOM({ style: 'main-header-item', event: ['click', () => View.show('builds')] }, 'Билды'),
-			DOM({ style: 'main-header-item', event: ['click', () => View.show('history')] }, 'История'),
+			/*DOM({ style: 'main-header-item', event: ['click', () => View.show('history')] }, 'История'),*/
 			DOM({ style: 'main-header-item', event: ['click', () => View.show('top')] }, 'Рейтинг'),
 			DOM({ style: 'main-header-item', event: ['click', () => View.show('game')] }, 'Фарм'),
 			DOM({ style: 'main-header-item', event: ['click', () => View.exitOrLogout()] }, 'Выйти')
@@ -2769,7 +3293,7 @@ class View {
 		return body;
 
 	}
-
+	/*
 	static async history(isWindow) {
 
 		let body = DOM({ style: 'main' }), history = DOM({ style: isWindow ? 'whistory' : 'history' });
@@ -2802,12 +3326,12 @@ class View {
 		return body;
 
 	}
-
-	static async top(hero = 0, isSplah = false) {
-
+	*/
+	static async top(hero = 0, isSplah = false, mode = 0) {
+		
 		let body = DOM({ style: 'main' });
 
-		let result = await App.api.request(CURRENT_MM, 'top', { limit: 100, hero: hero });
+		let result = await App.api.request(CURRENT_MM, 'top', { limit: 100, hero: hero, mode: mode });
 
 		if (!result) {
 
@@ -2845,9 +3369,9 @@ class View {
 						hero.addEventListener('click', async () => {
 
 							if (isSplah) {
-								Window.show('main', 'top', item.id);
+								Window.show('main', 'top', item.id, mode);
 							} else {
-								View.show('top', item.id);
+								View.show('top', item.id, false, mode);
 							}
 
 							Splash.hide();
@@ -3442,13 +3966,25 @@ class Window {
 		}
 		return false;
 	}
-
+	static async steamauth() {
+		return DOM({ id: 'wsteamauth' },
+			DOM({ style: 'castle-menu-title' }, Lang.text('steamauthTitle')),
+			DOM({ style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-text' }, Lang.text('steamauth')),
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => {
+				
+				ParentEvent.children = window.open('https://api2.26rus-game.ru:2087', 'SteamAuth', 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
+				
+			}]}, "Продолжить")			
+			)
+		);
+	}
 	static async build(heroId, targetId = 0, isWindow = false) {
 		let viewBuild = await View.build(heroId, targetId, isWindow);
 		return DOM({ id: 'wbuild' }, viewBuild);
 	}
-	static async top(hero = 0) {
-		let viewTop = await View.top(hero, true);
+	static async top(hero = 0,mode = 0) {
+		let viewTop = await View.top(hero, true, mode);
 		return DOM({ id: 'wtop' }, viewTop);
 	}
 	static async farm() {
@@ -3466,20 +4002,23 @@ class Window {
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
-			App.isAdmin() ? DOM({ style: 'castle-menu-item-v' },
+			DOM({style: 'castle-menu-items'},
+			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
-			DOM({ style: 'castle-menu-item-v' },
+			DOM({ style: 'castle-menu-item-button' },
+				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, 'Аккаунт')),
+			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
-			DOM({ style: 'castle-menu-item-v' },
+			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', async () => {
+				style: 'castle-menu-item-button', event: ['click', async () => {
 					App.exit();
 					Splash.hide();
 				}]
 			}, Lang.text('accountSwitch')),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					if (NativeAPI.status) {
 						NativeAPI.exit();
 					}
@@ -3495,8 +4034,12 @@ class Window {
 				),
 				DOM({ tag: 'a', href: 'https://discord.gg/MueeP3aAzh', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'menu-icons' })
+				),
+				DOM({ tag: 'a', href: 'https://store.steampowered.com/app/3684820/Prime_World_Classic', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
+					DOM({ tag: 'img', src: 'content/icons/steam2.webp', alt: 'Steam', style: 'menu-icons' })
 				)
 			)
+		)
 		)
 	}
 
@@ -3505,7 +4048,8 @@ class Window {
 	
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
-			DOM({ style: 'castle-menu-item' },
+			DOM({style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-item-checkbox' },
 				DOM({
 					tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 						Settings.settings.fullscreen = !e.target.checked;
@@ -3515,18 +4059,27 @@ class Window {
 					{ checked: Settings.settings.fullscreen }),
 				DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode'))
 			),
-			DOM({ style: 'castle-menu-item' },
+			DOM({ style: 'castle-menu-item-checkbox' },
+            	DOM({
+                	tag: 'input',
+                	type: 'checkbox',
+                	id: 'render-toggle',
+                	checked: Settings.settings.render,
+                	event: ['change', (e) => {
+                    	Settings.settings.render = e.target.checked;
+                    	Settings.ApplySettings({audio: false, window: false});
+                	}]
+            	}),
+            	DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
+        	),
+			DOM({ style: 'castle-menu-item-checkbox' },
 				DOM({
-					tag: 'input',
-					type: 'checkbox',
-					id: 'render-toggle',
-					checked: Settings.settings.render,
-					event: ['change', (e) => {
-						Settings.settings.render = e.target.checked;
-						Settings.ApplySettings({audio: false, window: false});
+					tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: Settings.settings.radminPriority, event: ['change', (e) => {
+						Settings.settings.radminPriority = e.target.checked;
 					}]
-				}),
-				DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD'))
+				},
+					{ checked: Settings.settings.radminPriority }),
+				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
 			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
 				DOM({
@@ -3618,9 +4171,9 @@ class Window {
 			
 			// Кнопка "Назад"
 			DOM({ 
-				style: 'castle-menu-item-v', 
+				style: 'castle-menu-item-button', 
 				event: ['click', () => Window.show('main', 'menu')] 
-			}, Lang.text('back')),
+			}, Lang.text('back'))/*,
 			
 			DOM(/*{ style: 'castle-menu-label-description' }, Lang.text('soundHelp')*/)
 		);
@@ -3750,44 +4303,74 @@ class Window {
 	}
 	
 	static async support() {
-		return DOM({ id: 'wcastle-support' },
+		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('support')),
-			DOM({ style: 'support-text' }, Lang.text('supportDesk')),
-			DOM({ style: 'support-icons' },
-				DOM({ tag: 'a', href: 'https://vk.me/join/HbESO2Fty/Z9sgbWSO0jOhNu_at9J84U7Uk=', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
+			DOM({style: 'castle-menu-items'},
+			DOM({ style: 'castle-menu-text' }, Lang.text('supportDesk')),
+			DOM({ style: 'menu-icons' },
+				DOM({ tag: 'a', href: 'https://vk.me/join/AZQ1dy/d2Qg98tKilOoQ1u34', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'support-icon' })
 				),
 				DOM({ tag: 'a', href: 'https://t.me/primeworldclassic/8232', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/telegram.webp', alt: 'Telegram', style: 'support-icon' })
 				),
-				DOM({ tag: 'a', href: 'https://discord.com/channels/1252164250265325598/1298407885876891691', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
+				DOM({ tag: 'a', href: 'https://discord.gg/S3yrbFGT86', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 					DOM({ tag: 'img', src: 'content/icons/discord.webp', alt: 'Discord', style: 'support-icon' })
 				)
 			),
-			DOM({ style: 'castle-menu-item-s', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+		)
 		);
 	}
 	static async adminPanel() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, 'Админ Панель'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents'); // Логика для отображения обычных талантов
 				}]
 			}, 'Таланты (обычные)'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents2'); // Логика для отображения классовых талантов
 				}]
 			}, 'Таланты (классовые)'),
 			DOM({
-				style: 'castle-menu-item-v', event: ['click', () => {
+				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('users'); // Логика для управления пользователями
 				}]
 			}, 'Пользователи'),
-			DOM({ style: 'castle-menu-item-v', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
+	static async accountPanel() {
+		return DOM({ id: 'wcastle-menu' },
+			DOM({ style: 'castle-menu-title' }, 'Аккаунт'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					ParentEvent.children = window.open(`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`, `SteamAuth`, 'width=1280, height=720, top='+((screen.height-720)/2)+', left='+((screen.width-1280)/2)+', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
+					
+				}]
+			}, 'Привязать Steam'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					App.setNickname();
+					
+				}]
+			}, 'Изменить никнейм'),
+			DOM({
+				style: 'castle-menu-item-button', event: ['click', () => {
+					
+					App.setFraction();
+					
+				}]
+			}, 'Сменить сторону'),
+			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+		);
+	}
+	
 }
 
 // Функция для обработки нажатия клавиш
@@ -3946,6 +4529,39 @@ class Rank {
 
 }
 
+class Division {
+	
+	static list = {
+	10:{name:'Рядовой',icon:3}, 
+	20:{name:'Капрал',icon:4},  
+	30:{name:'Сержант',icon:5}, 
+	40:{name:'Лейтенант',icon:6}, 
+	50:{name:'Капитан',icon:7},  
+	60:{name:'Майор',icon:8},  
+	70:{name:'Подполковник',icon:9}, 
+	80:{name:'Полковник',icon:10},  
+	90:{name:'Генерал',icon:11}, 
+	100:{name:'Маршал',icon:12} 
+	};
+	
+	static get(id){
+		
+		for(let key in Division.list){
+			
+			if(id <= key){
+				
+				return Division.list[key];
+				
+			}
+			
+		}
+		
+		return {name:'Не определено',icon:1};
+		
+	}
+	
+}
+
 class Build {
 
 	static loading = false;
@@ -3995,12 +4611,28 @@ class Build {
 	};
 
 	static talentRefineByRarity = {
-		4: 5.0,
+		4: 5.0, //И классовые
 		3: 7.0,
 		2: 9.0,
 		1: 12.0
 	}
-
+	
+	static talentPowerByRarityFirstLevel = {
+		4: 53.04,
+		3: 47.04,
+		2: 43.2,
+		1: 36,
+		0: 45.12
+	}
+	
+	static talentPowerByRarityPerLevel = {
+		4: 3.978,
+		3: 3.528,
+		2: 3.24,
+		1: 2.625,
+		0: 11.28
+	}
+	
 	static async view(user, hero, nickname = '', animate = true) {
 
 		let request = await App.api.request('build', 'get', { user: user, hero: hero });
@@ -4034,8 +4666,8 @@ class Build {
 				}
 
 				await App.api.request('build', 'steal', { user: user, hero: hero });
-
-				View.show('build', hero);
+				
+				await Window.show('main', 'build', hero, 0, true);
 
 				Splash.hide();
 
@@ -4269,7 +4901,7 @@ class Build {
 
 						await App.api.request(CURRENT_MM, 'heroParty', { id: MM.partyId, hero: Build.heroId });
 
-						await App.api.request(CURRENT_MM, 'start', { version: PW_VERSION, mode: 99 });
+						await App.api.request(CURRENT_MM, 'start', { version: PW_VERSION, mode: 99, mac: NativeAPI.getMACAdress() });
 
 					}
 					else {
@@ -5318,11 +5950,11 @@ class Build {
 
 		// Calculate overall power bonus
 		const talentPowerByRarity = {
-			4: 68.952,
-			3: 68.208,
-			2: 69.12,
-			1: 64.875,
-			0: 90.2
+			4: Build.talentPowerByRarityFirstLevel[4] + Build.talentPowerByRarityPerLevel[4]*(Build.talentRefineByRarity[4]-1),
+			3: Build.talentPowerByRarityFirstLevel[3] + Build.talentPowerByRarityPerLevel[3]*(Build.talentRefineByRarity[3]-1),
+			2: Build.talentPowerByRarityFirstLevel[2] + Build.talentPowerByRarityPerLevel[2]*(Build.talentRefineByRarity[2]-1),
+			1: Build.talentPowerByRarityFirstLevel[1] + Build.talentPowerByRarityPerLevel[1]*(Build.talentRefineByRarity[1]-1),
+			0: Build.talentPowerByRarityFirstLevel[0] + Build.talentPowerByRarityPerLevel[0]*(Build.talentRefineByRarity[4]-1)
 		}
 
 		let talentPower = 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
@@ -6608,7 +7240,54 @@ class Build {
 					}
 
 				}
-				Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${data.name}</b><div>${data.description}</div><span>${stats}</span>`;
+				
+				let dataTemp = data.rarity; 
+				 
+				switch (dataTemp) {
+
+					case 1: dataTemp = 1; break;
+
+					case 2: dataTemp = 2; break;
+
+					case 3: dataTemp = 3; break;
+					
+					case 4: dataTemp = 4; break;
+					
+					default: dataTemp = 0; break; 
+
+				}
+				
+				let talentIsClassBased = "";
+				
+				if(!dataTemp){
+					talentIsClassBased = Lang.text('classTalent') + `<br>`;
+				}
+				
+				let starOrange = window.innerHeight*0.015;
+				
+				let starGold = window.innerHeight*0.015;
+				
+				let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
+				
+				let stars = "";
+				
+				for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
+					if(Math.floor(i/5)%2 == 1){
+						stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+					}
+					else{
+						stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
+					}
+					
+				} 
+				
+				if(talentRefineByRarity>15){
+					stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+				}
+				
+				let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${data.description} `;
+				
+				Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${data.name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
 
 				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
 				let paramIterator = 0;
@@ -6724,14 +7403,21 @@ class Build {
 
 			Build.descriptionView.style.zIndex = 9999;
 
-			Build.descriptionView.style.position = 'absolute';
-
-			Build.descriptionView.style.left = positionElement.left + 'px';
-
-			Build.descriptionView.style.top = (positionElement.top + positionElement.height) + 'px';
-
+			Build.descriptionView.style.position = 'fixed';
+			
 			Build.descriptionView.style.display = 'block';
-
+			
+			let descriptionWidth = Build.descriptionView.offsetWidth;
+			
+			let ofSetW = 0,ofSetH = 0;
+		
+			if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
+				ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
+			}
+		
+			Build.descriptionView.style.left = (positionElement.left + positionElement.height)+ 'px';
+			
+			Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
 		}
 
 		let descEventEnd = () => {
@@ -6739,7 +7425,7 @@ class Build {
 			Build.descriptionView.style.display = 'none';
 
 		}
-
+		
 		element.ontouchstart = (e) => {
 			//e.preventDefault();
 			descEvent();
@@ -6823,11 +7509,23 @@ class Events {
 		if (!NativeAPI.status) {
 
 			return;
-
+			
 		}
 
 		MM.eventChangeHero(data);
+		
+	}
+	
+	static MMBanHero(data) {
 
+		if (!NativeAPI.status) {
+
+			return;
+			
+		}
+
+		MM.eventBanHero(data);
+		
 	}
 
 	static MMChat(data) {
@@ -6899,7 +7597,7 @@ class Events {
 		}
 
 		MM.select(data);
-
+		
 	}
 
 	static MMEnd(data) {
@@ -7001,10 +7699,18 @@ class Events {
 	}
 
 	static MMQueueV2(data) {
-
-		CastleNAVBAR.queue(data);
-
-	}
+  		console.log('[MMQueueV2] пришли данные:', data);
+  		View.mmQueueMap = data;
+		document.querySelectorAll('.banner-count').forEach((el, idx) => {
+    	const keys = ['pvp', 'anderkrug', 'cte', 'm4', 'pve-ep2-red', 'custom-battle'];
+    	const cssKey = keys[idx];
+    		if (cssKey) {
+     	 const val = View.getQueue(cssKey);
+		 console.log(`[${cssKey}] => ${val}`);
+		 el.textContent = val;
+    }
+  });
+}
 
 	static ADMStat(data) {
 
@@ -7039,15 +7745,65 @@ class Events {
 }
 
 class App {
+	static RIGA = 'wss://pw-classic.ddns.net:443';
+	static MOSCOW = 'wss://api2.26rus-game.ru:8443';
+	static CLOUDFLARE = 'wss://api.26rus-game.ru:8443';
+	static hostList = [this.RIGA, this.MOSCOW, this.CLOUDFLARE ];
+	static bestHost = -1;
+
+	static async findBestHostAndInit() {
+		const sockets = [];
+		let resolved = false;
+
+		const handleOpen = (index) => {
+			return () => {
+				if (!resolved) {
+					resolved = true;
+					this.bestHost = index;
+					
+					sockets.forEach((socket, i) => {
+						//if (i !== index && socket) {
+							socket.close();
+						//}
+					});
+
+					this.init();
+				}
+			};
+		};
+
+		for (let i = 0; i < this.hostList.length; i++) {
+			try {
+				const socket = new WebSocket(this.hostList[i]);
+				sockets[i] = socket;
+				
+				socket.onopen = handleOpen(i);
+				
+				socket.onerror = () => {
+					socket.close();
+				};
+			} catch (error) {
+				console.error(`Error creating WebSocket for ${this.hostList[i]}:`, error);
+			}
+		}
+
+		setTimeout(() => {
+			if (this.bestHost == -1) {
+				App.error("Нет соединения с API сервером Prime World Classic");
+			}				 
+		},30000);
+	}
 
 	static async init() {
-		
-		App.api = new Api(['wss://api.playpw.fun:8443', 'wss://pw.26rus-game.ru:8443'], Events);
+		// wss://api2.26rus-game.ru:8443 - Москва (основа)
+		// wss://relay.26rus-game.ru:8443 - Рига (Прокси)
+		// wss://api.26rus-game.ru:8443 - США (прокси)
+		App.api = new Api(this.hostList, this.bestHost, Events);
 		
 		await News.init();
 		
 		await Store.init();
-
+		
 		App.storage = new Store('u3');
 
 		await App.storage.init({ id: 0, token: '', login: '' });
@@ -7055,23 +7811,25 @@ class App {
 		await MM.init();
 		/*
 		setTimeout(() => {
-			let obj = {id:1, users:{
-				10:{nickname:'Nesh',hero:15,ready:1,rating:1300,select:false,team:1},
-				1858:{nickname:'vitaly-zdanevich',hero:3,ready:1,rating:1100,select:false,team:1},
-				2:{nickname:'Коао',hero:12,ready:1,rating:1100,select:false,team:1},
-				4:{nickname:'Lantarm',hero:24,ready:1,rating:1100,select:false,team:1},
-				5:{nickname:'123',hero:8,ready:1,rating:1100,select:false,team:2},
-				6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2},
-				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2},
-				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2},
-				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2}
-				},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858]};
-
-			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:49,ready:0,rating:1284,select:true,team:1,mode:0,commander:true};
-				
-			  MM.lobby(obj);
 			
-		 }, 1000);
+			let obj = {id:1, users:{
+				10:{nickname:'Nesh',hero:15,ready:1,rating:1300,select:false,team:1,banhero:59},
+				1858:{nickname:'DOK',hero:6,ready:1,rating:1100,select:false,team:1,banhero:14},
+				2:{nickname:'Коао',hero:12,ready:1,rating:1100,select:false,team:1,banhero:62},
+				4:{nickname:'Lantarm',hero:24,ready:1,rating:1100,select:false,team:1,banhero:9},
+				5:{nickname:'123',hero:8,ready:1,rating:1100,select:false,team:2,banhero:20},
+				6:{nickname:'123',hero:2,ready:1,rating:1100,select:false,team:2,banhero:21},
+				7:{nickname:'Farfania',hero:9,ready:1,rating:1100,select:false,team:2,banhero:22},
+				8:{nickname:'Rekongstor',hero:25,ready:1,rating:1100,select:false,team:2,banhero:23},
+				9:{nickname:'Hatem',hero:0,ready:1,rating:2200,select:false,team:2,banhero:26}
+			},target:7,map:[4,2,App.storage.data.id,5,6,7,8,9,10,1858],mode:0};
+
+			obj.users[App.storage.data.id] = {winrate:51,nickname:App.storage.data.login,hero:20,ready:0,rating:1284,select:true,team:1,mode:0,commander:true,banhero:16};
+			
+			MM.lobby(obj);
+			
+		},1000);
+		
 		setTimeout(() => {
 			
 			MM.chat({id:0,message:'тестовое сообщение'});
@@ -7084,6 +7842,13 @@ class App {
 		setTimeout(() => {
 			
 			ARAM.briefing(6,1,() => alert(1));
+			
+		},3000);
+		*/
+		/*
+		setTimeout(() => {
+			
+			Splash.show(DOM({style:'iframe-stats'},DOM({style:'iframe-stats-navbar',event:['click',() => Splash.hide()]},'X'),DOM({tag:'iframe',src:'https://stat.26rus-game.ru'})),false);
 			
 		},3000);
 		*/
@@ -7100,27 +7865,37 @@ class App {
 			
 		}
 
-		if (App.storage.data.login) {
-
-			View.show('castle');
-
-			//View.show('build', 1);
-
-		}
-		else {
-
-			View.show('authorization');
-
-		}
+		App.ShowCurrentView();
 
 		// App.backgroundAnimate = document.body.animate({backgroundSize:['150%','100%','150%']},{duration:30000,iterations:Infinity,easing:'ease-out'});
 
 		if (App.isAdmin()) {
 
 			document.body.append(DOM({ id: 'ADMStat' }));
-			
+
 		}
 
+	}
+
+	static ShowCurrentView() {
+		if (App.storage.data.login) {
+			
+			View.show('castle');
+			
+		}
+		else {
+
+			View.show('authorization');
+
+		}
+	}
+
+	static OpenExternalLink(url) {
+		if (NativeAPI.status) {
+			nw.Shell.openExternal(url);
+		} else {
+			window.open(url, url, 'popup');
+		}
 	}
 
 	static async authorization(login, password) {
@@ -7171,6 +7946,208 @@ class App {
 
 	}
 
+	static setNickname(){
+		
+		const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+		
+		close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+		
+		let template = document.createDocumentFragment();
+			
+		let title = DOM({tag: 'div', style: 'castle-menu-text'}, 'Сменить никнейм можно один раз в две недели');
+		
+		let name = DOM({tag:'input',placeholder:'Никнейм',value:App.storage.data.login});
+
+		let button = DOM({style:'splash-content-button',event:['click', async () => {
+
+				if(!name.value){
+					
+					Splash.hide();
+					
+					return;
+					
+				}
+				
+				if(App.storage.data.login == name.value){
+					
+					Splash.hide();
+					
+					return;
+					
+				}
+				
+				try{
+					
+					await App.api.request('user','set',{nickname:name.value});
+					
+				}
+				catch(error){
+					
+					return App.error(error);
+					
+				}
+				
+				await App.storage.set({login:name.value});
+				
+				View.show('castle');
+				
+				Splash.hide();
+				
+			}
+			
+		]},'Применить');
+
+		template.append(title, name, button, close);
+
+		Splash.show(template);
+		
+	}
+	
+	static setFraction() {
+    const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
+    close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+    
+    let template = document.createDocumentFragment();
+    
+ 
+    const title = DOM({tag: 'h2', style: 'faction-title'}, 'Выбор Фракции');
+    Object.assign(title.style, {
+        textAlign: 'center',
+        color: '#fff',
+        textShadow: '0 0 5px rgba(0,0,0,0.5)',
+        marginBottom: '30px',
+        fontSize: '24px'
+    });
+    
+  
+    const factionsContainer = DOM({tag: 'div', style: 'factions-container'});
+    Object.assign(factionsContainer.style, {
+        display: 'flex',
+        gap: '5%',  
+        justifyContent: 'center',
+        marginBottom: '30px',
+        flexWrap: 'wrap',
+        width: '90%',
+        maxWidth: '600px',
+        margin: '0 auto'
+    });
+    
+
+    const factions = [
+			{id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp'},
+			{id: 2, name: 'Докты', icon: 'Human_logo_over2.webp'}
+		];
+		
+	
+		const calculateIconSize = () => {
+			const windowWidth = window.innerWidth;
+			if (windowWidth < 500) return '20vw';  
+			if (windowWidth < 768) return '15vw';  
+			return '120px';  
+		};
+		
+
+		let selectedFaction = App.storage.data.fraction;
+		
+
+		factions.forEach(faction => {
+			const factionElement = DOM({
+				tag: 'div',
+				style: 'faction-item',
+				event: ['click', () => {
+					selectedFaction = faction.id;
+
+					factionsContainer.querySelectorAll('.faction-item').forEach(item => {
+						item.style.transform = 'scale(1)';
+						item.style.filter = 'brightness(0.7)';
+						item.style.boxShadow = 'none';
+					});
+
+					factionElement.style.transform = 'scale(1.05)';
+					factionElement.style.filter = 'brightness(1)';
+					factionElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.7)';
+				}]
+			});
+			
+			const iconSize = calculateIconSize();
+			Object.assign(factionElement.style, {
+				width: iconSize,
+				height: iconSize,
+				minWidth: '80px',
+				minHeight: '80px',
+				maxWidth: '150px',
+				maxHeight: '150px',
+				backgroundImage: `url(content/icons/${faction.icon})`,
+				backgroundSize: 'contain',
+				backgroundRepeat: 'no-repeat',
+				backgroundPosition: 'center',
+				cursor: 'pointer',
+				transition: 'all 0.3s ease',
+				transform: selectedFaction === faction.id ? 'scale(1.05)' : 'scale(1)',
+				filter: selectedFaction === faction.id ? 'brightness(1)' : 'brightness(0.7)',
+				boxShadow: selectedFaction === faction.id ? '0 0 15px rgba(255,215,0,0.7)' : 'none',
+				borderRadius: '10px'
+			});
+			
+			const nameLabel = DOM({tag: 'div', style: 'faction-name'}, faction.name);
+			Object.assign(nameLabel.style, {
+				textAlign: 'center',
+				color: '#fff',
+				marginTop: '10px',
+				textShadow: '0 0 3px #000',
+				fontSize: '16px'
+			});
+			
+			const wrapper = DOM({tag: 'div', style: 'faction-wrapper'});
+			Object.assign(wrapper.style, {
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				margin: '10px'
+			});
+			
+			wrapper.append(factionElement, nameLabel);
+			factionsContainer.append(wrapper);
+		});
+		
+		const button = DOM({
+			style: 'splash-content-button',
+			event: ['click', async () => {
+				if (!selectedFaction) {
+					Splash.hide();
+					return;
+				}
+				
+				try {
+					await App.api.request('user', 'set', {fraction: selectedFaction});
+				} catch(error) {
+					return App.error(error);
+				}
+				
+				await App.storage.set({fraction: selectedFaction});
+				View.show('castle');
+				Splash.hide();
+			}]
+		}, 'Применить');
+		
+		const resizeHandler = () => {
+			const iconSize = calculateIconSize();
+			factionsContainer.querySelectorAll('.faction-item').forEach(icon => {
+				icon.style.width = iconSize;
+				icon.style.height = iconSize;
+			});
+		};
+		
+		window.addEventListener('resize', resizeHandler);
+		
+		close.addEventListener('click', () => {
+			window.removeEventListener('resize', resizeHandler);
+		});
+		
+		template.append(title, factionsContainer, button, close);
+		Splash.show(template);
+	}
+
 	static async registration(fraction, invite, login, password, password2) {
 
 		if ((!fraction.value) || (!invite.value) || (!login.value) || (!password.value) || (!password2.value)) {
@@ -7204,7 +8181,7 @@ class App {
 
 		try {
 
-			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim(), analysis: analysis});
+			request = await App.api.request('user', 'registration', { fraction: fraction.value, invite: invite.value.trim(), login: login.value.trim(), password: password.value.trim(), analysis: analysis, mac: NativeAPI.getMACAdress() });
 
 		}
 		catch (error) {
@@ -7480,6 +8457,15 @@ class Chat {
 			nickname.classList.add('owner-text');
 
 		}
+		else if (data.id == -2) {
+
+			nickname.style.color = 'transparent';
+
+			nickname.style.fontWeight = 600;
+
+			nickname.classList.add('telegrambot-text');
+
+		}
 		else if (App.isAdmin(data.id)) {
 
 			nickname.style.color = 'transparent';
@@ -7596,7 +8582,11 @@ class PWGame {
 
 	static gameServerHasConnection = false;
 
+	static mainServerHasConnection = false;
+
 	static radminHasConnection = false;
+
+	static proxyHasConnection = false;
 
 	static gameConnectionTestIsActive = false;
 
@@ -7641,7 +8631,11 @@ class PWGame {
 	}
 
 	static GetPlayPwProtocol(id) {
-		return `pwclassic://runGame/${id}/${PW_VERSION}/${PWGame.radminHasConnection ? 1 : 0}`;
+		let chosenServer = PWGame.mainServerHasConnection ? 0 : 2;
+		if (Settings.settings.radminPriority && PWGame.radminHasConnection) {
+			chosenServer = 1;
+		}
+		return `pwclassic://runGame/${id}/${PW_VERSION}/${chosenServer}`;
 	}
 
 	static async start(id, callback) {
@@ -7690,20 +8684,22 @@ class PWGame {
 			throw 'Файлы игры повреждены! Обратитесь в поддержку PWClassic';
 		}
 		if (!PWGame.isUpToDate) {
-			throw 'Проверка обновления не завершена! Подождите';
+			//throw 'Проверка обновления не завершена! Подождите';
 		}
 		if (!PWGame.isValidated) {
-			throw 'Проверка файлов не завершена! Подождите';
+			//throw 'Проверка файлов не завершена! Подождите';
 		}
 	}
 
 
 	static gameServerIps = [
 		'http://81.88.210.30:27302/api',
-		'http://26.133.141.83:27302/api' // test connection to Radmin IP
+		'http://26.133.141.83:27302/api', // test connection to Radmin IP
+		'http://95.164.91.124:27302/api',
 	];
 	static MAIN_GAME_SERVER_IP = 0
 	static RADMIN_GAME_SERVER_IP = 1;
+	static PROXY_GAME_SERVER_IP = 2;
 
 	static async testServerConnection(serverIp) {
 		const data = {
@@ -8120,6 +9116,89 @@ class NativeAPI {
 		};
 
 	}
+	
+	static getMACAdress(){
+		
+		let result = new Array();
+		
+		if(!NativeAPI.status){
+			
+			return result;
+			
+		}
+		
+		try{
+			
+			let networkInterfaces = NativeAPI.os.networkInterfaces();
+			
+			for(let key in networkInterfaces){
+				
+				if(['Radmin VPN'].includes(`${key}`)){
+					
+					continue;
+					
+				}
+				
+				for(let networkInterface of networkInterfaces[key]){
+					
+					if(networkInterface.internal){
+						
+						continue;
+						
+					}
+					
+					if( !('mac' in networkInterface) || (!networkInterface.mac) || (networkInterface.mac == '00:00:00:00:00:00') ){
+						
+						continue;
+						
+					}
+					
+					if(!result.includes(`${networkInterface.mac}`)){
+						
+						result.push(`${networkInterface.mac}`);
+						
+					}
+					
+				}
+				
+			}
+			
+			
+		}
+		catch(error){
+			
+			console.log(error);
+			
+		}
+		
+		return result;
+		
+	}
+	
+	static getLocale(){
+		
+		let result = '';
+		
+		if(!NativeAPI.status){
+			
+			return result;
+			
+		}
+		
+		try{
+			
+			result = Intl.DateTimeFormat().resolvedOptions().locale;
+			
+		}
+		catch(error){
+			
+			
+			
+		}
+		
+		return result;
+		
+	}
 
 	static async ping(hostname, port = 80, timeout = 3000) {
 
@@ -8173,7 +9252,7 @@ class NativeAPI {
 			if (evt.currentTarget.href) {
 				url = evt.currentTarget.href;
 			}
-			nw.Shell.openExternal(url);
+			App.OpenExternalLink(url);
 		}
 	}
 
@@ -9103,6 +10182,20 @@ class Castle {
 
 	}
 
+	static uniformLocationCache = new Object();
+	static getUniformLocation(program, name) {
+		if (program.progId in this.uniformLocationCache) {
+			if (name in this.uniformLocationCache[program.progId]) {
+				return this.uniformLocationCache[program.progId][name];
+			}
+		} else {
+			this.uniformLocationCache[program.progId] = new Object();
+		}
+		let uniformLocation = Castle.gl.getUniformLocation(program.prog, name);
+		this.uniformLocationCache[program.progId][name] = uniformLocation;
+		return uniformLocation;
+	}
+
 	static async loadResources(sceneObjects, sceneBuildings, notUniqeShaderNames, notUniqeTexNames) {
 		let shaderNames = [...new Set(notUniqeShaderNames)];
 		let texNames = [...new Set(notUniqeTexNames)];
@@ -9197,6 +10290,8 @@ class Castle {
 
 	}
 
+	static uniqueProgCounter = 0;
+
 	static prepareShader(renderPassDefine, definesText, vsText, fsText) {
 
 		let vertexShader = Castle.gl.createShader(Castle.gl.VERTEX_SHADER), fragmentShader = Castle.gl.createShader(Castle.gl.FRAGMENT_SHADER);
@@ -9225,27 +10320,27 @@ class Castle {
 
 		}
 		//console.log('Loaded shader ' + shaderNames[shaderId]);
-		let program = Castle.gl.createProgram();
+		let program = {prog: Castle.gl.createProgram(), progId: this.uniqueProgCounter++};
 
-		Castle.gl.attachShader(program, vertexShader);
+		Castle.gl.attachShader(program.prog, vertexShader);
 
-		Castle.gl.attachShader(program, fragmentShader);
+		Castle.gl.attachShader(program.prog, fragmentShader);
 
-		Castle.gl.linkProgram(program);
+		Castle.gl.linkProgram(program.prog);
 
-		if (!Castle.gl.getProgramParameter(program, Castle.gl.LINK_STATUS)) {
+		if (!Castle.gl.getProgramParameter(program.prog, Castle.gl.LINK_STATUS)) {
 
-			console.error('ERROR linking program!', Castle.gl.getProgramInfoLog(program));
+			console.error('ERROR linking program!', Castle.gl.getProgramInfoLog(program.prog));
 
 			return 1;
 
 		}
 
-		Castle.gl.validateProgram(program);
+		Castle.gl.validateProgram(program.prog);
 
-		if (!Castle.gl.getProgramParameter(program, Castle.gl.VALIDATE_STATUS)) {
+		if (!Castle.gl.getProgramParameter(program.prog, Castle.gl.VALIDATE_STATUS)) {
 
-			console.error('ERROR validating program!', Castle.gl.getProgramInfoLog(program));
+			console.error('ERROR validating program!', Castle.gl.getProgramInfoLog(program.prog));
 
 			return 1;
 
@@ -9523,7 +10618,7 @@ class Castle {
 			textures, meshData.vertices, meshData.indexCount,
 			meshData.vertStride, Castle.sceneShaders[obj.shaderId].attributes,
 			obj.strip, obj.transform, isSMPass,
-			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride);
+			obj.blend, obj.tintColor, obj.uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride, obj.meshName == 'grid_9_01.bin');
 
 	}
 
@@ -9612,19 +10707,19 @@ class Castle {
 	}
 	static setupMainCam(program) {
 
-		let matViewProjUniformLocation = Castle.gl.getUniformLocation(program, 'mViewProj');
+		let matViewProjUniformLocation = Castle.getUniformLocation(program, 'mViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjUniformLocation, Castle.gl.FALSE, Castle.viewProjMatr);
 
-		let matViewProjSMUniformLocation = Castle.gl.getUniformLocation(program, 'lightViewProj');
+		let matViewProjSMUniformLocation = Castle.getUniformLocation(program, 'lightViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjSMUniformLocation, Castle.gl.FALSE, Castle.lightViewProjMatrix);
 
-		let zNearFar = Castle.gl.getUniformLocation(program, 'zNear_zFar');
+		let zNearFar = Castle.getUniformLocation(program, 'zNear_zFar');
 
 		Castle.gl.uniform4f(zNearFar, Castle.zNear, Castle.zFar, Castle.zNearSM, Castle.zFarSM);
 
-		let cursorGridPosition = Castle.gl.getUniformLocation(program, 'cursorGridPosition');
+		let cursorGridPosition = Castle.getUniformLocation(program, 'cursorGridPosition');
 
 		Castle.gl.uniform2f(cursorGridPosition, -Castle.gridCursorPosX, -Castle.gridCursorPosZ);
 
@@ -9632,7 +10727,7 @@ class Castle {
 
 	static setupSMCam(program) {
 
-		let matViewProjUniformLocation = Castle.gl.getUniformLocation(program, 'mViewProj');
+		let matViewProjUniformLocation = Castle.getUniformLocation(program, 'mViewProj');
 
 		Castle.gl.uniformMatrix4fv(matViewProjUniformLocation, Castle.gl.FALSE, Castle.lightViewProjMatrix);
 
@@ -9678,7 +10773,7 @@ class Castle {
 
 	}
 
-	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride) {
+	static drawObject(program, textures, vertices, indexCount, vertStride, attributes, strip, transform, isSMPass, blend, tintColor, uvScale, uvScroll, rotation, translation, tintOverride, scaleOverride, isGrid) {
 
 		if (blend) {
 
@@ -9702,7 +10797,7 @@ class Castle {
 
 		for (let attribute of attributes) {
 
-			let attribLocation = Castle.gl.getAttribLocation(program, attribute.name);
+			let attribLocation = Castle.gl.getAttribLocation(program.prog, attribute.name);
 
 			let attribType = attribute.sizeElem == 4 ? Castle.gl.FLOAT : (attribute.sizeElem == 2 ? Castle.gl.UNSIGNED_SHORT : Castle.gl.UNSIGNED_BYTE);
 
@@ -9723,19 +10818,19 @@ class Castle {
 
 		Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, null);
 		// Tell OpenGL state machine which program should be active.
-		Castle.gl.useProgram(program);
+		Castle.gl.useProgram(program.prog);
 
 		isSMPass ? Castle.setupSMCam(program) : Castle.setupMainCam(program);
 
 		let tintColorValue = tintOverride ? tintOverride : (tintColor ? tintColor : [1, 1, 1, 1]);
 
-		let tintColorLocation = Castle.gl.getUniformLocation(program, 'tintColor');
+		let tintColorLocation = Castle.getUniformLocation(program, 'tintColor');
 
 		Castle.gl.uniform4fv(tintColorLocation, tintColorValue);
 
 		let uvScaleValue = uvScale ? uvScale : [1, 1, 1, 1];
 
-		let uvScaleLocation = Castle.gl.getUniformLocation(program, 'uvScale');
+		let uvScaleLocation = Castle.getUniformLocation(program, 'uvScale');
 
 		Castle.gl.uniform4fv(uvScaleLocation, uvScaleValue);
 
@@ -9747,7 +10842,7 @@ class Castle {
 
 		let uvScrollValue = uvScroll ? uvScroll : [0, 0];
 
-		let uvScrollLocation = Castle.gl.getUniformLocation(program, 'uvScroll');
+		let uvScrollLocation = Castle.getUniformLocation(program, 'uvScroll');
 
 		Castle.gl.uniform2fv(uvScrollLocation, uvScrollValue);
 
@@ -9789,7 +10884,7 @@ class Castle {
 
 		}
 
-		let matWorldUniformLocation = Castle.gl.getUniformLocation(program, 'mWorld');
+		let matWorldUniformLocation = Castle.getUniformLocation(program, 'mWorld');
 
 		Castle.gl.uniformMatrix4fv(matWorldUniformLocation, Castle.gl.FALSE, worldMatrix2);
 
@@ -9803,7 +10898,7 @@ class Castle {
 
 				let attribName = "tex" + i;
 
-				let texLocation = Castle.gl.getUniformLocation(program, attribName);
+				let texLocation = Castle.getUniformLocation(program, attribName);
 
 				Castle.gl.uniform1i(texLocation, i);
 
@@ -9819,13 +10914,13 @@ class Castle {
 
 			let attribNameSM = "smTexture";
 
-			let texLocationSM = Castle.gl.getUniformLocation(program, attribNameSM);
+			let texLocationSM = Castle.getUniformLocation(program, attribNameSM);
 
 			Castle.gl.uniform1i(texLocationSM, textures.length);
 
 		}
 
-		if (!isSMPass) {
+		if (!isSMPass && isGrid) {
 			Castle.gl.activeTexture(Castle.gl.TEXTURE0 + textures.length + 1);
 
 			Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, Castle.gridTexture);
@@ -9833,7 +10928,7 @@ class Castle {
 
 			let attribNameSM = "gridTex";
 
-			let texLocationSM = Castle.gl.getUniformLocation(program, attribNameSM);
+			let texLocationSM = Castle.getUniformLocation(program, attribNameSM);
 
 			Castle.gl.uniform1i(texLocationSM, textures.length + 1);
 			
@@ -9846,13 +10941,14 @@ class Castle {
 }
 
 class Settings {
-	static defaultSettings = {
-		fullscreen: true,
-		render: true,
-		globalVolume: 0.5,
-		musicVolume: 0.7,
-		soundsVolume: 0.7,
-	};
+    static defaultSettings = {
+        fullscreen: true,
+        render: true,
+        globalVolume: 0.5,
+        musicVolume: 0.7,
+        soundsVolume: 0.7,
+		radminPriority: false
+    };
 	static defaultInputs = {
 		global: {},
 		adventure_screen: {
@@ -10146,6 +11242,8 @@ class MM {
 	static id = '';
 
 	static hero = false;
+	
+	static targetBanHeroId = 0;
 
 	static view = document.createElement('div');
 
@@ -10427,8 +11525,12 @@ class MM {
 
 			try {
 
-				let request = await App.api.request(CURRENT_MM, 'start', { hero: MM.activeSelectHero, version: PW_VERSION, mode: CastleNAVBAR.mode });
-
+				let request = await App.api.request(CURRENT_MM, 'start', { hero: MM.activeSelectHero, version: PW_VERSION, mode: CastleNAVBAR.mode, mac: NativeAPI.getMACAdress() });
+				
+				CastleNAVBAR.division(request.division);
+				
+				CastleNAVBAR.karma(request.karma);
+				
 				if (request.type == 'reconnect') {
 
 					MM.searchActive(false);
@@ -10523,6 +11625,8 @@ class MM {
 		}
 
 		let builds = await App.api.request('build', 'my', { hero: heroId });
+		
+		let target = 0;
 
 		for (let build of builds) {
 
@@ -10530,6 +11634,8 @@ class MM {
 				event: ['click', async () => {
 
 					await App.api.request('build', 'target', { id: build.id });
+					
+					target = build.id;
 
 					for (let child of MM.lobbyBuildTab.children) {
 
@@ -10551,6 +11657,8 @@ class MM {
 			}, build.name);
 
 			if (build.target) {
+				
+				target = build.id;
 
 				tab.style.background = 'rgba(255,255,255,0.3)';
 
@@ -10567,7 +11675,51 @@ class MM {
 			MM.lobbyBuildTab.append(tab);
 
 		}
-
+		
+		let notify = true, random = DOM({style:'ready-button',event:['click', async () => {
+			
+			if(notify){
+				
+				random.innerText = 'Перезаписать текущий билд?';
+				
+				notify = false;
+				
+				return;
+				
+			}
+			
+			random.innerText = 'Генерация...';
+			
+			let build = await App.api.request('build', 'rebuild', { id: target });
+			
+			if (MM.lobbyBuildField.firstChild) {
+				
+				MM.lobbyBuildField.firstChild.remove();
+				
+			}
+			
+			MM.lobbyBuildField.append(Build.viewModel(build.body, false, false));
+			
+			notify = true;
+			
+			for (let item of builds) {
+				
+				if(item.id == target){
+					
+					item.body = build.body;
+					
+				}
+				
+			}
+			
+			random.innerText = 'Случайный билд';
+			
+		}]},'Случайный билд');
+		
+		random.style.width = 'auto';
+		
+		MM.lobbyBuildTab.append(random);
+		
 	}
 
 	static async lobby(data) {
@@ -10607,8 +11759,8 @@ class MM {
 
 				try {
 
-					await App.api.request(CURRENT_MM, 'hero', { id: data.id, heroId: MM.targetHeroId });
-
+					await App.api.request(CURRENT_MM, 'hero', { id: data.id, heroId: MM.targetHeroId, banHeroId: MM.targetBanHeroId });
+					
 				}
 				catch (error) {
 
@@ -10617,9 +11769,9 @@ class MM {
 					setTimeout(() => {
 
 						MM.lobbyConfirm.innerText = 'Подтвердить';
-
+						
 					}, 1500);
-
+					
 				}
 
 			}]
@@ -10666,8 +11818,20 @@ class MM {
 				hero.append(DOM({ style: `mm-status-commander-${Winrate.icon(data.users[key].winrate)}` }));
 
 				name.setAttribute('style', 'color:rgba(255,215,0,0.9)');
-
+				
 			}
+			
+			let banhero = DOM({style:'mm-player-ban'});
+			
+			if(data.users[key].banhero){
+				
+				banhero.style.backgroundImage = `url(content/hero/${data.users[key].banhero}/1.webp)`
+				
+				banhero.style.display = 'block';
+				
+			}
+			
+			hero.append(banhero);
 
 			hero.style.backgroundImage = (data.users[key].hero) ? `url(content/hero/${data.users[key].hero}/1.webp)` : `url(content/hero/empty.webp)`;
 
@@ -10676,7 +11840,7 @@ class MM {
 			if (key == data.target) {
 
 				MM.lobbyPlayerAnimate = player.animate({ transform: ['scale(1)', 'scale(0.8)', 'scale(1.1)', 'scale(1)'] }, { duration: 2000, iterations: Infinity, easing: 'ease-in-out' });
-
+				
 			}
 
 			if (data.users[App.storage.data.id].team == data.users[key].team) {
@@ -10712,13 +11876,29 @@ class MM {
 
 		}
 
-		MM.lobbyHeroes = DOM({ style: 'mm-lobby-middle-hero' });
+		MM.lobbyHeroes = DOM({ style: 'mm-lobby-middle-hero' },DOM({style:'mm-lobby-middle-hero-prompt'},'ЛКМ (ВЫБРАТЬ) / ПКМ (ЗАБЛОКИРОВАТЬ)'));
 
 		//let preload = new PreloadImages(MM.lobbyHeroes);
 
 		let activeRankName = '';
 
 		for (let item of MM.hero) {
+			
+			if(!item.id){
+				
+				continue;
+				
+			}
+			
+			if( ('hero' in data) && (data.hero.length) ){
+				
+				if(!data.hero.includes(`${item.id}`)){
+					
+					continue;
+					
+				}
+				
+			}
 
 			let getRankName = Rank.getName(item.rating);
 
@@ -10749,7 +11929,15 @@ class MM {
 				await App.api.request(CURRENT_MM, 'eventChangeHero', { id: MM.id, heroId: item.id });
 
 				MM.lobbyBuildView(MM.targetHeroId);
-
+				
+			}
+			
+			hero.oncontextmenu = async () => {
+				
+				await App.api.request(CURRENT_MM, 'eventBanHero', { id: MM.id, heroId: item.id });
+				
+				MM.targetBanHeroId = item.id;
+				
 			}
 
 			let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating));
@@ -10809,7 +11997,7 @@ class MM {
 
 		});
 
-		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap() : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
+		let body = DOM({ style: 'mm-lobby' }, DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam), DOM({ style: 'mm-lobby-middle' }, DOM({ style: 'mm-lobby-middle-chat' }, DOM({ style: 'mm-lobby-middle-chat-map' }, (data.mode == 0) ? MM.renderMap(data.users[App.storage.data.id].team) : DOM()), MM.chatBody, chatInput), lobbyBuild, MM.lobbyHeroes));
 
 		Sound.play('content/sounds/tambur.ogg', { id: 'tambur', volume: Castle.GetVolume(Castle.AUDIO_MUSIC), loop: true });
 
@@ -10822,7 +12010,7 @@ class MM {
 			if (!data.users[key].hero) {
 
 				continue;
-
+				
 			}
 
 			let findHero = document.getElementById(`HERO${data.users[key].hero}`);
@@ -10834,16 +12022,30 @@ class MM {
 				findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 
 				findHero.dataset.ban = key;
-
+				
 			}
-
+			
+			if(data.users[key].banhero){
+				
+				let findHero = document.getElementById(`HERO${data.users[key].banhero}`);
+				
+				if (findHero) {
+					
+					findHero.style.filter = 'grayscale(100%)';
+					
+					findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+					
+				}
+				
+			}
+			
 		}
-
+		
 	}
 
-	static renderMap() {
+	static renderMap(team) {
 
-		MM.renderBody = DOM({ style: 'map' });
+		MM.renderBody = DOM({ style: (team == 1) ? 'map' : 'map-reverse' });
 
 		let container = DOM({ tag: 'div' }, MM.renderBody);
 
@@ -10855,14 +12057,15 @@ class MM {
 				style: `map-item-${number}`, data: { player: 0, position: number }, event: ['click', async () => {
 
 					await App.api.request(CURRENT_MM, 'position', { id: MM.id, position: (item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position });
+					
 
 				}]
 			})
 
 			MM.renderBody.append(item);
-
+			
 		}
-
+		
 		return container;
 
 	}
@@ -10895,7 +12098,20 @@ class MM {
 			findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 
 			findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/99.png)`;
-
+			
+			if(data.banHeroId){
+				
+				findOldPlayer.firstChild.lastChild.style.backgroundImage = `url(content/hero/${data.banHeroId}/1.webp)`;
+				
+				findOldPlayer.firstChild.lastChild.style.display = 'block';
+				
+			}
+			else{
+				
+				findOldPlayer.firstChild.lastChild.style.display = 'none';
+				
+			}
+			
 		}
 
 		if (data.target != 0) {
@@ -10905,7 +12121,7 @@ class MM {
 			if (findPlayer) {
 
 				MM.lobbyPlayerAnimate = findPlayer.animate({ transform: ['scale(1)', 'scale(0.8)', 'scale(1.2)', 'scale(1)'] }, { duration: 500, iterations: Infinity, easing: 'ease-in-out' });
-
+				
 			}
 
 		}
@@ -10921,7 +12137,7 @@ class MM {
 				child.style.backgroundColor = 'rgba(255, 255, 255, 0)';
 
 				break;
-
+				
 			}
 
 		}
@@ -10935,20 +12151,40 @@ class MM {
 			findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
 
 			findHero.onclick = false;
-
+			
+			findHero.oncontextmenu = false;
+			
+		}
+		
+		if(data.banHeroId){
+			
+			let findHero = document.getElementById(`HERO${data.banHeroId}`);
+			
+			if (findHero) {
+				
+				findHero.style.filter = 'grayscale(100%)';
+				
+				findHero.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+				
+				findHero.onclick = false;
+				
+				findHero.oncontextmenu = false;
+				
+			}
+			
 		}
 
 		if (App.storage.data.id == data.target) {
 
 			MM.lobbyConfirm.style.opacity = 1;
-
+			
 		}
 		else {
 
 			MM.lobbyConfirm.style.opacity = 0;
-
+			
 		}
-
+		
 	}
 
 	static finish(data) {
@@ -10960,7 +12196,7 @@ class MM {
 		} catch (e) {
 			App.error(e);
 		}
-	
+		/*
 		if (data.mode == 3) {
 			ARAM.briefing(data.hero, data.role, () => {
 				MM.gameRunEvent();
@@ -10970,6 +12206,12 @@ class MM {
 			MM.gameRunEvent();
 			PWGame.start(data.key, MM.gameStopEvent);
 		}
+		*/
+		
+		MM.gameRunEvent();
+		
+		PWGame.start(data.key, MM.gameStopEvent);
+		
 	}
 
 	static eventChangeHero(data) {
@@ -10999,63 +12241,34 @@ class MM {
 					item.style.backgroundImage = url;
 
 					break;
-
+					
 				}
+				
+			}
+			
+		}
+		
+	}
 
-			}
+	static eventBanHero(data){
 
-		}
-
-		/*
-		let oldHero = MM.lobbyUsers[data.id].hero, countHero = 0;
+		let findPlayer = document.getElementById(`PLAYER${data.id}`);
 		
-		for(let key in MM.lobbyUsers){
+		if(findPlayer){
 			
-			if(MM.lobbyUsers[key].hero == oldHero){
-				
-				countHero++;
-				
-			}
+			findPlayer.firstChild.lastChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.webp)`;
+			
+			findPlayer.firstChild.lastChild.style.display = 'block';
 			
 		}
 		
-		if(countHero == 1){
-			
-			let findHero = document.getElementById(`HERO${oldHero}`);
-			
-			if(findHero){
-				
-				findHero.style.backgroundColor = 'rgba(51, 255, 51, 0)';
-				
-				findHero.dataset.active = 0;
-				
-			}
-			
-		}
-		
-		let findHero = document.getElementById(`HERO${data.heroId}`);
-		
-		if(findHero){
-			
-			if(findHero.dataset.active == 0){
-				
-				findHero.style.backgroundColor = 'rgba(51, 255, 51, 0.8)';
-				
-				findHero.dataset.active = 1;
-				
-				MM.lobbyUsers[data.id].hero = data.heroId;
-				
-			}
-			
-		}
-		*/
 	}
 
 	static chat(data) {
 
 		let message = DOM(`${data.message}`);
 
-		if (data.id == 1) {
+		if (App.isAdmin(data.id)) {
 
 			message.style.color = 'rgba(255, 50, 0, 0.9)';
 			
@@ -11085,26 +12298,18 @@ class MM {
 }
 
 class ARAM {
-
-	static role = [
-		{ name: 'Защитник', task: 'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.', hero: [46,30,35,17,42,36,15] },
-		{ name: 'Боец ближнего боя', task: 'Поддержать прорыв обороны противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.', hero: [48,33,4,10,49,1,23,60,51,22,11,56,53,39,45,64] },
-		{ name: 'Боец дальнего боя', task: 'Нанести урон по более уязвимым героям вражеской команды и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [52,47,63,24,40,32,31,55,7,57,44,21,5,54,65,43,18,62,58,9,25,50] },
-		{ name: 'Поддержка', task: 'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.', hero: [19,38,13,59] },
-		{ name: 'Заклинатель', task: 'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.', hero: [26,34,28,8,2,12,29] }
-	];
 	
-	// { name: 'Ассасин', task: 'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.', hero: [3, 37, 6, 16] }
-
+	static role = {
+		1:{name:'Защитник',description:'Прорвать оборону противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.'},
+		2:{name:'Штурмовик',description:'Поддержать прорыв обороны противника и недопустить подхода вражеских героев к более уязвимым союзникам вашей команды.'},
+		3:{name:'Верховный повелитель',description:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'},
+		4:{name:'Младший повелитель',description:'Нанести основной урон вражеской команде и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'},
+		5:{name:'Поддержка',description:'Не допустить ослабления героев союзной команды и любой ценой быть готовым спасти каждого из них.'},
+		6:{name:'Преследователь',description:'Найти уязвимых героев вражеской команды для нанесения урона с целью ослабления роли противника или его уничтожения.'},
+		7:{name:'Стрелок',description:'Нанести урон по более уязвимым героям вражеской команды и соблюдать дистанцию между противниками, чтобы исключить их подход близко к вам.'}	
+	};
+	
 	static briefing(heroId, roleId, callback) {
-		
-		let heroAll = new Array();
-		
-		for(let item of ARAM.role){
-			
-			heroAll = heroAll.concat(item.hero);
-			
-		}
 
 		let hero = DOM({ style: 'aram-briefing-left' }, DOM({ style: 'aram-random' }));
 		
@@ -11134,7 +12339,7 @@ class ARAM {
 
 			while (true) {
 
-				heroRandom = heroAll[Math.floor(Math.random() * heroAll.length)];
+				heroRandom = App.getRandomInt(1,65);
 
 				if (heroRandom != lastRandomHero) {
 
@@ -11199,7 +12404,7 @@ class ARAM {
 							animate.onfinish = () => {
 								
 								h1.innerText = 'Ваша задача';
-								text.innerText = ARAM.role[roleId].task;
+								text.innerText = ARAM.role[roleId].description;
 								
 								animate.reverse();
 								
