@@ -4194,7 +4194,7 @@ class Window {
 		let bindsDom = DOM({});
 
 		for (const bind of currentBinds) {
-			bindsDom.appendChild(DOM({ style: 'castle-menu-label keybinding-row' }));
+			//bindsDom.appendChild(DOM({ style: 'castle-menu-label keybinding-row' }));
 			continue;
 			return DOM({ style: 'castle-menu-label keybinding-row' }, 
 				DOM({ style: 'keybinding-label' }, 
