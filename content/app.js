@@ -2536,7 +2536,7 @@ class View {
 
 			let buildingNameBase = DOM({ style: 'castle-item-hero-name' }, buildingName);
 
-			let building = DOM({ style: 'castle-hero-item' }, buildingNameBase);
+			let building = DOM({ style: 'castle-building-item' }, buildingNameBase);
 
 			building.dataset.url = `content/img/buildings/${Castle.currentSceneName}/${item}.png`;
 
@@ -2576,13 +2576,17 @@ class View {
 
 				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
 
-				let rankIcon = DOM({ style: 'rank-icon' });
+				let rankIcon = DOM({ style: 'castle-hero-rank-icon' });
 
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 
-				let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIcon);
+				let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
 
-				let hero = DOM({ style: 'castle-hero-item' }, rank, heroNameBase);
+				let heroImg = DOM({ style: 'castle-hero-item-img' });
+
+				let heroBg = DOM({ style: 'castle-hero-item-bg' });
+
+				let hero = DOM({ style: 'castle-hero-item' }, heroBg, heroImg, rank, heroNameBase);
 
 				hero.addEventListener('click', async () => Window.show('main', 'build', item.id, 0, true));
 
