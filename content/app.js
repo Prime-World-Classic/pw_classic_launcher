@@ -1719,7 +1719,7 @@ class View {
 			document.body.append(template);
 
 		}
-
+		
 	}
 	
 	static authorization() {
@@ -1832,6 +1832,8 @@ class View {
 		
 		body.append(backgroundImage,Castle.canvas);
 		
+		body.append(await View.castleQuest());
+		
 		try{
 			
 			let castlePlay = await View.castlePlay();
@@ -1880,6 +1882,20 @@ class View {
 		
 		return body;
 
+	}
+	
+	static async quest(questId,cloneNode){
+		
+		let ghost = DOM();
+		
+		cloneNode.lastChild.remove();
+		
+		ghost.append(cloneNode);
+		
+		ghost.setAttribute('style','position:absolute;left:-3vw;top:-3vw;transform:scale(1.3)');
+		
+		return DOM({tag:'div'},ghost);
+		
 	}
 
 	static async castlePlay() {
@@ -2500,6 +2516,36 @@ class View {
 
 		return body;
 
+	}
+	
+	static async castleQuest(){
+		
+		let body = DOM({style:'quest'});
+		
+		let request = [
+		{id:1,heroId:16,title:'',description:''},
+		{id:2,heroId:1,title:'',description:''},
+		{id:3,heroId:6,title:'',description:''}
+		];
+		
+		for(let item of request){
+			
+			let hero = DOM({style:'quest-item-hero'});
+			
+			hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
+			
+			let quest = DOM({style:'quest-item',event:['click',() => {
+				
+				Window.show('main','quest',item.id,quest.cloneNode(true));
+				
+			}]},DOM({style:'quest-item-1'}),hero,DOM({style:'quest-item-2'}),DOM({style:'quest-item-3'}));
+			
+			body.append(quest);
+			
+		}
+		
+		return body;
+		
 	}
 
 	static bodyCastleBuildings() {
@@ -3994,6 +4040,10 @@ class Window {
 	static async inventory() {
 		let view = await View.inventory(true);
 		return DOM({ id: 'winventory' }, view);
+	}
+	static async quest(questId,cloneNode) {
+		let view = await View.quest(questId,cloneNode);
+		return DOM({ id: 'wquest' }, view);
 	}
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
