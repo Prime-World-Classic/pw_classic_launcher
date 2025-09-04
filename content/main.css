@@ -1176,8 +1176,8 @@ text-align:center;
 }
 
 .castle-hero-rank{
-	width: 90cqw;
-	left: 5cqw;
+	width: 85cqw;
+	left: 7cqw;
 	bottom:22cqh;
 }
 
@@ -5081,7 +5081,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	width:84.8cqw;
 	overflow-x:scroll;
 	scroll-margin-block-start: 0;
-	border-left: 0.1cqh solid rgba(255, 200, 0, 0.5);
+	border-left: 0.3cqh solid rgba(192, 150, 100);
+	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
 }
 
 .castle-hero-item, .castle-friend-item, .castle-building-item{
@@ -5094,9 +5095,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-position:center;
 	background-repeat:no-repeat;
 	container-type: size;
-	border-right: 0.1cqh solid rgb(128, 100, 0);
-	border-top: 0.1cqh solid rgb(128, 100, 0);
-	border-bottom: 0.1cqh solid rgba(128, 100, 0);
+	border-right: 0.3cqh solid rgb(192, 150, 100);
+	border-top: 0.2cqh solid rgb(192, 150, 100);
+	border-bottom: 0.2cqh solid rgba(192, 150, 100);
 	display: flex;
 	overflow: hidden;
 }
