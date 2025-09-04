@@ -1176,6 +1176,8 @@ text-align:center;
 }
 
 .castle-hero-rank{
+	width: 90cqw;
+	left: 5cqw;
 	bottom:22cqh;
 }
 
@@ -5079,24 +5081,22 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	width:84.8cqw;
 	overflow-x:scroll;
 	scroll-margin-block-start: 0;
-	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
 	border-left: 0.1cqh solid rgba(255, 200, 0, 0.5);
 }
 
 .castle-hero-item, .castle-friend-item, .castle-building-item{
-	min-width:11cqh;
-	width: 11cqh;
+	min-width:12cqh;
+	width: 12cqh;
 	height:16cqh;
 	position: relative;
 	bottom: 0cqh;
-	padding:0cqh 0.4cqh 0cqh 0.4cqh;
 	background-size:80%;
 	background-position:center;
 	background-repeat:no-repeat;
 	container-type: size;
-	border-right: 0.1cqh solid rgba(255, 200, 0, 0.5);
-	border-top: 0.1cqh solid rgba(255, 200, 0, 0.5);
-	border-bottom: 0.1cqh solid rgba(255, 200, 0, 0.5);
+	border-right: 0.1cqh solid rgb(128, 100, 0);
+	border-top: 0.1cqh solid rgb(128, 100, 0);
+	border-bottom: 0.1cqh solid rgba(128, 100, 0);
 	display: flex;
 	overflow: hidden;
 }
@@ -5105,29 +5105,53 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-size: 0%;
 }
 
+.castle-item-background {
+	width: 100%;
+	height: 100%;
+	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
+	background-size: 100%;
+	z-index: -1;
+}
+
+.castle-hero-item:has(.hover-brightness):not(.no-hover-brightness):hover .hover-brightness {
+	filter: brightness(200%);
+}
+
+.no-hover-brightness:hover {
+	filter: brightness(100%);
+}
+
 .castle-hero-item-bg {
 	position: absolute;
-	left: 14cqw;
-	width: 80cqw;
-	height: 80cqw;
+	left: 10%;
+	width: 76cqw;
+	height: 76cqw;
 	align-self: center;
 	background-image:radial-gradient(rgb(0, 255, 128), rgb(0, 255, 128, 0.2),rgba(255, 255, 255, 0));
 	border-radius: 50%;
-	border: 2cqh solid rgba(255, 200, 0, 0.5);
+	border: 2cqw solid rgba(255, 200, 0, 0.5);
+}
+
+.castle-item-ornament {
+	position: absolute;
+	bottom: 0;
+	background-image: url('img/item-ornament.webp');
+	background-size: 100%;
+	width: 100cqw;
+	height: 15cqh;
 }
 
 .castle-hero-item-img {
 	position: absolute;
-	width: 100cqw;
-	height: 100cqw;
-	margin: auto;
+	left: 10%;
+	width: 80cqw;
+	height: 80cqw;
 	align-self: center;
 	background: inherit;
-	background-size: 80%;
+	background-size: 100%;
 }
 
 .castle-friend-item-middle{
-	
 	position:absolute;
 	display:flex;
 	flex-flow:row nowrap;
