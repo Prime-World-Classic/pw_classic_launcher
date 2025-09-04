@@ -1464,11 +1464,27 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .quest-item-3{
 	
 	background-image: url('img/quest/3.png');
-	z-index:4;
+	z-index:5;
 	left:2.5vw;
 	top:1vw;
 	transform:scale(0.4);
 	animation: questanim 1s linear infinite;
+	
+}
+
+.quest-item-5{
+	position:absolute;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	width:6vw;
+	background-image: url('img/quest/5.png');
+	z-index:4;
+	top:5vw;
+	aspect-ratio:121/21;
+	font-size:0.7vw;
+	text-align:center;
+	color:rgba(255,255,255,0.9);
 	
 }
 
