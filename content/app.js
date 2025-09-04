@@ -2574,7 +2574,7 @@ class View {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
 				}
 
-				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
+				let heroNameBase = DOM({ style: ['castle-item-hero-name', 'hover-brightness'] }, heroName);
 
 				let rankIcon = DOM({ style: 'castle-hero-rank-icon' });
 
@@ -2582,11 +2582,13 @@ class View {
 
 				let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
 
-				let heroImg = DOM({ style: 'castle-hero-item-img' });
-
-				let heroBg = DOM({ style: 'castle-hero-item-bg' });
-
-				let hero = DOM({ style: 'castle-hero-item' }, heroBg, heroImg, rank, heroNameBase);
+				let hero = DOM({ style: ['castle-hero-item', 'hover-brightness'] }, 
+					DOM({ style: ['castle-hero-item-bg', 'hover-brightness']}), 
+					DOM({ style: ['castle-hero-item-img', 'no-hover-brightness']}), 
+					DOM({ style: ['castle-item-background', 'hover-brightness']}), 
+					DOM({ style: ['castle-item-ornament', 'hover-brightness']}), 
+					rank, 
+					heroNameBase);
 
 				hero.addEventListener('click', async () => Window.show('main', 'build', item.id, 0, true));
 
