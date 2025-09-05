@@ -5053,36 +5053,93 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .castle-bottom-menu{
-	
-	width:27vh;
-	height: 15vh;
-	display:flex;
-	flex-flow:column nowrap;
-	justify-content:center;
-	align-items:center;
+	position: absolute;
+	bottom: -0.1vh;
+	background-image: url('img/menu.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	width: 12vw;
+	height: calc(12vw * 1.10);
 	container-type: size;
 }
 
-.castle-bottom-menu div{
-	
-	width:25cqh;
-	height:25cqh;
+.castle-bottom-menu div:hover {
+	filter: brightness(150%);
+}
+
+.settings-menu-item, .heroes-menu-item, .friends-menu-item, .buildings-menu-item{
+	position: absolute;
+	width:20cqh;
+	height:20cqh;
 	margin:0.1vh 0;
 	border-radius:50%;
 	background:rgba(255,255,255,0.0);
 	background-size: contain;
+	box-shadow: 0 0 2cqh  rgb(0, 217, 255);
 	
 }
 
+.nickname-menu-item {
+	overflow: hidden;
+	position: absolute;
+	left: 11cqw;
+	width: 55cqw;
+	text-align: center;
+	text-shadow:rgba(0,0,0,1) 0 0 4cqh;
+	bottom: calc(10cqh + 55cqw / 1.186);
+	color: wheat;
+}
+
+.nickname-menu-item div {
+}
+
+.flag-menu-item {
+	position: absolute;
+	left: 14cqw;
+	bottom: 10cqh;
+	width: 55cqw;
+	height: calc(55cqw / 1.186);
+	background-size: cover;
+}
+
+.settings-menu-item {
+	left: 6.1cqw;
+	top: 5.8cqh;
+	background-image: url('htalents/8.webp');
+	background-color: #00fff279;
+	width:18cqh;
+	height:18cqh;
+}
+
+.buildings-menu-item {
+	right: 13cqw;
+	bottom: 41cqh;
+	background-image: url('icons/buildings.webp');
+}
+.heroes-menu-item {
+	right: 10cqw;
+	bottom: 21.5cqh;
+	background-image: url('icons/heroes.png');
+}
+.friends-menu-item {
+	right: 1cqw;
+	bottom: 3.5cqh;
+	background-image: url('icons/friends.png');
+}
+
 .castle-bottom-content{
+	position: absolute;
 	display:flex;
 	align-items:center;
 	flex-flow:row nowrap;
-	width:84.8cqw;
+	left: 14vw;
+	width: 82.7vw;
 	overflow-x:scroll;
 	scroll-margin-block-start: 0;
 	border-left: 0.3cqh solid rgba(192, 150, 100);
+	border-right: 0.3cqh solid rgba(192, 150, 100);
 	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
+	border-radius: 0.5cqh;
 }
 
 .castle-hero-item, .castle-friend-item, .castle-building-item{
@@ -5100,6 +5157,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	border-bottom: 0.2cqh solid rgba(192, 150, 100);
 	display: flex;
 	overflow: hidden;
+	border-radius: 0.5cqh;
 }
 
 .castle-hero-item {
@@ -5115,7 +5173,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .castle-hero-item:has(.hover-brightness):not(.no-hover-brightness):hover .hover-brightness {
-	filter: brightness(200%);
+	filter: brightness(150%);
 }
 
 .no-hover-brightness:hover {
