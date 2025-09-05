@@ -2417,7 +2417,7 @@ class View {
 		input.max = '1';
 		input.step = '0.01';
 
-		let body = DOM({ style: ['castle-settings'] }, menu);
+		let body = DOM({ style: ['castle-settings'] });
 		let container = DOM({ style: ['castle-settings-container'] }, View.castleBannerOnline(), body);
 		return container;
 	}
@@ -2468,7 +2468,31 @@ class View {
 
 		View.bodyCastleHeroes();
 
+		let nicknameValue = String(App?.storage?.data?.login || '').trim();
+		let nicknameMenuItem = DOM({
+			style: 'nickname-menu-item',
+			event: ['click', () => {
+				App.setNickname();
+			}], title: 'Смена никнейма'
+			}, DOM({}, nicknameValue));
+		if (nicknameValue.length > 9) {
+			nicknameMenuItem.firstChild.classList.add('castle-name-autoscroll');
+		}
+		
+		let flagMenuItem = DOM({
+			style: 'flag-menu-item',
+			event: ['click', () => {
+				App.setFraction();
+			}], title: 'Выбор стороны'
+			});
+		let settingsMenuItem = DOM({
+			style: 'settings-menu-item',
+			event: ['click', () => {
+				Window.show('main', 'menu');
+			}], title: 'Настройки'
+			});
 		let heroesMenuItem = DOM({
+			style: 'heroes-menu-item',
 			event: ['click', () => {
 
 				View.bodyCastleHeroes();
@@ -2477,6 +2501,7 @@ class View {
 			}], title: 'Герои'
 			});
 		let friendsMenuItem = DOM({
+			style: 'friends-menu-item',
 			event: ['click', () => {
 
 				View.bodyCastleFriends();
@@ -2485,6 +2510,7 @@ class View {
 			}], title: 'Друзья'
 			});
 		let buildingsMenuItem = DOM({
+			style: 'buildings-menu-item',
 			event: ['click', () => {
 
 				View.bodyCastleBuildings();
@@ -2492,11 +2518,10 @@ class View {
 
 			}], title: 'Строительство'
 			});
-		heroesMenuItem.style.backgroundImage = `url(content/htalents/270.webp)`;
-		friendsMenuItem.style.backgroundImage = `url(content/htalents/456.webp)`;
-		buildingsMenuItem.style.backgroundImage = `url(content/icons/buildings.webp)`;
 
-		body.append(DOM({ style: 'castle-bottom-menu' }, heroesMenuItem , friendsMenuItem, buildingsMenuItem), View.castleBottom);
+		flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`; 
+
+		body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem), View.castleBottom);
 
 		return body;
 
