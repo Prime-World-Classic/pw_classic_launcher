@@ -2475,7 +2475,7 @@ class View {
 				App.setNickname();
 			}], title: 'Смена никнейма'
 			}, DOM({}, nicknameValue));
-		if (nicknameValue.length > 9) {
+		if (nicknameValue.length > 10) {
 			nicknameMenuItem.firstChild.classList.add('castle-name-autoscroll');
 		}
 		
