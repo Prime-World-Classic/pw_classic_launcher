@@ -5133,11 +5133,11 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	align-items:center;
 	flex-flow:row nowrap;
 	left: 14vw;
-	width: 82.7vw;
+	width: 81.9vw;
 	overflow-x:scroll;
 	scroll-margin-block-start: 0;
-	border-left: 0.3cqh solid rgba(192, 150, 100);
-	border-right: 0.3cqh solid rgba(192, 150, 100);
+	border-left: 0.2cqh solid rgba(192, 150, 100);
+	border-right: 0.2cqh solid rgba(192, 150, 100);
 	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
 	border-radius: 0.5cqh;
 }
@@ -5152,7 +5152,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-position:center;
 	background-repeat:no-repeat;
 	container-type: size;
-	border-right: 0.3cqh solid rgb(192, 150, 100);
+	border-right: 0.2cqh solid rgb(192, 150, 100);
 	border-top: 0.2cqh solid rgb(192, 150, 100);
 	border-bottom: 0.2cqh solid rgba(192, 150, 100);
 	display: flex;
