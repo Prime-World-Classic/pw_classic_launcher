@@ -1176,9 +1176,9 @@ text-align:center;
 }
 
 .castle-hero-rank{
-	width: 85cqw;
+	width: 90cqw;
 	left: 7cqw;
-	bottom:22cqh;
+	bottom:28cqh;
 }
 
 .rank-icon, .castle-hero-rank-icon{
@@ -5058,8 +5058,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-image: url('img/menu.png');
 	background-size: contain;
 	background-repeat: no-repeat;
-	width: 12vw;
-	height: calc(12vw * 1.10);
+	width: 10vw;
+	height: calc(10vw * 1.10);
 	container-type: size;
 }
 
@@ -5069,8 +5069,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 
 .settings-menu-item, .heroes-menu-item, .friends-menu-item, .buildings-menu-item, .chat-menu-item{
 	position: absolute;
-	width:20cqh;
-	height:20cqh;
+	width:19cqh;
+	height:19cqh;
 	margin:0.1vh 0;
 	border-radius:50%;
 	background:rgba(255,255,255,0.0);
@@ -5080,9 +5080,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .nickname-menu-item {
+	font-size: 7cqh;
 	overflow: hidden;
 	position: absolute;
-	left: 11cqw;
+	left: 13cqw;
 	width: 55cqw;
 	text-align: center;
 	text-shadow:rgba(0,0,0,1) 0 0 4cqh;
@@ -5102,20 +5103,20 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .settings-menu-item {
 	left: 6.1cqw;
 	top: 5.8cqh;
-	background-image: url('htalents/8.webp');
+	background-image: url('icons/settings.png');
 	background-color: #00fff279;
 	width:18cqh;
 	height:18cqh;
 }
 
 .buildings-menu-item {
-	right: 18cqw;
-	bottom: 62cqh;
+	right: 17cqw;
+	bottom: 63cqh;
 	background-image: url('icons/buildings.webp');
 }
 .heroes-menu-item {
-	right: 13cqw;
-	bottom: 41cqh;
+	right: 14cqw;
+	bottom: 42cqh;
 	background-image: url('icons/heroes.png');
 }
 .friends-menu-item {
@@ -5124,8 +5125,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-image: url('icons/friends.png');
 }
 .chat-menu-item {
-	right: 1cqw;
-	bottom: 3.5cqh;
+	right: 3cqw;
+	bottom: 3cqh;
 	background-image: url('icons/chat.webp');
 }
 
@@ -5134,32 +5135,31 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	display:flex;
 	align-items:center;
 	flex-flow:row nowrap;
-	left: 14vw;
-	width: 81.9vw;
+	left: 12vw;
+	bottom: 0;
+	width: 84.5vw;
 	overflow-x:scroll;
 	scroll-margin-block-start: 0;
-	border-left: 0.2cqh solid rgba(192, 150, 100);
-	border-right: 0.2cqh solid rgba(192, 150, 100);
+	border-left: 0.2cqh solid rgba(142, 150, 96);
+	border-right: 0.2cqh solid rgba(142, 150, 96);
 	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
-	border-radius: 0.5cqh;
 }
 
 .castle-hero-item, .castle-friend-item, .castle-building-item{
-	min-width:12cqh;
-	width: 12cqh;
-	height:16cqh;
+	min-width:9.9cqh;
+	width: 9.9cqh;
+	height:13.5cqh;
 	position: relative;
 	bottom: 0cqh;
 	background-size:80%;
 	background-position:center;
 	background-repeat:no-repeat;
 	container-type: size;
-	border-right: 0.2cqh solid rgb(192, 150, 100);
-	border-top: 0.2cqh solid rgb(192, 150, 100);
-	border-bottom: 0.2cqh solid rgba(192, 150, 100);
+	border-right: 0.2cqh solid rgb(142, 150, 96);
+	border-top: 0.2cqh solid rgb(142, 150, 96);
+	border-bottom: 0.2cqh solid rgba(142, 150, 96);
 	display: flex;
 	overflow: hidden;
-	border-radius: 0.5cqh;
 }
 
 .castle-hero-item {
@@ -5195,11 +5195,11 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 
 .castle-item-ornament {
 	position: absolute;
-	bottom: 0;
-	background-image: url('img/item-ornament.webp');
-	background-size: 100%;
-	width: 100cqw;
-	height: 15cqh;
+	top: 0;
+	background-image: url('img/item-ornament.svg');
+	background-size: 100cqw;
+	width: 200cqw;
+	height: 100cqh;
 }
 
 .castle-hero-item-img {
@@ -5339,15 +5339,14 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	overflow: scroll;
     height: 13cqh;
     color: #cc5;
-    font: 10cqh / 1 Tahoma;
+    font: 9cqh / 1 Tahoma;
 	text-shadow: #000 0 0 0.5cqh;
-    padding:2cqh 5cqh;
+    padding:5cqh 5cqh;
     white-space:nowrap;
 	
 }
 
 .castle-item-hero-name{
-	
 	width:100%;
 	display:flex;
 	flex-flow:row nowrap;
