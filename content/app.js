@@ -2491,6 +2491,12 @@ class View {
 				Window.show('main', 'menu');
 			}], title: 'Настройки'
 			});
+		let chatMenuItem = DOM({
+			style: 'chat-menu-item',
+			event: ['click', () => {
+				Chat.changeChatVisibility();
+			}], title: 'Отображение чата'
+			});
 		let heroesMenuItem = DOM({
 			style: 'heroes-menu-item',
 			event: ['click', () => {
@@ -2521,7 +2527,7 @@ class View {
 
 		flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`; 
 
-		body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem), View.castleBottom);
+		body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem, chatMenuItem), View.castleBottom);
 
 		return body;
 
@@ -8443,25 +8449,29 @@ class Chat {
 
 			if (event.code == 'KeyM' && (event.ctrlKey || event.metaKey)) {
 
-				if (Chat.hide) {
-
-					Chat.body.style.display = 'block';
-
-					Chat.hide = false;
-
-				}
-				else {
-
-					Chat.body.style.display = 'none';
-
-					Chat.hide = true;
-
-				}
+				changeChatVisibility();
 
 			}
 
 		});
 
+	}
+
+	static changeChatVisibility() {
+		if (Chat.hide) {
+
+			Chat.body.style.display = 'block';
+
+			Chat.hide = false;
+
+		}
+		else {
+
+			Chat.body.style.display = 'none';
+
+			Chat.hide = true;
+
+		}
 	}
 
 	static wrapLinksInATag(message) {
