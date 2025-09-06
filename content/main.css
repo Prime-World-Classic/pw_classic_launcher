@@ -5191,7 +5191,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .castle-bottom-content-btn-disable {
-	filter: saturate(0);
+	filter: saturate(20%);
 }
 
 .castle-bottom-content-container {
