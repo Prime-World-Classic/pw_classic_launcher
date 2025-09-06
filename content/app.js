@@ -2440,27 +2440,31 @@ class View {
 
 		View.castleBottom.addEventListener('wheel', function (event) {
 
-			let modifier = 0;
+			if (event.deltaY != 0) {
 
 			if (event.deltaMode == event.DOM_DELTA_PIXEL) {
 
-				modifier = 1;
+				event.preventDefault();
+				
+				View.scrollHero(event.deltaY / 100);
 
 			} else if (event.deltaMode == event.DOM_DELTA_LINE) {
 
-				modifier = parseInt(getComputedStyle(this).lineHeight);
+				event.preventDefault();
+				
+				View.scrollHeroLine(event.deltaY / 100);
 
 			} else if (event.deltaMode == event.DOM_DELTA_PAGE) {
 
-				modifier = this.clientHeight;
+				event.preventDefault();
+
+				let modifier = this.clientWidth;
+
+				View.castleBottom.scrollLeft += modifier;
+
+				View.updateArrows();
 
 			}
-
-			if (event.deltaY != 0) {
-
-				this.scrollLeft += modifier * event.deltaY;
-
-				event.preventDefault();
 
 			}
 
@@ -2526,11 +2530,81 @@ class View {
 			});
 
 		flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`; 
+		
+		View.arrows = new Object();
+		View.arrows.ls = DOM({style: 'castle-bottom-left-scroll-single', event: ['click', () => View.scrollHero(-1)]});
+		View.arrows.ld = DOM({style: 'castle-bottom-left-scroll-double', event: ['click', () => View.scrollHeroLine(-1)]});
+		View.arrows.rs = DOM({style: 'castle-bottom-right-scroll-single', event: ['click', () => View.scrollHero(1)]});
+		View.arrows.rd = DOM({style: 'castle-bottom-right-scroll-double', event: ['click', () => View.scrollHeroLine(1)]});
+		body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem, chatMenuItem), 
+		DOM({style: 'castle-bottom-content-container'}, 
+			View.castleBottom,
+			DOM({ style: 'castle-bottom-content-left-scroll' }, 
+				View.arrows.ls,
+				View.arrows.ld,
+			),
+			DOM({ style: 'castle-bottom-content-right-scroll' }, 
+				View.arrows.rs,
+				View.arrows.rd,
+			)
+			));
 
-		body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem, chatMenuItem), View.castleBottom);
+		View.updateArrows();
 
 		return body;
+	}
 
+	static currentFloatScroll = 0.0;
+
+	static scrollHero(delta) {
+
+		let modifier = parseFloat(getComputedStyle(View.castleBottom.firstChild).width) + parseFloat(getComputedStyle(View.castleBottom.firstChild).borderRightWidth);
+
+		let maxScrollLeft = View.castleBottom.scrollWidth - View.castleBottom.clientWidth;
+		if (isNaN(View.currentFloatScroll)) {
+			View.currentFloatScroll = 0;
+		}
+		View.currentFloatScroll += modifier * delta;
+		View.currentFloatScroll = Castle.clamp(View.currentFloatScroll, 0, maxScrollLeft);
+		View.castleBottom.scrollLeft = View.currentFloatScroll;
+
+		View.updateArrows();
+
+	}
+
+	static scrollHeroLine(delta) {
+
+		let width = parseFloat(getComputedStyle(View.castleBottom).width);
+
+		let maxScrollLeft = View.castleBottom.scrollWidth - View.castleBottom.clientWidth;
+		if (isNaN(View.currentFloatScroll)) {
+			View.currentFloatScroll = 0;
+		}
+		View.currentFloatScroll += width * delta;
+		View.currentFloatScroll = Castle.clamp(View.currentFloatScroll, 0, maxScrollLeft);
+		View.castleBottom.scrollLeft = View.currentFloatScroll;
+
+		View.updateArrows();
+		
+	}
+
+	static updateArrows() {
+		let maxScrollLeft = View.castleBottom.scrollWidth - View.castleBottom.clientWidth;
+		if (View.castleBottom.scrollLeft == 0) {
+			View.arrows.ls.classList.add('castle-bottom-content-btn-disable');
+			View.arrows.ld.classList.add('castle-bottom-content-btn-disable');
+		} else {
+			View.arrows.ls.classList.remove('castle-bottom-content-btn-disable');
+			View.arrows.ld.classList.remove('castle-bottom-content-btn-disable');
+		}
+
+		if (maxScrollLeft && View.castleBottom.scrollLeft == maxScrollLeft) {
+			View.arrows.rs.classList.add('castle-bottom-content-btn-disable');
+			View.arrows.rd.classList.add('castle-bottom-content-btn-disable');
+		} else {
+			View.arrows.rs.classList.remove('castle-bottom-content-btn-disable');
+			View.arrows.rd.classList.remove('castle-bottom-content-btn-disable');
+		}
 	}
 
 	static bodyCastleBuildings() {
