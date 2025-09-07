@@ -1594,81 +1594,79 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	
 	position:absolute;
 	left:0;
+	top: 17vh;
 	display:flex;
 	align-items:center;
 	justify-content:center;
 	flex-flow:column nowrap;
-	width:6vw;
-	height:100vh;
+	width:10vh;
 	margin:0 0.5vw;
+	container-type: size;
 	
 }
 
 .quest-item{
 	
 	position:relative;
-	width:6vw;
-	height:6vw;
-	margin:0.5vh 0;
+	width:100cqw;
+	height:100cqw;
+	margin:0 0 20cqw 0;
+	container-type: size;
 	
 }
 
-.quest-item-1,.quest-item-2,.quest-item-hero,.quest-item-3{
-	
-	position:absolute;
+.quest-item:hover  {
+	filter: brightness(120%);
+}
+
+.quest-item-portrait-background,.quest-item-portrait-glass,.quest-item-hero,.quest-item-exclamation{
+	height:100cqw;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
-	width:6vw;
-	height:6vw;
 	
 }
 
-.quest-item-1{
-	
+.quest-item-portrait-background{
+	width:100cqw;
 	transform:scale(0.9);
 	background-image: url('img/quest/1.png');
-	z-index:1;
 	
 }
 
-.quest-item-2{
+.quest-item-portrait-glass{
 	
 	background-image: url('img/quest/2.png');
-	z-index:3;
 	
 }
 
-.quest-item-3{
-	
+.quest-item-exclamation{
+	position: absolute;
+	width:80cqw;
+	height:80cqw;
 	background-image: url('img/quest/3.png');
-	z-index:5;
-	left:2.5vw;
-	top:1vw;
-	transform:scale(0.4);
 	animation: questanim 1s linear infinite;
+	position: absolute;
+	right: -30cqw;
+	bottom: -20cqw;
 	
 }
 
-.quest-item-5{
-	position:absolute;
+.quest-item-timer{
 	background-repeat: no-repeat;
 	background-position: center;
-	background-size: cover;
-	width:6vw;
+	background-size: contain;
 	background-image: url('img/quest/5.png');
-	z-index:4;
-	top:5vw;
 	aspect-ratio:121/21;
 	font-size:0.7vw;
 	text-align:center;
 	color:rgba(255,255,255,0.9);
+	position: relative;
+	bottom: 0;
 	
 }
 
 .quest-item-hero{
-	
-	z-index:2;
 	
 }
 

@@ -2693,11 +2693,11 @@ class View {
 		
 		for(let item of request){
 			
-			let hero = DOM({style:'quest-item-hero'});
+			let hero = DOM({style:'quest-item-hero'}, DOM({style:'quest-item-portrait-glass'}));
 			
 			hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
 			
-			let timer = DOM({style:'quest-item-5'});
+			let timer = DOM({style:'quest-item-timer'});
 			
 			timer.innerText = (item.timer - Date.now());
 			
@@ -2711,7 +2711,7 @@ class View {
 				
 				Window.show('main','quest',item.id,quest.cloneNode(true),item);
 				
-			}]},DOM({style:'quest-item-1'}),hero,DOM({style:'quest-item-2'}),DOM({style:'quest-item-3'}),timer);
+			}]},DOM({style:'quest-item-portrait-background'},hero, DOM({style:'quest-item-exclamation'})),timer);
 			
 			body.append(quest);
 			
