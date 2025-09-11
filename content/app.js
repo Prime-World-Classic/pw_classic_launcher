@@ -1338,13 +1338,12 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[3].onclick = () => {
 
-			// App.error('Привет от ifst 😎');
+		
 			
 		}
 
 		CastleNAVBAR.body.children[4].onclick = () => {
 
-			// App.error('Товарищеские матчи в процессе разработки...');
 			
 		}
 
@@ -1519,7 +1518,7 @@ class CastleNAVBAR {
 		
 		CastleNAVBAR.body.children[17].style.backgroundImage =  `url(content/ranks/${division.icon}.webp)`;
 		
-		CastleNAVBAR.body.children[17].title = division.name;
+		CastleNAVBAR.body.children[17].title = 'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.';
 		
 		CastleNAVBAR.body.children[17].style.display = 'block';
 		
@@ -2408,8 +2407,6 @@ class View {
 
 		let builds = DOM({ style: ['castle-builds', 'button-outline'], title: "Рейтинг", event: ['click', () => View.show('top')] });
 
-		/*let ratings = DOM({ style: ['castle-top', 'button-outline'], title: "Рейтинг", event: ['click', () => Window.show('main', 'top')] });*/
-
 		let settings = DOM({
 			style: ['castle-settings-btn', 'button-outline'], title: "Вкл/Выкл графики замка", event: ['click', () => {
 				let wrapper = DOM({ style: ['castle-settings-window'] })
@@ -2419,9 +2416,7 @@ class View {
 
 		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-		let menu = DOM({ style: ['castle-menu', 'button-outline'], event: ['click', () => Window.show('main', 'menu')] });
-
-		/*let history = DOM({ style: ['castle-history', 'button-outline'], title: 'История', event: ['click', () => Window.show('main', 'history')] });*/
+		
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
