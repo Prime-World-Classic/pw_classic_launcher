@@ -2398,12 +2398,7 @@ class View {
   // подсказка слева
   const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
   const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
-  const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
-  const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
-  tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
-  tooltipBubble.append(tooltipText);
-  tooltipWrap.append(questionIcon, tooltipBubble);
-
+  tooltipWrap.append(questionIcon);
   banner.append(tooltipWrap, statWrapper);
   return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
@@ -2630,9 +2625,28 @@ class View {
 	}
 	
 	static async castleQuest(){
-		
+
 		let body = DOM({style:'quest'});
 		
+		const list = DOM({ style: 'quest-list' });
+		const PAGE   = 4;       
+		let   start  = 0;       
+		const items  = [];       
+		const btnUp   = DOM({
+			style: ['quest-arrow','quest-arrow-up'],
+			event: ['click', () => {
+			if (start > 0) { start--; render(); }
+		}]
+});
+	const btnDown = DOM({
+		style: ['quest-arrow','quest-arrow-down'],
+		event: ['click', () => {
+		if (start < Math.max(0, items.length - PAGE)) { start++; render(); }
+    }]
+});
+
+  body.append(btnUp, list, btnDown); // порядок: ▲ список ▼
+
 		let request = [
 		{
 			id:1,
@@ -2690,35 +2704,53 @@ class View {
 			timer:(Date.now() + (86400000 * 30) )
 			}
 		];
-		
-		for(let item of request){
-			
-			let hero = DOM({style:'quest-item-hero'}, DOM({style:'quest-item-portrait-glass'}));
-			
-			hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
-			
-			let timer = DOM({style:'quest-item-timer'});
-			
-			timer.innerText = (item.timer - Date.now());
-			
-			setInterval(() => {
-				
-				timer.innerText = (item.timer - Date.now());
-				
-			},1000)
-			
-			let quest = DOM({style:'quest-item',event:['click',() => {
-				
-				Window.show('main','quest',item.id,quest.cloneNode(true),item);
-				
-			}]},DOM({style:'quest-item-portrait-background'},hero, DOM({style:'quest-item-exclamation'})),timer);
-			
-			body.append(quest);
-			
-		}
-		
-		return body;
-		
+	
+    for (let item of request) {
+
+    let hero = DOM({style:'quest-item-hero'}, DOM({style:'quest-item-portrait-glass'}));
+    hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
+
+    let timer = DOM({style:'quest-item-timer'});
+    const tick = () => {
+    const ms = item.timer - Date.now();
+    const sec = Math.max(0, Math.floor(ms/1000));
+    const h = Math.floor(sec/3600);
+    const m = Math.floor((sec%3600)/60);
+    const s = sec%60;
+    timer.textContent = h>0
+        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+        : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
+    tick(); setInterval(tick, 1000);
+
+    let quest = DOM(
+		{
+        style:'quest-item',
+        event:['click', () => {
+			Window.show('main','quest', item.id, quest.cloneNode(true), item);
+        }]
+	},
+	DOM({style:'quest-item-portrait-background'}, hero, DOM({style:'quest-item-exclamation'})),
+	timer
+    );
+
+    items.push(quest);
+
+    if (items.length <= PAGE) list.append(quest);
+	}
+
+	function render() {
+		list.innerHTML = '';
+				const end = Math.min(start + PAGE, items.length);
+				for (let i = start; i < end; i++) list.append(items[i]);
+				const maxStart = Math.max(0, items.length - PAGE);
+				const noScroll = items.length <= PAGE;
+				btnUp.classList.toggle('disabled', noScroll || start === 0);
+				btnDown.classList.toggle('disabled', noScroll || start >= maxStart);
+}
+
+	render();
+	return body;
 	}
 
 	static bodyCastleBuildings() {

@@ -276,45 +276,17 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .question-icon {
+  margin-top: -2.6cqh;
+  margin-right: 1.2cqh;
   position: absolute;   
-  width: 4vh;
-  height: 4vh;
-  background: url('statbtn/справка.png') no-repeat center/contain;
+  width: 6.9vh;
+  height: 6.9vh;
+  background: url('./img/queue/Cristal.png') no-repeat center/contain;
   top: 0.4cqh;   
   right: 0.1cqh; 
-  cursor: pointer;
   z-index: 5;
 }
 
-
-.castle-banner-online .question-icon {
-    width: 70%;
-    height: 70%;
-    background: url('./img/queue/Spravka.png') no-repeat center/contain;
-    opacity: 50%;
-}
-
-.castle-banner-online .question-icon:hover {
-    opacity: 100%;
-}
-
-.castle-banner-online .tooltip-bubble-img {
-    opacity: 0;
-    transform: translateY(-1cqh);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    position: absolute;
-    top: -4cqh;
-    right: 4cqh;
-    width: 16cqh;
-    height: 12.5cqh;
-    background: url('./img/queue/spravkfa2.png') no-repeat center/100% 100%;
-    z-index: 10;
-}
-
-.castle-banner-online .tooltip-wrap-left:hover .tooltip-bubble-img {
-    opacity: 1;
-    transform: translateY(0);
-}
 
 .castle-banner-online .tooltip-text {
   position: absolute;
@@ -857,10 +829,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .banner-icon.banner-icon--stat.button-outline::after {
   content: "";
   position: absolute;
-  top: -15%;   
-  left: -15%;
-  width: 130%; 
-  height: 130%;
+  top: -25%;   
+  left: -25%;
+  width: 145%; 
+  height: 145%;
   background: url("img/queue/321.png") no-repeat center/contain;
   pointer-events: none;
   z-index: 5;
@@ -885,8 +857,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   filter: saturate(.7);
 }
 
-
-.banner-division-badge--stat {
+.castle-button-play-division {
   pointer-events: auto !important;
   position: absolute;
   left: 50%;
@@ -1260,6 +1231,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-color: #00fff279;
 	width:18cqh;
 	height:18cqh;
+
 }
 
 .buildings-menu-item {
@@ -1590,6 +1562,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	bottom: 0;
 }
 
+
+
 .quest{
 	
 	position:absolute;
@@ -1669,7 +1643,48 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .quest-item-hero{
 	
 }
+.quest-list{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;                 
+  overflow:hidden;
+  height: calc(4 * 100cqw + 3 * 20cqw); 
+  container-type: size;       
+}
 
+.quest-arrow{
+  width: 70cqw;            
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: .95;
+  transition: opacity .15s ease, transform .12s ease, filter .15s ease;
+}
+
+.quest-arrow-up{
+  background-image: url('./icons/arrowUPnqu.png');
+  aspect-ratio: 49 / 41;         
+  margin-bottom: 8cqw;
+  max-width: 50cqw;
+}
+
+.quest-arrow-down{
+  background-image: url('./icons/arrowDownqu.png');
+  aspect-ratio: 49 / 44;         
+  margin-top: 8cqw;
+  max-width: 50cqw;
+}
+
+.quest-arrow:hover   { opacity: 1; filter: brightness(1.05) drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+.quest-arrow:active  { transform: translateY(1cqw) scale(.98); }
+
+.quest-arrow.disabled{
+  opacity: .35;
+  filter: grayscale(35%);
+  pointer-events: none;
+}
 @media (max-aspect-ratio: 1/1) {
 	.castle-settings {
 		flex-direction: column;
