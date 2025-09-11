@@ -554,6 +554,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     position: relative;
     top: 4.7vh;
     transform: scale(1.9);
+	z-index: 10;
 }
 
 .castle-button-play-mode,
@@ -860,10 +861,11 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .castle-button-play-division {
   pointer-events: auto !important;
   position: absolute;
-  left: 50%;
+  margin-left: 90.5vh;
+  top: 27%;
   bottom: -2.6cqh;          
   transform: translateX(-50%);
-  width: 2.4cqh;
+  width: 1.4cqh;
   height: 2.4cqh;
   background-size: contain;
   background-repeat: no-repeat;
@@ -888,18 +890,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 
-.castle-button-play-division {
-  z-index: 3;
-  width: 2vh; 
-  aspect-ratio: 1/1;
-  top: 4.4vh;
-  left: 2vh;
-  transform: scale(0.8);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  display: block;   
-}
+
 
 
 
