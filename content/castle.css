@@ -1623,7 +1623,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-size: contain;
 	background-image: url('img/quest/5.png');
 	aspect-ratio:121/21;
-	font-size:0.7vw;
+	font-size:1.19vh;
 	text-align:center;
 	color:rgba(255,255,255,0.9);
 	position: relative;
