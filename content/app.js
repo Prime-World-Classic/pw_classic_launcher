@@ -112,7 +112,9 @@ class Lang {
 				authorizationSteam: 'Login with Steam',
 				steamauthTitle: 'Login with Steam',
 				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
-				classTalent: 'Class Talent'
+				classTalent: 'Class Talent',
+				language: 'Language',
+				LangTarg: 'Language changed'
 			}
 		},
 		ru: {
@@ -166,7 +168,9 @@ class Lang {
 				authorizationSteam: 'Вход через Steam',
 				steamauthTitle: 'Вход через Steam',
 				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
-				classTalent: 'Классовый'
+				classTalent: 'Классовый',
+				language: 'Язык',
+				LangTarg: 'Язык изменен'
 			}
 		},
 		be: {
@@ -220,7 +224,9 @@ class Lang {
 				authorizationSteam: 'Увайсці праз steam',
 				steamauthTitle: 'Увайсці праз steam',
 				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
-				classTalent: 'Класавы'
+				classTalent: 'Класавы',
+				language: 'Мова',
+				LangTarg: 'Мова зменены'
 			}	
 		}
 	};
@@ -1756,9 +1762,36 @@ class View {
 		}];
 
 		let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
+	// Создаем выпадающий список языков
+		const languageSelect = DOM({
+			tag: 'select',
+			style: 'language-select',
+			event: ['change', (e) => {
+				const newLanguage = e.target.value;
+				Lang.target = newLanguage;
+				Settings.settings.language = newLanguage;
+				App.error(`Язык изменен: ${Lang.list[newLanguage].name}`);
+				// Перезагружаем страницу для применения языка
+				setTimeout(() => location.reload(), 300);
+			}]
+		});
 
+		// Заполняем выпадающий список языками
+		Object.entries(Lang.list).forEach(([code, langData]) => {
+			languageSelect.appendChild(
+				DOM({
+					tag: 'option',
+					value: code,
+					selected: code === Lang.target,
+					text: langData.name
+				})
+			);
+		});
 		let authorizationForm = DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' }, DOM({ tag: 'div' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' })),
 
+			DOM({ style: 'language-select-container' },
+					languageSelect
+				),
 			DOM({ style: 'login-box-forma-inputs' },
 				login,
 				password,
@@ -4419,7 +4452,7 @@ class Window {
 					const oldLanguage = Lang.target;
         			Lang.toggle();
         			Settings.settings.language = Lang.target;
-					App.error(`Язык изменен: ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
+					App.error(`Lang.text('LangTarg'): ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
         			Window.show('main', 'settings');
     			}]
 				}, `${Lang.text('language')} (${Lang.target})`
