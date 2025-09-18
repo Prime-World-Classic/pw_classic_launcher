@@ -86,7 +86,7 @@ class Lang {
 				volume: 'Volume',
 				volumeMusic: 'Volume of music',
 				volumeSound: 'Volume of sounds',
-				back: 'Back',
+				back: 'Save',
 				soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
 				support: 'Support',
 				supportDesk: 'Questions? Feel free to contact us:',
@@ -142,7 +142,7 @@ class Lang {
 				volume: 'Общая громкость',
 				volumeMusic: 'Громкость музыки',
 				volumeSound: 'Громкость звуков',
-				back: 'Назад',
+				back: 'Сохранить',
 				soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
 				support: 'Поддержка',
 				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
@@ -198,7 +198,7 @@ class Lang {
 				volume: 'Агульная гучнасць',
 				volumeMusic: 'Гучнасць музыкі',
 				volumeSound: 'Гучнасць гукаў',
-				back: 'Назад',
+				back: 'Захаваць',
 				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
 				support: 'Падтрымка',
 				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
@@ -4227,7 +4227,6 @@ class Window {
 			title: 'Закрыть',
 			event: ['click', () => {
 				Window.close(category);
-				location.reload();
 			}]
 		},
 			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style' }));
