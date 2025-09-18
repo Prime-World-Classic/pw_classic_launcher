@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.7.3';
+PW_VERSION = '2.7.4';
 
 CURRENT_MM = 'mmtest'
 
@@ -226,33 +226,42 @@ class Lang {
 	};
 	
 	static init(){
-		
-		let locale = NativeAPI.getLocale();
-		
-		if(!locale){
-			
-			if( !('language' in navigator) ){
-				
-				return;
-				
-			}
-			
-			locale = navigator.language;
-			
-		}
-		
-		for(let key in Lang.list){
-			
-			if(Lang.list[key].locale.includes(locale)){
-				
-				Lang.target = key;
-				
-				break;
-				
-			}
-			
-		}
-		
+    
+    	// Сначала пробуем загрузить сохраненный язык из настроек
+    	if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
+        	if (Settings.settings.language in Lang.list) {
+            	Lang.target = Settings.settings.language;
+            	return;
+        	}
+    	}
+    
+    	// Если сохраненного языка нет, определяем по локали системы
+    	let locale = NativeAPI.getLocale();
+    
+    	if(!locale){
+        
+        	if( !('language' in navigator) ){
+            
+            	return;
+            
+        	}
+        
+        	locale = navigator.language;
+        
+    	}
+    
+    	for(let key in Lang.list){
+        
+        	if(Lang.list[key].locale.includes(locale)){
+            
+            	Lang.target = key;
+            
+            	break;
+            
+        	}
+        
+    	}
+    
 	}
 
 	static text(word) {
@@ -261,6 +270,23 @@ class Lang {
 		}
 
 		return Lang.list[Lang.default].word[word];
+	}
+
+	// Новая функция для переключения языков
+	static toggle() {
+    	const languages = Object.keys(Lang.list);
+    	const currentIndex = languages.indexOf(Lang.target);
+    	const nextIndex = (currentIndex + 1) % languages.length;
+    	Lang.target = languages[nextIndex];
+    	return Lang.target;
+	}
+
+	// Функция только для получения следующего языка
+	static getNextLanguage() {
+    	const languages = Object.keys(Lang.list);
+    	const currentIndex = languages.indexOf(Lang.target);
+    	const nextIndex = (currentIndex + 1) % languages.length;
+    	return languages[nextIndex];
 	}
 
 }
@@ -4168,6 +4194,7 @@ class Window {
 			title: 'Закрыть',
 			event: ['click', () => {
 				Window.close(category);
+				location.reload();
 			}]
 		},
 			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style' }));
@@ -4386,6 +4413,17 @@ class Window {
 					style: 'volume-percentage' 
 				}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
 			),
+			DOM({ 
+    			style: 'castle-menu-item-button',
+    			event: ['click', (e) => {
+					const oldLanguage = Lang.target;
+        			Lang.toggle();
+        			Settings.settings.language = Lang.target;
+					App.error(`Язык изменен: ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
+        			Window.show('main', 'settings');
+    			}]
+				}, `${Lang.text('language')} (${Lang.target})`
+			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
 				style: 'castle-menu-item-button',
@@ -4398,7 +4436,10 @@ class Window {
 			// Кнопка "Назад"
 			DOM({ 
 				style: 'castle-menu-item-button', 
-				event: ['click', () => Window.show('main', 'menu')] 
+				event: ['click', () => {
+        			Window.show('main', 'menu');
+        			location.reload();
+    			}]
 			}, Lang.text('back'))/*,
 			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
@@ -11221,7 +11262,8 @@ class Settings {
         globalVolume: 0.5,
         musicVolume: 0.7,
         soundsVolume: 0.7,
-		radminPriority: false
+		radminPriority: false,
+		language: 'ru'
     };
 
     static settings = JSON.parse(JSON.stringify(this.defaultSettings));
@@ -11324,7 +11366,14 @@ class Settings {
 					Sound.setVolume('sound_test', Castle.GetVolume(Castle.AUDIO_SOUNDS));
 				}
 			}
-	
+			// 4. Применение настроек языка (если не отключено в options)
+			if (options.language !== false && typeof Lang !== 'undefined') {
+            // Обновляем текущий язык
+            if (this.settings.language && this.settings.language in Lang.list) {
+                Lang.target = this.settings.language;
+            }
+		}
+
 		} catch (e) {
 			App.error('Ошибка применения настроек: ' + e);
 		}
