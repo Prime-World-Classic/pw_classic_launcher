@@ -57,6 +57,7 @@ export const en = {
 		sr: 'Strength/Intelligence',
 		hp: 'Health',
 		provorstvo: 'Agility',
+		hitrost: 'Trick',
 		cunning: 'Cunning',
 		regenmp: 'Energy Regeneration',
 		stoikost: 'Stamina',
