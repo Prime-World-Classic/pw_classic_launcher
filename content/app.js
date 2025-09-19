@@ -198,7 +198,7 @@ class Lang {
 				volume: 'Агульная гучнасць',
 				volumeMusic: 'Гучнасць музыкі',
 				volumeSound: 'Гучнасць гукаў',
-				back: 'Захаваць',
+				back: 'Захавацьд',
 				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
 				support: 'Падтрымка',
 				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
@@ -4911,22 +4911,22 @@ class Build {
 
 	static language = {
 		sr: 'Сила/Разум',
-		hp: Lang.text('health'),
-		provorstvo: Lang.text('agility'),
-		hitrost: Lang.text('dexterity'),
+		hp: 'Здоровье',
+		provorstvo: 'Проворство',
+		hitrost: 'Хитрость',
 		regenmp: 'Регенерация энергии',
-		stoikost: Lang.text('stamina'),
-		volia: Lang.text('will'),
+		stoikost: 'Стойкость',
+		volia: 'Воля',
 		ph: 'Проворство/Хитрость',
 		sv: 'Стойкость/Воля',
-		razum: Lang.text('intelligence'),
-		sila: Lang.text('strength'),
+		razum: 'Разум',
+		sila: 'Сила',
 		speedtal: '%<speedtal></speedtal>',
 		srsv: 'Сила/Разум/Стойкость/Воля',
 		hpmp: 'Здоровье/Энергия',
 		krajahp: 'Кража здоровья',
 		regenhp: 'Регенерация здоровья',
-		mp: Lang.text('energy'),
+		mp: 'Энергия',
 		krajamp: 'Кража энергии',
 		stoikostrz: 'Стойкость на родной земле',
 		voliarz: 'Воля на родной земле',
@@ -4946,7 +4946,7 @@ class Build {
 		svvz: 'Стойкость/Воля на вражеской земле',
 		krajahpvz: 'Кража здоровья на вражеской земле',
 		vs: 'Воля/Стойкость',
-		speed: Lang.text('speed'),
+		speed: 'Скорость',
 		speedrz: 'Скорость на родной земле',
 		speedvz: 'Скорость на вражеской или нейтральной земле',
 		dopspeed: 'Дополнительный бонус к скорости',
@@ -7527,263 +7527,240 @@ class Build {
 	}
 
 	static description(element) {
-		let descEvent = () => {
+    let descEvent = () => {
+        let positionElement = element.getBoundingClientRect();
+        let data = Build.talents[element.dataset.id];
 
-			let positionElement = element.getBoundingClientRect();
+        if (!data) {
+            console.log("Не найден талант в билде: " + element.dataset.id);
+            Build.descriptionView.style.display = 'none';
+            return;
+        }
 
-			let data = Build.talents[element.dataset.id];
+        // Определяем тип таланта и формируем ключи для перевода
+        const isHeroTalent = data.id < 0;
+        const prefix = isHeroTalent ? "htalent_" : "talent_";
+        const absId = Math.abs(data.id);
+        
+        const nameKey = `${prefix}${absId}_name`;
+        const descriptionKey = `${prefix}${absId}_description`;
 
-			if (!data) {
-				console.log("Не найден талант в билде: " + element.dataset.id)
-				Build.descriptionView.style.display = 'none';
-				return;
-			}
+        // Получаем переводы из системы Lang
+        const name = Lang.text(nameKey);
+        const description = Lang.text(descriptionKey);
 
-			if ((!data.name) || (!data.description)) {
+        // Проверяем, есть ли переводы (если вернулся ключ, значит перевода нет)
+        if (name === nameKey || description === descriptionKey) {
+            Build.descriptionView.innerHTML = `<b>Талант #${data.id}</b><div>Информация отсутствует. Сообщите пожалуйста об этом в отдельную тему Telegram сообщества Prime World Classic.</div><span>+1000 Уважение</span>`;
+            
+            let positionDescription = Build.descriptionView.getBoundingClientRect();
+            Build.descriptionView.style.zIndex = 9999;
+            Build.descriptionView.style.position = 'fixed';
+            Build.descriptionView.style.display = 'block';
+            Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
+            Build.descriptionView.style.top = (positionElement.top) + 'px';
+            return;
+        }
 
-				Build.descriptionView.innerHTML = `<b>Талант #${data.id}</b><div>Информация отсутствует. Сообщите пожалуйста об этом в отдельную тему Telegram сообщества Prime World Classic.</div><span>+1000 Уважение</span>`;
+        let rgb = '';
+        switch (data.rarity) {
+            case 1: rgb = '17,105,237'; break;
+            case 2: rgb = '205,0,205'; break;
+            case 3: rgb = '237,129,5'; break;
+            case 4: rgb = '170,20,44'; break;
+        }
 
-			}
-			else {
+        let stats = '';
+        if (('stats' in data) && (data.stats)) {
+            for (let key in data.stats) {
+                if (Build.talentStatFilter(key)) {
+                    continue;
+                }
 
-				let rgb = '';
+                let statValue = parseFloat(data.stats[key]);
 
-				switch (data.rarity) {
+                if ('statsRefine' in data && 'rarity' in data) {
+                    let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+                    let refineMul = parseFloat(data.statsRefine[key]);
+                    statValue += refineBonus * refineMul;
+                }
 
-					case 1: rgb = '17,105,237'; break;
+                let sign = key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz' ? '-' : '+';
+                stats += sign + `${Math.floor(statValue * 10.0) / 10.0} ${Lang.text(key)}<br>`;
+            }
+        }
+        
+        let dataTemp = data.rarity; 
+         
+        switch (dataTemp) {
+            case 1: dataTemp = 1; break;
+            case 2: dataTemp = 2; break;
+            case 3: dataTemp = 3; break;
+            case 4: dataTemp = 4; break;
+            default: dataTemp = 0; break; 
+        }
+        
+        let talentIsClassBased = "";
+        
+        if(!dataTemp){
+            talentIsClassBased = Lang.text('classTalent') + `<br>`;
+        }
+        
+        let starOrange = window.innerHeight*0.015;
+        let starGold = window.innerHeight*0.015;
+        let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
+        
+        let stars = "";
+        
+        for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
+            if(Math.floor(i/5)%2 == 1){
+                stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+            }
+            else{
+                stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
+            }
+        } 
+        
+        if(talentRefineByRarity>15){
+            stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+        }
+        
+        // Используем переведенное описание
+        let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${description} `;
+        
+        // Используем переведенное название
+        Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
 
-					case 2: rgb = '205,0,205'; break;
+        let innerChilds = Build.descriptionView.childNodes[1].childNodes;
+        let paramIterator = 0;
+        for (let outerTag of innerChilds) {
+            for (let specialTag of outerTag.childNodes) {
+                let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
+                if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
+                    continue;
+                }
+                let params = data.params.split(';');
+                if (paramIterator >= params.length) {
+                    continue;
+                }
+                let param = params[paramIterator];
+                let paramValues = param.split(',');
 
-					case 3: rgb = '237,129,5'; break;
+                let statAffection, minValue, maxValue;
 
-					case 4: rgb = '170,20,44'; break;
+                if (paramValues.length == 5) {
+                    minValue = parseFloat(paramValues[1]);
+                    maxValue = parseFloat(paramValues[2]);
+                    statAffection = paramValues[4];
+                }
+                else if (paramValues.length == 3) {
+                    minValue = parseFloat(paramValues[0]);
+                    maxValue = parseFloat(paramValues[1]);
+                    statAffection = paramValues[2];
+                }
 
-				}
+                let resolvedStatAffection;
+                let resolvedStatAffection1;
+                let resolvedStatAffection2;
+                switch (statAffection) {
+                    case 'sr_max':
+                        resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+                        break;
+                    case 'sv_max':
+                        resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+                        break;
+                    case 'ph_max':
+                        resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+                        break;
+                    case 'hpmp_max':
+                        resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
+                        break;
+                    case 'sr_sum':    
+                        resolvedStatAffection1 = 'sila';
+                        resolvedStatAffection2 = 'razum';                        
+                        break;
+                    case 'ph_sum':    
+                        resolvedStatAffection1 = 'provorstvo';
+                        resolvedStatAffection2 = 'hitrost';                        
+                        break;
+                    case 'sv_sum':    
+                        resolvedStatAffection1 = 'stoikost';
+                        resolvedStatAffection2 = 'volia';                        
+                        break;    
+                    case 'hpmp_sum':    
+                        resolvedStatAffection1 = 'hp';
+                        resolvedStatAffection2 = 'mp';                        
+                        break;    
+                    default:
+                        resolvedStatAffection = statAffection;
+                        break;
+                }
 
-				let stats = '';
+                function lerp(a, b, alpha) {
+                    return a + alpha * (b - a);
+                }
+                
+                let outputString;
+                if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
+                    let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
+                    let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
+                    const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
+                    const param1 = isHpOrEnergy ? 600.0 : 50.0;
+                    const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+                    outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
+                    if (outputString.endsWith(('.0'))) {
+                        outputString = outputString.replace('.0', '');
+                    }
+                } else {
+                    if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+                        let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+                        const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+                        const param1 = isHpOrEnergy ? 600.0 : 50.0;
+                        const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+                        outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
+                        if (outputString.endsWith(('.0'))) {
+                            outputString = outputString.replace('.0', '');
+                        }
+                    } else {
+                        let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+                        outputString = (minValue + maxValue * refineBonus).toFixed(1);
+                        if (outputString.endsWith(('.0'))) {
+                            outputString = outputString.replace('.0', '');
+                        }
+                    }
+                }
+                if (specialTag.innerHTML) {
+                    specialTag.innerHTML = tagString.replace('%s', outputString);
+                } else {
+                    outerTag.innerHTML = tagString.replace('%s', outputString);
+                }
+                paramIterator++;
+            }
+        }
 
-				if (('stats' in data) && (data.stats)) {
+        let positionDescription = Build.descriptionView.getBoundingClientRect();
+        Build.descriptionView.style.zIndex = 9999;
+        Build.descriptionView.style.position = 'fixed';
+        Build.descriptionView.style.display = 'block';
+        
+        let descriptionWidth = Build.descriptionView.offsetWidth;
+        let ofSetW = 0,ofSetH = 0;
+    
+        if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
+            ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
+        }
+    
+        Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
+        Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
+    }
 
-					for (let key in data.stats) {
-						if (Build.talentStatFilter(key)) {
-							continue;
-						}
-
-						let statValue = parseFloat(data.stats[key]);
-
-						if ('statsRefine' in data && 'rarity' in data) {
-							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-							let refineMul = parseFloat(data.statsRefine[key]);
-							statValue += refineBonus * refineMul;
-						}
-
-						let sign = key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz' ? '-' : '+';
-						stats += sign + `${Math.floor(statValue * 10.0) / 10.0} ${(Build.language[key]) ? Build.language[key] : key}<br>`;
-
-					}
-
-				}
-				
-				let dataTemp = data.rarity; 
-				 
-				switch (dataTemp) {
-
-					case 1: dataTemp = 1; break;
-
-					case 2: dataTemp = 2; break;
-
-					case 3: dataTemp = 3; break;
-					
-					case 4: dataTemp = 4; break;
-					
-					default: dataTemp = 0; break; 
-
-				}
-				
-				let talentIsClassBased = "";
-				
-				if(!dataTemp){
-					talentIsClassBased = Lang.text('classTalent') + `<br>`;
-				}
-				
-				let starOrange = window.innerHeight*0.015;
-				
-				let starGold = window.innerHeight*0.015;
-				
-				let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
-				
-				let stars = "";
-				
-				for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
-					if(Math.floor(i/5)%2 == 1){
-						stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-					}
-					else{
-						stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
-					}
-					
-				} 
-				
-				if(talentRefineByRarity>15){
-					stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-				}
-				
-				let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${data.description} `;
-				
-				Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${data.name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
-
-				let innerChilds = Build.descriptionView.childNodes[1].childNodes;
-				let paramIterator = 0;
-				for (let outerTag of innerChilds) {
-					for (let specialTag of outerTag.childNodes) {
-						let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
-						if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
-							continue;
-						}
-						let params = data.params.split(';');
-						if (paramIterator >= params.length) {
-							continue;
-						}
-						let param = params[paramIterator];
-						let paramValues = param.split(',');
-
-						let statAffection, minValue, maxValue;
-
-						if (paramValues.length == 5) {
-							//let applyTo = paramValues[0];
-							minValue = parseFloat(paramValues[1]);
-							maxValue = parseFloat(paramValues[2]);
-							//let applicator = paramValues[3];
-							statAffection = paramValues[4];
-						}
-						else if (paramValues.length == 3) {
-							minValue = parseFloat(paramValues[0]);
-							maxValue = parseFloat(paramValues[1]);
-							statAffection = paramValues[2];
-						}
-
-						let resolvedStatAffection;
-						let resolvedStatAffection1;
-						let resolvedStatAffection2;
-						switch (statAffection) {
-							case 'sr_max':
-								resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
-								break;
-							case 'sv_max':
-								resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
-								break;
-							case 'ph_max':
-								resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
-								break;
-							case 'hpmp_max':
-								resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
-								break;
-							case 'sr_sum':	
-								resolvedStatAffection1 = 'sila';
-								resolvedStatAffection2 = 'razum';						
-								break;
-							case 'ph_sum':	
-								resolvedStatAffection1 = 'provorstvo';
-								resolvedStatAffection2 = 'hitrost';						
-								break;
-							case 'sv_sum':	
-								resolvedStatAffection1 = 'stoikost';
-								resolvedStatAffection2 = 'volia';						
-								break;	
-							case 'hpmp_sum':	
-								resolvedStatAffection1 = 'hp';
-								resolvedStatAffection2 = 'mp';						
-								break;	
-							default:
-								resolvedStatAffection = statAffection;
-								break;
-						}
-
-						function lerp(a, b, alpha) {
-							return a + alpha * (b - a);
-						}
-						
-						let outputString;
-						if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
-							let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
-							let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
-								const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
-								const param1 = isHpOrEnergy ? 600.0 : 50.0;
-								const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-								outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
-								if (outputString.endsWith(('.0'))) {
-									outputString = outputString.replace('.0', '')
-								}
-						} else {
-							if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
-								let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
-								const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
-								const param1 = isHpOrEnergy ? 600.0 : 50.0;
-								const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-								outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
-								if (outputString.endsWith(('.0'))) {
-									outputString = outputString.replace('.0', '')
-								}
-							} else {
-								let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-								outputString = (minValue + maxValue * refineBonus).toFixed(1);
-								if (outputString.endsWith(('.0'))) {
-									outputString = outputString.replace('.0', '');
-								}
-							}
-						}
-						if (specialTag.innerHTML) {
-							specialTag.innerHTML = tagString.replace('%s', outputString);
-						} else {
-							outerTag.innerHTML = tagString.replace('%s', outputString);
-						}
-						paramIterator++;
-					}
-				}
-			}
-
-			let positionDescription = Build.descriptionView.getBoundingClientRect();
-
-			Build.descriptionView.style.zIndex = 9999;
-
-			Build.descriptionView.style.position = 'fixed';
-			
-			Build.descriptionView.style.display = 'block';
-			
-			let descriptionWidth = Build.descriptionView.offsetWidth;
-			
-			let ofSetW = 0,ofSetH = 0;
-		
-			if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
-				ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
-			}
-		
-			Build.descriptionView.style.left = (positionElement.left + positionElement.height)+ 'px';
-			
-			Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
-		}
-
-		let descEventEnd = () => {
-
-			Build.descriptionView.style.display = 'none';
-
-		}
-		
-		element.ontouchstart = (e) => {
-			//e.preventDefault();
-			descEvent();
-		};
-
-		element.onmouseover = () => { descEvent() };
-
-		element.onmouseout = () => { descEventEnd() };
-
-		element.ontouchend = () => {
-			//e.preventDefault();
-			descEventEnd();
-		};
-
-	}
+    let descEventEnd = () => {
+        Build.descriptionView.style.display = 'none';
+    };
+    
+    element.ontouchstart = (e) => {
+        descEvent();
+    };
 
 }
 
