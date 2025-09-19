@@ -55,246 +55,81 @@ class ParentEvent {
 }
 
 class Lang {
+		static target = 'ru';
+		static default = 'ru';
+		static list = {};
 
-	static target = 'ru'; // TODO get from the system
-	// TODO add UI dropdown?
-	static default = 'ru';
+		static async init() {
+			try {
+				console.log('Loading languages...');
+				
+				// Абсолютные пути
+				const { ru } = await import('/content/lang/ru.js');
+				const { en } = await import('/content/lang/en.js');
+				const { be } = await import('/content/lang/be.js');
 
-	static list = {
-		en: {
-			locale:['en_US'],
-			name:'English',
-			word: {
-				nickname: 'login/Nickname',
-				code: 'code/Telegram bot',
-				password: 'password',
-				passwordAgain: 'password again',
-				login: 'Login',
-				registration: 'Registration',
-				fraction: 'Select a faction',
-				adornia: 'Kingdom of Adornia',
-				docts: 'Empire of the Docts',
-				fight: 'Fight!',
-				enterTextAndPressEnter: 'Enter the text and press Enter',
-				ready: 'Ready',
-				library: 'Library',
-				menu: 'Меню',
-				preferences: 'Preferences',
-				windowMode: 'Window mode',
-				radminPriority: 'RadminVPN Priority',
-				threeD: '3D',
-				volume: 'Volume',
-				volumeMusic: 'Volume of music',
-				volumeSound: 'Volume of sounds',
-				back: 'Save',
-				soundHelp: 'If the sound settings are lost, you can adjust the volume in the mixer: right-click on the sound icon on the Taskbar -> Volume Mixer -> Game icon -> make it quieter',
-				support: 'Support',
-				supportDesk: 'Questions? Feel free to contact us:',
-				accountSwitch: 'Switch account',
-				exit: 'Exit from Prime World',
-				version: 'Version',
-				health: 'Health',
-				energy: 'Energy',
-				speed: 'Speed',
-				strength: 'Strength',
-				intelligence: 'Intelligence',
-				agility: 'Agility',
-				dexterity: 'Dexterity',
-				stamina: 'Stamina',
-				will: 'Will',
-				damage: 'Damage',
-				criticalHit: 'Critical Hit',
-				attacksPerSecond: 'Attacks per second',
-				penetration: 'Penetration',
-				defencePsys: 'Defence Psysical',
-				defenceMagic: 'Defence Magic',
-				skins: 'Skins',
-				authorizationSteam: 'Login with Steam',
-				steamauthTitle: 'Login with Steam',
-				steamauth: 'By clicking Continue, you will register a new account! If you want to log in to your current PW Classic account, you must first link your Steam account from the settings menu.',
-				classTalent: 'Class Talent',
-				language: 'Language',
-				LangTarg: 'Language changed'
+				Lang.list = { ru, en, be };
+				console.log('Languages loaded successfully:', Object.keys(Lang.list));
+
+			} catch (error) {
+				console.error('Error loading language files:', error);
+				throw new Error('Failed to load language files: ' + error.message);
 			}
-		},
-		ru: {
-			locale:['ru_RU'],
-			name:'Русский',
-			word: {
-				nickname: 'Логин/Никнейм',
-				code: 'Инвайт-код',
-				password: 'Пароль',
-				passwordAgain: 'Еще раз пароль',
-				login: 'Войти',
-				registration: 'Регистрация',
-				fraction: 'Выберите фракцию',
-				adornia: 'Королевство Адорния',
-				docts: 'Империя Доктов',
-				fight: 'В бой!',
-				enterTextAndPressEnter: 'Введите текст и нажмите Enter',
-				ready: 'Готов',
-				library: 'Библиотека',
-				menu: 'Меню',
-				preferences: 'Настройки',
-				windowMode: 'Оконный режим',
-				radminPriority: 'Приоритет RadminVPN',
-				threeD: '3D графика',
-				volume: 'Общая громкость',
-				volumeMusic: 'Громкость музыки',
-				volumeSound: 'Громкость звуков',
-				back: 'Сохранить',
-				soundHelp: 'Если сбиваются настройки звука, то можно отрегулировать в микшере громкости: ПКМ на значок звука на Панели задач -> Микшер громкости -> Значок игры -> делаете тише',
-				support: 'Поддержка',
-				supportDesk: 'Если у Вас есть вопросы, Вы можете связаться с нами через:',
-				accountSwitch: 'Сменить аккаунт',
-				exit: 'Выйти из Prime World',
-				version: 'Версия',
-				health: 'Здоровье',
-				energy: 'Энергия',
-				speed: 'Скорость',
-				strength: 'Сила',
-				intelligence: 'Разум',
-				agility: 'Проворство',
-				dexterity: 'Хитрость',
-				stamina: 'Стойкость',
-				will: 'Воля',
-				damage: 'Урон',
-				criticalHit: 'Шанс крита',
-				attacksPerSecond: 'Скорость атаки',
-				penetration: 'Пробивание',
-				defencePsys: 'Защита тела',
-				defenceMagic: 'Защита духа',
-				skins: 'Скины',
-				authorizationSteam: 'Вход через Steam',
-				steamauthTitle: 'Вход через Steam',
-				steamauth: 'Нажимая кнопку Продолжить, произойдёт регистрация нового аккаунта! Если Вы хотите осуществить вход в свой текущий аккаунт PW Classic, Вам необхоидмо сначала привязать свой Steam аккаунт из меню настроек.',
-				classTalent: 'Классовый',
-				language: 'Язык',
-				LangTarg: 'Язык изменен'
-			}
-		},
-		be: {
-			locale:['be_BY'],
-			name:'Беларускі',
-			word: {
-				nickname: 'Лагін/Нікнейм',
-				code: 'Код/бот тэлеграм',
-				password: 'Пароль',
-				passwordAgain: 'Яшчэ раз пароль',
-				login: 'Увайсці',
-				registration: 'Рэгістрацыя',
-				fraction: 'Абярыце фракцыю',
-				adornia: 'Каралеўства Адорнія',
-				docts: 'Імперыя Доктаў',
-				fight: 'У бой!',
-				enterTextAndPressEnter: 'Увядзіце тэкст і націсніце Enter',
-				ready: 'Гатоў',
-				library: 'Бібліятэка',
-				menu: 'Мяню',
-				preferences: 'Прылады',
-				windowMode: 'Аконны рэжым',
-				radminPriority: 'Прыярытэт RadminVPN',
-				threeD: '3D графіка',
-				volume: 'Агульная гучнасць',
-				volumeMusic: 'Гучнасць музыкі',
-				volumeSound: 'Гучнасць гукаў',
-				back: 'Захавацьд',
-				soundHelp: 'Калі збіваюцца налады гуку, то можна адрэгуляваць ў мікшар гучнасці: правы пстрык мышы на значок гуку на панэлі задач -> Мікшар гучнасці -> Значок гульні -> рабіце цішэй',
-				support: 'Падтрымка',
-				supportDesk: 'Калі ў вас ёсць пытанні, вы можаце звязацца з намі праз:',
-				accountSwitch: 'Змяніць улiковы запiс',
-				exit: 'Выйсці з Prime World',
-				version: 'Версія',
-				health: 'Здароўе',
-				energy: 'Энергія',
-				speed: 'Хуткасць',
-				strength: 'Сіла',
-				intelligence: 'Розум',
-				agility: 'Шпаркасць',
-				dexterity: 'Хітрасць',
-				stamina: 'Цягавітасьць',
-				will: 'Воля',
-				damage: 'Шкода',
-				criticalHit: 'Шанец крытычнага траплення',
-				attacksPerSecond: 'Хуткасць атакі',
-				penetration: 'Прабіванне',
-				defencePsys: 'Абарона цела',
-				defenceMagic: 'Абарона духу',
-				skins: 'Абалонкі',
-				authorizationSteam: 'Увайсці праз steam',
-				steamauthTitle: 'Увайсці праз steam',
-				steamauth: 'Націскаючы кнопку Працягнуць, адбудзецца рэгістрацыя новага акаўнта! Калі Вы жадаеце ажыццявіць уваход у свой бягучы акаўнт PW Classic, Вам неабходна спачатку прывязаць свой Steam акаўнт з меню налад.',
-				classTalent: 'Класавы',
-				language: 'Мова',
-				LangTarg: 'Мова зменены'
-			}	
-		}
-	};
-	
-	static init(){
-    
-    	// Сначала пробуем загрузить сохраненный язык из настроек
-    	if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
-        	if (Settings.settings.language in Lang.list) {
-            	Lang.target = Settings.settings.language;
-            	return;
-        	}
-    	}
-    
-    	// Если сохраненного языка нет, определяем по локали системы
-    	let locale = NativeAPI.getLocale();
-    
-    	if(!locale){
-        
-        	if( !('language' in navigator) ){
-            
-            	return;
-            
-        	}
-        
-        	locale = navigator.language;
-        
-    	}
-    
-    	for(let key in Lang.list){
-        
-        	if(Lang.list[key].locale.includes(locale)){
-            
-            	Lang.target = key;
-            
-            	break;
-            
-        	}
-        
-    	}
-    
-	}
 
-	static text(word) {
-		if (word in Lang.list[Lang.target].word) {
-			return Lang.list[Lang.target].word[word];
+			// Загрузка языка из настроек
+			if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
+				if (Settings.settings.language in Lang.list) {
+					Lang.target = Settings.settings.language;
+					console.log('Language from settings:', Lang.target);
+					return;
+				}
+			}
+
+			// Автоопределение языка по локали
+			let locale = NativeAPI.getLocale();
+			if (!locale && 'language' in navigator) {
+				locale = navigator.language;
+			}
+
+			for (let key in Lang.list) {
+				if (Lang.list[key].locale.includes(locale)) {
+					Lang.target = key;
+					console.log('Language detected from locale:', locale, '->', Lang.target);
+					break;
+				}
+			}
+			
+			console.log('Final language:', Lang.target);
 		}
 
-		return Lang.list[Lang.default].word[word];
-	}
+		static text(word) {
+			// Безопасное получение перевода
+			if (Lang.list[Lang.target] && Lang.list[Lang.target].word && word in Lang.list[Lang.target].word) {
+				return Lang.list[Lang.target].word[word];
+			}
 
-	// Новая функция для переключения языков
-	static toggle() {
-    	const languages = Object.keys(Lang.list);
-    	const currentIndex = languages.indexOf(Lang.target);
-    	const nextIndex = (currentIndex + 1) % languages.length;
-    	Lang.target = languages[nextIndex];
-    	return Lang.target;
-	}
+			if (Lang.list[Lang.default] && Lang.list[Lang.default].word && word in Lang.list[Lang.default].word) {
+				return Lang.list[Lang.default].word[word];
+			}
 
-	// Функция только для получения следующего языка
-	static getNextLanguage() {
-    	const languages = Object.keys(Lang.list);
-    	const currentIndex = languages.indexOf(Lang.target);
-    	const nextIndex = (currentIndex + 1) % languages.length;
-    	return languages[nextIndex];
-	}
+			console.warn('Translation not found:', word);
+			return word;
+		}
 
+		static toggle() {
+			const languages = Object.keys(Lang.list);
+			const currentIndex = languages.indexOf(Lang.target);
+			const nextIndex = (currentIndex + 1) % languages.length;
+			Lang.target = languages[nextIndex];
+			return Lang.target;
+		}
+
+		static getNextLanguage() {
+			const languages = Object.keys(Lang.list);
+			const currentIndex = languages.indexOf(Lang.target);
+			const nextIndex = (currentIndex + 1) % languages.length;
+			return languages[nextIndex];
+		}
 }
 
 class News {
@@ -411,12 +246,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		console.log('event.data',event.data);
 		
 	});
-	
+
+	Lang.init();
+
 	Splash.init();
 
 	NativeAPI.init();
-	
-	Lang.init();
 
 	NativeAPI.update((data) => {
 
@@ -7589,179 +7424,180 @@ class Build {
                 stats += sign + `${Math.floor(statValue * 10.0) / 10.0} ${Lang.text(key)}<br>`;
             }
         }
-        
-        let dataTemp = data.rarity; 
-         
-        switch (dataTemp) {
-            case 1: dataTemp = 1; break;
-            case 2: dataTemp = 2; break;
-            case 3: dataTemp = 3; break;
-            case 4: dataTemp = 4; break;
-            default: dataTemp = 0; break; 
-        }
-        
-        let talentIsClassBased = "";
-        
-        if(!dataTemp){
-            talentIsClassBased = Lang.text('classTalent') + `<br>`;
-        }
-        
-        let starOrange = window.innerHeight*0.015;
-        let starGold = window.innerHeight*0.015;
-        let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
-        
-        let stars = "";
-        
-        for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
-            if(Math.floor(i/5)%2 == 1){
-                stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-            }
-            else{
-                stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
-            }
-        } 
-        
-        if(talentRefineByRarity>15){
-            stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-        }
-        
-        // Используем переведенное описание
-        let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${description} `;
-        
-        // Используем переведенное название
-        Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
 
-        let innerChilds = Build.descriptionView.childNodes[1].childNodes;
-        let paramIterator = 0;
-        for (let outerTag of innerChilds) {
-            for (let specialTag of outerTag.childNodes) {
-                let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
-                if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
-                    continue;
-                }
-                let params = data.params.split(';');
-                if (paramIterator >= params.length) {
-                    continue;
-                }
-                let param = params[paramIterator];
-                let paramValues = param.split(',');
+			let dataTemp = data.rarity; 
 
-                let statAffection, minValue, maxValue;
+			switch (dataTemp) {
+				case 1: dataTemp = 1; break;
+				case 2: dataTemp = 2; break;
+				case 3: dataTemp = 3; break;
+				case 4: dataTemp = 4; break;
+				default: dataTemp = 0; break; 
+			}
 
-                if (paramValues.length == 5) {
-                    minValue = parseFloat(paramValues[1]);
-                    maxValue = parseFloat(paramValues[2]);
-                    statAffection = paramValues[4];
-                }
-                else if (paramValues.length == 3) {
-                    minValue = parseFloat(paramValues[0]);
-                    maxValue = parseFloat(paramValues[1]);
-                    statAffection = paramValues[2];
-                }
+			let talentIsClassBased = "";
 
-                let resolvedStatAffection;
-                let resolvedStatAffection1;
-                let resolvedStatAffection2;
-                switch (statAffection) {
-                    case 'sr_max':
-                        resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
-                        break;
-                    case 'sv_max':
-                        resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
-                        break;
-                    case 'ph_max':
-                        resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
-                        break;
-                    case 'hpmp_max':
-                        resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
-                        break;
-                    case 'sr_sum':    
-                        resolvedStatAffection1 = 'sila';
-                        resolvedStatAffection2 = 'razum';                        
-                        break;
-                    case 'ph_sum':    
-                        resolvedStatAffection1 = 'provorstvo';
-                        resolvedStatAffection2 = 'hitrost';                        
-                        break;
-                    case 'sv_sum':    
-                        resolvedStatAffection1 = 'stoikost';
-                        resolvedStatAffection2 = 'volia';                        
-                        break;    
-                    case 'hpmp_sum':    
-                        resolvedStatAffection1 = 'hp';
-                        resolvedStatAffection2 = 'mp';                        
-                        break;    
-                    default:
-                        resolvedStatAffection = statAffection;
-                        break;
-                }
+			if(!dataTemp){
+				talentIsClassBased = Lang.text('classTalent') + `<br>`;
+			}
 
-                function lerp(a, b, alpha) {
-                    return a + alpha * (b - a);
-                }
-                
-                let outputString;
-                if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
-                    let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
-                    let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
-                    const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
-                    const param1 = isHpOrEnergy ? 600.0 : 50.0;
-                    const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-                    outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
-                    if (outputString.endsWith(('.0'))) {
-                        outputString = outputString.replace('.0', '');
-                    }
-                } else {
-                    if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
-                        let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
-                        const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
-                        const param1 = isHpOrEnergy ? 600.0 : 50.0;
-                        const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-                        outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
-                        if (outputString.endsWith(('.0'))) {
-                            outputString = outputString.replace('.0', '');
-                        }
-                    } else {
-                        let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-                        outputString = (minValue + maxValue * refineBonus).toFixed(1);
-                        if (outputString.endsWith(('.0'))) {
-                            outputString = outputString.replace('.0', '');
-                        }
-                    }
-                }
-                if (specialTag.innerHTML) {
-                    specialTag.innerHTML = tagString.replace('%s', outputString);
-                } else {
-                    outerTag.innerHTML = tagString.replace('%s', outputString);
-                }
-                paramIterator++;
-            }
-        }
+			let starOrange = window.innerHeight*0.015;
+			let starGold = window.innerHeight*0.015;
+			let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
 
-        let positionDescription = Build.descriptionView.getBoundingClientRect();
-        Build.descriptionView.style.zIndex = 9999;
-        Build.descriptionView.style.position = 'fixed';
-        Build.descriptionView.style.display = 'block';
-        
-        let descriptionWidth = Build.descriptionView.offsetWidth;
-        let ofSetW = 0,ofSetH = 0;
-    
-        if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
-            ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
-        }
-    
-        Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
-        Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
-    }
+			let stars = "";
 
-    let descEventEnd = () => {
-        Build.descriptionView.style.display = 'none';
-    };
-    
-    element.ontouchstart = (e) => {
-        descEvent();
-    };
+			for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
+				if(Math.floor(i/5)%2 == 1){
+					stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+				}
+				else{
+					stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
+				}
+			} 
 
+			if(talentRefineByRarity>15){
+				stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+			}
+
+			// Используем переведенное описание
+			let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${description} `;
+
+			// Используем переведенное название
+			Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
+
+			let innerChilds = Build.descriptionView.childNodes[1].childNodes;
+			let paramIterator = 0;
+			for (let outerTag of innerChilds) {
+				for (let specialTag of outerTag.childNodes) {
+					let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
+					if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
+						continue;
+					}
+					let params = data.params.split(';');
+					if (paramIterator >= params.length) {
+						continue;
+					}
+					let param = params[paramIterator];
+					let paramValues = param.split(',');
+
+					let statAffection, minValue, maxValue;
+
+					if (paramValues.length == 5) {
+						minValue = parseFloat(paramValues[1]);
+						maxValue = parseFloat(paramValues[2]);
+						statAffection = paramValues[4];
+					}
+					else if (paramValues.length == 3) {
+						minValue = parseFloat(paramValues[0]);
+						maxValue = parseFloat(paramValues[1]);
+						statAffection = paramValues[2];
+					}
+
+					let resolvedStatAffection;
+					let resolvedStatAffection1;
+					let resolvedStatAffection2;
+					switch (statAffection) {
+						case 'sr_max':
+							resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+							break;
+						case 'sv_max':
+							resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+							break;
+						case 'ph_max':
+							resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+							break;
+						case 'hpmp_max':
+							resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
+							break;
+						case 'sr_sum':    
+							resolvedStatAffection1 = 'sila';
+							resolvedStatAffection2 = 'razum';                        
+							break;
+						case 'ph_sum':    
+							resolvedStatAffection1 = 'provorstvo';
+							resolvedStatAffection2 = 'hitrost';                        
+							break;
+						case 'sv_sum':    
+							resolvedStatAffection1 = 'stoikost';
+							resolvedStatAffection2 = 'volia';                        
+							break;    
+						case 'hpmp_sum':    
+							resolvedStatAffection1 = 'hp';
+							resolvedStatAffection2 = 'mp';                        
+							break;    
+						default:
+							resolvedStatAffection = statAffection;
+							break;
+					}
+
+					function lerp(a, b, alpha) {
+						return a + alpha * (b - a);
+					}
+
+					let outputString;
+					if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
+						let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
+						let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
+						const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
+						const param1 = isHpOrEnergy ? 600.0 : 50.0;
+						const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+						outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
+						if (outputString.endsWith(('.0'))) {
+							outputString = outputString.replace('.0', '');
+						}
+					} else {
+						if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+							let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+							const param1 = isHpOrEnergy ? 600.0 : 50.0;
+							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+							outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
+							if (outputString.endsWith(('.0'))) {
+								outputString = outputString.replace('.0', '');
+							}
+						} else {
+							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+							outputString = (minValue + maxValue * refineBonus).toFixed(1);
+							if (outputString.endsWith(('.0'))) {
+								outputString = outputString.replace('.0', '');
+							}
+						}
+					}
+					if (specialTag.innerHTML) {
+						specialTag.innerHTML = tagString.replace('%s', outputString);
+					} else {
+						outerTag.innerHTML = tagString.replace('%s', outputString);
+					}
+					paramIterator++;
+				}
+			}
+
+			let positionDescription = Build.descriptionView.getBoundingClientRect();
+			Build.descriptionView.style.zIndex = 9999;
+			Build.descriptionView.style.position = 'fixed';
+			Build.descriptionView.style.display = 'block';
+
+			let descriptionWidth = Build.descriptionView.offsetWidth;
+			let ofSetW = 0,ofSetH = 0;
+
+			if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
+				ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
+			}
+
+			Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
+			Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
+		}
+
+		let descEventEnd = () => {
+			Build.descriptionView.style.display = 'none';
+		};
+
+		element.ontouchstart = (e) => {
+				descEvent();
+			};
+
+	}
 }
 
 class Events {
