@@ -55,81 +55,81 @@ class ParentEvent {
 }
 
 class Lang {
-		static target = 'ru';
-		static default = 'ru';
-		static list = {};
+    static target = 'ru';
+    static default = 'ru';
+    static list = {};
 
-		static async init() {
-			try {
-				console.log('Loading languages...');
-				
-				// Абсолютные пути
-				const { ru } = await import('/content/lang/ru.js');
-				const { en } = await import('/content/lang/en.js');
-				const { be } = await import('/content/lang/be.js');
+    static async init() {
+        try {
+            console.log('Loading languages...');
+            
+            // Абсолютные пути
+            const { ru } = await import('/content/lang/ru.js');
+            const { en } = await import('/content/lang/en.js');
+            const { be } = await import('/content/lang/be.js');
+            
+            Lang.list = { ru, en, be };
+            console.log('Languages loaded successfully:', Object.keys(Lang.list));
+            
+        } catch (error) {
+            console.error('Error loading language files:', error);
+            throw new Error('Failed to load language files: ' + error.message);
+        }
 
-				Lang.list = { ru, en, be };
-				console.log('Languages loaded successfully:', Object.keys(Lang.list));
+        // Загрузка языка из настроек
+        if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
+            if (Settings.settings.language in Lang.list) {
+                Lang.target = Settings.settings.language;
+                console.log('Language from settings:', Lang.target);
+                return;
+            }
+        }
+        
+        // Автоопределение языка по локали
+        let locale = NativeAPI.getLocale();
+        if (!locale && 'language' in navigator) {
+            locale = navigator.language;
+        }
+        
+        for (let key in Lang.list) {
+            if (Lang.list[key].locale.includes(locale)) {
+                Lang.target = key;
+                console.log('Language detected from locale:', locale, '->', Lang.target);
+                break;
+            }
+        }
+        
+        console.log('Final language:', Lang.target);
+    }
 
-			} catch (error) {
-				console.error('Error loading language files:', error);
-				throw new Error('Failed to load language files: ' + error.message);
-			}
+    static text(word) {
+        // Безопасное получение перевода
+        if (Lang.list[Lang.target] && Lang.list[Lang.target].word && word in Lang.list[Lang.target].word) {
+            return Lang.list[Lang.target].word[word];
+        }
 
-			// Загрузка языка из настроек
-			if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
-				if (Settings.settings.language in Lang.list) {
-					Lang.target = Settings.settings.language;
-					console.log('Language from settings:', Lang.target);
-					return;
-				}
-			}
+        if (Lang.list[Lang.default] && Lang.list[Lang.default].word && word in Lang.list[Lang.default].word) {
+            return Lang.list[Lang.default].word[word];
+        }
 
-			// Автоопределение языка по локали
-			let locale = NativeAPI.getLocale();
-			if (!locale && 'language' in navigator) {
-				locale = navigator.language;
-			}
+        console.warn('Translation not found:', word);
+        return word;
+    }
 
-			for (let key in Lang.list) {
-				if (Lang.list[key].locale.includes(locale)) {
-					Lang.target = key;
-					console.log('Language detected from locale:', locale, '->', Lang.target);
-					break;
-				}
-			}
-			
-			console.log('Final language:', Lang.target);
-		}
+    static toggle() {
+        const languages = Object.keys(Lang.list);
+        const currentIndex = languages.indexOf(Lang.target);
+        const nextIndex = (currentIndex + 1) % languages.length;
+        Lang.target = languages[nextIndex];
+        return Lang.target;
+    }
 
-		static text(word) {
-			// Безопасное получение перевода
-			if (Lang.list[Lang.target] && Lang.list[Lang.target].word && word in Lang.list[Lang.target].word) {
-				return Lang.list[Lang.target].word[word];
-			}
-
-			if (Lang.list[Lang.default] && Lang.list[Lang.default].word && word in Lang.list[Lang.default].word) {
-				return Lang.list[Lang.default].word[word];
-			}
-
-			console.warn('Translation not found:', word);
-			return word;
-		}
-
-		static toggle() {
-			const languages = Object.keys(Lang.list);
-			const currentIndex = languages.indexOf(Lang.target);
-			const nextIndex = (currentIndex + 1) % languages.length;
-			Lang.target = languages[nextIndex];
-			return Lang.target;
-		}
-
-		static getNextLanguage() {
-			const languages = Object.keys(Lang.list);
-			const currentIndex = languages.indexOf(Lang.target);
-			const nextIndex = (currentIndex + 1) % languages.length;
-			return languages[nextIndex];
-		}
+    static getNextLanguage() {
+        const languages = Object.keys(Lang.list);
+        const currentIndex = languages.indexOf(Lang.target);
+        const nextIndex = (currentIndex + 1) % languages.length;
+        return languages[nextIndex];
+    }
 }
 
 class News {
@@ -4286,7 +4286,7 @@ class Window {
 					const oldLanguage = Lang.target;
         			Lang.toggle();
         			Settings.settings.language = Lang.target;
-					App.error(`Lang.text('LangTarg'): ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
+					App.error(`${Lang.text('LangTarg')}: ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
         			Window.show('main', 'settings');
     			}]
 				}, `${Lang.text('language')} (${Lang.target})`
@@ -7424,180 +7424,186 @@ class Build {
                 stats += sign + `${Math.floor(statValue * 10.0) / 10.0} ${Lang.text(key)}<br>`;
             }
         }
+        
+        let dataTemp = data.rarity; 
+         
+        switch (dataTemp) {
+            case 1: dataTemp = 1; break;
+            case 2: dataTemp = 2; break;
+            case 3: dataTemp = 3; break;
+            case 4: dataTemp = 4; break;
+            default: dataTemp = 0; break; 
+        }
+        
+        let talentIsClassBased = "";
+        
+        if(!dataTemp){
+            talentIsClassBased = Lang.text('classTalent') + `<br>`;
+        }
+        
+        let starOrange = window.innerHeight*0.015;
+        let starGold = window.innerHeight*0.015;
+        let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
+        
+        let stars = "";
+        
+        for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
+            if(Math.floor(i/5)%2 == 1){
+                stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+            }
+            else{
+                stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
+            }
+        } 
+        
+        if(talentRefineByRarity>15){
+            stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
+        }
+        
+        // Используем переведенное описание
+        let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${description} `;
+        
+        // Используем переведенное название
+        Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
 
-			let dataTemp = data.rarity; 
+        let innerChilds = Build.descriptionView.childNodes[1].childNodes;
+        let paramIterator = 0;
+        for (let outerTag of innerChilds) {
+            for (let specialTag of outerTag.childNodes) {
+                let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
+                if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
+                    continue;
+                }
+                let params = data.params.split(';');
+                if (paramIterator >= params.length) {
+                    continue;
+                }
+                let param = params[paramIterator];
+                let paramValues = param.split(',');
 
-			switch (dataTemp) {
-				case 1: dataTemp = 1; break;
-				case 2: dataTemp = 2; break;
-				case 3: dataTemp = 3; break;
-				case 4: dataTemp = 4; break;
-				default: dataTemp = 0; break; 
-			}
+                let statAffection, minValue, maxValue;
 
-			let talentIsClassBased = "";
+                if (paramValues.length == 5) {
+                    minValue = parseFloat(paramValues[1]);
+                    maxValue = parseFloat(paramValues[2]);
+                    statAffection = paramValues[4];
+                }
+                else if (paramValues.length == 3) {
+                    minValue = parseFloat(paramValues[0]);
+                    maxValue = parseFloat(paramValues[1]);
+                    statAffection = paramValues[2];
+                }
 
-			if(!dataTemp){
-				talentIsClassBased = Lang.text('classTalent') + `<br>`;
-			}
+                let resolvedStatAffection;
+                let resolvedStatAffection1;
+                let resolvedStatAffection2;
+                switch (statAffection) {
+                    case 'sr_max':
+                        resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
+                        break;
+                    case 'sv_max':
+                        resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
+                        break;
+                    case 'ph_max':
+                        resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
+                        break;
+                    case 'hpmp_max':
+                        resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
+                        break;
+                    case 'sr_sum':    
+                        resolvedStatAffection1 = 'sila';
+                        resolvedStatAffection2 = 'razum';                        
+                        break;
+                    case 'ph_sum':    
+                        resolvedStatAffection1 = 'provorstvo';
+                        resolvedStatAffection2 = 'hitrost';                        
+                        break;
+                    case 'sv_sum':    
+                        resolvedStatAffection1 = 'stoikost';
+                        resolvedStatAffection2 = 'volia';                        
+                        break;    
+                    case 'hpmp_sum':    
+                        resolvedStatAffection1 = 'hp';
+                        resolvedStatAffection2 = 'mp';                        
+                        break;    
+                    default:
+                        resolvedStatAffection = statAffection;
+                        break;
+                }
 
-			let starOrange = window.innerHeight*0.015;
-			let starGold = window.innerHeight*0.015;
-			let talentRefineByRarity = Build.talentRefineByRarity[dataTemp==0?4:dataTemp];
+                function lerp(a, b, alpha) {
+                    return a + alpha * (b - a);
+                }
+                
+                let outputString;
+                if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
+                    let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
+                    let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
+                    const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
+                    const param1 = isHpOrEnergy ? 600.0 : 50.0;
+                    const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+                    outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
+                    if (outputString.endsWith(('.0'))) {
+                        outputString = outputString.replace('.0', '');
+                    }
+                } else {
+                    if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
+                        let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
+                        const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
+                        const param1 = isHpOrEnergy ? 600.0 : 50.0;
+                        const param2 = isHpOrEnergy ? 6250.0 : 250.0;
+                        outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
+                        if (outputString.endsWith(('.0'))) {
+                            outputString = outputString.replace('.0', '');
+                        }
+                    } else {
+                        let refineBonus = Build.getTalentRefineByRarity(data.rarity);
+                        outputString = (minValue + maxValue * refineBonus).toFixed(1);
+                        if (outputString.endsWith(('.0'))) {
+                            outputString = outputString.replace('.0', '');
+                        }
+                    }
+                }
+                if (specialTag.innerHTML) {
+                    specialTag.innerHTML = tagString.replace('%s', outputString);
+                } else {
+                    outerTag.innerHTML = tagString.replace('%s', outputString);
+                }
+                paramIterator++;
+            }
+        }
 
-			let stars = "";
+        let positionDescription = Build.descriptionView.getBoundingClientRect();
+        Build.descriptionView.style.zIndex = 9999;
+        Build.descriptionView.style.position = 'fixed';
+        Build.descriptionView.style.display = 'block';
+        
+        let descriptionWidth = Build.descriptionView.offsetWidth;
+        let ofSetW = 0,ofSetH = 0;
+    
+        if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
+            ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
+        }
+    
+        Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
+        Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
+    }
 
-			for(let i = 0; i < (talentRefineByRarity>15?0:talentRefineByRarity); i++){
-				if(Math.floor(i/5)%2 == 1){
-					stars = stars + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-				}
-				else{
-					stars = stars + `<img src="content/icons/starGold.webp" width=${starGold} height=${starGold}>`;
-				}
-			} 
+    let descEventEnd = () => {
+        Build.descriptionView.style.display = 'none';
+    };
+    
+    element.ontouchstart = (e) => {
+        descEvent();
+    };
 
-			if(talentRefineByRarity>15){
-				stars = stars + talentRefineByRarity + `<img src="content/icons/starOrange27.webp" width=${starOrange} height=${starOrange}>`;
-			}
+    element.onmouseover = () => { descEvent() };
+    element.onmouseout = () => { descEventEnd() };
+    element.ontouchend = () => {
+        descEventEnd();
+    };
+}
 
-			// Используем переведенное описание
-			let descriptionWithStars = `<b>${talentIsClassBased}</b>${stars} <br><br> ${description} `;
-
-			// Используем переведенное название
-			Build.descriptionView.innerHTML = `<b style="color:rgb(${rgb})">${name}</b><div>${descriptionWithStars}</div><span>${stats}</span>`;
-
-			let innerChilds = Build.descriptionView.childNodes[1].childNodes;
-			let paramIterator = 0;
-			for (let outerTag of innerChilds) {
-				for (let specialTag of outerTag.childNodes) {
-					let tagString = specialTag.innerHTML ? specialTag.innerHTML : specialTag.data;
-					if (!tagString || tagString.indexOf('%s') == -1 || !data.params) {
-						continue;
-					}
-					let params = data.params.split(';');
-					if (paramIterator >= params.length) {
-						continue;
-					}
-					let param = params[paramIterator];
-					let paramValues = param.split(',');
-
-					let statAffection, minValue, maxValue;
-
-					if (paramValues.length == 5) {
-						minValue = parseFloat(paramValues[1]);
-						maxValue = parseFloat(paramValues[2]);
-						statAffection = paramValues[4];
-					}
-					else if (paramValues.length == 3) {
-						minValue = parseFloat(paramValues[0]);
-						maxValue = parseFloat(paramValues[1]);
-						statAffection = paramValues[2];
-					}
-
-					let resolvedStatAffection;
-					let resolvedStatAffection1;
-					let resolvedStatAffection2;
-					switch (statAffection) {
-						case 'sr_max':
-							resolvedStatAffection = Build.getMaxStat(['sila', 'razum']);
-							break;
-						case 'sv_max':
-							resolvedStatAffection = Build.getMaxStat(['stoikost', 'volia']);
-							break;
-						case 'ph_max':
-							resolvedStatAffection = Build.getMaxStat(['provorstvo', 'hitrost']);
-							break;
-						case 'hpmp_max':
-							resolvedStatAffection = Build.getMaxStat(['hp', 'mp']);
-							break;
-						case 'sr_sum':    
-							resolvedStatAffection1 = 'sila';
-							resolvedStatAffection2 = 'razum';                        
-							break;
-						case 'ph_sum':    
-							resolvedStatAffection1 = 'provorstvo';
-							resolvedStatAffection2 = 'hitrost';                        
-							break;
-						case 'sv_sum':    
-							resolvedStatAffection1 = 'stoikost';
-							resolvedStatAffection2 = 'volia';                        
-							break;    
-						case 'hpmp_sum':    
-							resolvedStatAffection1 = 'hp';
-							resolvedStatAffection2 = 'mp';                        
-							break;    
-						default:
-							resolvedStatAffection = statAffection;
-							break;
-					}
-
-					function lerp(a, b, alpha) {
-						return a + alpha * (b - a);
-					}
-
-					let outputString;
-					if (statAffection == 'sr_sum'||statAffection == 'ph_sum'||statAffection == 'sv_sum'||statAffection == 'hpmp_sum'){
-						let resolvedTotalStat1 = Build.totalStat(resolvedStatAffection1);
-						let resolvedTotalStat2 = Build.totalStat(resolvedStatAffection2);
-						const isHpOrEnergy = resolvedStatAffection1 == 'hp' || resolvedStatAffection1 == 'mp'|| resolvedStatAffection2 == 'hp' || resolvedStatAffection2 == 'mp';
-						const param1 = isHpOrEnergy ? 600.0 : 50.0;
-						const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-						outputString = (lerp(minValue, maxValue, (resolvedTotalStat1 + resolvedTotalStat2 - param1) / param2)).toFixed(1);
-						if (outputString.endsWith(('.0'))) {
-							outputString = outputString.replace('.0', '');
-						}
-					} else {
-						if (resolvedStatAffection in Build.dataStats && paramValues.length == 5) {
-							let resolvedTotalStat = Build.totalStat(resolvedStatAffection);
-							const isHpOrEnergy = resolvedStatAffection == 'hp' || resolvedStatAffection == 'mp';
-							const param1 = isHpOrEnergy ? 600.0 : 50.0;
-							const param2 = isHpOrEnergy ? 6250.0 : 250.0;
-							outputString = (lerp(minValue, maxValue, (resolvedTotalStat - param1) / param2)).toFixed(1);
-							if (outputString.endsWith(('.0'))) {
-								outputString = outputString.replace('.0', '');
-							}
-						} else {
-							let refineBonus = Build.getTalentRefineByRarity(data.rarity);
-							outputString = (minValue + maxValue * refineBonus).toFixed(1);
-							if (outputString.endsWith(('.0'))) {
-								outputString = outputString.replace('.0', '');
-							}
-						}
-					}
-					if (specialTag.innerHTML) {
-						specialTag.innerHTML = tagString.replace('%s', outputString);
-					} else {
-						outerTag.innerHTML = tagString.replace('%s', outputString);
-					}
-					paramIterator++;
-				}
-			}
-
-			let positionDescription = Build.descriptionView.getBoundingClientRect();
-			Build.descriptionView.style.zIndex = 9999;
-			Build.descriptionView.style.position = 'fixed';
-			Build.descriptionView.style.display = 'block';
-
-			let descriptionWidth = Build.descriptionView.offsetWidth;
-			let ofSetW = 0,ofSetH = 0;
-
-			if(Build.descriptionView.offsetHeight + positionElement.top > window.innerHeight){
-				ofSetW = window.innerHeight - Build.descriptionView.offsetHeight - positionElement.top;
-			}
-
-			Build.descriptionView.style.left = (positionElement.left + positionElement.height) + 'px';
-			Build.descriptionView.style.top = (positionElement.top + ofSetW) + 'px';
-		}
-
-		let descEventEnd = () => {
-			Build.descriptionView.style.display = 'none';
-		};
-
-		element.ontouchstart = (e) => {
-				descEvent();
-			};
-
-	}
 }
 
 class Events {
@@ -11217,8 +11223,8 @@ class Settings {
             if (this.settings.language && this.settings.language in Lang.list) {
                 Lang.target = this.settings.language;
             }
-		}
-
+        }
+	
 		} catch (e) {
 			App.error('Ошибка применения настроек: ' + e);
 		}
