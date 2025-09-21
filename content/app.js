@@ -2666,31 +2666,27 @@ class View {
 	}
 
 	static bodyCastleHeroes() {
+	let preload = new PreloadImages(View.castleBottom);
 
-		let preload = new PreloadImages(View.castleBottom);
-
-		App.api.silent((result) => {
-
+	App.api.silent((result) => {
 			MM.hero = result;
 
 			while (View.castleBottom.firstChild) {
-
 				View.castleBottom.firstChild.remove();
-
 			}
 
 			for (let item of result) {
+				// Используем локализованное имя через Lang.text() с ключом hero_X_name
+				const localizedName = Lang.text(`hero_${item.id}_name`);
+				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, localizedName));
 
-				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, item.name));
-
-				if (item.name.length > 10) {
+				if (localizedName.length > 10) {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
 				}
 
 				let heroNameBase = DOM({ style: ['castle-item-hero-name', 'hover-brightness'] }, heroName);
 
 				let rankIcon = DOM({ style: 'castle-hero-rank-icon' });
-
 				rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
 
 				let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
@@ -2708,11 +2704,8 @@ class View {
 				hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
 
 				preload.add(hero);
-
 			}
-
 		}, 'build', 'heroAll');
-
 	}
 
 	static bodyCastleFriends() {
@@ -5939,7 +5932,7 @@ class Build {
 
 		if (MM.hero) {
 
-			Build.heroName.innerText = MM.hero.find(h => h.id === data.id).name;
+			Build.heroName.innerText = Lang.text(`hero_${data.id}_name`);
 
 		}
 
