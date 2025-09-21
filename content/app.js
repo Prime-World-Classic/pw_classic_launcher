@@ -2245,7 +2245,7 @@ class View {
 
   const statsBtn = DOM({
     style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
-    title: 'Статистика',
+    title: Lang.text('titlestatistic'),
     event: ['click', () => {
       const onEsc = (e) => {
         if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
@@ -2403,19 +2403,19 @@ class View {
 			style: 'flag-menu-item',
 			event: ['click', () => {
 				App.setFraction();
-			}], title: 'Выбор стороны'
+			}], title: Lang.text('titleflag')
 			});
 		let settingsMenuItem = DOM({
 			style: 'settings-menu-item',
 			event: ['click', () => {
 				Window.show('main', 'menu');
-			}], title: 'Настройки'
+			}], title: Lang.text('titlesettings')
 			});
 		let chatMenuItem = DOM({
 			style: 'chat-menu-item',
 			event: ['click', () => {
 				Chat.changeChatVisibility();
-			}], title: 'Отображение чата'
+			}], title: Lang.text('titlechat')
 			});
 		let heroesMenuItem = DOM({
 			style: 'heroes-menu-item',
@@ -2424,7 +2424,7 @@ class View {
 				View.bodyCastleHeroes();
 				Castle.buildMode = false;
 
-			}], title: 'Герои'
+			}], title: Lang.text('titleheroes')
 			});
 		let friendsMenuItem = DOM({
 			style: 'friends-menu-item',
@@ -2433,7 +2433,7 @@ class View {
 				View.bodyCastleFriends();
 				Castle.buildMode = false;
 
-			}], title: 'Друзья'
+			}], title: Lang.text('titlefriends')
 			});
 		let buildingsMenuItem = DOM({
 			style: 'buildings-menu-item',
@@ -2442,7 +2442,7 @@ class View {
 				View.bodyCastleBuildings();
 				Castle.buildMode = true;
 
-			}], title: 'Строительство'
+			}], title: Lang.text('titleconstruction')
 			});
 
 		flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`; 
@@ -4307,7 +4307,7 @@ class Window {
         			Window.show('main', 'menu');
         			location.reload();
     			}]
-			}, Lang.text('back'))/*,
+			}, Lang.text('save'))/*,
 			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
 			*/
@@ -5068,7 +5068,7 @@ class Build {
 		Build.training = DOM({
 			tag: 'button',
 			style: ['btn-skins', 'btn-hover', 'color-3'],
-			title: 'Режим тренировки',
+			title: Lang.text('titletraining'),
 			event: ['click', async () => {
 
 				try {
@@ -5097,7 +5097,7 @@ class Build {
 
 			}]
 		},
-			'Тренировка'
+			Lang.text('training')
 		);
 
 		Build.inventoryView.append(buildTalents);
