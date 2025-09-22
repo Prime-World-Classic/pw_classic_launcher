@@ -55,81 +55,96 @@ class ParentEvent {
 }
 
 class Lang {
-    static target = 'ru';
-    static default = 'ru';
-    static list = {};
+	static target = 'ru';
+	static default = 'ru';
+	static list = {};
 
-    static async init() {
-        try {
-            console.log('Loading languages...');
-            
-            // Абсолютные пути
-            const { ru } = await import('/content/lang/ru.js');
-            const { en } = await import('/content/lang/en.js');
-            const { be } = await import('/content/lang/be.js');
-            
-            Lang.list = { ru, en, be };
-            console.log('Languages loaded successfully:', Object.keys(Lang.list));
-            
-        } catch (error) {
-            console.error('Error loading language files:', error);
-            throw new Error('Failed to load language files: ' + error.message);
-        }
+	static async init() {
+		try {
+			console.log('Loading languages...');
 
-        // Загрузка языка из настроек
-        if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
-            if (Settings.settings.language in Lang.list) {
-                Lang.target = Settings.settings.language;
-                console.log('Language from settings:', Lang.target);
-                return;
-            }
-        }
-        
-        // Автоопределение языка по локали
-        let locale = NativeAPI.getLocale();
-        if (!locale && 'language' in navigator) {
-            locale = navigator.language;
-        }
-        
-        for (let key in Lang.list) {
-            if (Lang.list[key].locale.includes(locale)) {
-                Lang.target = key;
-                console.log('Language detected from locale:', locale, '->', Lang.target);
-                break;
-            }
-        }
-        
-        console.log('Final language:', Lang.target);
-    }
+			// Абсолютные пути
+			const { ru } = await import('/content/lang/ru.js');
+			const { en } = await import('/content/lang/en.js');
+			const { be } = await import('/content/lang/be.js');
 
-    static text(word) {
-        // Безопасное получение перевода
-        if (Lang.list[Lang.target] && Lang.list[Lang.target].word && word in Lang.list[Lang.target].word) {
-            return Lang.list[Lang.target].word[word];
-        }
+			Lang.list = { ru, en, be };
+			console.log('Languages loaded successfully:', Object.keys(Lang.list));
 
-        if (Lang.list[Lang.default] && Lang.list[Lang.default].word && word in Lang.list[Lang.default].word) {
-            return Lang.list[Lang.default].word[word];
-        }
+		} catch (error) {
+			console.error('Error loading language files:', error);
+			throw new Error('Failed to load language files: ' + error.message);
+		}
 
-        console.warn('Translation not found:', word);
-        return word;
-    }
+		// Загрузка языка из настроек
+		if (typeof Settings !== 'undefined' && Settings.settings && Settings.settings.language) {
+			if (Settings.settings.language in Lang.list) {
+				Lang.target = Settings.settings.language;
+				console.log('Language from settings:', Lang.target);
+				return;
+			}
+		}
 
-    static toggle() {
-        const languages = Object.keys(Lang.list);
-        const currentIndex = languages.indexOf(Lang.target);
-        const nextIndex = (currentIndex + 1) % languages.length;
-        Lang.target = languages[nextIndex];
-        return Lang.target;
-    }
+		// Автоопределение языка по локали
+		let locale = NativeAPI.getLocale();
+		if (!locale && 'language' in navigator) {
+			locale = navigator.language;
+		}
 
-    static getNextLanguage() {
-        const languages = Object.keys(Lang.list);
-        const currentIndex = languages.indexOf(Lang.target);
-        const nextIndex = (currentIndex + 1) % languages.length;
-        return languages[nextIndex];
-    }
+		for (let key in Lang.list) {
+			if (Lang.list[key].locale.includes(locale)) {
+				Lang.target = key;
+				console.log('Language detected from locale:', locale, '->', Lang.target);
+				break;
+			}
+		}
+
+		console.log('Final language:', Lang.target);
+	}
+
+	static text(word) {
+		// Безопасное получение перевода
+		if (Lang.list[Lang.target] && Lang.list[Lang.target].word && word in Lang.list[Lang.target].word) {
+			return Lang.list[Lang.target].word[word];
+		}
+
+		if (Lang.list[Lang.default] && Lang.list[Lang.default].word && word in Lang.list[Lang.default].word) {
+			return Lang.list[Lang.default].word[word];
+		}
+
+		console.warn('Translation not found:', word);
+		return word;
+	}
+
+	static toggle() {
+		const languages = Object.keys(Lang.list);
+		const currentIndex = languages.indexOf(Lang.target);
+		const nextIndex = (currentIndex + 1) % languages.length;
+		Lang.target = languages[nextIndex];
+		return Lang.target;
+	}
+
+	static getNextLanguage() {
+		const languages = Object.keys(Lang.list);
+		const currentIndex = languages.indexOf(Lang.target);
+		const nextIndex = (currentIndex + 1) % languages.length;
+		return languages[nextIndex];
+	}
+	static heroName(heroId, skinIndex = 1) {
+		// Пробуем получить имя для конкретного скина
+		if (skinIndex > 1) {
+			const skinKey = `hero_${heroId}_skin_${skinIndex}_name`;
+			const skinName = this.text(skinKey);
+
+			// Если нашли перевод для скина, возвращаем его
+			if (skinName !== skinKey) {
+				return skinName;
+			}
+		}
+
+		// Возвращаем основное имя героя (скин 1)
+		return this.text(`hero_${heroId}_name`);
+	}
 }
 
 class News {
@@ -2666,9 +2681,9 @@ class View {
 	}
 
 	static bodyCastleHeroes() {
-	let preload = new PreloadImages(View.castleBottom);
+		let preload = new PreloadImages(View.castleBottom);
 
-	App.api.silent((result) => {
+		App.api.silent((result) => {
 			MM.hero = result;
 
 			while (View.castleBottom.firstChild) {
@@ -2676,8 +2691,8 @@ class View {
 			}
 
 			for (let item of result) {
-				// Используем локализованное имя через Lang.text() с ключом hero_X_name
-				const localizedName = Lang.text(`hero_${item.id}_name`);
+				// Используем новый метод для получения имени с учётом скина
+				const localizedName = Lang.heroName(item.id, item.skin || 1);
 				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, localizedName));
 
 				if (localizedName.length > 10) {
@@ -5931,9 +5946,8 @@ class Build {
 		Build.heroName = DOM({ tag: 'div', style: 'name' });
 
 		if (MM.hero) {
-
-			Build.heroName.innerText = Lang.text(`hero_${data.id}_name`);
-
+			const hero = MM.hero.find(h => h.id === data.id);
+			Build.heroName.innerText = Lang.heroName(hero.id, hero.skin || 1);
 		}
 
 		Build.heroImg = DOM({ style: 'avatar' });
