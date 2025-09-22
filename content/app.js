@@ -145,6 +145,11 @@ class Lang {
 		// Возвращаем основное имя героя (скин 1)
 		return this.text(`hero_${heroId}_name`);
 	}
+	static async reinitViews() {
+		Chat.initView();
+		MM.initView();
+		await App.ShowCurrentViewAsync();
+	}
 }
 
 class News {
@@ -262,8 +267,6 @@ window.addEventListener('DOMContentLoaded', () => {
 		
 	});
 
-	Lang.init();
-
 	Splash.init();
 
 	NativeAPI.init();
@@ -288,10 +291,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	});
 
-	App.findBestHostAndInit();
-
-	Settings.init();
-
 	let testRadminConnection = async () => {
 		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
 		if (hasConnection) {
@@ -308,6 +307,16 @@ window.addEventListener('DOMContentLoaded', () => {
 		testRadminConnection();
 		testMainConnection();
 	}, 3000);
+
+	Settings.init().then(() => {
+
+		Lang.init().then(() => {
+			
+			App.findBestHostAndInit();
+
+		})
+
+	});
 });
 
 class DataBase {
@@ -1536,6 +1545,8 @@ class View {
 
 	static activeAnimation = false;
 
+	static animationIsEnabled = false;
+
 	static defaultAnimation = { transform: ['scale(1.1)', 'scale(1)'], opacity: [0, 1], backdropFilter: ['blur(0)', 'blur(1cqh)'] };
 
 	static defaultOptionAnimation = { duration: 150, fill: 'both', easing: 'ease-out' };
@@ -1577,11 +1588,36 @@ class View {
 
 		if (View.active) {
 
-			View.activeAnimation.reverse();
+			if (View.animationIsEnabled) {
 
-			View.activeAnimation.addEventListener('finish', () => {
+				View.activeAnimation.reverse();
+
+				View.activeAnimation.addEventListener('finish', () => {
+
+					View.active.remove();
+
+					View.active = template;
+
+					View.activeAnimation = template.animate(View.defaultAnimation, View.defaultOptionAnimation);
+
+					document.body.append(template);
+
+				});
+
+			} else {
 
 				View.active.remove();
+
+				View.active = template;
+
+				document.body.append(template);
+
+			}
+
+		}
+		else {
+
+			if (View.animationIsEnabled) {
 
 				View.active = template;
 
@@ -1589,16 +1625,13 @@ class View {
 
 				document.body.append(template);
 
-			});
+			} else {
 
-		}
-		else {
+				View.active = template;
 
-			View.active = template;
+				document.body.append(template);
 
-			View.activeAnimation = template.animate(View.defaultAnimation, View.defaultOptionAnimation);
-
-			document.body.append(template);
+			}
 
 		}
 		
@@ -1615,14 +1648,15 @@ class View {
 	// Создаем выпадающий список языков
 		const languageSelect = DOM({
 			tag: 'select',
+			id: 'lang_select',
 			style: 'language-select',
-			event: ['change', (e) => {
+			event: ['change', async (e) => {
 				const newLanguage = e.target.value;
 				Lang.target = newLanguage;
 				Settings.settings.language = newLanguage;
 				App.error(`Язык изменен: ${Lang.list[newLanguage].name}`);
 				// Перезагружаем страницу для применения языка
-				setTimeout(() => location.reload(), 300);
+				await Lang.reinitViews();
 			}]
 		});
 
@@ -4290,15 +4324,16 @@ class Window {
 			),
 			DOM({ 
     			style: 'castle-menu-item-button',
-    			event: ['click', (e) => {
+    			event: ['click', async (e) => {
 					const oldLanguage = Lang.target;
         			Lang.toggle();
         			Settings.settings.language = Lang.target;
 					App.error(`${Lang.text('LangTarg')}: ${Lang.list[oldLanguage].name} → ${Lang.list[Lang.target].name}`);
-        			Window.show('main', 'settings');
+					await Lang.reinitViews();
+					await Window.show('main', 'settings');
     			}]
 				}, `${Lang.text('language')} (${Lang.target})`
-			),
+			)
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
 				style: 'castle-menu-item-button',
@@ -4309,13 +4344,8 @@ class Window {
 			}, Lang.text('keys') || 'Клавиши'), // Fallback на текст, если перевод отсутствует
 			*/
 			// Кнопка "Назад"
-			DOM({ 
-				style: 'castle-menu-item-button', 
-				event: ['click', () => {
-        			Window.show('main', 'menu');
-        			location.reload();
-    			}]
-			}, Lang.text('save'))/*,
+			
+			/*,
 			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
 			*/
@@ -8059,6 +8089,19 @@ class App {
 		}
 	}
 
+	static async ShowCurrentViewAsync() {
+		if (App.storage.data.login) {
+			
+			await View.show('castle');
+			
+		}
+		else {
+
+			await View.show('authorization');
+
+		}
+	}
+
 	static OpenExternalLink(url) {
 		if (NativeAPI.status) {
 			nw.Shell.openExternal(url);
@@ -8495,7 +8538,7 @@ class Chat {
 
 	static to = 0;
 
-	static init() {
+	static initView() {
 		let scrollBtn = DOM({
 			style: 'scroll-btn',
 			event: ['click', () => {
@@ -8535,6 +8578,11 @@ class Chat {
 			}
 
 		});
+	}
+
+	static init() {
+
+		Chat.initView();
 
 		document.addEventListener('keydown', (event) => {
 
@@ -11295,8 +11343,8 @@ class MM {
 		View.show('castle');
 	}
 
-	static async init() {
-
+	static initView() {
+		
 		MM.view.classList.add('mm');
 
 		MM.view.style.display = 'none';
@@ -11306,6 +11354,11 @@ class MM {
 		let button = CastleNAVBAR.init();
 
 		button.onclick = () => MM.start();
+	}
+
+	static async init() {
+
+		MM.initView();
 
 		// Linux test
 		//let testRun = DOM({style:'castle-button-play-test'}, "Test");
