@@ -2726,7 +2726,7 @@ class View {
 
 			for (let item of result) {
 				// Используем новый метод для получения имени с учётом скина
-				const localizedName = Lang.heroName(item.id, item.skin || 1);
+				const localizedName = Lang.heroName(item.id, item.skin);
 				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, localizedName));
 
 				if (localizedName.length > 10) {
@@ -2740,7 +2740,7 @@ class View {
 
 				let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
 
-				let hero = DOM({ style: ['castle-hero-item', 'hover-brightness'] }, 
+				let hero = DOM({ id: `id${item.id}`, style: ['castle-hero-item', 'hover-brightness'] }, 
 					DOM({ style: ['castle-hero-item-bg', 'hover-brightness']}), 
 					DOM({ style: ['castle-hero-item-img', 'no-hover-brightness']}), 
 					DOM({ style: ['castle-item-background', 'hover-brightness']}), 
@@ -5245,6 +5245,24 @@ class Build {
 				Build.heroImg.style.backgroundImage = `url(content/hero/${Build.heroId}/${hero.dataset.skin}.webp)`;
 
 				Splash.hide();
+
+				try {
+
+					let heroItem = View.castleBottom.querySelector(`#id${Build.heroId}`);
+
+					heroItem.style.backgroundImage = `url(content/hero/${Build.heroId}/${hero.dataset.skin}.webp)`;
+
+					let heroName = heroItem.querySelector('.castle-item-hero-name');
+
+					heroName.firstChild.innerText = Lang.heroName(Build.heroId, hero.dataset.skin);
+
+				} catch (e) {
+					App.error(e);
+				}
+
+				//View.bodyCastleHeroes();
+				
+				//await App.ShowCurrentViewAsync();
 
 			});
 
