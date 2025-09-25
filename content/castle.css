@@ -1218,7 +1218,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .settings-menu-item {
 	left: 6.1cqw;
 	top: 5.8cqh;
-	background-image: url('icons/settings.png');
+	background-image: url('icons/settings.png'),url('content/img/queue/321.png');
 	background-color: #00fff279;
 	width:18cqh;
 	height:18cqh;
