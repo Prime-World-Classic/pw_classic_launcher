@@ -3386,26 +3386,209 @@ border-radius:5px;
 	display: flex;
 	align-items: center;
 }
-#wquest {
-	container-type: size;
-	position: absolute;
-	margin-top: 30cqh;
-	margin-left: auto;
-	margin-right: auto;
-	left: 0;
-	right: 0;
-	text-align: center;
-	width: 60cqh;
-	height: 40cqh;
-	/*background-color: #8d8b8b;*/
-	border-radius: 2cqh;
-	border: 0.1cqh solid rgb(158, 155, 104);
-	background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.9), rgba(18, 69, 73, 0.85), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.85), rgba(4, 32, 42, 0.9));
-	display: flex;
-	flex-flow:column nowrap;
-	align-items: center;
-	justify-content:center;
+#wquest{
+  position:absolute;
+  left:50%;
+  top:15cqh;
+  transform:translateX(-50%);
+  z-index:9999;
+  width:80cqh;
+  max-width:92vw;
+  height:auto;
+  border-radius:2cqh;
+  border:0.25cqh solid rgb(208,180,96);
+  background-image:linear-gradient(to bottom, rgba(4,32,42,.96), rgba(18,69,73,.92) 40%, rgba(21,51,59,.90) 60%, rgba(18,69,73,.92));
+  box-shadow:0 0.6cqh 1.8cqh rgba(0,0,0,.45), inset 0 0 0.7cqh rgba(255,255,255,.06);
+  display:grid;
+  grid-template-rows:auto auto auto auto;
+  gap:1.6cqh;
+  padding:3.6cqh 3.6cqh 2.6cqh 14cqh;
+  color:#e7f7f9;
+  text-align:left;
+  overflow:visible;
 }
+.wquest__avatar {
+  position: absolute;
+  top: -6cqh;         
+  left: -4cqh;       
+  width: 15cqh;
+  height: 15cqh;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.55),
+              inset 0 0 0 2px rgba(212,186,92,.9);
+  z-index: 10;
+}
+/* --- Контейнер наград --- */
+.wquest__rewards {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1em;
+  flex-wrap: wrap;
+  margin-top: 0.8em;
+  text-align: center;
+}
+
+/* --- Чип награды --- */
+.wquest__chip {
+  display: flex;
+  flex-direction: column;  
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4em;
+
+  min-width: 70px;
+  padding: 10px 8px 12px 8px;
+  border-radius: 14px;
+
+  box-shadow:
+    inset 0 6px 12px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.25);
+
+  backdrop-filter: blur(2px);
+  line-height: 1.1;
+}
+
+/* --- Иконка --- */
+.wquest__chip-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: center / 70% no-repeat;
+  background-color: rgba(0, 0, 0, 0.3); 
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.5);
+}
+
+/* --- Значение под иконкой --- */
+.wquest__chip-value {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #ffc24a; 
+  
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.6),
+    0 0 6px rgba(0,0,0,.25);
+  margin-top: 4px;
+}
+
+
+#wquest .wquest__close{
+  position:absolute; right:1.2cqh; top:1.0cqh;
+  width:3.2cqh; height:3.2cqh; cursor:pointer; user-select:none;
+  display:block; filter:drop-shadow(0 0.6cqh 1.2cqh rgba(0,0,0,.35));
+  transition:transform .08s ease, filter .15s ease;
+}
+#wquest .wquest__close:hover{ filter:drop-shadow(0 0.8cqh 1.6cqh rgba(0,0,0,.45)) brightness(1.05); }
+#wquest .wquest__close:active{ transform:translateY(0.2cqh) scale(.98); }
+
+#wquest .wquest__rewards{ display:flex; gap:2.2cqh; align-items:center; }
+#wquest .wquest__rewards--center{ justify-content:center; }
+
+#wquest .wquest__portrait{
+  position:absolute;
+  top:-5cqh;
+  left:-5cqh;
+  width:18cqh;
+  aspect-ratio:1/1;
+  border-radius:50%;
+  overflow:hidden;
+  z-index:2;
+  border:0.3cqh solid rgb(208,180,96);
+  box-shadow:0 1.0cqh 2.0cqh rgba(0,0,0,.5), inset 0 0 0.5cqh rgba(255,255,255,.35);
+  filter:drop-shadow(0 1.2cqh 1.8cqh rgba(0,0,0,.45));
+}
+#wquest .wquest__portrait-img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+#wquest .wquest__titlebar{
+  background:linear-gradient(to bottom, rgba(255,221,120,.25), rgba(255,221,120,.06));
+  border-radius:1.2cqh;
+  padding:1.4cqh 1.8cqh;
+  box-shadow:inset 0 0 0 0.2cqh rgba(255,225,150,.25), inset 0 1.2cqh 2.2cqh rgba(255,255,255,.07);
+}
+#wquest .wquest__title{
+  margin:0;
+  font-size:2.4cqh;
+  font-weight:800;
+  text-align:center;
+  color:#ffe79e;
+  text-shadow:0 0.3cqh 0.6cqh rgba(0,0,0,.55);
+}
+#wquest .wquest__subtitle{
+  margin:.6cqh 0 0 0;
+  font-size:1.6cqh;
+  color:rgba(255,255,255,.85);
+  text-align:center;
+}
+
+#wquest .wquest__body{
+  background:rgba(0,0,0,.18);
+  border:0.15cqh solid rgba(255,255,255,.12);
+  border-radius:1.2cqh;
+  padding:2.0cqh;
+  line-height:1.45;
+  font-size:1.75cqh;
+  color:rgba(235,249,252,.95);
+  box-shadow:inset 0 0.6cqh 1.2cqh rgba(0,0,0,.25);
+}
+
+#wquest .wquest__objective{
+  background:linear-gradient(to bottom, rgba(20,100,110,.35), rgba(10,50,60,.35));
+  border:0.2cqh solid rgba(119,210,220,.45);
+  border-radius:1.2cqh;
+  padding:1.6cqh;
+  box-shadow:inset 0 0 0.8cqh rgba(0,0,0,.25);
+}
+#wquest .wquest__objective-text{
+  background:rgba(0,0,0,.15);
+  border:0.15cqh solid rgba(255,255,255,.12);
+  border-radius:0.8cqh;
+  padding:1.4cqh 1.6cqh;
+  font-size:1.75cqh;
+  color:rgba(235,249,252,.96);
+}
+
+#wquest .wquest__rewards{
+  display:flex;
+  gap:2.2cqh;
+  align-items:center;
+  margin-top:0.4cqh;
+}
+#wquest .wquest__chip {
+  display: flex;
+  flex-direction: column;   /* иконка сверху, цифра снизу */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6cqh;
+
+  /* убрана жёсткая внутренняя тень */
+  box-shadow: none;
+
+  line-height: 1.1;
+}
+
+
+#wquest .wquest__chip-icon{
+  width:11cqh;
+  height:11cqh;
+  border-radius:50%;
+  display:inline-grid;
+  place-items:center;
+  background-image: url("img/queue/DiamondBlue.png") ;
+
+}
+
+@media (max-width: 680px){
+  #wquest{ padding-left:11cqh; }
+  #wquest .wquest__portrait{ top:-4cqh; left:-4cqh; width:15cqh; }
+}
+
+
+
+
 .keybinding-row {
     display: flex;
     align-items: center;
