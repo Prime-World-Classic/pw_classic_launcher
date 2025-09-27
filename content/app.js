@@ -1367,7 +1367,7 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.body.children[0].style.display = 'block';
 
-		CastleNAVBAR.body.children[5].innerText = 'Отменить';
+		CastleNAVBAR.body.children[5].innerText = Lang.text('cancel');;
 
 		//CastleNAVBAR.body.children[5].style.fontSize = '1.1vw';
 
@@ -2269,7 +2269,7 @@ class View {
     if (disabled) {
       medal.title = 'Режим временно недоступен';
     } else {
-      medal.title = 'Посмотреть статистику по режиму';
+      medal.title = Lang.text('titlestatisticmode');
       medal.setAttribute('role', 'button');
       medal.tabIndex = 0;
       const openStats = () => { Window.show('main', 'top', 0, idx); };
@@ -2332,8 +2332,7 @@ class View {
 
   const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
   divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
-  divisionBadgeUnderStat.title =
-    'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.';
+  divisionBadgeUnderStat.title = Lang.text('titlehint2');
 
   statCircle.append(statsBtn, divisionBadgeUnderStat);
   statWrapper.append(statRect, statCircle);
@@ -2343,7 +2342,7 @@ class View {
   const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
   const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
   const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
-  tooltipText.textContent = 'Сколько \nчеловек\nв очереди\nпо режимам.';
+  tooltipText.textContent = Lang.text('titlehint');
   tooltipBubble.append(tooltipText);
   tooltipWrap.append(questionIcon, tooltipBubble);
 
@@ -3000,7 +2999,7 @@ class View {
 							friend.remove();
 
 						}]
-					}, 'Отменить'));
+					}, Lang.text('cancel')));
 
 				}
 
