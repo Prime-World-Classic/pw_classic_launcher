@@ -14,6 +14,7 @@ export const en = {
 		fight: 'Fight!',
 		enterTextAndPressEnter: 'Enter the text and press Enter',
 		ready: 'Ready',
+		cancel: 'Cancel',
 		library: 'Library',
 		menu: 'Menu',
 		preferences: 'Preferences',
@@ -62,6 +63,11 @@ export const en = {
 		titlefriends: 'Friends',
 		titleconstruction: 'Construction',
 		titlestatistic: 'Statistics',
+		titlestatisticmode:'View statistics on the mode',
+
+		// Подсказки
+		titlehint:'How many \npeople are \nin the queue according to \nthe modes.',
+		titlehint2:'Division — a group of players of the same rank \nwho are matched based on having a similar win rate.',
 
 		// Постройки
 		pearl_farm_ad: "Pearl Farm",

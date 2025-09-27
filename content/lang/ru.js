@@ -15,6 +15,7 @@ export const ru = {
 		fight: 'В бой!',
 		enterTextAndPressEnter: 'Введите текст и нажмите Enter',
 		ready: 'Готов',
+		cancel: 'Отменить',
 		library: 'Библиотека',
 		menu: 'Меню',
 		preferences: 'Настройки',
@@ -63,6 +64,11 @@ export const ru = {
 		titlefriends: 'Друзья',
 		titleconstruction: 'Строительство',
 		titlestatistic: 'Статистика',
+		titlestatisticmode:'Посмотреть статистику по режиму',
+
+		// Подсказки
+		titlehint:'Сколько \nчеловек\nв очереди\nпо режимам.',
+		titlehint2:'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.',
 
 		// Постройки
 		pearl_farm_ad: "Жемчужная ферма",
