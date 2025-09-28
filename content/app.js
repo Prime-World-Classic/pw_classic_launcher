@@ -1,6 +1,6 @@
 APP_VERSION = '0';
 
-PW_VERSION = '2.7.4';
+PW_VERSION = '2.8.0';
 
 CURRENT_MM = 'mmtest'
 
@@ -4166,7 +4166,7 @@ class Window {
 			App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
 			DOM({ style: 'castle-menu-item-button' },
-				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, 'Аккаунт')),
+				DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account'))),
 			DOM({ style: 'castle-menu-item-button' },
 				DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 			DOM({ style: 'castle-menu-item-button' },

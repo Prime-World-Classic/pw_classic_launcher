@@ -18,6 +18,7 @@ export const ru = {
 		cancel: 'Отменить',
 		library: 'Библиотека',
 		menu: 'Меню',
+		account:'Аккаунт',
 		preferences: 'Настройки',
 		windowMode: 'Оконный режим',
 		radminPriority: 'Приоритет RadminVPN',

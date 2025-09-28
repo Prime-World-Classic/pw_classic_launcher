@@ -17,6 +17,7 @@ export const en = {
 		cancel: 'Cancel',
 		library: 'Library',
 		menu: 'Menu',
+		account:'Account',
 		preferences: 'Preferences',
 		windowMode: 'Window mode',
 		radminPriority: 'RadminVPN Priority',
