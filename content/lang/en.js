@@ -417,6 +417,7 @@ export const en = {
 		hero_27_skin_6_name: "Cyborg",
 		hero_27_skin_7_name: "Blade Master",
 		hero_28_skin_2_name: "Genie",
+		hero_28_skin_3_name: "Frost Mage",
 		hero_28_skin_4_name: "Black Sorceress",
 		hero_28_skin_5_name: "Primologist",
 		hero_28_skin_6_name: "Frost Mage",

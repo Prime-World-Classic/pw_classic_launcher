@@ -418,7 +418,7 @@ export const ru = {
 		hero_27_skin_6_name: "Киборг",
 		hero_27_skin_7_name: "Мастер клинков",
 		hero_28_skin_2_name: "Джинн",
-		hero_28_skin_3_name: "Маг Мороз",//такого нет скина
+		hero_28_skin_3_name: "Маг Мороз",
 		hero_28_skin_4_name: "Чёрная чародейка",
 		hero_28_skin_5_name: "Праймолог",
 		hero_28_skin_6_name: "Маг Мороз",
