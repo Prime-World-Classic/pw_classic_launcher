@@ -55,6 +55,8 @@ export const ru = {
 		classTalent: 'Классовый',
 		language: 'Язык',
 		LangTarg: 'Язык изменен',
+
+		// Подсказки
 		titletraining: 'Тренировка',
 		training: 'Тренировка',
 		titleflag: 'Выбор стороны',
@@ -65,8 +67,6 @@ export const ru = {
 		titleconstruction: 'Строительство',
 		titlestatistic: 'Статистика',
 		titlestatisticmode:'Посмотреть статистику по режиму',
-
-		// Подсказки
 		titlehint:'Сколько \nчеловек\nв очереди\nпо режимам.',
 		titlehint2:'Дивизия — группа игроков под одним званием,\nкоторая играет примерно на равном винрейте матчмейкинга.',
 

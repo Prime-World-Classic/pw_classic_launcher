@@ -1654,7 +1654,7 @@ class View {
 				const newLanguage = e.target.value;
 				Lang.target = newLanguage;
 				Settings.settings.language = newLanguage;
-				App.error(`Язык изменен: ${Lang.list[newLanguage].name}`);
+				App.error(`${Lang.text('LangTarg')}: ${Lang.list[newLanguage].name}`);
 				// Перезагружаем страницу для применения языка
 				await Lang.reinitViews();
 			}]
