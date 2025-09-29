@@ -283,7 +283,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   height: 6.9vh;
   background: url('./img/queue/Cristal.png') no-repeat center/contain;
   top: 0.4cqh;   
-  right: 0.1cqh; 
+  left: -10.1cqh; 
   z-index: 5;
 }
 

@@ -2450,17 +2450,18 @@ root.appendChild(content);
 
   statCircle.append(statsBtn, divisionBadgeUnderStat);
   statWrapper.append(statRect, statCircle);
+  
+  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
 
   // подсказка слева
   const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
-  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
   const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
   const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
   tooltipText.textContent = Lang.text('titlehint');
   tooltipBubble.append(tooltipText);
-  tooltipWrap.append(questionIcon, tooltipBubble);
+  tooltipWrap.append(tooltipBubble);
 
-  banner.append(tooltipWrap, statWrapper);
+  banner.append(questionIcon, tooltipWrap, statWrapper);
   return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
 
