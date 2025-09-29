@@ -2461,7 +2461,7 @@ root.appendChild(content);
   tooltipBubble.append(tooltipText);
   tooltipWrap.append(tooltipBubble);
 
-  banner.append(questionIcon, tooltipWrap, statWrapper);
+  banner.append(questionIcon, statWrapper);
   return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
 
