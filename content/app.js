@@ -10237,6 +10237,8 @@ class Castle {
 
 		Castle.currentSceneName = sceneName;
 
+		Castle.shaderFactionDef = sceneName == 'doct' ? "SCENE_DOCT" : "SCENE_AD";
+
 		window.addEventListener('resize', function (event) {
 
 			canvas.width = document.body.offsetWidth;
@@ -10620,9 +10622,9 @@ class Castle {
 
 			let definesText = await HTTP.request(`content/shaders/${shaderNames[i]}.glsl`, 'text');
 
-			let programColor = Castle.prepareShader("\n#define RENDER_PASS_COLOR\n", definesText, vsText, fsText);
+			let programColor = Castle.prepareShader(`\n#define RENDER_PASS_COLOR\n #define ${Castle.shaderFactionDef}`, definesText, vsText, fsText);
 
-			let programSM = Castle.prepareShader("\n#define RENDER_PASS_SM\n", definesText, vsText, fsText);
+			let programSM = Castle.prepareShader(`\n#define RENDER_PASS_SM\n #define ${Castle.shaderFactionDef}`, definesText, vsText, fsText);
 
 			Castle.sceneShaders[i] = { PSO: programColor, PSO_SM: programSM, attributes: Castle.scenesJson.shaderLayouts.find(value => value.name === shaderNames[i]).layout, vertStride: 0 };
 
@@ -10675,6 +10677,8 @@ class Castle {
 	}
 
 	static uniqueProgCounter = 0;
+
+	static shaderFactionDef = "INVALID_DEFINE"
 
 	static prepareShader(renderPassDefine, definesText, vsText, fsText) {
 
