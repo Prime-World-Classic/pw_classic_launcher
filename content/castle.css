@@ -832,8 +832,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   position: absolute;
   top: -25%;   
   left: -25%;
-  width: 145%; 
-  height: 145%;
+  width: 155%; 
+  height: 155%;
   background: url("img/queue/321.png") no-repeat center/contain;
   pointer-events: none;
   z-index: 5;
