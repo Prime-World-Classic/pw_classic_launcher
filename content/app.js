@@ -1774,7 +1774,7 @@ class View {
 		
 		body.append(backgroundImage,Castle.canvas);
 		
-		body.append(await View.castleQuest());
+		//body.append(await View.castleQuest());
 		
 		try{
 			
@@ -1826,6 +1826,7 @@ class View {
 
 	}
 	
+	/* 
 static async quest(questId, cloneNode, item) {
   let root = document.querySelector('#wquest');
   if (root) {
@@ -1947,7 +1948,7 @@ root.appendChild(content);
   return root;
 }
 
-
+*/
 
 
 
@@ -2451,7 +2452,7 @@ root.appendChild(content);
   statCircle.append(statsBtn, divisionBadgeUnderStat);
   statWrapper.append(statRect, statCircle);
   
-  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
+  //const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
 
   // подсказка слева
   const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
@@ -2461,7 +2462,7 @@ root.appendChild(content);
   tooltipBubble.append(tooltipText);
   tooltipWrap.append(tooltipBubble);
 
-  banner.append(questionIcon, statWrapper);
+banner.append( statWrapper);
   return DOM({ style: 'castle-banner-online-wrapper' }, banner);
 }
 
@@ -2681,7 +2682,7 @@ root.appendChild(content);
 			View.arrows.rd.classList.remove('castle-bottom-content-btn-disable');
 		}
 	}
-	
+/*	
 	static async castleQuest(){
 
   let body = DOM({ style:'quest' });
@@ -2812,7 +2813,7 @@ root.appendChild(content);
   render();
   return body;
 }
-
+*/
 
 	static bodyCastleBuildings() {
 
@@ -4306,10 +4307,12 @@ class Window {
 		let view = await View.inventory(true);
 		return DOM({ id: 'winventory' }, view);
 	}
+	/*
 	static async quest(questId,cloneNode,test) {
 		let view = await View.quest(questId,cloneNode,test);
 		
 	}
+		*/
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),

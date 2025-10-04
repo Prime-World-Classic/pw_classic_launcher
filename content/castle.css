@@ -832,8 +832,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   position: absolute;
   top: -25%;   
   left: -25%;
-  width: 145%; 
-  height: 145%;
+  width: 150%; 
+  height: 150%;
   background: url("img/queue/321.png") no-repeat center/contain;
   pointer-events: none;
   z-index: 5;
@@ -1218,7 +1218,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .settings-menu-item {
 	left: 6.1cqw;
 	top: 5.8cqh;
-	background-image: url('icons/settings.png'),url('content/img/queue/321.png');
+	background-image: url('icons/settings.png');
 	background-color: #00fff279;
 	width:18cqh;
 	height:18cqh;
