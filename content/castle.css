@@ -1359,7 +1359,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 .no-hover-brightness:hover {
 	filter: brightness(100%);
 }
-
+.castle-hero-rank-icon{
+	transform: scale(.8);
+}
 .castle-hero-item-bg {
 	position: absolute;
 	left: 10%;
