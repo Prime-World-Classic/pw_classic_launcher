@@ -8,6 +8,7 @@ export const en = {
 		passwordAgain: 'password again',
 		login: 'Login',
 		registration: 'Registration',
+		registration1: 'Register',
 		fraction: 'Select a faction',
 		adornia: 'Kingdom of Adornia',
 		docts: 'Empire of the Docts',
@@ -57,6 +58,8 @@ export const en = {
 		LangTarg: 'Language changed',
 		titletraining: 'Training mode',
 		training: 'Training',
+		confirm:'Confirm',
+		continue:'Continue',
 
 		// Подсказки
 		titleflag: 'Choosing a faction',
