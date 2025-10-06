@@ -8146,6 +8146,20 @@ class Events {
 		Chat.viewMessage(data);
 
 	}
+	
+	static async VCall(data){
+		
+		let voice = new Voice(data.id);
+		
+		await voice.accept(data.offer);
+		
+	}
+	
+	static async VReady(data){
+		
+		await Voice.ready(data.id,data.answer);
+		
+	}
 
 }
 
@@ -8734,6 +8748,227 @@ class App {
 
 	}
 
+}
+
+class Voice {
+	
+	static peerConnectionConfig = {
+		// полный список stun https://gist.github.com/sagivo/3a4b2f2c7ac6e1b5267c2f1f59ac6c6b
+		iceServers:[
+		{urls:[
+		'stun:stun.l.google.com:19302',
+		'stun:stun1.l.google.com:19302',
+		'stun:stun2.l.google.com:19302',
+		'stun:stun3.l.google.com:19302',
+		'stun:stun4.l.google.com:19302'
+		]}
+		]
+		
+	};
+	
+	static localStreamAudio = null;
+	
+	static manager = new Object();
+	
+	static async initAudio(){
+		
+		if(!Voice.localStreamAudio){
+			
+			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:48000,sampleSize:16},video:false});
+			
+			Voice.initEventAudio();
+			
+		}
+		
+	}
+	
+    static initEventAudio(){
+		
+		let audioContext = new AudioContext();
+		
+		let source = audioContext.createMediaStreamSource(Voice.localStreamAudio);
+
+		let analyser = audioContext.createAnalyser();
+		
+		source.connect(analyser);
+		
+		analyser.fftSize = 256;
+		
+		let bufferLength = analyser.frequencyBinCount;
+		
+		let dataArray = new Uint8Array(bufferLength);
+		
+        let checkVolume = () => {
+			
+			analyser.getByteFrequencyData(dataArray);
+			
+			let sum = 0;
+			
+			for(let i = 0; i < bufferLength; i++){
+				
+				sum += dataArray[i];
+				
+			}
+			
+			let average = sum / bufferLength;
+			
+			let event = new CustomEvent('voiceVolumeChange',{detail:average});
+			
+			window.dispatchEvent(event);
+			
+			requestAnimationFrame(checkVolume);
+			
+        };
+		
+		checkVolume();
+		
+    }
+	
+	static async ready(userId,answer){
+		
+		if( !(userId in Voice.manager) ){
+			
+			return;
+			
+		}
+		
+		await Voice.manager[userId].setRemoteDescription(answer);
+		
+    }
+	
+	constructor(userId){
+		
+		this.id = userId;
+		
+	}
+	
+	createPeerConnection(){
+		
+		this.peer = new RTCPeerConnection(Voice.peerConnectionConfig);
+		
+		Voice.manager[this.id] = this.peer;
+		
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			console.log(`Добавили трек: ${track.kind} (${track.id})`);
+			
+			this.peer.addTrack(track);
+			
+		}
+		
+		this.peer.ontrack = (event) => {
+			
+			console.log('Получен удаленный медиапоток');
+			
+			let audio = document.createElement('audio');
+			
+			audio.srcObject = event.streams[0];
+			
+            console.log(event.streams[0]);
+			
+		}
+		
+		this.peer.onicecandidate = async (event) => {
+			
+			if(event.candidate){
+				
+				console.log('Сгенерирован ICE кандидат:',event.candidate);
+				
+				// await this.peer.addIceCandidate(event.candidate);
+				
+				// await App.api.request('user','callCandidate',{id:this.id,candidate:event.candidate});
+				
+			}
+			else{
+				
+				console.log('Все ICE кандидаты собраны');
+				
+			}
+			
+		}
+		
+		this.peer.oniceconnectionstatechange = () => {
+			
+			switch(this.peer.iceConnectionState){
+				
+				case 'connected': console.log('Соединение установлено!'); break;
+				
+				case 'disconnected': console.log('Соединение прервано'); break;
+				
+				case 'failed': console.error('Соединение не удалось'); break;
+				
+				case 'closed': console.log('Соединение закрыто'); break;
+				
+			}
+			
+		}
+		
+		this.peer.onconnectionstatechange = () => {
+			
+			console.log(`Состояние соединения: ${this.peerConnection.connectionState}`);
+			
+		};
+		
+	}
+	
+	async call(){
+		
+		if(this.id in Voice.manager){
+			
+			return;
+			
+		}
+		
+		await Voice.initAudio();
+		
+		this.createPeerConnection();
+		
+		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
+		
+		await this.peer.setLocalDescription(offer);
+		
+		await App.api.request('user','call',{id:this.id,offer:offer});
+		
+	}
+	
+	async accept(offer){
+		
+		if(this.id in Voice.manager){
+			
+			return;
+			
+		}
+		
+		await Voice.initAudio();
+		
+		this.createPeerConnection();
+		
+		await this.peer.setRemoteDescription(offer);
+		
+		let answer = await this.peer.createAnswer();
+		
+		await this.peerConnection.setLocalDescription(answer);
+		
+		await App.api.request('user','callAccept',{id:this.id,answer:answer});
+		
+	}
+	
+	async close(){
+		
+		if(this.peer){
+			
+			this.peer.close();
+			
+		}
+		/*
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			track.stop();
+			
+		}
+		*/
+	}
+	
 }
 
 class Chat {
