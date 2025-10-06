@@ -8144,7 +8144,7 @@ class Events {
 	static UChat(data) {
 
 		Chat.viewMessage(data);
-
+		
 	}
 	
 	static async VCall(data){
@@ -8158,6 +8158,12 @@ class Events {
 	static async VReady(data){
 		
 		await Voice.ready(data.id,data.answer);
+		
+	}
+	
+	static async VCandidate(data){
+		
+		await Voice.candidate(data.id,candidate);
 		
 	}
 
@@ -8766,6 +8772,15 @@ class Voice {
 		
 	};
 	
+	static mediaAudioConfig = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:48000,
+		sampleSize:16
+	};
+	
 	static localStreamAudio = null;
 	
 	static manager = new Object();
@@ -8774,7 +8789,7 @@ class Voice {
 		
 		if(!Voice.localStreamAudio){
 			
-			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:48000,sampleSize:16},video:false});
+			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:Voice.mediaAudioConfig,video:false});
 			
 			Voice.initEventAudio();
 			
@@ -8824,21 +8839,33 @@ class Voice {
 		
     }
 	
-	static async ready(userId,answer){
+	static async ready(id,answer){
 		
-		if( !(userId in Voice.manager) ){
+		if( !(id in Voice.manager) ){
 			
 			return;
 			
 		}
 		
-		await Voice.manager[userId].setRemoteDescription(answer);
+		await Voice.manager[id].setRemoteDescription(answer);
 		
     }
 	
-	constructor(userId){
+	static async candidate(id,candidate){
 		
-		this.id = userId;
+		if( !(id in Voice.manager) ){
+			
+			return;
+			
+		}
+		
+		await Voice.manager[id].addIceCandidate(candidate); // new RTCIceCandidate()
+		
+    }
+	
+	constructor(id){
+		
+		this.id = id;
 		
 	}
 	
@@ -8858,13 +8885,15 @@ class Voice {
 		
 		this.peer.ontrack = (event) => {
 			
-			console.log('Получен удаленный медиапоток');
+			console.log('Получен удаленный медиапоток',event);
 			
-			let audio = document.createElement('audio');
+			let audio = new Audio();
+			
+			audio.volume = 0.5;
 			
 			audio.srcObject = event.streams[0];
 			
-            console.log(event.streams[0]);
+			audio.play();
 			
 		}
 		
@@ -8874,9 +8903,7 @@ class Voice {
 				
 				console.log('Сгенерирован ICE кандидат:',event.candidate);
 				
-				// await this.peer.addIceCandidate(event.candidate);
-				
-				// await App.api.request('user','callCandidate',{id:this.id,candidate:event.candidate});
+				await App.api.request('user','callCandidate',{id:this.id,candidate:event.candidate});
 				
 			}
 			else{
@@ -8895,9 +8922,21 @@ class Voice {
 				
 				case 'disconnected': console.log('Соединение прервано'); break;
 				
-				case 'failed': console.error('Соединение не удалось'); break;
+				case 'failed':
 				
-				case 'closed': console.log('Соединение закрыто'); break;
+				console.error('Соединение не удалось');
+				
+				this.close();
+				
+				break;
+				
+				case 'closed':
+				
+				console.log('Соединение закрыто');
+				
+				this.close();
+				
+				break;
 				
 			}
 			
@@ -8960,6 +8999,9 @@ class Voice {
 			this.peer.close();
 			
 		}
+		
+		delete Voice.manager[this.id];
+		
 		/*
 		for(let track of Voice.localStreamAudio.getTracks()){
 			
