@@ -3077,13 +3077,7 @@ root.appendChild(content);
 			for (let item of result) {
 
 				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, item.nickname));
-
-				if (item.nickname.length > 10) {
-					heroName.firstChild.classList.add('castle-name-autoscroll');
-				}
-
-				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
-				heroNameBase.append(DOM({tag:'span',event:['click', async () => {
+				heroName.append(DOM({tag:'span',event:['click', async () => {
 					
 					try{
 						
@@ -3098,7 +3092,13 @@ root.appendChild(content);
 						
 					}
 					
-				}]},'☎️'))
+				}]},'☎️'));
+				if (item.nickname.length > 10) {
+					heroName.firstChild.classList.add('castle-name-autoscroll');
+				}
+
+				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
+				
 				let bottom = DOM({ style: 'castle-friend-item-bottom' });
 
 				let friend = DOM({ style: 'castle-friend-item' }, heroNameBase, bottom);
