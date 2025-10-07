@@ -3081,9 +3081,9 @@ root.appendChild(content);
 					
 					try{
 						
-						let voice = new Voice(item.id);
+						let voice = new Voice(item.id,'friend');
 						
-						await voice.call('testkey');
+						await voice.call();
 						
 					}
 					catch(error){
@@ -8178,9 +8178,30 @@ class Events {
 	
 	static async VCall(data){
 		
-		let voice = new Voice(data.id);
-		
-		await voice.accept(data.offer);
+		if(data.isCaller){
+			
+			let body = document.createDocumentFragment();
+			
+			body.append(DOM(`Принять звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
+				
+				let voice = new Voice(data.id);
+				
+				await voice.accept(data.offer);
+				
+				Splash.hide();
+				
+			}]},'Да'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Нет'));
+			
+			Splash.show(body);
+			
+		}
+		else{
+			
+			let voice = new Voice(data.id);
+			
+			await voice.accept(data.offer);
+			
+		}
 		
 	}
 	
@@ -8193,6 +8214,12 @@ class Events {
 	static async VCandidate(data){
 		
 		await Voice.candidate(data.id,data.candidate);
+		
+	}
+	
+	static VKick(){
+		
+		Voice.destroy();
 		
 	}
 
@@ -8952,33 +8979,23 @@ class Voice {
 				
 			}
 			
-			let voice = new Voice(id);
+			let voice = new Voice(id,key);
 			
-			await voice.call(key);
+			await voice.call();
 			
 		}
 		
 	}
 	
-	constructor(id){
+	constructor(id,key = ''){
 		
 		this.id = id;
 		
-	}
-	
-	createPeerConnection(){
+		this.key = key;
 		
 		this.peer = new RTCPeerConnection(Voice.peerConnectionConfig);
 		
 		Voice.manager[this.id] = this.peer;
-		
-		for(let track of Voice.localStreamAudio.getTracks()){
-			
-			console.log(`Добавили трек: ${track.kind} (${track.id})`);
-			
-			this.peer.addTrack(track);
-			
-		}
 		
 		this.peer.ontrack = (event) => {
 			
@@ -9055,7 +9072,7 @@ class Voice {
 		
 	}
 	
-	async call(key){
+	async call(){
 		
 		if(!Settings.settings.voice){
 			
@@ -9071,13 +9088,17 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.createPeerConnection();
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			this.peer.addTrack(track);
+			
+		}
 		
 		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
 		
 		await this.peer.setLocalDescription(offer);
 		
-		await App.api.request('user','call',{id:this.id,key:key,offer:offer});
+		await App.api.request('user','call',{id:this.id,key:this.key,offer:offer});
 		
 	}
 	
@@ -9097,7 +9118,11 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.createPeerConnection();
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			this.peer.addTrack(track);
+			
+		}
 		
 		await this.peer.setRemoteDescription(offer);
 		
