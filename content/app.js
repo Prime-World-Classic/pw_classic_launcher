@@ -8222,7 +8222,7 @@ class Events {
 		Voice.destroy();
 		
 	}
-
+	
 }
 
 class App {
@@ -8960,6 +8960,12 @@ class Voice {
 	}
 	
 	static async association(i,users,key){
+		
+		if(!Settings.settings.voice){
+			
+			return;
+			
+		}
 		
 		let start = false;
 		
@@ -12418,6 +12424,17 @@ class MM {
 		}
 
 		MM.searchActive(false);
+		
+		try{
+			
+			Voice.association(App.storage.data.id,data.map,data.id);
+			
+		}
+		catch(error){
+			
+			console.log('Voice.association',error);
+			
+		}
 
 		MM.lobbyUsers = data.users;
 
