@@ -4446,6 +4446,15 @@ class Window {
 					{ checked: Settings.settings.radminPriority }),
 				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
 			),
+			DOM({ style: 'castle-menu-item-checkbox' },
+				DOM({
+					tag: 'input', type: 'checkbox', id: 'voice', checked: Settings.settings.voice, event: ['change', (e) => {
+						Settings.settings.voice = e.target.checked;
+					}]
+				},
+					{ checked: Settings.settings.voice }),
+				DOM({ tag: 'label', for: 'voice' }, Lang.text('voiceEnabled'))
+			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
             	DOM({
                 	tag: 'input',
@@ -8823,8 +8832,6 @@ class Voice {
 	
 	static manager = new Object();
 	
-	static enabled = true;
-	
 	static async initAudio(){
 		
 		if(!Voice.localStreamAudio){
@@ -9050,7 +9057,7 @@ class Voice {
 	
 	async call(key){
 		
-		if(!Voice.enabled){
+		if(!Settings.settings.voice){
 			
 			return;
 			
@@ -9076,7 +9083,7 @@ class Voice {
 	
 	async accept(offer){
 		
-		if(!Voice.enabled){
+		if(!Settings.settings.voice){
 			
 			return;
 			
@@ -10951,7 +10958,7 @@ class Castle {
 				Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic)
 
 			}
-			//playCastleMusic();
+			playCastleMusic();
 		}
 
 		Castle.loadBuildings();
@@ -11754,7 +11761,8 @@ class Settings {
         musicVolume: 0.7,
         soundsVolume: 0.7,
 		radminPriority: false,
-		language: 'ru'
+		language: 'ru',
+		voice: false
     };
 
     static settings = JSON.parse(JSON.stringify(this.defaultSettings));
