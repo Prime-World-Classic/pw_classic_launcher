@@ -8910,6 +8910,34 @@ class Voice {
 		
 	}
 	
+	static async association(i,users,key){
+		
+		let start = false;
+		
+		for(let id of users){
+			
+			if(id == i){
+				
+				start = true;
+				
+				continue;
+				
+			}
+			
+			if(!start){
+				
+				continue;
+				
+			}
+			
+			let voice = new Voice(id);
+			
+			await voice.call(key);
+			
+		}
+		
+	}
+	
 	constructor(id){
 		
 		this.id = id;
