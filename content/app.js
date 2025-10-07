@@ -8886,6 +8886,28 @@ class Voice {
 		
     }
 	
+	static destroy(){
+		
+		for(let id in Voice.manager){
+			
+			Voice.manager[id].close();
+			
+		}
+		
+		if(Voice.localStreamAudio){
+			
+			for(let track of Voice.localStreamAudio.getTracks()){
+				
+				track.stop();
+				
+			}
+			
+			Voice.localStreamAudio = null;
+			
+		}
+		
+	}
+	
 	constructor(id){
 		
 		this.id = id;
@@ -9025,13 +9047,6 @@ class Voice {
 		
 		delete Voice.manager[this.id];
 		
-		/*
-		for(let track of Voice.localStreamAudio.getTracks()){
-			
-			track.stop();
-			
-		}
-		*/
 	}
 	
 }
