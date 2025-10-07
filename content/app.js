@@ -8808,6 +8808,8 @@ class Voice {
 	
 	static manager = new Object();
 	
+	static enabled = true;
+	
 	static async initAudio(){
 		
 		if(!Voice.localStreamAudio){
@@ -8997,6 +8999,12 @@ class Voice {
 	
 	async call(){
 		
+		if(!Voice.enabled){
+			
+			return;
+			
+		}
+		
 		if(this.id in Voice.manager){
 			
 			return;
@@ -9016,6 +9024,12 @@ class Voice {
 	}
 	
 	async accept(offer){
+		
+		if(!Voice.enabled){
+			
+			return;
+			
+		}
 		
 		if(this.id in Voice.manager){
 			
