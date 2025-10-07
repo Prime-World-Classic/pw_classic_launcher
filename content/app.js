@@ -8997,7 +8997,7 @@ class Voice {
 		
 	}
 	
-	async call(){
+	async call(key){
 		
 		if(!Voice.enabled){
 			
@@ -9019,7 +9019,7 @@ class Voice {
 		
 		await this.peer.setLocalDescription(offer);
 		
-		await App.api.request('user','call',{id:this.id,offer:offer});
+		await App.api.request('user','call',{id:this.id,key:key,offer:offer});
 		
 	}
 	
