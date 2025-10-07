@@ -8777,12 +8777,30 @@ class Voice {
 		
 	};
 	
+	static mediaAudioConfigManual = {
+		echoCancellation:false,
+		noiseSuppression:false,
+		autoGainControl:false,
+		channelCount:1,
+		sampleRate:48000,
+		sampleSize:16
+	};
+	
 	static mediaAudioConfig = {
 		echoCancellation:true,
 		noiseSuppression:true,
 		autoGainControl:true,
 		channelCount:1,
-		sampleRate:48000,
+		sampleRate:16000,
+		sampleSize:16
+	};
+	
+	static mediaAudioConfigLowQality = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:8000,
 		sampleSize:16
 	};
 	
@@ -8991,7 +9009,7 @@ class Voice {
 		
 		let answer = await this.peer.createAnswer();
 		
-		await this.peerConnection.setLocalDescription(answer);
+		await this.peer.setLocalDescription(answer);
 		
 		await App.api.request('user','callAccept',{id:this.id,answer:answer});
 		
