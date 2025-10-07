@@ -3083,13 +3083,13 @@ root.appendChild(content);
 				}
 
 				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
-				heroNameBase.append(DOM({tag:'span',event:['click',() => {
+				heroNameBase.append(DOM({tag:'span',event:['click', async () => {
 					
 					try{
 						
 						let voice = new Voice(item.id);
 						
-						voice.call('testkey');
+						await voice.call('testkey');
 						
 					}
 					catch(error){
