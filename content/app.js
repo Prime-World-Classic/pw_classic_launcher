@@ -8817,14 +8817,21 @@ class App {
 class Voice {
 	
 	static peerConnectionConfig = {
-		// полный список stun https://gist.github.com/sagivo/3a4b2f2c7ac6e1b5267c2f1f59ac6c6b
+		// проверка stun https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
 		iceServers:[
 		{urls:[
 		'stun:stun.l.google.com:19302',
 		'stun:stun1.l.google.com:19302',
 		'stun:stun2.l.google.com:19302',
 		'stun:stun3.l.google.com:19302',
-		'stun:stun4.l.google.com:19302'
+		'stun:stun4.l.google.com:19302',
+		'stun:stun.ideasip.com:3478',
+		'stun:stun.sipgate.net:3478',
+		'stun:stun.voipbuster.com:3478',
+		'stun:stun.voipstunt.com:3478',
+		'stun:stun.arbuz.ru:3478',
+		'stun:stun.demos.ru:3478',
+		'stun:stun.tatneft.ru:3478'
 		]}
 		]
 		
