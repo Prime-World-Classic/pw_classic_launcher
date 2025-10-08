@@ -8175,9 +8175,30 @@ class Events {
 	
 	static async VCall(data){
 		
-		let voice = new Voice(data.id);
+		if(data.isCaller){
 			
-		await voice.accept(data.offer);
+			let body = document.createDocumentFragment();
+			
+			body.append(DOM(`Принять звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
+				
+				let voice = new Voice(data.id);
+				
+				await voice.accept(data.offer);
+				
+				Splash.hide();
+				
+			}]},'Да'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Нет'));
+			
+			Splash.show(body);
+			
+		}
+		else{
+			
+			let voice = new Voice(data.id);
+			
+			await voice.accept(data.offer);
+			
+		}
 		
 	}
 	
@@ -8795,29 +8816,10 @@ class Voice {
 	static peerConnectionConfig = {
 		// проверка stun https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
 		iceServers:[
-		{urls:[
-		'stun:stun.l.google.com:19302'
-		]},
-		{
-    url: 'turn:192.158.29.39:3478?transport=udp',
-    credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-    username: '28224511:1379330808'
-},
-{
-    url: 'turn:192.158.29.39:3478?transport=tcp',
-    credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-    username: '28224511:1379330808'
-},
-{
-    url: 'turn:turn.bistri.com:80',
-    credential: 'homeo',
-    username: 'homeo'
- },
- {
-    url: 'turn:turn.anyfirewall.com:443?transport=tcp',
-    credential: 'webrtc',
-    username: 'webrtc'
-}
+		{url:'turn:192.158.29.39:3478?transport=udp',credential:'JZEOEt2V3Qb0y27GRntt2u2PAYA=',username:'28224511:1379330808'},
+		{url:'turn:192.158.29.39:3478?transport=tcp',credential:'JZEOEt2V3Qb0y27GRntt2u2PAYA=',username:'28224511:1379330808'},
+		{url:'turn:turn.bistri.com:80',credential:'homeo',username:'homeo'},
+		{url:'turn:turn.anyfirewall.com:443?transport=tcp',credential:'webrtc',username:'webrtc'}
 		]
 		
 	};
@@ -8863,6 +8865,8 @@ class Voice {
 	static manager = new Object();
 	
 	static infoPanel = null;
+	
+	static cacheCandidate = new Object();
 	
 	static init(){
 		
@@ -8983,8 +8987,22 @@ class Voice {
 			return;
 			
 		}
-		console.log('ДОБАВЛЕН РЕМОТЕ ',answer);
+		
 		await Voice.manager[id].peer.setRemoteDescription(answer);
+		
+		if(id in Voice.cacheCandidate){
+			
+			for(let candidate of Voice.cacheCandidate){
+				
+				console.log('ОТПРАВИЛИ ICE кандидат:',candidate);
+				
+				await App.api.ghost('user','callCandidate',{id:this.id,candidate:candidate});
+				
+			}
+			
+			delete Voice.cacheCandidate[id];
+			
+		}
 		
     }
 	
@@ -8995,8 +9013,8 @@ class Voice {
 			return;
 			
 		}
-		console.log('КАНДИДАТ ДОБАВЛЕН!!!!!!',id,candidate,Voice.manager[id].peer);
-		await Voice.manager[id].peer.addIceCandidate(candidate); // new RTCIceCandidate()
+		
+		await Voice.manager[id].peer.addIceCandidate(candidate);
 		
     }
 	
@@ -9059,7 +9077,7 @@ class Voice {
 	constructor(id,key = ''){
 		
 		this.id = id;
-		this.second = 1;
+		
 		this.key = key;
 		
 		this.isCaller = false;
@@ -9101,17 +9119,27 @@ class Voice {
 		this.peer.onicecandidate = async (event) => {
 			
 			if(event.candidate){
-				this.second = this.second + 1;
+				
 				console.log('Сгенерирован ICE кандидат:',event.candidate);
 				
-				setTimeout( async () => {
+				if(this.peer.remoteDescription){
+					
 					console.log('ОТПРАВИЛИ ICE кандидат:',event.candidate);
+					
 					await App.api.ghost('user','callCandidate',{id:this.id,candidate:event.candidate});
 					
+				}
+				else{
 					
-				},this.second);
-				
-				
+					if( !(this.id in Voice.cacheCandidate) ){
+						
+						Voice.cacheCandidate[this.id] = new Array();
+						
+					}
+					
+					Voice.cacheCandidate[this.id].push(event.candidate);
+					
+				}
 				
 			}
 			else{
@@ -9128,9 +9156,9 @@ class Voice {
 				
 				case 'connected': console.log('Соединение успешно установлено'); break;
 				
-				case 'disconnected': this.close(); break;
+				case 'disconnected': this.close(); break; // reconnect
 				
-				case 'failed': this.close(); break;
+				case 'failed': this.close(); break; // reconnect
 				
 				case 'closed': this.close(); break;
 				
@@ -9246,6 +9274,12 @@ class Voice {
 		this.peer.close();
 		
 		delete Voice.manager[this.id];
+		
+		if(this.id in Voice.cacheCandidate){
+			
+			delete Voice.cacheCandidate[this.id];
+			
+		}
 		
 		Voice.updateInfoPanel();
 		
