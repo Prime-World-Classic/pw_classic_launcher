@@ -9055,13 +9055,13 @@ class Voice {
 			
 		}
 		
-		this.peer.onconnectionstatechange = () => {
+		this.peer.oniceconnectionstatechange = () => {
 			
-			switch(this.peer.connectionState){
+			switch(this.peer.iceConnectionState){
 				
-				case 'connected':  break;
+				case 'connected': console.log('Соединение успешно установлено'); break;
 				
-				case 'disconnected':  break;
+				case 'disconnected': console.log('Разрыв соединения...'); break;
 				
 				case 'failed': this.reconnect(); break;
 				
@@ -9069,7 +9069,7 @@ class Voice {
 				
 			}
 			
-			console.log(`Состояние соединения: ${this.peer.connectionState}`);
+			console.log(`Состояние соединения: ${this.peer.iceConnectionState}`);
 			
 		};
 		
@@ -9143,6 +9143,22 @@ class Voice {
 		
 	}
 	
+	async reconnect(){
+		
+		this.close();
+		
+		if(!this.isCaller){
+			
+			return;
+			
+		}
+		
+		let voice = new Voice(this.id,this.key);
+		
+		voice.call();
+		
+	}
+	
 	async close(){
 		
 		this.peer.close();
@@ -9165,15 +9181,7 @@ class Voice {
 		
 		body.style.display = 'block';
 		
-		if(!body.children.length){
-			
-			return;
-			
-		}
-		
-		body.append();
-		
-		this.peer.addEventListener('connectionstatechange',() => {
+		this.peer.onconnectionstatechange = () => {
 			
 			body.onclick = false;
 			
@@ -9199,7 +9207,7 @@ class Voice {
 				
 			}
 			
-		});
+		};
 		
 	}
 	
