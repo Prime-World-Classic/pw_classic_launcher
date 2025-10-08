@@ -9151,7 +9151,7 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			//throw 'Голосовая связь отключена';
+			throw 'Голосовая связь отключена';
 			
 		}
 		
@@ -9191,7 +9191,7 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			//return;
+			return;
 			
 		}
 		
