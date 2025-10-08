@@ -3079,7 +3079,7 @@ root.appendChild(content);
 					
 					try{
 						
-						let voice = new Voice(item.id,'friend');
+						let voice = new Voice(item.id,'friend',item.nickname);
 						
 						await voice.call();
 						
@@ -3090,7 +3090,7 @@ root.appendChild(content);
 						
 					}
 					
-				}]},' ☎️'));
+				}]},'☎️ '));
 				if (item.nickname.length > 10) {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
 				}
@@ -8181,7 +8181,7 @@ class Events {
 			
 			body.append(DOM(`Принять звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
 				
-				let voice = new Voice(data.id);
+				let voice = new Voice(data.id,'',data.isCaller);
 				
 				await voice.accept(data.offer);
 				
@@ -8954,23 +8954,25 @@ class Voice {
 		
 		for(let id in Voice.manager){
 			
+			let name = (Voice.manager[id].name) ? Voice.manager[id].name : `id${id}`;
+			
+			let state = () => {
+				
+				return (Voice.manager[id].peer.connectionState == 'connected') ? `Подключен ${name} [X]` : `${name} (${Voice.manager[id].peer.connectionState}) [X]`;
+				
+			}
+			
 			let item = DOM({event:['click',() => {
 				
 				Voice.manager[id].close();
 				
 				item.remove();
 				
-			}]},`Звонок id${id}... [X]`);
+			}]},state());
 			
 			Voice.manager[id].peer.onconnectionstatechange = () => {
 				
-				switch(Voice.manager[id].peer.connectionState){
-					
-					case 'connected': item.innerText = `Подключен id${id} [X]`; break;
-					
-					default: item.innerText = `Статус (${Voice.manager[id].peer.connectionState}) [X]`; break;
-					
-				}
+				item.innerText = state();
 				
 			}
 			
@@ -8996,7 +8998,7 @@ class Voice {
 				
 				console.log('ОТПРАВИЛИ ICE кандидат:',candidate);
 				
-				await App.api.ghost('user','callCandidate',{id:this.id,candidate:candidate});
+				await App.api.ghost('user','callCandidate',{id:id,candidate:candidate});
 				
 			}
 			
@@ -9074,11 +9076,13 @@ class Voice {
 		
 	}
 	
-	constructor(id,key = ''){
+	constructor(id,key = '',name = ''){
 		
 		this.id = id;
 		
 		this.key = key;
+		
+		this.name = name;
 		
 		this.isCaller = false;
 		
