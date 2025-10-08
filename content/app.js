@@ -8837,6 +8837,15 @@ class Voice {
 		sampleSize:16
 	};
 	
+	static mediaAudioConfigHighQality = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:32000,
+		sampleSize:16
+	};
+	
 	static mediaAudioConfig = {
 		echoCancellation:true,
 		noiseSuppression:true,
@@ -8863,7 +8872,7 @@ class Voice {
 		
 		if(!Voice.localStreamAudio){
 			
-			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:Voice.mediaAudioConfig,video:false});
+			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:( App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig ),video:false});
 			
 			Voice.initEventAudio();
 			
