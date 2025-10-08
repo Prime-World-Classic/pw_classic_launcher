@@ -23,6 +23,7 @@ export const en = {
 		windowMode: 'Window mode',
 		radminPriority: 'RadminVPN Priority',
 		threeD: '3D',
+		voiceEnabled: 'Голосовая связь',
 		volume: 'Volume',
 		volumeMusic: 'Volume of music',
 		volumeSound: 'Volume of sounds',
