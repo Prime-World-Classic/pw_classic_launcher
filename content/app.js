@@ -8968,7 +8968,19 @@ class Voice {
 				
 				item.remove();
 				
-			}]},`id${id}`);
+			}]},`Звонок id${id}... [X]`);
+			
+			Voice.manager[id].peer.onconnectionstatechange = () => {
+				
+				switch(Voice.manager[id].peer.connectionState){
+					
+					case 'connected': item.innerText = `Подключен id${id} [X]`; break;
+					
+					default: item.innerText = `Статус (${Voice.manager[id].peer.connectionState}) [X]`; break;
+					
+				}
+				
+			}
 			
 			Voice.infoPanel.lastChild.append(item);
 			
