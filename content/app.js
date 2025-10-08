@@ -3077,13 +3077,28 @@ root.appendChild(content);
 			for (let item of result) {
 
 				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, item.nickname));
-
+				heroName.append(DOM({tag:'span',event:['click', async () => {
+					
+					try{
+						
+						let voice = new Voice(item.id,'friend');
+						
+						await voice.call();
+						
+					}
+					catch(error){
+						
+						App.error(error);
+						
+					}
+					
+				}]},'☎️'));
 				if (item.nickname.length > 10) {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
 				}
 
 				let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
-
+				
 				let bottom = DOM({ style: 'castle-friend-item-bottom' });
 
 				let friend = DOM({ style: 'castle-friend-item' }, heroNameBase, bottom);
@@ -3194,7 +3209,9 @@ root.appendChild(content);
 				friend.dataset.url = `content/hero/empty.webp`;
 
 				preload.add(friend);
-
+				
+				bottom.append(DOM({id:`VoiceId${item.id}`}));
+				
 			}
 
 		}, 'friend', 'list');
@@ -4431,6 +4448,15 @@ class Window {
 					{ checked: Settings.settings.radminPriority }),
 				DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority'))
 			),
+			DOM({ style: 'castle-menu-item-checkbox' },
+				DOM({
+					tag: 'input', type: 'checkbox', id: 'voice', checked: Settings.settings.voice, event: ['change', (e) => {
+						Settings.settings.voice = e.target.checked;
+					}]
+				},
+					{ checked: Settings.settings.voice }),
+				DOM({ tag: 'label', for: 'voice' }, Lang.text('voiceEnabled'))
+			),
 			DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
             	DOM({
                 	tag: 'input',
@@ -4522,7 +4548,7 @@ class Window {
 					await Window.show('main', 'settings');
     			}]
 				}, `${Lang.text('language')} (${Lang.target})`
-			)
+			),
 			// Добавленная кнопка "Клавиши"
 			/*DOM({ 
 				style: 'castle-menu-item-button',
@@ -4533,7 +4559,12 @@ class Window {
 			}, Lang.text('keys') || 'Клавиши'), // Fallback на текст, если перевод отсутствует
 			*/
 			// Кнопка "Назад"
-			
+			DOM({ 
+				style: 'castle-menu-item-button', 
+				event: ['click', () => {
+				Window.show('main', 'menu');
+				}]
+			}, Lang.text('back'))
 			/*,
 			
 			DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
@@ -8144,14 +8175,35 @@ class Events {
 	static UChat(data) {
 
 		Chat.viewMessage(data);
-
+		
 	}
 	
 	static async VCall(data){
 		
-		let voice = new Voice(data.id);
-		
-		await voice.accept(data.offer);
+		if(data.isCaller){
+			
+			let body = document.createDocumentFragment();
+			
+			body.append(DOM(`Принять звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
+				
+				let voice = new Voice(data.id);
+				
+				await voice.accept(data.offer);
+				
+				Splash.hide();
+				
+			}]},'Да'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Нет'));
+			
+			Splash.show(body);
+			
+		}
+		else{
+			
+			let voice = new Voice(data.id);
+			
+			await voice.accept(data.offer);
+			
+		}
 		
 	}
 	
@@ -8160,7 +8212,19 @@ class Events {
 		await Voice.ready(data.id,data.answer);
 		
 	}
-
+	
+	static async VCandidate(data){
+		
+		await Voice.candidate(data.id,data.candidate);
+		
+	}
+	
+	static VKick(){
+		
+		Voice.destroy();
+		
+	}
+	
 }
 
 class App {
@@ -8766,6 +8830,42 @@ class Voice {
 		
 	};
 	
+	static mediaAudioConfigManual = {
+		echoCancellation:false,
+		noiseSuppression:false,
+		autoGainControl:false,
+		channelCount:1,
+		sampleRate:48000,
+		sampleSize:16
+	};
+	
+	static mediaAudioConfigHighQality = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:32000,
+		sampleSize:16
+	};
+	
+	static mediaAudioConfig = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:16000,
+		sampleSize:16
+	};
+	
+	static mediaAudioConfigLowQality = {
+		echoCancellation:true,
+		noiseSuppression:true,
+		autoGainControl:true,
+		channelCount:1,
+		sampleRate:8000,
+		sampleSize:16
+	};
+	
 	static localStreamAudio = null;
 	
 	static manager = new Object();
@@ -8774,7 +8874,7 @@ class Voice {
 		
 		if(!Voice.localStreamAudio){
 			
-			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:48000,sampleSize:16},video:false});
+			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:( App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig ),video:false});
 			
 			Voice.initEventAudio();
 			
@@ -8824,47 +8924,117 @@ class Voice {
 		
     }
 	
-	static async ready(userId,answer){
+	static async ready(id,answer){
 		
-		if( !(userId in Voice.manager) ){
+		if( !(id in Voice.manager) ){
 			
 			return;
 			
 		}
 		
-		await Voice.manager[userId].setRemoteDescription(answer);
+		await Voice.manager[id].setRemoteDescription(answer);
 		
     }
 	
-	constructor(userId){
+	static async candidate(id,candidate){
 		
-		this.id = userId;
+		if( !(id in Voice.manager) ){
+			
+			return;
+			
+		}
+		
+		await Voice.manager[id].addIceCandidate(candidate); // new RTCIceCandidate()
+		
+    }
+	
+	static destroy(){
+		
+		for(let id in Voice.manager){
+			
+			Voice.manager[id].close();
+			
+		}
+		
+		if(Voice.localStreamAudio){
+			
+			for(let track of Voice.localStreamAudio.getTracks()){
+				
+				track.stop();
+				
+			}
+			
+			Voice.localStreamAudio = null;
+			
+		}
 		
 	}
 	
-	createPeerConnection(){
+	static async association(i,users,key){
+		
+		if(!Settings.settings.voice){
+			
+			throw 'Голосовая связь отключена';
+			
+		}
+		
+		let start = false;
+		
+		for(let id of users){
+			
+			if(id == i){
+				
+				start = true;
+				
+				continue;
+				
+			}
+			
+			if(!start){
+				
+				continue;
+				
+			}
+			
+			let voice = new Voice(id,key);
+			
+			await voice.call();
+			
+		}
+		
+	}
+	
+	constructor(id,key = ''){
+		
+		this.id = id;
+		
+		this.key = key;
+		
+		this.isCaller = false;
 		
 		this.peer = new RTCPeerConnection(Voice.peerConnectionConfig);
 		
 		Voice.manager[this.id] = this.peer;
 		
-		for(let track of Voice.localStreamAudio.getTracks()){
-			
-			console.log(`Добавили трек: ${track.kind} (${track.id})`);
-			
-			this.peer.addTrack(track);
-			
-		}
-		
 		this.peer.ontrack = (event) => {
 			
-			console.log('Получен удаленный медиапоток');
+			console.log('Получен удаленный медиапоток',event);
 			
-			let audio = document.createElement('audio');
+			let audio = new Audio();
 			
-			audio.srcObject = event.streams[0];
+			audio.srcObject = new MediaStream([event.track]);
 			
-            console.log(event.streams[0]);
+			audio.autoplay = true;
+			
+			audio.controls = true;
+			
+			audio.volume = 1.0;
+			
+			audio.play();
+			
+			document.body.prepend(audio);
+			
+			audio.style.display = 'none';
 			
 		}
 		
@@ -8874,9 +9044,7 @@ class Voice {
 				
 				console.log('Сгенерирован ICE кандидат:',event.candidate);
 				
-				// await this.peer.addIceCandidate(event.candidate);
-				
-				// await App.api.request('user','callCandidate',{id:this.id,candidate:event.candidate});
+				await App.api.ghost('user','callCandidate',{id:this.id,candidate:event.candidate});
 				
 			}
 			else{
@@ -8891,21 +9059,17 @@ class Voice {
 			
 			switch(this.peer.iceConnectionState){
 				
-				case 'connected': console.log('Соединение установлено!'); break;
+				case 'connected': console.log('Соединение успешно установлено'); break;
 				
-				case 'disconnected': console.log('Соединение прервано'); break;
+				case 'disconnected': console.log('Разрыв соединения...'); break;
 				
-				case 'failed': console.error('Соединение не удалось'); break;
+				case 'failed': this.reconnect(); break;
 				
-				case 'closed': console.log('Соединение закрыто'); break;
+				case 'closed': this.close(); break;
 				
 			}
 			
-		}
-		
-		this.peer.onconnectionstatechange = () => {
-			
-			console.log(`Состояние соединения: ${this.peerConnection.connectionState}`);
+			console.log(`Состояние соединения: ${this.peer.iceConnectionState}`);
 			
 		};
 		
@@ -8913,6 +9077,12 @@ class Voice {
 	
 	async call(){
 		
+		if(!Settings.settings.voice){
+			
+			throw 'Голосовая связь отключена';
+			
+		}
+		
 		if(this.id in Voice.manager){
 			
 			return;
@@ -8921,17 +9091,31 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.createPeerConnection();
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			this.peer.addTrack(track);
+			
+		}
 		
 		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
 		
 		await this.peer.setLocalDescription(offer);
 		
-		await App.api.request('user','call',{id:this.id,offer:offer});
+		await App.api.request('user','call',{id:this.id,key:this.key,offer:offer});
+		
+		this.isCaller = true;
+		
+		this.renderInfoPanel();
 		
 	}
 	
 	async accept(offer){
+		
+		if(!Settings.settings.voice){
+			
+			return;
+			
+		}
 		
 		if(this.id in Voice.manager){
 			
@@ -8941,32 +9125,90 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.createPeerConnection();
+		for(let track of Voice.localStreamAudio.getTracks()){
+			
+			this.peer.addTrack(track);
+			
+		}
 		
 		await this.peer.setRemoteDescription(offer);
 		
 		let answer = await this.peer.createAnswer();
 		
-		await this.peerConnection.setLocalDescription(answer);
+		await this.peer.setLocalDescription(answer);
 		
 		await App.api.request('user','callAccept',{id:this.id,answer:answer});
+		
+		this.renderInfoPanel();
+		
+	}
+	
+	async reconnect(){
+		
+		this.close();
+		
+		if(!this.isCaller){
+			
+			return;
+			
+		}
+		
+		let voice = new Voice(this.id,this.key);
+		
+		voice.call();
 		
 	}
 	
 	async close(){
 		
-		if(this.peer){
+		this.peer.close();
+		
+		delete Voice.manager[this.id];
+		
+	}
+	
+	renderInfoPanel(){
+		
+		let body = document.getElementById(`VoiceId${this.id}`);
+		
+		if(!body){
 			
-			this.peer.close();
+			return;
 			
 		}
-		/*
-		for(let track of Voice.localStreamAudio.getTracks()){
+		
+		body.parentNode.style.position = 'relative';
+		
+		body.style.display = 'block';
+		
+		this.peer.onconnectionstatechange = () => {
 			
-			track.stop();
+			body.onclick = false;
 			
-		}
-		*/
+			switch(this.peer.connectionState){
+				
+				case 'connected': 
+				
+				body.innerText = 'Сбросить';
+				
+				body.onclick = () => {
+					
+					this.close();
+					
+				}
+				
+				break;
+				
+				case 'disconnected': body.innerText = 'Восстанавливаем связь...'; break;
+				
+				case 'failed': body.innerText = 'Переподключение...'; break;
+				
+				case 'closed': body.style.display = 'none'; break;
+				
+			}
+			
+		};
+		
 	}
 	
 }
@@ -11609,7 +11851,8 @@ class Settings {
         musicVolume: 0.7,
         soundsVolume: 0.7,
 		radminPriority: false,
-		language: 'ru'
+		language: 'ru',
+		voice: false
     };
 
     static settings = JSON.parse(JSON.stringify(this.defaultSettings));
@@ -12541,6 +12784,29 @@ class MM {
 				}
 				
 			}
+			
+		}
+		
+		try{
+			
+			let list = new Array();
+			
+			for(let key of data.map){
+				
+				if(data.users[App.storage.data.id].team == data.users[key].team){
+					
+					list.push(key);
+					
+				}
+				
+			}
+			
+			Voice.association(App.storage.data.id,list,data.id);
+			
+		}
+		catch(error){
+			
+			console.log('Voice.association',error);
 			
 		}
 		
