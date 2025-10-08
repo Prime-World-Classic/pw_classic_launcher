@@ -12424,17 +12424,6 @@ class MM {
 		}
 
 		MM.searchActive(false);
-		
-		try{
-			
-			Voice.association(App.storage.data.id,data.map,data.id);
-			
-		}
-		catch(error){
-			
-			console.log('Voice.association',error);
-			
-		}
 
 		MM.lobbyUsers = data.users;
 
@@ -12736,6 +12725,29 @@ class MM {
 				}
 				
 			}
+			
+		}
+		
+		try{
+			
+			let list = new Array();
+			
+			for(let key of data.map){
+				
+				if(data.users[App.storage.data.id].team == data.users[key].team){
+					
+					list.push(key);
+					
+				}
+				
+			}
+			
+			Voice.association(App.storage.data.id,list,data.id);
+			
+		}
+		catch(error){
+			
+			console.log('Voice.association',error);
 			
 		}
 		
