@@ -1007,8 +1007,6 @@ class Api {
 
 		let json = JSON.parse(body);
 
-		console.log('Сообщение API', json);
-
 		if (!json) {
 
 			return;
@@ -1059,7 +1057,7 @@ class Api {
 			}
 
 			if (action in this.events) {
-				console.log('Событие API', json.from);
+				
 				try {
 
 					this.events[action](data);
@@ -3076,7 +3074,7 @@ root.appendChild(content);
 
 			for (let item of result) {
 
-				const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, item.nickname));
+				const heroName = DOM({ style: 'castle-hero-name' }, DOM({tag:'span'}, item.nickname));
 				heroName.append(DOM({tag:'span',event:['click', async () => {
 					
 					try{
@@ -3092,7 +3090,7 @@ root.appendChild(content);
 						
 					}
 					
-				}]},'☎️'));
+				}]},' ☎️'));
 				if (item.nickname.length > 10) {
 					heroName.firstChild.classList.add('castle-name-autoscroll');
 				}
@@ -3209,8 +3207,6 @@ root.appendChild(content);
 				friend.dataset.url = `content/hero/empty.webp`;
 
 				preload.add(friend);
-				
-				bottom.append(DOM({id:`VoiceId${item.id}`}));
 				
 			}
 
@@ -8135,14 +8131,13 @@ class Events {
 	}
 
 	static MMQueueV2(data) {
-  		console.log('[MMQueueV2] пришли данные:', data);
+		
   		View.mmQueueMap = data;
 		document.querySelectorAll('.banner-count').forEach((el, idx) => {
     	const keys = ['pvp', 'anderkrug', 'cte', 'm4', 'pve-ep2-red', 'custom-battle'];
     	const cssKey = keys[idx];
     		if (cssKey) {
      	 const val = View.getQueue(cssKey);
-		 console.log(`[${cssKey}] => ${val}`);
 		 el.textContent = val;
     }
   });
@@ -8357,6 +8352,8 @@ class App {
 			document.body.append(DOM({ id: 'ADMStat' }));
 
 		}
+		
+		Voice.init();
 
 	}
 
@@ -8877,6 +8874,20 @@ class Voice {
 	
 	static manager = new Object();
 	
+	static infoPanel = null;
+	
+	static init(){
+		
+		if(!Voice.infoPanel){
+			
+			Voice.infoPanel = DOM({style:'voice-info-panel'},DOM({style:'voice-volume'}),DOM({style:'voice-stream'}));
+			
+		}
+		
+		document.body.append(Voice.infoPanel);
+		
+	}
+	
 	static async initAudio(){
 		
 		if(!Voice.localStreamAudio){
@@ -8884,6 +8895,8 @@ class Voice {
 			Voice.localStreamAudio = await navigator.mediaDevices.getUserMedia({audio:( App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig ),video:false});
 			
 			Voice.initEventAudio();
+			
+			Voice.infoPanel.style.display = 'block';
 			
 		}
 		
@@ -8917,11 +8930,19 @@ class Voice {
 				
 			}
 			
-			let average = sum / bufferLength;
+			let average = Math.round(sum / bufferLength);
 			
-			let event = new CustomEvent('voiceVolumeChange',{detail:average});
+			if(average > 100){
+				
+				average = 100;
+				
+			}
 			
-			window.dispatchEvent(event);
+			if(Voice.infoPanel){
+				
+				Voice.infoPanel.firstChild.style.width = `${average}%`;
+				
+			}
 			
 			requestAnimationFrame(checkVolume);
 			
@@ -8931,6 +8952,30 @@ class Voice {
 		
     }
 	
+	static updateInfoPanel(){
+		
+		while(Voice.infoPanel.lastChild.firstChild){
+			
+			Voice.infoPanel.lastChild.firstChild.remove();
+			
+		}
+		
+		for(let id in Voice.manager){
+			
+			let item = DOM({event:['click',() => {
+				
+				Voice.manager[id].close();
+				
+				item.remove();
+				
+			}]},`id${id}`);
+			
+			Voice.infoPanel.lastChild.append(item);
+			
+		}
+		
+	}
+	
 	static async ready(id,answer){
 		
 		if( !(id in Voice.manager) ){
@@ -8939,7 +8984,7 @@ class Voice {
 			
 		}
 		
-		await Voice.manager[id].setRemoteDescription(answer);
+		await Voice.manager[id].peer.setRemoteDescription(answer);
 		
     }
 	
@@ -8951,7 +8996,7 @@ class Voice {
 			
 		}
 		
-		await Voice.manager[id].addIceCandidate(candidate); // new RTCIceCandidate()
+		await Voice.manager[id].peer.addIceCandidate(candidate); // new RTCIceCandidate()
 		
     }
 	
@@ -9019,9 +9064,17 @@ class Voice {
 		
 		this.isCaller = false;
 		
+		if(this.id in Voice.manager){
+			
+			this.peer = null;
+			
+			return this;
+			
+		}
+		
 		this.peer = new RTCPeerConnection(Voice.peerConnectionConfig);
 		
-		Voice.manager[this.id] = this.peer;
+		Voice.manager[this.id] = this;
 		
 		this.peer.ontrack = (event) => {
 			
@@ -9068,7 +9121,7 @@ class Voice {
 				
 				case 'connected': console.log('Соединение успешно установлено'); break;
 				
-				case 'disconnected': console.log('Разрыв соединения...'); break;
+				case 'disconnected': this.reconnect(); break;
 				
 				case 'failed': this.reconnect(); break;
 				
@@ -9086,11 +9139,17 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			throw 'Голосовая связь отключена';
+			//throw 'Голосовая связь отключена';
 			
 		}
 		
-		if(this.id in Voice.manager){
+		if(!this.peer){
+			
+			return;
+			
+		}
+		
+		if(this.isCaller){
 			
 			return;
 			
@@ -9107,12 +9166,12 @@ class Voice {
 		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
 		
 		await this.peer.setLocalDescription(offer);
-		
+
 		await App.api.request('user','call',{id:this.id,key:this.key,offer:offer});
 		
 		this.isCaller = true;
 		
-		this.renderInfoPanel();
+		Voice.updateInfoPanel();
 		
 	}
 	
@@ -9120,11 +9179,11 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			return;
+			//return;
 			
 		}
 		
-		if(this.id in Voice.manager){
+		if(!this.peer){
 			
 			return;
 			
@@ -9146,12 +9205,12 @@ class Voice {
 		
 		await App.api.request('user','callAccept',{id:this.id,answer:answer});
 		
-		this.renderInfoPanel();
+		Voice.updateInfoPanel();
 		
 	}
 	
 	async reconnect(){
-		
+		console.log('Реконнект...');
 		this.close();
 		
 		if(!this.isCaller){
@@ -9162,7 +9221,26 @@ class Voice {
 		
 		let voice = new Voice(this.id,this.key);
 		
-		voice.call();
+		try{
+			
+			voice.call();
+			
+		}
+		catch(error){
+			
+			console.log(error);
+			
+		}
+		
+		setTimeout(() => {
+			
+			if(voice.peer.iceConnectionState != 'connected'){
+				
+				this.reconnect();
+				
+			}
+			
+		},15000);
 		
 	}
 	
@@ -9172,49 +9250,7 @@ class Voice {
 		
 		delete Voice.manager[this.id];
 		
-	}
-	
-	renderInfoPanel(){
-		
-		let body = document.getElementById(`VoiceId${this.id}`);
-		
-		if(!body){
-			
-			return;
-			
-		}
-		
-		body.parentNode.style.position = 'relative';
-		
-		body.style.display = 'block';
-		
-		this.peer.onconnectionstatechange = () => {
-			
-			body.onclick = false;
-			
-			switch(this.peer.connectionState){
-				
-				case 'connected': 
-				
-				body.innerText = 'Сбросить';
-				
-				body.onclick = () => {
-					
-					this.close();
-					
-				}
-				
-				break;
-				
-				case 'disconnected': body.innerText = 'Восстанавливаем связь...'; break;
-				
-				case 'failed': body.innerText = 'Переподключение...'; break;
-				
-				case 'closed': body.style.display = 'none'; break;
-				
-			}
-			
-		};
+		Voice.updateInfoPanel();
 		
 	}
 	
