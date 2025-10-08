@@ -1514,7 +1514,7 @@ class CastleNAVBAR {
 
 		CastleNAVBAR.mode = modeSelect;
 
-		CastleNAVBAR.body.children[5].style.display = 'flex';
+		CastleNAVBAR.body.children[5].style.display = 'flex'; //починил кнопку
 
 		let background = window.getComputedStyle(CastleNAVBAR.body.children[`1${type}`], null).getPropertyValue('background-image');
 
