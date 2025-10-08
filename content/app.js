@@ -3209,7 +3209,9 @@ root.appendChild(content);
 				friend.dataset.url = `content/hero/empty.webp`;
 
 				preload.add(friend);
-
+				
+				bottom.append(DOM({id:`VoiceId${item.id}`}));
+				
 			}
 
 		}, 'friend', 'list');
@@ -8972,7 +8974,7 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			return;
+			throw 'Голосовая связь отключена';
 			
 		}
 		
@@ -9007,6 +9009,8 @@ class Voice {
 		this.id = id;
 		
 		this.key = key;
+		
+		this.isCaller = false;
 		
 		this.peer = new RTCPeerConnection(Voice.peerConnectionConfig);
 		
@@ -9051,35 +9055,19 @@ class Voice {
 			
 		}
 		
-		this.peer.oniceconnectionstatechange = () => {
+		this.peer.onconnectionstatechange = () => {
 			
-			switch(this.peer.iceConnectionState){
+			switch(this.peer.connectionState){
 				
-				case 'connected': console.log('Соединение установлено!'); break;
+				case 'connected':  break;
 				
-				case 'disconnected': console.log('Соединение прервано'); break;
+				case 'disconnected':  break;
 				
-				case 'failed':
+				case 'failed': this.reconnect(); break;
 				
-				console.error('Соединение не удалось');
-				
-				this.close();
-				
-				break;
-				
-				case 'closed':
-				
-				console.log('Соединение закрыто');
-				
-				this.close();
-				
-				break;
+				case 'closed': this.close(); break;
 				
 			}
-			
-		}
-		
-		this.peer.onconnectionstatechange = () => {
 			
 			console.log(`Состояние соединения: ${this.peer.connectionState}`);
 			
@@ -9091,7 +9079,7 @@ class Voice {
 		
 		if(!Settings.settings.voice){
 			
-			return;
+			throw 'Голосовая связь отключена';
 			
 		}
 		
@@ -9114,6 +9102,10 @@ class Voice {
 		await this.peer.setLocalDescription(offer);
 		
 		await App.api.request('user','call',{id:this.id,key:this.key,offer:offer});
+		
+		this.isCaller = true;
+		
+		this.renderInfoPanel();
 		
 	}
 	
@@ -9147,17 +9139,67 @@ class Voice {
 		
 		await App.api.request('user','callAccept',{id:this.id,answer:answer});
 		
+		this.renderInfoPanel();
+		
 	}
 	
 	async close(){
 		
-		if(this.peer){
+		this.peer.close();
+		
+		delete Voice.manager[this.id];
+		
+	}
+	
+	renderInfoPanel(){
+		
+		let body = document.getElementById(`VoiceId${this.id}`);
+		
+		if(!body){
 			
-			this.peer.close();
+			return;
 			
 		}
 		
-		delete Voice.manager[this.id];
+		body.parentNode.style.position = 'relative';
+		
+		body.style.display = 'block';
+		
+		if(!body.children.length){
+			
+			return;
+			
+		}
+		
+		body.append();
+		
+		this.peer.addEventListener('connectionstatechange',() => {
+			
+			body.onclick = false;
+			
+			switch(this.peer.connectionState){
+				
+				case 'connected': 
+				
+				body.innerText = 'Сбросить';
+				
+				body.onclick = () => {
+					
+					this.close();
+					
+				}
+				
+				break;
+				
+				case 'disconnected': body.innerText = 'Восстанавливаем связь...'; break;
+				
+				case 'failed': body.innerText = 'Переподключение...'; break;
+				
+				case 'closed': body.style.display = 'none'; break;
+				
+			}
+			
+		});
 		
 	}
 	
