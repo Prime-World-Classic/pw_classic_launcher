@@ -9005,6 +9005,12 @@ class Voice {
 			
 		}
 		
+		if(Voice.manager[id].timer){
+			
+			clearTimeout(Voice.manager[id].timer);
+			
+		}
+		
 		await Voice.manager[id].peer.setRemoteDescription(answer);
 		
 		if(id in Voice.cacheCandidate){
@@ -9220,6 +9226,14 @@ class Voice {
 		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
 		
 		await this.peer.setLocalDescription(offer);
+		
+		this.timer = setTimeout(() => {
+			
+			this.timer = null;
+			
+			this.close();
+			
+		},15000);
 
 		await App.api.request('user','call',{id:this.id,key:this.key,offer:offer});
 		
