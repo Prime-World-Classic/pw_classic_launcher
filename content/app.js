@@ -9073,9 +9073,9 @@ class Voice {
 		
 		let start = false;
 		
-		for(let id of users){
+		for(let user of users){
 			
-			if(id == i){
+			if(user.id == i){
 				
 				start = true;
 				
@@ -9089,7 +9089,7 @@ class Voice {
 				
 			}
 			
-			let voice = new Voice(id,key);
+			let voice = new Voice(user.id,key,user.name);
 			
 			await voice.call();
 			
@@ -12902,7 +12902,7 @@ class MM {
 				
 				if(data.users[App.storage.data.id].team == data.users[key].team){
 					
-					list.push(key);
+					list.push({id:key,name:data.users[key].nickname});
 					
 				}
 				
