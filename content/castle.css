@@ -554,7 +554,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     position: relative;
     top: 4.7vh;
     transform: scale(1.9);
-	z-index: 10;
+	
+	/*кнопка была выше топа игроков Fixed */
+	z-index: 9; 
 }
 
 .castle-button-play-mode,
