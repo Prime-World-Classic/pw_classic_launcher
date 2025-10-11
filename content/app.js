@@ -3079,7 +3079,7 @@ root.appendChild(content);
 					
 					try{
 						
-						let voice = new Voice(item.id,'friend',item.nickname);
+						let voice = new Voice(item.id,'friend',item.nickname,true);
 						
 						await voice.call();
 						
@@ -8183,7 +8183,7 @@ class Events {
 				
 				try{
 					
-					let voice = new Voice(data.id,'',data.isCaller);
+					let voice = new Voice(data.id,'',data.isCaller,true);
 					
 					await voice.accept(data.offer);
 					
@@ -8225,7 +8225,7 @@ class Events {
 	
 	static VKick(){
 		
-		Voice.destroy();
+		Voice.destroy(true);
 		
 	}
 	
@@ -9086,9 +9086,15 @@ class Voice {
 		
     }
 	
-	static destroy(){
+	static destroy(full = false){
 		
 		for(let id in Voice.manager){
+			
+			if( (!full) && (Voice.manager[id].important) ){
+				
+				continue;
+				
+			}
 			
 			Voice.manager[id].close();
 			
@@ -9096,11 +9102,26 @@ class Voice {
 		
 		if(Voice.mic){
 			
-			Voice.mic.stop();
+			if(full){
+				
+				Voice.mic.stop();
+				
+				Voice.mic = null;
+				
+				Voice.userMedia = null;
+				
+			}
+			else{
+				
+				if(!Object.keys(Voice.manager).length){
+					
+					Voice.mic.enabled = false;
+					
+				}
+				
+			}
 			
-			Voice.mic = null;
-			
-			Voice.userMedia = null;
+			Voice.updateInfoPanel();
 			
 		}
 		
@@ -9140,13 +9161,15 @@ class Voice {
 		
 	}
 	
-	constructor(id,key = '',name = ''){
+	constructor(id,key = '',name = '',important = false){
 		
 		this.id = id;
 		
 		this.key = key;
 		
 		this.name = name;
+		
+		this.important = important;
 		
 		this.isCaller = false;
 		
@@ -12464,9 +12487,20 @@ class MM {
 
 		let button = DOM({
 			style: 'ready-button', event: ['click', async () => {
+				
+				try{
+					
+					Voice.destroy();
+					
+				}
+				catch(error){
+					
+					console.log(error);
+					
+				}
 
 				try {
-
+					
 					await App.api.request(CURRENT_MM, 'ready', { id: data.id });
 
 				}
