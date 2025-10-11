@@ -8181,11 +8181,20 @@ class Events {
 			
 			body.append(DOM(`Звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
 				
-				let voice = new Voice(data.id,'',data.isCaller);
-				
-				await voice.accept(data.offer);
-				
-				Splash.hide();
+				try{
+					
+					let voice = new Voice(data.id,'',data.isCaller);
+					
+					await voice.accept(data.offer);
+					
+					Splash.hide();
+					
+				}
+				catch(error){
+					
+					App.error(error);
+					
+				}
 				
 			}]},'Принять'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Сбросить'));
 			
