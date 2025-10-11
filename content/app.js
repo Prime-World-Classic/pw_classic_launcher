@@ -8882,6 +8882,8 @@ class Voice {
 	
 	static cacheCandidate = new Object();
 	
+	static limit = 5;
+	
 	static init(){
 		
 		if(!Voice.infoPanel){
@@ -9173,7 +9175,7 @@ class Voice {
 		
 		this.isCaller = false;
 		
-		if(this.id in Voice.manager){
+		if( ( this.id in Voice.manager ) || ( ( Object.keys(Voice.manager).length + 1 ) > Voice.limit ) ){
 			
 			this.peer = null;
 			
