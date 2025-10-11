@@ -9025,7 +9025,15 @@ class Voice {
 			
 		}
 		
-		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-tutorial'},'Нажмите CTRL + Z, чтобы включить микрофон!'));
+		let tutorial = DOM({style:'voice-info-panel-body-tutorial'},'Нажмите CTRL + Z, чтобы включить микрофон!');
+		
+		if(Voice.mic.enabled){
+			
+			tutorial.style.opacity = 0;
+			
+		}
+		
+		Voice.infoPanel.firstChild.append(tutorial);
 		
 	}
 	
