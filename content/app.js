@@ -8926,6 +8926,16 @@ class Voice {
 		
 	}
 	
+	static toggleEnabledMic(){
+		
+		if(Voice.mic){
+			
+			Voice.mic.enabled = !Voice.mic.enabled;
+			
+		}
+		
+	}
+	
     static indication(source,callback){
 		
 		let audioContext = new AudioContext();
@@ -9187,6 +9197,8 @@ class Voice {
 		
 		this.stream = null;
 		
+		this.controller = null;
+		
 		if( ( this.id in Voice.manager ) || ( ( Object.keys(Voice.manager).length + 1 ) > Voice.limit ) ){
 			
 			this.peer = null;
@@ -9205,21 +9217,21 @@ class Voice {
 			
 			this.stream = new MediaStream([event.track]);
 			
-			let audio = new Audio();
+			this.controller = new Audio();
 			
-			audio.srcObject = this.stream;
+			this.controller.srcObject = this.stream;
 			
-			audio.autoplay = true;
+			this.controller.autoplay = true;
 			
-			audio.controls = true;
+			this.controller.controls = true;
 			
-			audio.volume = 1.0;
+			this.controller.volume = 1.0;
 			
-			audio.play();
+			this.controller.play();
 			
-			document.body.prepend(audio);
+			document.body.prepend(this.controller);
 			
-			audio.style.display = 'none';
+			this.controller.style.display = 'none';
 			
 		}
 		
@@ -9904,11 +9916,7 @@ class NativeAPI {
 		NativeAPI.voiceShortcut = new nw.Shortcut({
 			key: 'Z', active: () => {
 				
-				if(Voice.mic){
-					
-					Voice.mic.enabled = !Voice.mic.enabled;
-					
-				}
+				Voice.toggleEnabledMic();
 				
 			},
 			failed: (error) => {
@@ -9919,7 +9927,22 @@ class NativeAPI {
 		});
 		
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceShortcut);
-
+		
+		NativeAPI.voiceDestroyShortcut = new nw.Shortcut({
+			key: 'K', active: () => {
+				
+				Voice.destroy();
+				
+			},
+			failed: (error) => {
+				
+				console.log(error);
+				
+			}
+		});
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceDestroyShortcut);
+		
 		NativeAPI.loadModules();
 
 		NativeAPI.platform = NativeAPI.os.platform();
