@@ -9048,19 +9048,23 @@ class Voice {
 		
 		let item = DOM({style:'voice-info-panel-body-item-name'},state());
 		
+		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
+		
 		Voice.manager[id].peer.onconnectionstatechange = () => {
 			
 			item.innerText = state();
 			
+			if( (Voice.manager[id].peer.connectionState == 'connected') && (Voice.manager[id].stream) ){
+				
+				Voice.indication(Voice.manager[id].stream,(percent) => {
+					
+					level.style.width = `${percent}%`;
+					
+				});
+				
+			}
+			
 		}
-		
-		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
-		
-		Voice.indication(Voice.userMedia,(percent) => {
-			
-			//level.style.width = `${percent}%`;
-			
-		});
 		
 		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},item,DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
 		
@@ -9197,6 +9201,8 @@ class Voice {
 		
 		this.isCaller = false;
 		
+		this.stream = null;
+		
 		if( ( this.id in Voice.manager ) || ( ( Object.keys(Voice.manager).length + 1 ) > Voice.limit ) ){
 			
 			this.peer = null;
@@ -9213,9 +9219,11 @@ class Voice {
 			
 			console.log('Получен удаленный медиапоток',event);
 			
+			this.stream = new MediaStream([event.track]);
+			
 			let audio = new Audio();
 			
-			audio.srcObject = new MediaStream([event.track]);
+			audio.srcObject = this.stream;
 			
 			audio.autoplay = true;
 			
