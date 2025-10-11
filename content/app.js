@@ -9069,9 +9069,7 @@ class Voice {
 		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
-		Voice.manager[id].peer.onconnectionstatechange = () => {
-			
-			item.innerText = state();
+		let indication = () => {
 			
 			if( (Voice.manager[id].peer.connectionState == 'connected') && (Voice.manager[id].stream) ){
 				
@@ -9082,6 +9080,16 @@ class Voice {
 				});
 				
 			}
+			
+		}
+		
+		indication();
+		
+		Voice.manager[id].peer.onconnectionstatechange = () => {
+			
+			item.innerText = state();
+			
+			indication();
 			
 		}
 		
