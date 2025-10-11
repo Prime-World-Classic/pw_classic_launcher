@@ -8984,20 +8984,6 @@ class Voice {
 			
 		}
 		
-		let mute = () => {
-			
-			return (Voice.mic.enabled) ? `Вы в эфире! [Х]` : `Ваш микрофон «${Voice.mic.label}» не в эфире, включить?`;
-			
-		}
-		
-		let mic = DOM({event:['click',() => {
-			
-			Voice.mic.enabled = !Voice.mic.enabled;
-			
-			mic.innerText = mute();
-			
-		}]},mute());
-		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
 		Voice.indication(Voice.userMedia,(percent) => {
@@ -9009,15 +8995,7 @@ class Voice {
 		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},DOM({style:'voice-info-panel-body-item-name'},App.storage.data.login),DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
 		
 		for(let id in Voice.manager){
-			/*
-			let item = DOM({event:['click',() => {
-				
-				Voice.manager[id].close();
-				
-				item.remove();
-				
-			}]},`2345`);
-			*/
+			
 			Voice.playerInfoPanel(id);
 			
 		}
@@ -9042,11 +9020,17 @@ class Voice {
 				
 			}
 			
-			return (Voice.manager[id].peer.connectionState == 'connected') ? `${name}` : `${name} (${status})`;
+			return (Voice.manager[id].peer.connectionState == 'connected') ? `${name} [Х]` : `${name} (${status})`;
 			
 		}
 		
-		let item = DOM({style:'voice-info-panel-body-item-name'},state());
+		let item = DOM({style:'voice-info-panel-body-item-name',event:['click',() => {
+			
+			Voice.manager[id].close();
+			
+			item.remove();
+			
+		}]},state());
 		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
@@ -9916,6 +9900,25 @@ class NativeAPI {
 		});
 
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
+		
+		NativeAPI.voiceShortcut = new nw.Shortcut({
+			key: 'Z', active: () => {
+				
+				if(Voice.mic){
+					
+					Voice.mic.enabled = !Voice.mic.enabled;
+					
+				}
+				
+			},
+			failed: (error) => {
+				
+				console.log(error);
+				
+			}
+		});
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceShortcut);
 
 		NativeAPI.loadModules();
 
