@@ -8932,6 +8932,17 @@ class Voice {
 			
 			Voice.mic.enabled = !Voice.mic.enabled;
 			
+			if(Voice.mic.enabled){
+				
+				Sound.play('content/sounds/voice/enabled.mp3');
+				
+			}
+			else{
+				
+				Sound.play('content/sounds/voice/disabled.mp3');
+				
+			}
+			
 		}
 		
 	}
