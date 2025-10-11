@@ -8936,10 +8936,14 @@ class Voice {
 				
 				Sound.play('content/sounds/voice/enabled.mp3');
 				
+				Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
+				
 			}
 			else{
 				
 				Sound.play('content/sounds/voice/disabled.mp3');
+				
+				Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
 				
 			}
 			
@@ -9020,6 +9024,8 @@ class Voice {
 			Voice.playerInfoPanel(id);
 			
 		}
+		
+		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-tutorial'},'Нажмите CTRL + Z, чтобы включить микрофон!'));
 		
 	}
 	
@@ -9925,7 +9931,7 @@ class NativeAPI {
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
 		
 		NativeAPI.voiceShortcut = new nw.Shortcut({
-			key: 'Z', active: () => {
+			key: 'Ctrl+Z', active: () => {
 				
 				Voice.toggleEnabledMic();
 				
@@ -9940,7 +9946,7 @@ class NativeAPI {
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceShortcut);
 		
 		NativeAPI.voiceDestroyShortcut = new nw.Shortcut({
-			key: 'K', active: () => {
+			key: 'Ctrl+K', active: () => {
 				
 				Voice.destroy();
 				
