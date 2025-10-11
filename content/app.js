@@ -9295,7 +9295,7 @@ class Voice {
 		
 		let answer = await this.peer.createAnswer();
 		
-		await App.api.request('user','callAccept',{id:this.id,answer:answer});
+		await App.api.ghost('user','callAccept',{id:this.id,answer:answer});
 		
 		await this.peer.setLocalDescription(answer);
 		
