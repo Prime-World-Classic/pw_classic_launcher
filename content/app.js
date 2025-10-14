@@ -8900,7 +8900,7 @@ class Voice {
 	
 	static cacheCandidate = new Object();
 	
-	static limit = 5;
+	static limit = 10;
 	
 	static init(){
 		
