@@ -2513,10 +2513,12 @@ root.appendChild(content);
 			}]
 		});
 
-	
+		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
+
+		
 
 		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
-		
+
 		
 		let input = DOM({ style: 'castle-input', tag: 'input' });
 
@@ -4845,7 +4847,17 @@ class Frame {
 
 		test.setAttribute('style', 'width:100%;background:green;text-align:center;font-size:5cqw');
 		Frame.body.append(test);
+
 	}
+
+	static clan() {
+
+
+
+	}
+
+
+
 }
 
 class Winrate {
@@ -10284,7 +10296,6 @@ class NativeAPI {
 
 }
 
-
 class CastleBuildingsEvents {
 	static library() {
 		Window.show('main', 'inventory');
@@ -10292,16 +10303,8 @@ class CastleBuildingsEvents {
 	static talent_farm() {
 		Window.show('main', 'farm');
 	}
-	static clan_house(){
-		clansWindowDraw();		
-	}
 }
-function clansWindowDraw(){
-	document.getElementById('clan-wapper').style.display = 'flex';
-}
-function disableClanWrapper(){
-	document.getElementById('clan-wapper').style.display = 'none';
-}
+
 class Castle {
 
 	static canvas;
