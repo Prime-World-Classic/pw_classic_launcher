@@ -1,7 +1,7 @@
 // test1
 APP_VERSION = '0';
 
-PW_VERSION = '2.9.1';
+PW_VERSION = '2.9.2';
 
 CURRENT_MM = 'mmtest'
 
@@ -2586,7 +2586,7 @@ root.appendChild(content);
 			style: 'nickname-menu-item',
 			event: ['click', () => {
 				App.setNickname();
-			}], title: 'Смена никнейма'
+			}], title: Lang.text('titleNicknameСhange')
 			}, DOM({}, nicknameValue));
 		if (nicknameValue.length > 10) {
 			nicknameMenuItem.firstChild.classList.add('castle-name-autoscroll');
@@ -3078,7 +3078,7 @@ root.appendChild(content);
 					
 					try{
 						
-						let voice = new Voice(item.id,'friend',item.nickname);
+						let voice = new Voice(item.id,'friend',item.nickname,true);
 						
 						await voice.call();
 						
@@ -4016,7 +4016,7 @@ root.appendChild(content);
 		if (!isWindow) {
 			body.append(DOM({
 				style: ['build-list-close', 'close-button'],
-				title: 'Закрыть',
+				title: Lang.text('titleClose'),
 				event: ['click', () => {
 					Build.CleanInvalidDescriptions();
 					if (isWindow) {
@@ -4025,7 +4025,7 @@ root.appendChild(content);
 						View.show('builds');
 					}
 				}]
-			}, DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style' }))); // Замените путь к изображению
+			}, DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: Lang.text('titleClose'), style: 'close-image-style' }))); // Замените путь к изображению
 		}
 
 		return isWindow ? body : DOM({ id: 'viewbuild' }, body);
@@ -4034,142 +4034,160 @@ root.appendChild(content);
 
 
 	static async talents() {
-    let body = DOM({ style: 'main' });
-    
-    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
-    let header = DOM({ style: 'adm-header' });
-    
-    // Кнопка закрытия
-    let closeBtn = DOM({ 
-        style: 'close-btn',
-        event: ['click', () => View.show('castle')] 
-    }, '[X]');
-    
-    // Строка поиска
-    let searchInput = DOM({
-        tag: 'input',
-        placeholder: 'Поиск талантов...',
-        style: 'search-input'
-    });
-    
-    header.append(closeBtn, searchInput);
-    
-    let adm = DOM({ style: 'adm' }, header);
-    let result = await App.api.request('build', 'talentAll');
-    let talentContainers = [];
-    let talentsContainer = DOM({ style: 'talents-container' });
+		let body = DOM({ style: 'main' });
+		
+		// Создаем контейнер для заголовка (кнопка закрытия + поиск)
+		let header = DOM({ style: 'adm-header' });
+		
+		// Кнопка закрытия
+		let closeBtn = DOM({ 
+			style: 'close-btn',
+			event: ['click', () => View.show('castle')] 
+		}, '[X]');
+		
+		// Строка поиска
+		let searchInput = DOM({
+			tag: 'input',
+			placeholder: 'Поиск талантов...',
+			style: 'search-input'
+		});
+		
+		header.append(closeBtn, searchInput);
+		
+		let adm = DOM({ style: 'adm' }, header);
+		let result = await App.api.request('build', 'talentAll');
+		let talentContainers = [];
+		let talentsContainer = DOM({ style: 'talents-container' });
 
-    for (let item of result) {
-        let div = DOM({ tag: 'div', class: 'talent-item' });
-        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
+		for (let item of result) {
+			let div = DOM({ tag: 'div', class: 'talent-item' });
+			div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/talents/${item.id}.webp` }));
 
-        for (let key in item) {
-            if (key == 'id') continue;
-            div.append(
-                DOM({ tag: 'div' }, key),
-                App.input(async (value) => {
-                    let object = new Object();
-                    object[key] = value;
-                    await App.api.request('build', 'talentEdit', { id: item.id, object: object });
-                }, { value: item[key] })
-            );
-        }
-        
-        talentContainers.push({ element: div, data: item });
-        talentsContainer.append(div);
-    }
-    
-    const filterTalents = (searchText) => {
-        searchText = searchText.toLowerCase();
-        talentContainers.forEach(({ element, data }) => {
-            let matches = false;
-            for (let key in data) {
-                if (String(data[key]).toLowerCase().includes(searchText)) {
-                    matches = true;
-                    break;
-                }
-            }
-            element.style.display = matches ? 'flex' : 'none';
-        });
-    };
-    
-    searchInput.addEventListener('input', (e) => {
-        filterTalents(e.target.value);
-    });
-    
-    adm.append(talentsContainer);
-    body.append(adm);
-    return body;
-}
+			for (let key in item) {
+				if (key == 'id') continue;
+				
+				// Создаем контейнер для пары "ключ-значение"
+				let keyValuePair = DOM({ 
+					tag: 'div', 
+					class: 'key-value-pair' 
+				});
+				
+				keyValuePair.append(
+					DOM({ tag: 'div', class: 'key' }, key),
+					App.input(async (value) => {
+						let object = new Object();
+						object[key] = value;
+						await App.api.request('build', 'talentEdit', { id: item.id, object: object });
+					}, { value: item[key] })
+				);
+				
+				div.append(keyValuePair);
+			}
+			
+			talentContainers.push({ element: div, data: item });
+			talentsContainer.append(div);
+		}
+		
+		const filterTalents = (searchText) => {
+			searchText = searchText.toLowerCase();
+			talentContainers.forEach(({ element, data }) => {
+				let matches = false;
+				for (let key in data) {
+					if (String(data[key]).toLowerCase().includes(searchText)) {
+						matches = true;
+						break;
+					}
+				}
+				element.style.display = matches ? 'flex' : 'none';
+			});
+		};
+		
+		searchInput.addEventListener('input', (e) => {
+			filterTalents(e.target.value);
+		});
+		
+		adm.append(talentsContainer);
+		body.append(adm);
+		return body;
+	}
 
-static async talents2() {
-    let body = DOM({ style: 'main' });
-    
-    // Создаем контейнер для заголовка (кнопка закрытия + поиск)
-    let header = DOM({ style: 'adm-header' });
-    
-    // Кнопка закрытия
-    let closeBtn = DOM({ 
-        style: 'close-btn',
-        event: ['click', () => View.show('castle')] 
-    }, '[X]');
-    
-    // Строка поиска
-    let searchInput = DOM({
-        tag: 'input',
-        placeholder: 'Поиск геройских талантов...',
-        style: 'search-input'
-    });
-    
-    header.append(closeBtn, searchInput);
-    
-    let adm = DOM({ style: 'adm' }, header);
-    let result = await App.api.request('build', 'talentHeroAll');
-    let talentContainers = [];
-    let talentsContainer = DOM({ style: 'talents-container' });
+	static async talents2() {
+		let body = DOM({ style: 'main' });
+		
+		// Создаем контейнер для заголовка (кнопка закрытия + поиск)
+		let header = DOM({ style: 'adm-header' });
+		
+		// Кнопка закрытия
+		let closeBtn = DOM({ 
+			style: 'close-btn',
+			event: ['click', () => View.show('castle')] 
+		}, '[X]');
+		
+		// Строка поиска
+		let searchInput = DOM({
+			tag: 'input',
+			placeholder: 'Поиск геройских талантов...',
+			style: 'search-input'
+		});
+		
+		header.append(closeBtn, searchInput);
+		
+		let adm = DOM({ style: 'adm' }, header);
+		let result = await App.api.request('build', 'talentHeroAll');
+		let talentContainers = [];
+		let talentsContainer = DOM({ style: 'talents-container' });
 
-    for (let item of result) {
-        let div = DOM({ tag: 'div', class: 'talent-item' });
-        div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
+		for (let item of result) {
+			let div = DOM({ tag: 'div', class: 'talent-item' });
+			div.append(DOM(`id${item.id}`), DOM({ tag: 'img', src: `content/htalents/${item.id}.webp` }));
 
-        for (let key in item) {
-            if (key == 'id') continue;
-            div.append(
-                DOM({ tag: 'div' }, key),
-                App.input(async (value) => {
-                    let object = new Object();
-                    object[key] = value;
-                    await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
-                }, { value: item[key] })
-            );
-        }
-        
-        talentContainers.push({ element: div, data: item });
-        talentsContainer.append(div);
-    }
-    
-    const filterTalents = (searchText) => {
-        searchText = searchText.toLowerCase();
-        talentContainers.forEach(({ element, data }) => {
-            let matches = false;
-            for (let key in data) {
-                if (String(data[key]).toLowerCase().includes(searchText)) {
-                    matches = true;
-                    break;
-                }
-            }
-            element.style.display = matches ? 'flex' : 'none';
-        });
-    };
-    
-    searchInput.addEventListener('input', (e) => {
-        filterTalents(e.target.value);
-    });
-    
-    adm.append(talentsContainer);
-    body.append(adm);
-    return body;
-}
+			for (let key in item) {
+				if (key == 'id') continue;
+				
+				// Создаем контейнер для пары "ключ-значение"
+				let keyValuePair = DOM({ 
+					tag: 'div', 
+					class: 'key-value-pair' 
+				});
+				
+				keyValuePair.append(
+					DOM({ tag: 'div', class: 'key' }, key),
+					App.input(async (value) => {
+						let object = new Object();
+						object[key] = value;
+						await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
+					}, { value: item[key] })
+				);
+				
+				div.append(keyValuePair);
+			}
+			
+			talentContainers.push({ element: div, data: item });
+			talentsContainer.append(div);
+		}
+		
+		const filterTalents = (searchText) => {
+			searchText = searchText.toLowerCase();
+			talentContainers.forEach(({ element, data }) => {
+				let matches = false;
+				for (let key in data) {
+					if (String(data[key]).toLowerCase().includes(searchText)) {
+						matches = true;
+						break;
+					}
+				}
+				element.style.display = matches ? 'flex' : 'none';
+			});
+		};
+		
+		searchInput.addEventListener('input', (e) => {
+			filterTalents(e.target.value);
+		});
+		
+		adm.append(talentsContainer);
+		body.append(adm);
+		return body;
+	}
 
 	static async users() {
 
@@ -4300,12 +4318,12 @@ class Window {
 		let template = await Window[method](value, value2, value3);
 		let closeButton = DOM({
 			style: 'close-button',
-			title: 'Закрыть',
+			title: Lang.text('titleClose'),
 			event: ['click', () => {
 				Window.close(category);
 			}]
 		},
-			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: 'Закрыть', style: 'close-image-style' }));
+			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: Lang.text('titleClose'), style: 'close-image-style' }));
 		template.append(closeButton);
 		if (category in Window.windows) {
 			Window.windows[category].remove();
@@ -5301,7 +5319,7 @@ class Build {
 		Build.skinView = DOM({
 			tag: 'button',
 			style: ['btn-skins', 'btn-hover', 'color-3'],
-			title: 'Образы на героя',
+			title: Lang.text('titleSkinsForTheHero'),
 			event: ['click', async () => Build.skinChange()]
 		},
 			Lang.text('skins')
@@ -5522,7 +5540,7 @@ class Build {
 		if (builds.length < 6) {
 			const create = DOM({
 				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Создать новую вкладку билда',
+				title: Lang.text('titleCreateANewBuildTab'),
 				event: ['click', () => Build.buildSelectName('create', 'Создать билд', { heroId: Build.heroId }, isWindow)]
 			});
 
@@ -5537,7 +5555,7 @@ class Build {
 		const duplicate = DOM({
 		tag: 'button', 
 		style: ['build-action-item', 'btn-hover', 'color-1'],
-		title: 'Дублировать текущий билд',
+		title: Lang.text('titleDuplicateTheCurrentBuild'),
 		event: ['click', async () => {
 			// Сохраняем ID текущего билда до любых действий
 			const currentBuildId = Build.id;
@@ -5641,7 +5659,7 @@ class Build {
 		{
 			const random = DOM({
 				tag: 'button', style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Сгенерировать случайный билд',
+				title: Lang.text('titleGenerateARandomBuild'),
 				event: ['click', async () => {
 					await App.api.request('build', 'random', { id: Build.id });
 					isWindow ? Window.show('main', 'build', Build.heroId, 0, true) : View.show('build', Build.heroId);
@@ -5659,7 +5677,7 @@ class Build {
 			const resetBuild = DOM({
 				tag: 'button', 
 				style: ['build-action-item', 'btn-hover', 'color-1'],
-				title: 'Сбросить таланты в этом билде',
+				title: Lang.text('titleResetTalentsInThisBuild'),
 				event: ['click', async () => {
 					const fragment = document.createDocumentFragment();
 					const title = DOM({ style: 'splash-text' }, 'Сбросить таланты в этом билде?');
@@ -6178,17 +6196,17 @@ class Build {
 
 		let landTypeSetting = DOM({
 			style: ['build-hero-stats-setting-land-type', 'button-outline', 'build-hero-stats-setting-land-type-rz'],
-			title: 'Тип земли - с учетом родной земли',
+			title: Lang.text('titleLandTipeRZ'),
 			event: ['click', async () => {
 				Build.applyRz = !Build.applyRz;
 				Build.applyVz = !Build.applyVz;
 				Build.updateHeroStats();
 				if (Build.applyRz) {
 					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-vz', 'build-hero-stats-setting-land-type-rz');
-					landTypeSetting.title = 'Тип земли - с учетом родной земли';
+					landTypeSetting.title = Lang.text('titleLandTipeRZ');
 				} else {
 					landTypeSetting.classList.replace('build-hero-stats-setting-land-type-rz', 'build-hero-stats-setting-land-type-vz');
-					landTypeSetting.title = 'Тип земли - с учетом нейтральной/вражеской земли';
+					landTypeSetting.title = Lang.text('titleLandTipeVZ');
 				}
 			}]
 		});
@@ -6224,7 +6242,7 @@ class Build {
 
 				}
 
-				body.append(DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, 'Закрыть'));
+				body.append(DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, Lang.text('titleClose')));
 
 				Splash.show(body);
 
@@ -6715,7 +6733,7 @@ class Build {
 		];
 
 		let a = document.createElement('div');
-		a.title = 'Активные таланты';
+		a.title = Lang.text('titleActiveTalents');
 
 		a.classList.add('build-rarity-other');
 
@@ -8170,11 +8188,20 @@ class Events {
 			
 			body.append(DOM(`Звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
 				
-				let voice = new Voice(data.id,'',data.isCaller);
-				
-				await voice.accept(data.offer);
-				
-				Splash.hide();
+				try{
+					
+					let voice = new Voice(data.id,'',data.isCaller,true);
+					
+					await voice.accept(data.offer);
+					
+					Splash.hide();
+					
+				}
+				catch(error){
+					
+					App.error(error);
+					
+				}
 				
 			}]},'Принять'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Сбросить'));
 			
@@ -8205,7 +8232,7 @@ class Events {
 	
 	static VKick(){
 		
-		Voice.destroy();
+		Voice.destroy(true);
 		
 	}
 	
@@ -8862,11 +8889,13 @@ class Voice {
 	
 	static cacheCandidate = new Object();
 	
+	static limit = 5;
+	
 	static init(){
 		
 		if(!Voice.infoPanel){
 			
-			Voice.infoPanel = DOM({style:'voice-info-panel'},DOM({style:'voice-volume'}),DOM({style:'voice-stream'}));
+			Voice.infoPanel = DOM({style:'voice-info-panel'},DOM({style:'voice-info-panel-body'}));
 			
 		}
 		
@@ -8898,23 +8927,46 @@ class Voice {
 			
 			Voice.mic.enabled = false;
 			
-			Voice.initEventAudio();
-			
-			Voice.infoPanel.style.display = 'block';
+			Voice.infoPanel.style.display = 'flex';
 			
 		}
 		
 	}
 	
-    static initEventAudio(){
+	static toggleEnabledMic(){
+		
+		if(Voice.mic){
+			
+			Voice.mic.enabled = !Voice.mic.enabled;
+			
+			if(Voice.mic.enabled){
+				
+				Sound.play('content/sounds/voice/enabled.mp3');
+				
+				Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
+				
+			}
+			else{
+				
+				Sound.play('content/sounds/voice/disabled.mp3');
+				
+				Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
+				
+			}
+			
+		}
+		
+	}
+	
+    static indication(source,callback){
 		
 		let audioContext = new AudioContext();
 		
-		let source = audioContext.createMediaStreamSource(Voice.userMedia);
+		let mediaStreamSource = audioContext.createMediaStreamSource(source);
 
 		let analyser = audioContext.createAnalyser();
 		
-		source.connect(analyser);
+		mediaStreamSource.connect(analyser);
 		
 		analyser.fftSize = 256;
 		
@@ -8942,9 +8994,9 @@ class Voice {
 				
 			}
 			
-			if(Voice.infoPanel){
+			if(callback){
 				
-				Voice.infoPanel.firstChild.style.width = `${average}%`;
+				callback(average);
 				
 			}
 			
@@ -8958,67 +9010,97 @@ class Voice {
 	
 	static updateInfoPanel(){
 		
-		while(Voice.infoPanel.lastChild.firstChild){
+		while(Voice.infoPanel.firstChild.firstChild){
 			
-			Voice.infoPanel.lastChild.firstChild.remove();
-			
-		}
-		
-		let mute = () => {
-			
-			return (Voice.mic.enabled) ? `Вы в эфире! [Х]` : `Ваш микрофон «${Voice.mic.label}» не в эфире, включить?`;
+			Voice.infoPanel.firstChild.firstChild.remove();
 			
 		}
 		
-		let mic = DOM({event:['click',() => {
-			
-			Voice.mic.enabled = !Voice.mic.enabled;
-			
-			mic.innerText = mute();
-			
-		}]},mute())
+		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
-		Voice.infoPanel.lastChild.append(mic);
+		Voice.indication(Voice.userMedia,(percent) => {
+			
+			level.style.width = `${percent}%`;
+			
+		});
+		
+		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},DOM({style:'voice-info-panel-body-item-name'},App.storage.data.login),DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
 		
 		for(let id in Voice.manager){
 			
-			let name = (Voice.manager[id].name) ? Voice.manager[id].name : `id${id}`;
-			
-			let state = () => {
-				
-				let status = '';
-				
-				switch(Voice.manager[id].peer.connectionState){
-					
-					case 'new': status = 'ожидание ответа'; break;
-					
-					case 'connecting': status = 'соединение'; break;
-					
-					default: status = Voice.manager[id].peer.connectionState; break;
-					
-				}
-				
-				return (Voice.manager[id].peer.connectionState == 'connected') ? `${name} [X]` : `${name} (${status}) [X]`;
-				
-			}
-			
-			let item = DOM({event:['click',() => {
-				
-				Voice.manager[id].close();
-				
-				item.remove();
-				
-			}]},state());
-			
-			Voice.manager[id].peer.onconnectionstatechange = () => {
-				
-				item.innerText = state();
-				
-			}
-			
-			Voice.infoPanel.lastChild.append(item);
+			Voice.playerInfoPanel(id);
 			
 		}
+		
+		let tutorial = DOM({style:'voice-info-panel-body-tutorial'},'Нажмите CTRL + Z, чтобы включить микрофон!');
+		
+		if(Voice.mic.enabled){
+			
+			tutorial.style.opacity = 0;
+			
+		}
+		
+		Voice.infoPanel.firstChild.append(tutorial);
+		
+	}
+	
+	static playerInfoPanel(id){
+		
+		let name = (Voice.manager[id].name) ? Voice.manager[id].name : `id${id}`;
+		
+		let state = () => {
+			
+			let status = '';
+			
+			switch(Voice.manager[id].peer.connectionState){
+				
+				case 'new': status = 'ожидание ответа'; break;
+				
+				case 'connecting': status = 'соединение'; break;
+				
+				default: status = Voice.manager[id].peer.connectionState; break;
+				
+			}
+			
+			return (Voice.manager[id].peer.connectionState == 'connected') ? `${name} [Х]` : `${name} (${status})`;
+			
+		}
+		
+		let item = DOM({style:'voice-info-panel-body-item-name',event:['click',() => {
+			
+			Voice.manager[id].close();
+			
+			item.remove();
+			
+		}]},state());
+		
+		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
+		
+		let indication = () => {
+			
+			if( (Voice.manager[id].peer.connectionState == 'connected') && (Voice.manager[id].stream) ){
+				
+				Voice.indication(Voice.manager[id].stream,(percent) => {
+					
+					level.style.width = `${percent}%`;
+					
+				});
+				
+			}
+			
+		}
+		
+		indication();
+		
+		Voice.manager[id].peer.onconnectionstatechange = () => {
+			
+			item.innerText = state();
+			
+			indication();
+			
+		}
+		
+		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},item,DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
 		
 	}
 	
@@ -9066,9 +9148,15 @@ class Voice {
 		
     }
 	
-	static destroy(){
+	static destroy(full = false){
 		
 		for(let id in Voice.manager){
+			
+			if( (!full) && (Voice.manager[id].important) ){
+				
+				continue;
+				
+			}
 			
 			Voice.manager[id].close();
 			
@@ -9076,11 +9164,26 @@ class Voice {
 		
 		if(Voice.mic){
 			
-			Voice.mic.stop();
+			if(full){
+				
+				Voice.mic.stop();
+				
+				Voice.mic = null;
+				
+				Voice.userMedia = null;
+				
+			}
+			else{
+				
+				if(!Object.keys(Voice.manager).length){
+					
+					Voice.mic.enabled = false;
+					
+				}
+				
+			}
 			
-			Voice.mic = null;
-			
-			Voice.userMedia = null;
+			Voice.updateInfoPanel();
 			
 		}
 		
@@ -9120,7 +9223,7 @@ class Voice {
 		
 	}
 	
-	constructor(id,key = '',name = ''){
+	constructor(id,key = '',name = '',important = false){
 		
 		this.id = id;
 		
@@ -9128,9 +9231,15 @@ class Voice {
 		
 		this.name = name;
 		
+		this.important = important;
+		
 		this.isCaller = false;
 		
-		if(this.id in Voice.manager){
+		this.stream = null;
+		
+		this.controller = null;
+		
+		if( ( this.id in Voice.manager ) || ( ( Object.keys(Voice.manager).length + 1 ) > Voice.limit ) ){
 			
 			this.peer = null;
 			
@@ -9146,21 +9255,23 @@ class Voice {
 			
 			console.log('Получен удаленный медиапоток',event);
 			
-			let audio = new Audio();
+			this.stream = new MediaStream([event.track]);
 			
-			audio.srcObject = new MediaStream([event.track]);
+			this.controller = new Audio();
 			
-			audio.autoplay = true;
+			this.controller.srcObject = this.stream;
 			
-			audio.controls = true;
+			this.controller.autoplay = true;
 			
-			audio.volume = 1.0;
+			this.controller.controls = true;
 			
-			audio.play();
+			this.controller.volume = 1.0;
 			
-			document.body.prepend(audio);
+			this.controller.play();
 			
-			audio.style.display = 'none';
+			document.body.prepend(this.controller);
+			
+			this.controller.style.display = 'none';
 			
 		}
 		
@@ -9284,7 +9395,7 @@ class Voice {
 		
 		let answer = await this.peer.createAnswer();
 		
-		await App.api.request('user','callAccept',{id:this.id,answer:answer});
+		await App.api.ghost('user','callAccept',{id:this.id,answer:answer});
 		
 		await this.peer.setLocalDescription(answer);
 		
@@ -9841,7 +9952,37 @@ class NativeAPI {
 		});
 
 		NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
-
+		
+		NativeAPI.voiceShortcut = new nw.Shortcut({
+			key: 'Ctrl+Z', active: () => {
+				
+				Voice.toggleEnabledMic();
+				
+			},
+			failed: (error) => {
+				
+				console.log(error);
+				
+			}
+		});
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceShortcut);
+		
+		NativeAPI.voiceDestroyShortcut = new nw.Shortcut({
+			key: 'Ctrl+K', active: () => {
+				
+				Voice.destroy();
+				
+			},
+			failed: (error) => {
+				
+				console.log(error);
+				
+			}
+		});
+		
+		NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceDestroyShortcut);
+		
 		NativeAPI.loadModules();
 
 		NativeAPI.platform = NativeAPI.os.platform();
@@ -12453,9 +12594,20 @@ class MM {
 
 		let button = DOM({
 			style: 'ready-button', event: ['click', async () => {
+				
+				try{
+					
+					Voice.destroy();
+					
+				}
+				catch(error){
+					
+					console.log(error);
+					
+				}
 
 				try {
-
+					
 					await App.api.request(CURRENT_MM, 'ready', { id: data.id });
 
 				}
