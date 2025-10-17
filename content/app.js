@@ -8197,11 +8197,11 @@ class Events {
 			
 			let body = document.createDocumentFragment();
 			
-			body.append(DOM(`Звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
+			body.append(DOM(`Звонок от ${data.name}?`),DOM({style:'splash-content-button',event:['click', async () => {
 				
 				try{
 					
-					let voice = new Voice(data.id,'',data.isCaller,true);
+					let voice = new Voice(data.id,'',data.name,true);
 					
 					await voice.accept(data.offer);
 					
@@ -8221,7 +8221,7 @@ class Events {
 		}
 		else{
 			
-			let voice = new Voice(data.id);
+			let voice = new Voice(data.id,'',data.name);
 			
 			await voice.accept(data.offer);
 			
