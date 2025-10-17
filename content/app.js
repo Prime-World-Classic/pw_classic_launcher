@@ -1,4 +1,8 @@
-
+try {
+    if (nw) {
+        NativeAPI = 1; // Защита работы fallback скрипта
+    }
+} catch (e) {}
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
