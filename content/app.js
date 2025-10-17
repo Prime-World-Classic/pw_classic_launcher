@@ -8918,19 +8918,41 @@ class Voice {
 		
 		if(!Voice.userMedia){
 			
-			Voice.userMedia = await navigator.mediaDevices.getUserMedia({audio:( App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig ),video:false});
+			Voice.infoPanel.style.display = 'flex';
 			
-			let tracks = Voice.userMedia.getTracks();
+			try{
+				
+				Voice.userMedia = await navigator.mediaDevices.getUserMedia({audio:( App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig ),video:false});
+				
+			}
+			catch(error){
+				
+				return App.error(`Не можем получить доступ к медиа устройствам: ${error}`);
+				
+			}
+			
+			let tracks = new Array();
+			
+			try{
+				
+				tracks = Voice.userMedia.getTracks();
+				
+			}
+			catch(error){
+				
+				return App.error(`Не можем получить дорожки потоков: ${error}`);
+				
+			}
 			
 			if(!tracks.length){
 				
-				throw 'Отсутствие медиа потоков';
+				return App.error('Отсутствие медиа потоков');
 				
 			}
 			
 			if(tracks[0].kind != 'audio'){
 				
-				throw 'Нам нужен микрофон';
+				return App.error('Не можем найти микрофон по умолчанию');
 				
 			}
 			
@@ -8938,32 +8960,32 @@ class Voice {
 			
 			Voice.mic.enabled = false;
 			
-			Voice.infoPanel.style.display = 'flex';
-			
 		}
 		
 	}
 	
 	static toggleEnabledMic(){
 		
-		if(Voice.mic){
+		if(!Voice.mic){
 			
-			Voice.mic.enabled = !Voice.mic.enabled;
+			return App.error('Мы не смогли определить ваш микрофон по умолчанию');
 			
-			if(Voice.mic.enabled){
-				
-				Sound.play('content/sounds/voice/enabled.mp3');
-				
-				Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
-				
-			}
-			else{
-				
-				Sound.play('content/sounds/voice/disabled.mp3');
-				
-				Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
-				
-			}
+		}
+		
+		Voice.mic.enabled = !Voice.mic.enabled;
+		
+		if(Voice.mic.enabled){
+			
+			Sound.play('content/sounds/voice/enabled.mp3');
+			
+			Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
+			
+		}
+		else{
+			
+			Sound.play('content/sounds/voice/disabled.mp3');
+			
+			Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
 			
 		}
 		
@@ -9029,11 +9051,15 @@ class Voice {
 		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
-		Voice.indication(Voice.userMedia,(percent) => {
+		if(Voice.mic){
 			
-			level.style.width = `${percent}%`;
+			Voice.indication(Voice.userMedia,(percent) => {
+				
+				level.style.width = `${percent}%`;
+				
+			});
 			
-		});
+		}
 		
 		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},DOM({style:'voice-info-panel-body-item-name',event:['click',() => Voice.toggleEnabledMic()]},App.storage.data.login),DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
 		
@@ -9045,9 +9071,13 @@ class Voice {
 		
 		let tutorial = DOM({style:'voice-info-panel-body-tutorial'},'Нажмите CTRL + Z, чтобы включить микрофон!');
 		
-		if(Voice.mic.enabled){
+		if(Voice.mic){
 			
-			tutorial.style.opacity = 0;
+			if(Voice.mic.enabled){
+				
+				tutorial.style.opacity = 0;
+				
+			}
 			
 		}
 		
@@ -9188,7 +9218,11 @@ class Voice {
 				
 				if(!Object.keys(Voice.manager).length){
 					
-					Voice.mic.enabled = false;
+					if(Voice.mic){
+						
+						Voice.mic.enabled = false;
+						
+					}
 					
 				}
 				
@@ -9362,7 +9396,11 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.peer.addTrack(Voice.mic);
+		if(Voice.mic){
+			
+			this.peer.addTrack(Voice.mic);
+			
+		}
 		
 		let offer = await this.peer.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:false});
 		
@@ -9400,7 +9438,11 @@ class Voice {
 		
 		await Voice.initAudio();
 		
-		this.peer.addTrack(Voice.mic);
+		if(Voice.mic){
+			
+			this.peer.addTrack(Voice.mic);
+			
+		}
 		
 		await this.peer.setRemoteDescription(offer);
 		
