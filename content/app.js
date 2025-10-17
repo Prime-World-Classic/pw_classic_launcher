@@ -9051,6 +9051,8 @@ class Voice {
 		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
+		let bar = DOM({style:'voice-info-panel-body-item-bar'},level);
+		
 		if(Voice.mic){
 			
 			Voice.indication(Voice.userMedia,(percent) => {
@@ -9060,8 +9062,13 @@ class Voice {
 			});
 			
 		}
+		else{
+			
+			bar.classList.add('voice-info-panel-body-item-nostream');
+			
+		}
 		
-		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},DOM({style:'voice-info-panel-body-item-name',event:['click',() => Voice.toggleEnabledMic()]},App.storage.data.login),DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
+		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},DOM({style:'voice-info-panel-body-item-name',event:['click',() => Voice.toggleEnabledMic()]},App.storage.data.login),DOM({style:'voice-info-panel-body-item-status'},bar)));
 		
 		for(let id in Voice.manager){
 			
@@ -9117,6 +9124,8 @@ class Voice {
 		
 		let level = DOM({style:'voice-info-panel-body-item-bar-level'});
 		
+		let bar = DOM({style:'voice-info-panel-body-item-bar'},level);
+		
 		let indication = () => {
 			
 			if( (Voice.manager[id].peer.connectionState == 'connected') && (Voice.manager[id].stream) ){
@@ -9126,6 +9135,25 @@ class Voice {
 					level.style.width = `${percent}%`;
 					
 				});
+				
+			}
+			
+			if(Voice.manager[id].stream){
+				
+				if(bar.classList.contains('voice-info-panel-body-item-nostream')){
+					
+					bar.classList.remove('voice-info-panel-body-item-nostream');
+					
+				}
+				
+			}
+			else{
+				
+				if(!bar.classList.contains('voice-info-panel-body-item-nostream')){
+					
+					bar.classList.add('voice-info-panel-body-item-nostream');
+					
+				}
 				
 			}
 			
@@ -9141,7 +9169,7 @@ class Voice {
 			
 		}
 		
-		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},item,DOM({style:'voice-info-panel-body-item-status'},DOM({style:'voice-info-panel-body-item-bar'},level))));
+		Voice.infoPanel.firstChild.append(DOM({style:'voice-info-panel-body-item'},item,DOM({style:'voice-info-panel-body-item-status'},bar)));
 		
 	}
 	
