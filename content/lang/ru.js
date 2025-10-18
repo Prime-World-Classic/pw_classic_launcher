@@ -63,6 +63,9 @@ export const ru = {
 		LangTarg: 'Язык изменен',
 		confirm:'Подтвердить',
 		continue:'Продолжить',
+		fullscreenEnabled:'Включен полноэкранный режим',
+		fullscreenDisabled:'Включен оконный режим',
+		smartcastDescription:'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)',
 
 		// Подсказки
 		titletraining: 'Тренировка',
@@ -88,6 +91,7 @@ export const ru = {
 		titleThePurpleQualityOfTalents:'Фиолетовое качество талантов',
 		titleTheBlueQualityOfTalents:'Синее качество талантов',
 		titleSmartcastIsEnabled:'Смарткаст включен',
+		titleSmartcastIsDisabled:'Смарткаст выключен',
 		titleClose:'Закрыть',
 		titleNicknameСhange:'Смена никнейма',
 		titleLandTipeRZ:'Тип земли - с учетом родной земли',
