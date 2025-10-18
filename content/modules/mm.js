@@ -290,7 +290,7 @@ export class MM {
 
             try {
 
-                await App.api.request(CURRENT_MM, 'cancel');
+                await App.api.request(App.CURRENT_MM, 'cancel');
 
             }
             catch (error) {
@@ -373,7 +373,7 @@ export class MM {
 
                 try {
 
-                    await App.api.request(CURRENT_MM, 'ready', { id: data.id });
+                    await App.api.request(App.CURRENT_MM, 'ready', { id: data.id });
 
                 }
                 catch (error) {
@@ -555,7 +555,7 @@ export class MM {
 
                 try {
 
-                    await App.api.request(CURRENT_MM, 'hero', { id: data.id, heroId: MM.targetHeroId, banHeroId: MM.targetBanHeroId });
+                    await App.api.request(App.CURRENT_MM, 'hero', { id: data.id, heroId: MM.targetHeroId, banHeroId: MM.targetBanHeroId });
 
                 }
                 catch (error) {
@@ -722,7 +722,7 @@ export class MM {
 
                 MM.targetHeroId = item.id;
 
-                await App.api.request(CURRENT_MM, 'eventChangeHero', { id: MM.id, heroId: item.id });
+                await App.api.request(App.CURRENT_MM, 'eventChangeHero', { id: MM.id, heroId: item.id });
 
                 MM.lobbyBuildView(MM.targetHeroId);
 
@@ -730,7 +730,7 @@ export class MM {
 
             hero.oncontextmenu = async () => {
 
-                await App.api.request(CURRENT_MM, 'eventBanHero', { id: MM.id, heroId: item.id });
+                await App.api.request(App.CURRENT_MM, 'eventBanHero', { id: MM.id, heroId: item.id });
 
                 MM.targetBanHeroId = item.id;
 
@@ -785,7 +785,7 @@ export class MM {
 
                 }
 
-                await App.api.request(CURRENT_MM, 'chat', { id: MM.id, message: chatInput.value });
+                await App.api.request(App.CURRENT_MM, 'chat', { id: MM.id, message: chatInput.value });
 
                 chatInput.value = '';
 
@@ -875,7 +875,7 @@ export class MM {
             let item = DOM({
                 style: `map-item-${number}`, data: { player: 0, position: number }, event: ['click', async () => {
 
-                    await App.api.request(CURRENT_MM, 'position', { id: MM.id, position: (item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position });
+                    await App.api.request(App.CURRENT_MM, 'position', { id: MM.id, position: (item.dataset.player == App.storage.data.id) ? 0 : item.dataset.position });
 
 
                 }]

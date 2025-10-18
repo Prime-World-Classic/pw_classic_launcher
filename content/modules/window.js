@@ -106,7 +106,7 @@ export class Window {
 						}
 					}]
 				}, Lang.text('exit')),
-				DOM({ style: 'castle-menu-label' }, `${Lang.text('version')}: v.${PW_VERSION}`),
+				DOM({ style: 'castle-menu-label' }, `${Lang.text('version')}: v.${App.PW_VERSION}`),
 				DOM({ style: 'menu-icons' },
 					DOM({ tag: 'a', href: 'https://vk.com/primeworldclassic', target: '_blank', event: ['click', (e) => NativeAPI.linkHandler(e)] },
 						DOM({ tag: 'img', src: 'content/icons/vk.webp', alt: 'VK', style: 'menu-icons' })

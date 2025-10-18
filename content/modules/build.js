@@ -347,9 +347,9 @@ export class Build {
 
 						await MM.gameStartCheck();
 
-						await App.api.request(CURRENT_MM, 'heroParty', { id: MM.partyId, hero: Build.heroId });
+						await App.api.request(App.CURRENT_MM, 'heroParty', { id: MM.partyId, hero: Build.heroId });
 
-						await App.api.request(CURRENT_MM, 'start', { version: PW_VERSION, mode: 99, mac: NativeAPI.getMACAdress() });
+						await App.api.request(App.CURRENT_MM, 'start', { version: App.PW_VERSION, mode: 99, mac: NativeAPI.getMACAdress() });
 
 					}
 					else {

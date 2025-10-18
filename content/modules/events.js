@@ -185,7 +185,7 @@ export class Events {
 		let b1 = DOM({
 			style: 'splash-content-button', event: ['click', async () => {
 
-				await App.api.request(CURRENT_MM, 'joinParty', { code: data.code, version: PW_VERSION });
+				await App.api.request(App.CURRENT_MM, 'joinParty', { code: data.code, version: App.PW_VERSION });
 
 				Splash.hide();
 
