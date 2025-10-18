@@ -13,7 +13,7 @@ import { Splash } from './splash.js';
 export class App {
     static APP_VERSION = '0';
 
-    static PW_VERSION = '2.9.2';
+    static PW_VERSION = '2.9.4';
 
     static CURRENT_MM = 'mmtest'
 
