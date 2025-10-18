@@ -11,6 +11,7 @@ import { Splash } from './splash.js';
 
 export class Window {
 	static windows = {}
+	static windowOrder = []
 	static async show(category, method, value, value2, value3) {
 		if (!(method in Window)) {
 			return;
@@ -27,8 +28,15 @@ export class Window {
 		template.append(closeButton);
 		if (category in Window.windows) {
 			Window.windows[category].remove();
+			const index = Window.windowOrder.indexOf(category);
+            if (index > -1) {
+                Window.windowOrder.splice(index, 1);
+            }
 		}
 		Window.windows[category] = template;
+		
+		Window.windowOrder.unshift(category);
+		
 		View.active.append(template);
 	}
 
@@ -36,10 +44,24 @@ export class Window {
 		if (category in Window.windows) {
 			Window.windows[category].remove();
 			delete Window.windows[category];
+			const index = Window.windowOrder.indexOf(category);
+            if (index > -1) {
+                Window.windowOrder.splice(index, 1);
+            }
 			return true;
 		}
 		return false;
 	}
+	static closeLast() {
+        if (Window.windowOrder.length > 0) {
+            const lastCategory = Window.windowOrder[0]; // Берем первый элемент (последний открытый)
+            return this.close(lastCategory);
+        }
+        return false;
+    }
+	 static anyOpen() {
+        return Window.windowOrder.length > 0;
+    }
 	static async steamauth() {
 		return DOM({ id: 'wsteamauth' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('steamauthTitle')),
