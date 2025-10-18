@@ -2368,7 +2368,14 @@ export class Build {
 
 								}
 							}
-
+							
+							if (conflictState) {
+								if (typeof App !== 'undefined' && App.notify) {
+									const message = Lang.text('talentConflict');
+									App.notify(message);
+								}
+							}
+							
 							if (!conflictState) {
 
 								if ('conflict' in data) {
