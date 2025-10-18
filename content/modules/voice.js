@@ -79,64 +79,74 @@ export class Voice {
 
 	}
 
-	static async initAudio() {
+	static async initLocalMedia() {
 
-		if (!Voice.userMedia) {
-
-			Voice.infoPanel.style.display = 'flex';
-
-			try {
-
-				Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: (App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig), video: false });
-
-			}
-			catch (error) {
-
-				return App.error(`Не можем получить доступ к медиа устройствам: ${error}`);
-
-			}
-
-			let tracks = new Array();
-
-			try {
-
-				tracks = Voice.userMedia.getTracks();
-
-			}
-			catch (error) {
-
-				return App.error(`Не можем получить дорожки потоков: ${error}`);
-
-			}
-
-			if (!tracks.length) {
-
-				return App.error('Отсутствие медиа потоков');
-
-			}
-
-			if (tracks[0].kind != 'audio') {
-
-				return App.error('Не можем найти микрофон по умолчанию');
-
-			}
-
-			Voice.mic = tracks[0];
-
-			Voice.mic.enabled = false;
-
+		if (Voice.userMedia) {
+			
+			return;
+			
 		}
-
+		
+		Voice.infoPanel.style.display = 'flex';
+		
+		try {
+			
+			Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: (App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig), video: false });
+			
+		}
+		catch (error) {
+			
+			return App.error(`Не можем получить доступ к медиа устройствам: ${error}`);
+			
+		}
+		
+		let tracks = new Array();
+		
+		try {
+			
+			tracks = Voice.userMedia.getTracks();
+			
+		}
+		catch (error) {
+			
+			return App.error(`Не можем получить дорожки потоков: ${error}`);
+			
+		}
+		
+		if (!tracks.length) {
+			
+			return App.error('Отсутствие медиа потоков');
+			
+		}
+		
+		if (tracks[0].kind != 'audio') {
+			
+			return App.error('Не можем найти микрофон по умолчанию');
+			
+		}
+		
+		Voice.mic = tracks[0];
+		
+		Voice.mic.enabled = false;
+		
 	}
 
-	static toggleEnabledMic() {
-
-		if (!Voice.mic) {
-
-			return App.error('Мы не смогли определить ваш микрофон по умолчанию');
-
+	static async toggleEnabledMic() {
+		
+		if (!Voice.userMedia) {
+			
+			await Voice.initLocalMedia();
+			
+			Voice.updateInfoPanel();
+			
 		}
-
+		
+		if (!Voice.mic) {
+			
+			return App.error('Мы не смогли определить ваш микрофон по умолчанию');
+			
+		}
+		
 		Voice.mic.enabled = !Voice.mic.enabled;
 
 		if (Voice.mic.enabled) {
@@ -589,7 +599,7 @@ export class Voice {
 
 		}
 
-		await Voice.initAudio();
+		await Voice.initLocalMedia();
 
 		if (Voice.mic) {
 
@@ -631,7 +641,7 @@ export class Voice {
 
 		}
 
-		await Voice.initAudio();
+		await Voice.initLocalMedia();
 
 		if (Voice.mic) {
 
