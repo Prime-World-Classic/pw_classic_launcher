@@ -1,4 +1,4 @@
-import {Window} from './window.js';
+import { Window } from './window.js';
 
 export class CastleBuildingsEvents {
 	static library() {

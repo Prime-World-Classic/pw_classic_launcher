@@ -1,34 +1,34 @@
-import {ParentEvent} from './parentEvent.js';
-import {Lang} from './lang.js';
-import {View} from './view.js';
-import {App} from './app.js';
-import {PWGame} from './pwgame.js';
-import {NativeAPI} from './nativeApi.js';
-import {Settings} from './settings.js';
-import {Splash} from './splash.js';
+import { ParentEvent } from './parentEvent.js';
+import { Lang } from './lang.js';
+import { View } from './view.js';
+import { App } from './app.js';
+import { PWGame } from './pwgame.js';
+import { NativeAPI } from './nativeApi.js';
+import { Settings } from './settings.js';
+import { Splash } from './splash.js';
 
 
 
-window.addEventListener('message',(event) => {
+window.addEventListener('message', (event) => {
 
 	if (event.data == '') {
 		return;
 	}
-	
-	if( !('action' in event.data) ){
-		
+
+	if (!('action' in event.data)) {
+
 		return;
-		
+
 	}
-	
-	if(event.data.action in ParentEvent){
-		
+
+	if (event.data.action in ParentEvent) {
+
 		ParentEvent[event.data.action](event.data.body);
-		
+
 	}
-	
-	console.log('event.data',event.data);
-	
+
+	console.log('event.data', event.data);
+
 });
 
 Splash.init();
@@ -75,7 +75,7 @@ setTimeout(_ => {
 Settings.init().then(() => {
 
 	Lang.init().then(() => {
-		
+
 		App.findBestHostAndInit();
 
 	})

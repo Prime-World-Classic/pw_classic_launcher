@@ -1,6 +1,6 @@
-import {App} from './app.js';
-import {NativeAPI} from './nativeApi.js';
-import {Settings} from './settings.js';
+import { App } from './app.js';
+import { NativeAPI } from './nativeApi.js';
+import { Settings } from './settings.js';
 
 export class PWGame {
 

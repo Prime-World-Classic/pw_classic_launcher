@@ -1,21 +1,21 @@
-import {DOM} from './dom.js';
-import {Lang} from './lang.js';
-import {CastleNAVBAR} from './castleNavBar.js';
-import {Window} from './window.js';
-import {Rank} from './rank.js';
-import {Division} from './division.js';
-import {Build} from './build.js';
-import {App} from './app.js';
-import {Voice} from './voice.js';
-import {Chat} from './chat.js';
-import {PWGame} from './pwgame.js';
-import {NativeAPI} from './nativeApi.js';
-import {Castle} from './castle.js';
-import {Settings} from './settings.js';
-import {MM} from './mm.js';
-import {PreloadImages} from './preloadImages.js';
-import {Game} from './game.js';
-import {Splash} from './splash.js';
+import { DOM } from './dom.js';
+import { Lang } from './lang.js';
+import { CastleNAVBAR } from './castleNavBar.js';
+import { Window } from './window.js';
+import { Rank } from './rank.js';
+import { Division } from './division.js';
+import { Build } from './build.js';
+import { App } from './app.js';
+import { Voice } from './voice.js';
+import { Chat } from './chat.js';
+import { PWGame } from './pwgame.js';
+import { NativeAPI } from './nativeApi.js';
+import { Castle } from './castle.js';
+import { Settings } from './settings.js';
+import { MM } from './mm.js';
+import { PreloadImages } from './preloadImages.js';
+import { Game } from './game.js';
+import { Splash } from './splash.js';
 
 export class View {
     static mmQueueMap = {};
@@ -29,9 +29,9 @@ export class View {
             'pve-ep2-red': 4,
             'custom-battle': 5
         };
-            const index = map[cssKey];
-            return (View.mmQueueMap.mode && View.mmQueueMap.mode[index]) || '-';
-        }
+        const index = map[cssKey];
+        return (View.mmQueueMap.mode && View.mmQueueMap.mode[index]) || '-';
+    }
     static activeTemplate = false;
 
     static activeAnimation = false;
@@ -125,9 +125,9 @@ export class View {
             }
 
         }
-        
+
     }
-    
+
     static authorization() {
         let numEnterEvent = ['keyup', async (event) => {
             if (event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -136,7 +136,7 @@ export class View {
         }];
 
         let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
-    // Создаем выпадающий список языков
+        // Создаем выпадающий список языков
         const languageSelect = DOM({
             tag: 'select',
             id: 'lang_select',
@@ -165,17 +165,17 @@ export class View {
         let authorizationForm = DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' }, DOM({ tag: 'div' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' })),
 
             DOM({ style: 'language-select-container' },
-                    languageSelect
-                ),
+                languageSelect
+            ),
             DOM({ style: 'login-box-forma-inputs' },
                 login,
                 password,
-                DOM({ style: 'login-box-forma-buttons' }, 
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, Lang.text('login')), 
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('registration')]}, Lang.text('registration'))
+                DOM({ style: 'login-box-forma-buttons' },
+                    DOM({ style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, Lang.text('login')),
+                    DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('registration')] }, Lang.text('registration'))
                 ),
-                DOM({ style: 'login-box-forma-buttons' }, 
-                    DOM({style: ['login-box-forma-button', 'steamauth'], event:['click',() => Window.show('main', 'steamauth')]}, Lang.text('authorizationSteam'))
+                DOM({ style: 'login-box-forma-buttons' },
+                    DOM({ style: ['login-box-forma-button', 'steamauth'], event: ['click', () => Window.show('main', 'steamauth')] }, Lang.text('authorizationSteam'))
                 ),
             )), DOM({ style: 'author' }, `Prime World: Classic v.${App.PW_VERSION}.${App.APP_VERSION}`));
 
@@ -197,7 +197,7 @@ export class View {
 
         let tgBotUrl = 'https://t.me/primeworldclassic_bot';
 
-        let telegramBotLink = DOM({ style: 'telegram-bot' , tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)]});
+        let telegramBotLink = DOM({ style: 'telegram-bot', tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)] });
 
         let invite = DOM({ tag: 'input', placeholder: Lang.text('code'), event: numEnterEvent });
 
@@ -222,7 +222,7 @@ export class View {
                     DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('authorization')] }, Lang.text('back'))
                 )
             ),
-            DOM({ style: 'login-box-forma-right' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' }),DOM({style:'login-box-form-invite-text'},`Получить инвайт-код через QR-код`), DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/pwclassicbot.png' }))
+            DOM({ style: 'login-box-forma-right' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' }), DOM({ style: 'login-box-form-invite-text' }, `Получить инвайт-код через QR-код`), DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/pwclassicbot.png' }))
 
         ), DOM({ style: 'author' }, `Prime World: Classic v.${App.PW_VERSION}.${App.APP_VERSION}`));
 
@@ -239,7 +239,7 @@ export class View {
     }
 
     static async castle() {
-        
+
         document.body.classList.add('noselect');
 
         View.setCss('content/castle.css');
@@ -263,57 +263,57 @@ export class View {
             App.error(error);
 
         }
-        
-        body.append(backgroundImage,Castle.canvas);
-        
+
+        body.append(backgroundImage, Castle.canvas);
+
         //body.append(await View.castleQuest());
-        
-        try{
-            
+
+        try {
+
             let castlePlay = await View.castlePlay();
-            
+
             body.append(castlePlay);
-            
+
         }
-        catch(error){
-            
-            if(String(error).search(new RegExp(`session is not valid`, 'i')) != -1){
-                
+        catch (error) {
+
+            if (String(error).search(new RegExp(`session is not valid`, 'i')) != -1) {
+
                 await App.exit();
-                
+
                 NativeAPI.reset();
-                
+
                 return;
-                
+
             }
-            
+
             App.error(error);
-            
+
         }
-        
+
         body.append(View.castleChat());
-        
-        try{
-            
+
+        try {
+
             let castleHeroes = await View.castleHeroes();
-            
+
             body.append(castleHeroes);
-            
+
         }
-        catch(e){
-            
+        catch (e) {
+
             App.error(e);
-            
+
         }
-        
+
         body.append(View.castleSettings());
-        
+
         setTimeout(() => {
 
             Chat.scroll();
 
         }, 1500);
-        
+
         return body;
 
     }
@@ -766,196 +766,196 @@ root.appendChild(content);
     }
 
     static castleBannerOnline() {
-  const getDivisionId = () =>
-    (window.User && (User.divisionId || User.rank || User.rating)) ||
-    (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
-    10;
+        const getDivisionId = () =>
+            (window.User && (User.divisionId || User.rank || User.rating)) ||
+            (window.Settings && Settings.user && (Settings.user.divisionId || Settings.user.rank)) ||
+            10;
 
-    const isFiniteNumber = (v) => Number.isFinite(v) && !Number.isNaN(v);
+        const isFiniteNumber = (v) => Number.isFinite(v) && !Number.isNaN(v);
 
-    const safeQueueCounts = (cssKey) => {
-    let party = 0, players = 0;
+        const safeQueueCounts = (cssKey) => {
+            let party = 0, players = 0;
 
-    try {
-        if (typeof View?.getQueue === 'function') {
-        const v = Number(View.getQueue(cssKey));
-        if (isFiniteNumber(v)) party = v;
+            try {
+                if (typeof View?.getQueue === 'function') {
+                    const v = Number(View.getQueue(cssKey));
+                    if (isFiniteNumber(v)) party = v;
+                }
+            } catch (_) { }
+
+            try {
+                if (typeof View?.getTotalQueue === 'function') {
+                    const t = Number(View.getTotalQueue(cssKey));
+                    if (isFiniteNumber(t)) players = t;
+                }
+            } catch (_) { }
+
+            return { players, party };
+        };
+
+        // карта режимов
+        const modeMap = {
+            pvp: 0,
+            anderkrug: 1,
+            cte: 2,
+            m4: 3,
+            'custom-battle': 4,
+            'pve-ep2-red': 5
+        };
+
+        // тип медалей
+        const medalMap = {
+            pvp: 'gold',
+            anderkrug: 'gold',
+            cte: 'gold',
+            m4: 'gold',
+            'pve-ep2-red': 'gold',
+            'custom-battle': 'silver'
+        };
+
+        const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
+            cssKey,
+            label: () => (typeof View?.getQueue === 'function' ? View.getQueue(cssKey) : 0)
+        }));
+
+        const banner = DOM({ style: ['castle-banner-online'] });
+        banner.append(DOM({ style: ['banner-ornament'] }));
+
+        // --- элементы по режимам ---
+        bannerItems.forEach((item, idx) => {
+            const wrap = DOM({ style: ['banner-item'] });
+
+            // иконка режима
+            const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
+            wrap.append(icon);
+
+            // счётчик: всегда стартует с "0/0"
+            const lbl = DOM({ tag: 'div', style: ['banner-count', 'is-loading'] });
+            lbl.textContent = '0/0';
+            lbl.title =
+                'Отображение очереди по режимам:\n' +
+                'слева — игроков в поиске,\n' +
+                'справа — количество групп (пати).';
+            wrap.append(lbl);
+
+
+            const onQueuesUpdated = () => {
+                const { players, party } = safeQueueCounts(item.cssKey);
+                lbl.textContent = `${players}/${party}`;
+                if (players || party) lbl.classList.remove('is-loading');
+            };
+            window.addEventListener?.('queues:updated', onQueuesUpdated);
+
+            let ticks = 0;
+            const iv = setInterval(() => {
+                ticks++;
+                const { players, party } = safeQueueCounts(item.cssKey);
+                const current = lbl.textContent;
+                const next = `${players}/${party}`;
+                if (current !== next) {
+                    lbl.textContent = next;
+                }
+                if (players || party) {
+                    lbl.classList.remove('is-loading');
+                }
+                if ((players || party) || ticks >= 30) {
+                    clearInterval(iv);
+                }
+            }, 500);
+
+            // медаль/кнопка
+            const type = medalMap[item.cssKey] || 'gold';
+            const disabled = (type === 'silver');
+
+            const medal = DOM({
+                tag: 'span',
+                style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
+            });
+
+            if (disabled) {
+                medal.title = 'Режим временно недоступен';
+            } else {
+                medal.title = Lang.text('titlestatisticmode');
+                medal.setAttribute('role', 'button');
+                medal.tabIndex = 0;
+                const openStats = () => { Window.show('main', 'top', 0, idx); };
+                medal.addEventListener('click', openStats);
+                medal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
+                });
+            }
+
+            wrap.append(medal);
+            banner.append(wrap);
+
+            if (idx < bannerItems.length - 1) {
+                banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
+            }
+        });
+
+        // --- блок статистики/кнопка Stat ---
+        const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
+        const statRect = DOM({ style: ['banner-stat-rect'] });
+        const statCircle = DOM({ style: ['banner-stat-circle'] });
+
+        const statsBtn = DOM({
+            style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
+            title: Lang.text('titlestatistic'),
+            event: ['click', () => {
+                const onEsc = (e) => {
+                    if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
+                };
+                document.addEventListener('keydown', onEsc, { once: true });
+
+                const BASE = 'https://pw2.26rus-game.ru/stats/';
+                const id = Number(App?.storage?.data?.id) || 0;
+                const login = String(App?.storage?.data?.login || '').trim();
+
+                const qs = new URLSearchParams();
+                if (id > 0) qs.set('user_id', String(id));
+                else if (login) qs.set('login', login);
+                else qs.set('user_id', '0');
+                qs.set('tab', 'info');
+                qs.set('q', '');
+                qs.set('_', Date.now().toString());
+
+                const src = `${BASE}?${qs.toString()}`;
+
+                Splash.show(
+                    DOM(
+                        { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
+                        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+                        DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
+                    ),
+                    false
+                );
+            }]
+        });
+
+        // бейдж дивизии под кнопкой Stat
+        const divId = getDivisionId();
+        const divInfo = typeof Division?.get === 'function' ? Division.get(divId) : { name: 'Дивизион', icon: 1 };
+
+        const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
+        divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
+        divisionBadgeUnderStat.title = Lang.text('titlehint2');
+
+        statCircle.append(statsBtn, divisionBadgeUnderStat);
+        statWrapper.append(statRect, statCircle);
+
+        const questionIcon = DOM({ tag: 'div', style: ['question-icon'] });
+
+        // подсказка слева
+        const tooltipWrap = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
+        const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
+        const tooltipText = DOM({ tag: 'div', style: ['tooltip-text'] });
+        tooltipText.textContent = Lang.text('titlehint');
+        tooltipBubble.append(tooltipText);
+        tooltipWrap.append(tooltipBubble);
+
+        banner.append(statWrapper);
+        return DOM({ style: 'castle-banner-online-wrapper' }, banner);
     }
-    } catch (_) {}
-
-    try {
-        if (typeof View?.getTotalQueue === 'function') {
-        const t = Number(View.getTotalQueue(cssKey));
-        if (isFiniteNumber(t)) players = t;
-    }
-    } catch (_) {}
-
-    return { players, party };
-  };
-
-  // карта режимов
-  const modeMap = {
-    pvp: 0,
-    anderkrug: 1,
-    cte: 2,
-    m4: 3,
-    'custom-battle': 4,
-    'pve-ep2-red': 5
-  };
-
-  // тип медалей
-  const medalMap = {
-    pvp: 'gold',
-    anderkrug: 'gold',
-    cte: 'gold',
-    m4: 'gold',
-    'pve-ep2-red': 'gold',
-    'custom-battle': 'silver'
-  };
-
-  const bannerItems = Object.entries(modeMap).map(([cssKey]) => ({
-    cssKey,
-    label: () => (typeof View?.getQueue === 'function' ? View.getQueue(cssKey) : 0)
-  }));
-
-  const banner = DOM({ style: ['castle-banner-online'] });
-  banner.append(DOM({ style: ['banner-ornament'] }));
-
-  // --- элементы по режимам ---
-  bannerItems.forEach((item, idx) => {
-    const wrap = DOM({ style: ['banner-item'] });
-
-    // иконка режима
-    const icon = DOM({ style: ['banner-icon', `banner-icon--${item.cssKey}`] });
-    wrap.append(icon);
-
-    // счётчик: всегда стартует с "0/0"
-    const lbl = DOM({ tag: 'div', style: ['banner-count', 'is-loading'] });
-    lbl.textContent = '0/0';
-    lbl.title =
-      'Отображение очереди по режимам:\n' +
-      'слева — игроков в поиске,\n' +
-      'справа — количество групп (пати).';
-    wrap.append(lbl);
-
-
-    const onQueuesUpdated = () => {
-      const { players, party } = safeQueueCounts(item.cssKey);
-      lbl.textContent = `${players}/${party}`;
-      if (players || party) lbl.classList.remove('is-loading');
-    };
-    window.addEventListener?.('queues:updated', onQueuesUpdated);
-
-    let ticks = 0;
-    const iv = setInterval(() => {
-      ticks++;
-      const { players, party } = safeQueueCounts(item.cssKey);
-      const current = lbl.textContent;
-      const next = `${players}/${party}`;
-      if (current !== next) {
-        lbl.textContent = next;
-      }
-      if (players || party) {
-        lbl.classList.remove('is-loading');
-      }
-      if ((players || party) || ticks >= 30) {
-        clearInterval(iv);
-      }
-    }, 500);
-
-    // медаль/кнопка
-    const type = medalMap[item.cssKey] || 'gold';
-    const disabled = (type === 'silver');
-
-    const medal = DOM({
-      tag: 'span',
-      style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
-    });
-
-    if (disabled) {
-      medal.title = 'Режим временно недоступен';
-    } else {
-      medal.title = Lang.text('titlestatisticmode');
-      medal.setAttribute('role', 'button');
-      medal.tabIndex = 0;
-      const openStats = () => { Window.show('main', 'top', 0, idx); };
-      medal.addEventListener('click', openStats);
-      medal.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); }
-      });
-    }
-
-    wrap.append(medal);
-    banner.append(wrap);
-
-    if (idx < bannerItems.length - 1) {
-      banner.append(DOM({ tag: 'div', style: ['banner-separator'] }));
-    }
-  });
-
-  // --- блок статистики/кнопка Stat ---
-  const statWrapper = DOM({ style: ['banner-stat-wrapper'] });
-  const statRect    = DOM({ style: ['banner-stat-rect'] });
-  const statCircle  = DOM({ style: ['banner-stat-circle'] });
-
-  const statsBtn = DOM({
-    style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
-    title: Lang.text('titlestatistic'),
-    event: ['click', () => {
-      const onEsc = (e) => {
-        if (e.key === 'Escape') { Splash.hide(); document.removeEventListener('keydown', onEsc); }
-      };
-      document.addEventListener('keydown', onEsc, { once: true });
-
-      const BASE  = 'https://pw2.26rus-game.ru/stats/';
-      const id    = Number(App?.storage?.data?.id) || 0;
-      const login = String(App?.storage?.data?.login || '').trim();
-
-      const qs = new URLSearchParams();
-      if (id > 0) qs.set('user_id', String(id));
-      else if (login) qs.set('login', login);
-      else qs.set('user_id', '0');
-      qs.set('tab', 'info');
-      qs.set('q', '');
-      qs.set('_', Date.now().toString());
-
-      const src = `${BASE}?${qs.toString()}`;
-
-      Splash.show(
-        DOM(
-          { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
-          DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
-          DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
-        ),
-        false
-      );
-    }]
-  });
-
-  // бейдж дивизии под кнопкой Stat
-  const divId   = getDivisionId();
-  const divInfo = typeof Division?.get === 'function' ? Division.get(divId) : { name: 'Дивизион', icon: 1 };
-
-  const divisionBadgeUnderStat = DOM({ style: ['banner-division-badge', 'banner-division-badge--stat'] });
-  divisionBadgeUnderStat.style.backgroundImage = `url(content/ranks/${divInfo.icon}.webp)`;
-  divisionBadgeUnderStat.title = Lang.text('titlehint2');
-
-  statCircle.append(statsBtn, divisionBadgeUnderStat);
-  statWrapper.append(statRect, statCircle);
-  
-  const questionIcon  = DOM({ tag: 'div', style: ['question-icon'] });
-
-  // подсказка слева
-  const tooltipWrap   = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
-  const tooltipBubble = DOM({ tag: 'div', style: ['tooltip-bubble-img'] });
-  const tooltipText   = DOM({ tag: 'div', style: ['tooltip-text'] });
-  tooltipText.textContent = Lang.text('titlehint');
-  tooltipBubble.append(tooltipText);
-  tooltipWrap.append(tooltipBubble);
-
-  banner.append(statWrapper);
-  return DOM({ style: 'castle-banner-online-wrapper' }, banner);
-}
 
 
     static castleSettings() {
@@ -971,11 +971,11 @@ root.appendChild(content);
 
         let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-        
+
 
         let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
 
-        
+
         let input = DOM({ style: 'castle-input', tag: 'input' });
 
         input.type = 'range';
@@ -1009,29 +1009,29 @@ root.appendChild(content);
 
             if (event.deltaY != 0) {
 
-            if (event.deltaMode == event.DOM_DELTA_PIXEL) {
+                if (event.deltaMode == event.DOM_DELTA_PIXEL) {
 
-                event.preventDefault();
-                
-                View.scrollHero(event.deltaY / 100);
+                    event.preventDefault();
 
-            } else if (event.deltaMode == event.DOM_DELTA_LINE) {
+                    View.scrollHero(event.deltaY / 100);
 
-                event.preventDefault();
-                
-                View.scrollHeroLine(event.deltaY / 100);
+                } else if (event.deltaMode == event.DOM_DELTA_LINE) {
 
-            } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
+                    event.preventDefault();
 
-                event.preventDefault();
+                    View.scrollHeroLine(event.deltaY / 100);
 
-                let modifier = this.clientWidth;
+                } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
 
-                View.castleBottom.scrollLeft += modifier;
+                    event.preventDefault();
 
-                View.updateArrows();
+                    let modifier = this.clientWidth;
 
-            }
+                    View.castleBottom.scrollLeft += modifier;
+
+                    View.updateArrows();
+
+                }
 
             }
 
@@ -1045,29 +1045,29 @@ root.appendChild(content);
             event: ['click', () => {
                 App.setNickname();
             }], title: Lang.text('titleNicknameСhange')
-            }, DOM({}, nicknameValue));
+        }, DOM({}, nicknameValue));
         if (nicknameValue.length > 10) {
             nicknameMenuItem.firstChild.classList.add('castle-name-autoscroll');
         }
-        
+
         let flagMenuItem = DOM({
             style: 'flag-menu-item',
             event: ['click', () => {
                 App.setFraction();
             }], title: Lang.text('titleflag')
-            });
+        });
         let settingsMenuItem = DOM({
             style: 'settings-menu-item',
             event: ['click', () => {
                 Window.show('main', 'menu');
             }], title: Lang.text('titlesettings')
-            });
+        });
         let chatMenuItem = DOM({
             style: 'chat-menu-item',
             event: ['click', () => {
                 Chat.changeChatVisibility();
             }], title: Lang.text('titlechat')
-            });
+        });
         let heroesMenuItem = DOM({
             style: 'heroes-menu-item',
             event: ['click', () => {
@@ -1076,7 +1076,7 @@ root.appendChild(content);
                 Castle.buildMode = false;
 
             }], title: Lang.text('titleheroes')
-            });
+        });
         let friendsMenuItem = DOM({
             style: 'friends-menu-item',
             event: ['click', () => {
@@ -1085,7 +1085,7 @@ root.appendChild(content);
                 Castle.buildMode = false;
 
             }], title: Lang.text('titlefriends')
-            });
+        });
         let buildingsMenuItem = DOM({
             style: 'buildings-menu-item',
             event: ['click', () => {
@@ -1094,26 +1094,26 @@ root.appendChild(content);
                 Castle.buildMode = true;
 
             }], title: Lang.text('titleconstruction')
-            });
+        });
 
-        flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`; 
-        
+        flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`;
+
         View.arrows = new Object();
-        View.arrows.ls = DOM({style: 'castle-bottom-left-scroll-single', event: ['click', () => View.scrollHero(-1)]});
-        View.arrows.ld = DOM({style: 'castle-bottom-left-scroll-double', event: ['click', () => View.scrollHeroLine(-1)]});
-        View.arrows.rs = DOM({style: 'castle-bottom-right-scroll-single', event: ['click', () => View.scrollHero(1)]});
-        View.arrows.rd = DOM({style: 'castle-bottom-right-scroll-double', event: ['click', () => View.scrollHeroLine(1)]});
-        body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem , friendsMenuItem, buildingsMenuItem, chatMenuItem), 
-        DOM({style: 'castle-bottom-content-container'}, 
-            View.castleBottom,
-            DOM({ style: 'castle-bottom-content-left-scroll' }, 
-                View.arrows.ls,
-                View.arrows.ld,
-            ),
-            DOM({ style: 'castle-bottom-content-right-scroll' }, 
-                View.arrows.rs,
-                View.arrows.rd,
-            )
+        View.arrows.ls = DOM({ style: 'castle-bottom-left-scroll-single', event: ['click', () => View.scrollHero(-1)] });
+        View.arrows.ld = DOM({ style: 'castle-bottom-left-scroll-double', event: ['click', () => View.scrollHeroLine(-1)] });
+        View.arrows.rs = DOM({ style: 'castle-bottom-right-scroll-single', event: ['click', () => View.scrollHero(1)] });
+        View.arrows.rd = DOM({ style: 'castle-bottom-right-scroll-double', event: ['click', () => View.scrollHeroLine(1)] });
+        body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem, friendsMenuItem, buildingsMenuItem, chatMenuItem),
+            DOM({ style: 'castle-bottom-content-container' },
+                View.castleBottom,
+                DOM({ style: 'castle-bottom-content-left-scroll' },
+                    View.arrows.ls,
+                    View.arrows.ld,
+                ),
+                DOM({ style: 'castle-bottom-content-right-scroll' },
+                    View.arrows.rs,
+                    View.arrows.rd,
+                )
             ));
 
         View.updateArrows();
@@ -1152,7 +1152,7 @@ root.appendChild(content);
         View.castleBottom.scrollLeft = View.currentFloatScroll;
 
         View.updateArrows();
-        
+
     }
 
     static updateArrows() {
@@ -1331,7 +1331,7 @@ root.appendChild(content);
         for (let i = 1; i < Castle.buildings.length; ++i) {
             let item = Castle.buildings[i];
             let itemName = Lang.text(Castle.buildingsNames[i][selectedFaction]);
-            
+
             let buildingName = DOM({ style: 'castle-hero-name' }, DOM({}, itemName));
 
             if (itemName.length > 10) {
@@ -1382,12 +1382,12 @@ root.appendChild(content);
 
                 let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
 
-                let hero = DOM({ id: `id${item.id}`, style: ['castle-hero-item', 'hover-brightness'] }, 
-                    DOM({ style: ['castle-hero-item-bg', 'hover-brightness']}), 
-                    DOM({ style: ['castle-hero-item-img', 'no-hover-brightness']}), 
-                    DOM({ style: ['castle-item-background', 'hover-brightness']}), 
-                    DOM({ style: ['castle-item-ornament', 'hover-brightness']}), 
-                    rank, 
+                let hero = DOM({ id: `id${item.id}`, style: ['castle-hero-item', 'hover-brightness'] },
+                    DOM({ style: ['castle-hero-item-bg', 'hover-brightness'] }),
+                    DOM({ style: ['castle-hero-item-img', 'no-hover-brightness'] }),
+                    DOM({ style: ['castle-item-background', 'hover-brightness'] }),
+                    DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+                    rank,
                     heroNameBase);
 
                 hero.addEventListener('click', async () => Window.show('main', 'build', item.id, 0, true));
@@ -1414,29 +1414,29 @@ root.appendChild(content);
             console.log('ДРУЗЬЯ', result);
 
             let buttonAdd = DOM({
-            style: 'castle-friend-item',
-            onclick: () => {
-                let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
-                let body = DOM({ style: 'search-body' });
+                style: 'castle-friend-item',
+                onclick: () => {
+                    let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+                    let body = DOM({ style: 'search-body' });
 
-                // Создаём крестик для закрытия (как в buildSelectName)
-                let closeButton = DOM({
-                    tag: 'div',
-                    style: 'close-button',
-                    event: ['click', () => Splash.hide()]
-                });
-                closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+                    // Создаём крестик для закрытия (как в buildSelectName)
+                    let closeButton = DOM({
+                        tag: 'div',
+                        style: 'close-button',
+                        event: ['click', () => Splash.hide()]
+                    });
+                    closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
-                let search = DOM({ style: 'search' }, input, body, closeButton);
+                    let search = DOM({ style: 'search' }, input, body, closeButton);
 
-                input.addEventListener('input', async () => {
-                    let request = await App.api.request('user', 'find', { nickname: input.value });
+                    input.addEventListener('input', async () => {
+                        let request = await App.api.request('user', 'find', { nickname: input.value });
 
-                    if (body.firstChild) {
-                        while (body.firstChild) {
-                            body.firstChild.remove();
+                        if (body.firstChild) {
+                            while (body.firstChild) {
+                                body.firstChild.remove();
+                            }
                         }
-                    }
 
                         for (let item of request) {
 
@@ -1457,46 +1457,46 @@ root.appendChild(content);
                             if ('blocked' in item) {
 
                                 template.oncontextmenu = () => {
-                                let body = document.createDocumentFragment();
-                                
-                                // Создаём крестик для закрытия
-                                const closeButton = DOM({
-                                    tag: 'div',
-                                    style: 'close-button',
-                                    event: ['click', () => Splash.hide()]
-                                });
-                                closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+                                    let body = document.createDocumentFragment();
 
-                                body.append(
-                                    DOM({}, item.nickname),
-                                    DOM({
-                                        style: 'splash-content-button',
-                                        event: ['click', async () => {
-                                            await App.api.request('user', 'blocked', { id: item.id });
-                                            Splash.hide();
-                                        }]
-                                    }, (item.blocked ? 'Разблокировать' : 'Заблокировать')),
-                                    DOM({
-                                        style: 'splash-content-button',
-                                        event: ['click', async () => {
-                                            await App.api.request('user', 'mute', { id: item.id });
-                                            Splash.hide();
-                                        }]
-                                    }, (item.mute ? 'Убрать мут' : 'Мут чата')),
-                                    DOM({
-                                        style: 'splash-content-button',
-                                        event: ['click', async () => {
-                                            let password = await App.api.request('user', 'restore', { id: item.id });
-                                            App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
-                                            navigator.clipboard.writeText(password);
-                                        }]
-                                    }, 'Сброс пароля'),
-                                    closeButton // Добавляем крестик вместо кнопки "Назад"
-                                );
+                                    // Создаём крестик для закрытия
+                                    const closeButton = DOM({
+                                        tag: 'div',
+                                        style: 'close-button',
+                                        event: ['click', () => Splash.hide()]
+                                    });
+                                    closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
-                                Splash.show(body);
-                                return false;
-                            }
+                                    body.append(
+                                        DOM({}, item.nickname),
+                                        DOM({
+                                            style: 'splash-content-button',
+                                            event: ['click', async () => {
+                                                await App.api.request('user', 'blocked', { id: item.id });
+                                                Splash.hide();
+                                            }]
+                                        }, (item.blocked ? 'Разблокировать' : 'Заблокировать')),
+                                        DOM({
+                                            style: 'splash-content-button',
+                                            event: ['click', async () => {
+                                                await App.api.request('user', 'mute', { id: item.id });
+                                                Splash.hide();
+                                            }]
+                                        }, (item.mute ? 'Убрать мут' : 'Мут чата')),
+                                        DOM({
+                                            style: 'splash-content-button',
+                                            event: ['click', async () => {
+                                                let password = await App.api.request('user', 'restore', { id: item.id });
+                                                App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
+                                                navigator.clipboard.writeText(password);
+                                            }]
+                                        }, 'Сброс пароля'),
+                                        closeButton // Добавляем крестик вместо кнопки "Назад"
+                                    );
+
+                                    Splash.show(body);
+                                    return false;
+                                }
 
                                 if (item.mute) {
 
@@ -1531,29 +1531,31 @@ root.appendChild(content);
 
             for (let item of result) {
 
-                const heroName = DOM({ style: 'castle-hero-name' }, DOM({tag:'span'}, item.nickname));
-                heroName.prepend(DOM({tag:'span',event:['click', async () => {
-                    
-                    try{
-                        
-                        let voice = new Voice(item.id,'friend',item.nickname,true);
-                        
-                        await voice.call();
-                        
-                    }
-                    catch(error){
-                        
-                        App.error(error);
-                        
-                    }
-                    
-                }]},'☎️ '));
+                const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, item.nickname));
+                heroName.prepend(DOM({
+                    tag: 'span', event: ['click', async () => {
+
+                        try {
+
+                            let voice = new Voice(item.id, 'friend', item.nickname, true);
+
+                            await voice.call();
+
+                        }
+                        catch (error) {
+
+                            App.error(error);
+
+                        }
+
+                    }]
+                }, '☎️ '));
                 if (item.nickname.length > 10) {
                     heroName.firstChild.classList.add('castle-name-autoscroll');
                 }
 
                 let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
-                
+
                 let bottom = DOM({ style: 'castle-friend-item-bottom' });
 
                 let friend = DOM({ style: 'castle-friend-item' }, heroNameBase, bottom);
@@ -1664,7 +1666,7 @@ root.appendChild(content);
                 friend.dataset.url = `content/hero/empty.webp`;
 
                 preload.add(friend);
-                
+
             }
 
         }, 'friend', 'list');
@@ -2142,7 +2144,7 @@ root.appendChild(content);
     }
     */
     static async top(hero = 0, isSplah = false, mode = 0) {
-        
+
         let body = DOM({ style: 'main' });
 
         let result = await App.api.request(CURRENT_MM, 'top', { limit: 100, hero: hero, mode: mode });
@@ -2493,25 +2495,25 @@ root.appendChild(content);
 
     static async talents() {
         let body = DOM({ style: 'main' });
-        
+
         // Создаем контейнер для заголовка (кнопка закрытия + поиск)
         let header = DOM({ style: 'adm-header' });
-        
+
         // Кнопка закрытия
-        let closeBtn = DOM({ 
+        let closeBtn = DOM({
             style: 'close-btn',
-            event: ['click', () => View.show('castle')] 
+            event: ['click', () => View.show('castle')]
         }, '[X]');
-        
+
         // Строка поиска
         let searchInput = DOM({
             tag: 'input',
             placeholder: 'Поиск талантов...',
             style: 'search-input'
         });
-        
+
         header.append(closeBtn, searchInput);
-        
+
         let adm = DOM({ style: 'adm' }, header);
         let result = await App.api.request('build', 'talentAll');
         let talentContainers = [];
@@ -2523,13 +2525,13 @@ root.appendChild(content);
 
             for (let key in item) {
                 if (key == 'id') continue;
-                
+
                 // Создаем контейнер для пары "ключ-значение"
-                let keyValuePair = DOM({ 
-                    tag: 'div', 
-                    class: 'key-value-pair' 
+                let keyValuePair = DOM({
+                    tag: 'div',
+                    class: 'key-value-pair'
                 });
-                
+
                 keyValuePair.append(
                     DOM({ tag: 'div', class: 'key' }, key),
                     App.input(async (value) => {
@@ -2538,14 +2540,14 @@ root.appendChild(content);
                         await App.api.request('build', 'talentEdit', { id: item.id, object: object });
                     }, { value: item[key] })
                 );
-                
+
                 div.append(keyValuePair);
             }
-            
+
             talentContainers.push({ element: div, data: item });
             talentsContainer.append(div);
         }
-        
+
         const filterTalents = (searchText) => {
             searchText = searchText.toLowerCase();
             talentContainers.forEach(({ element, data }) => {
@@ -2559,11 +2561,11 @@ root.appendChild(content);
                 element.style.display = matches ? 'flex' : 'none';
             });
         };
-        
+
         searchInput.addEventListener('input', (e) => {
             filterTalents(e.target.value);
         });
-        
+
         adm.append(talentsContainer);
         body.append(adm);
         return body;
@@ -2571,25 +2573,25 @@ root.appendChild(content);
 
     static async talents2() {
         let body = DOM({ style: 'main' });
-        
+
         // Создаем контейнер для заголовка (кнопка закрытия + поиск)
         let header = DOM({ style: 'adm-header' });
-        
+
         // Кнопка закрытия
-        let closeBtn = DOM({ 
+        let closeBtn = DOM({
             style: 'close-btn',
-            event: ['click', () => View.show('castle')] 
+            event: ['click', () => View.show('castle')]
         }, '[X]');
-        
+
         // Строка поиска
         let searchInput = DOM({
             tag: 'input',
             placeholder: 'Поиск геройских талантов...',
             style: 'search-input'
         });
-        
+
         header.append(closeBtn, searchInput);
-        
+
         let adm = DOM({ style: 'adm' }, header);
         let result = await App.api.request('build', 'talentHeroAll');
         let talentContainers = [];
@@ -2601,13 +2603,13 @@ root.appendChild(content);
 
             for (let key in item) {
                 if (key == 'id') continue;
-                
+
                 // Создаем контейнер для пары "ключ-значение"
-                let keyValuePair = DOM({ 
-                    tag: 'div', 
-                    class: 'key-value-pair' 
+                let keyValuePair = DOM({
+                    tag: 'div',
+                    class: 'key-value-pair'
                 });
-                
+
                 keyValuePair.append(
                     DOM({ tag: 'div', class: 'key' }, key),
                     App.input(async (value) => {
@@ -2616,14 +2618,14 @@ root.appendChild(content);
                         await App.api.request('build', 'talentHeroEdit', { id: item.id, object: object });
                     }, { value: item[key] })
                 );
-                
+
                 div.append(keyValuePair);
             }
-            
+
             talentContainers.push({ element: div, data: item });
             talentsContainer.append(div);
         }
-        
+
         const filterTalents = (searchText) => {
             searchText = searchText.toLowerCase();
             talentContainers.forEach(({ element, data }) => {
@@ -2637,11 +2639,11 @@ root.appendChild(content);
                 element.style.display = matches ? 'flex' : 'none';
             });
         };
-        
+
         searchInput.addEventListener('input', (e) => {
             filterTalents(e.target.value);
         });
-        
+
         adm.append(talentsContainer);
         body.append(adm);
         return body;

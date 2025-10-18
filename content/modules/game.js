@@ -1,5 +1,5 @@
-import {DOM} from './dom.js';
-import {App} from './app.js';
+import { DOM } from './dom.js';
+import { App } from './app.js';
 
 export class Game {
 

@@ -1,14 +1,14 @@
-import {DOM} from './dom.js';
-import {News} from './news.js';
-import {Store} from './store.js';
-import {Api} from './api.js';
-import {View} from './view.js';
-import {Events} from './events.js';
-import {Voice} from './voice.js';
-import {Chat} from './chat.js';
-import {NativeAPI} from './nativeApi.js';
-import {MM} from './mm.js';
-import {Splash} from './splash.js';
+import { DOM } from './dom.js';
+import { News } from './news.js';
+import { Store } from './store.js';
+import { Api } from './api.js';
+import { View } from './view.js';
+import { Events } from './events.js';
+import { Voice } from './voice.js';
+import { Chat } from './chat.js';
+import { NativeAPI } from './nativeApi.js';
+import { MM } from './mm.js';
+import { Splash } from './splash.js';
 
 export class App {
     static APP_VERSION = '0';
@@ -20,7 +20,7 @@ export class App {
     static RIGA = 'wss://pwclassic.isgood.host:443';
     static MOSCOW = 'wss://api2.26rus-game.ru:8443';
     static CLOUDFLARE = 'wss://api.26rus-game.ru:8443';
-    static hostList = [this.RIGA, this.MOSCOW, this.CLOUDFLARE ];
+    static hostList = [this.RIGA, this.MOSCOW, this.CLOUDFLARE];
     static bestHost = -1;
 
     static async findBestHostAndInit() {
@@ -32,10 +32,10 @@ export class App {
                 if (!resolved) {
                     resolved = true;
                     this.bestHost = index;
-                    
+
                     sockets.forEach((socket, i) => {
                         //if (i !== index && socket) {
-                            socket.close();
+                        socket.close();
                         //}
                     });
 
@@ -48,9 +48,9 @@ export class App {
             try {
                 const socket = new WebSocket(this.hostList[i]);
                 sockets[i] = socket;
-                
+
                 socket.onopen = handleOpen(i);
-                
+
                 socket.onerror = () => {
                     socket.close();
                 };
@@ -62,8 +62,8 @@ export class App {
         setTimeout(() => {
             if (this.bestHost == -1) {
                 App.error("Нет соединения с API сервером Prime World Classic");
-            }				 
-        },30000);
+            }
+        }, 30000);
     }
 
     static async init() {
@@ -71,11 +71,11 @@ export class App {
         // wss://relay.26rus-game.ru:8443 - Рига (Прокси)
         // wss://api.26rus-game.ru:8443 - США (прокси)
         App.api = new Api(this.hostList, this.bestHost, Events);
-        
+
         await News.init();
-        
+
         await Store.init();
-        
+
         App.storage = new Store('u3');
 
         await App.storage.init({ id: 0, token: '', login: '' });
@@ -125,16 +125,16 @@ export class App {
         },3000);
         */
         Chat.init();
-        
-        try{
-            
+
+        try {
+
             await App.api.init();
-            
+
         }
-        catch(error){
-            
-            
-            
+        catch (error) {
+
+
+
         }
 
         //App.ShowCurrentView();
@@ -146,16 +146,16 @@ export class App {
             document.body.append(DOM({ id: 'ADMStat' }));
 
         }
-        
+
         Voice.init();
 
     }
 
     static ShowCurrentView() {
         if (App.storage.data.login) {
-            
+
             View.show('castle');
-            
+
         }
         else {
 
@@ -166,9 +166,9 @@ export class App {
 
     static async ShowCurrentViewAsync() {
         if (App.storage.data.login) {
-            
+
             await View.show('castle');
-            
+
         }
         else {
 
@@ -233,109 +233,111 @@ export class App {
 
     }
 
-    static setNickname(){
-        
-        const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
-        
+    static setNickname() {
+
+        const close = DOM({ tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
+
         close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-        
+
         let template = document.createDocumentFragment();
-            
-        let title = DOM({tag: 'div', style: 'castle-menu-text'}, 'Сменить никнейм можно один раз в две недели');
-        
-        let name = DOM({tag:'input',placeholder:'Никнейм',value:App.storage.data.login});
 
-        let button = DOM({style:'splash-content-button',event:['click', async () => {
+        let title = DOM({ tag: 'div', style: 'castle-menu-text' }, 'Сменить никнейм можно один раз в две недели');
 
-                if(!name.value){
-                    
+        let name = DOM({ tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
+
+        let button = DOM({
+            style: 'splash-content-button', event: ['click', async () => {
+
+                if (!name.value) {
+
                     Splash.hide();
-                    
+
                     return;
-                    
+
                 }
-                
-                if(App.storage.data.login == name.value){
-                    
+
+                if (App.storage.data.login == name.value) {
+
                     Splash.hide();
-                    
+
                     return;
-                    
+
                 }
-                
-                try{
-                    
-                    await App.api.request('user','set',{nickname:name.value});
-                    
+
+                try {
+
+                    await App.api.request('user', 'set', { nickname: name.value });
+
                 }
-                catch(error){
-                    
+                catch (error) {
+
                     return App.error(error);
-                    
+
                 }
-                
-                await App.storage.set({login:name.value});
-                
+
+                await App.storage.set({ login: name.value });
+
                 View.show('castle');
-                
+
                 Splash.hide();
-                
+
             }
-            
-        ]},'Применить');
+
+            ]
+        }, 'Применить');
 
         template.append(title, name, button, close);
 
         Splash.show(template);
-        
-    }
-    
-    static setFraction() {
-    const close = DOM({tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()]});
-    close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-    
-    let template = document.createDocumentFragment();
-    
- 
-    const title = DOM({tag: 'h2', style: 'faction-title'}, 'Выбор Фракции');
-    Object.assign(title.style, {
-        textAlign: 'center',
-        color: '#fff',
-        textShadow: '0 0 5px rgba(0,0,0,0.5)',
-        marginBottom: '30px',
-        fontSize: '24px'
-    });
-    
-  
-    const factionsContainer = DOM({tag: 'div', style: 'factions-container'});
-    Object.assign(factionsContainer.style, {
-        display: 'flex',
-        gap: '5%',  
-        justifyContent: 'center',
-        marginBottom: '30px',
-        flexWrap: 'wrap',
-        width: '90%',
-        maxWidth: '600px',
-        margin: '0 auto'
-    });
-    
 
-    const factions = [
-            {id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp'},
-            {id: 2, name: 'Докты', icon: 'Human_logo_over2.webp'}
+    }
+
+    static setFraction() {
+        const close = DOM({ tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
+        close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+
+        let template = document.createDocumentFragment();
+
+
+        const title = DOM({ tag: 'h2', style: 'faction-title' }, 'Выбор Фракции');
+        Object.assign(title.style, {
+            textAlign: 'center',
+            color: '#fff',
+            textShadow: '0 0 5px rgba(0,0,0,0.5)',
+            marginBottom: '30px',
+            fontSize: '24px'
+        });
+
+
+        const factionsContainer = DOM({ tag: 'div', style: 'factions-container' });
+        Object.assign(factionsContainer.style, {
+            display: 'flex',
+            gap: '5%',
+            justifyContent: 'center',
+            marginBottom: '30px',
+            flexWrap: 'wrap',
+            width: '90%',
+            maxWidth: '600px',
+            margin: '0 auto'
+        });
+
+
+        const factions = [
+            { id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp' },
+            { id: 2, name: 'Докты', icon: 'Human_logo_over2.webp' }
         ];
-        
-    
+
+
         const calculateIconSize = () => {
             const windowWidth = window.innerWidth;
-            if (windowWidth < 500) return '20vw';  
-            if (windowWidth < 768) return '15vw';  
-            return '120px';  
+            if (windowWidth < 500) return '20vw';
+            if (windowWidth < 768) return '15vw';
+            return '120px';
         };
-        
+
 
         let selectedFaction = App.storage.data.fraction;
-        
+
 
         factions.forEach(faction => {
             const factionElement = DOM({
@@ -355,7 +357,7 @@ export class App {
                     factionElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.7)';
                 }]
             });
-            
+
             const iconSize = calculateIconSize();
             Object.assign(factionElement.style, {
                 width: iconSize,
@@ -375,8 +377,8 @@ export class App {
                 boxShadow: selectedFaction === faction.id ? '0 0 15px rgba(255,215,0,0.7)' : 'none',
                 borderRadius: '10px'
             });
-            
-            const nameLabel = DOM({tag: 'div', style: 'faction-name'}, faction.name);
+
+            const nameLabel = DOM({ tag: 'div', style: 'faction-name' }, faction.name);
             Object.assign(nameLabel.style, {
                 textAlign: 'center',
                 color: '#fff',
@@ -384,19 +386,19 @@ export class App {
                 textShadow: '0 0 3px #000',
                 fontSize: '16px'
             });
-            
-            const wrapper = DOM({tag: 'div', style: 'faction-wrapper'});
+
+            const wrapper = DOM({ tag: 'div', style: 'faction-wrapper' });
             Object.assign(wrapper.style, {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 margin: '10px'
             });
-            
+
             wrapper.append(factionElement, nameLabel);
             factionsContainer.append(wrapper);
         });
-        
+
         const button = DOM({
             style: 'splash-content-button',
             event: ['click', async () => {
@@ -404,19 +406,19 @@ export class App {
                     Splash.hide();
                     return;
                 }
-                
+
                 try {
-                    await App.api.request('user', 'set', {fraction: selectedFaction});
-                } catch(error) {
+                    await App.api.request('user', 'set', { fraction: selectedFaction });
+                } catch (error) {
                     return App.error(error);
                 }
-                
-                await App.storage.set({fraction: selectedFaction});
+
+                await App.storage.set({ fraction: selectedFaction });
                 View.show('castle');
                 Splash.hide();
             }]
         }, 'Применить');
-        
+
         const resizeHandler = () => {
             const iconSize = calculateIconSize();
             factionsContainer.querySelectorAll('.faction-item').forEach(icon => {
@@ -424,13 +426,13 @@ export class App {
                 icon.style.height = iconSize;
             });
         };
-        
+
         window.addEventListener('resize', resizeHandler);
-        
+
         close.addEventListener('click', () => {
             window.removeEventListener('resize', resizeHandler);
         });
-        
+
         template.append(title, factionsContainer, button, close);
         Splash.show(template);
     }
@@ -453,12 +455,12 @@ export class App {
 
         }
 
-        let request,analysis;
-        
+        let request, analysis;
+
         try {
 
             analysis = NativeAPI.analysis();
-            
+
         }
         catch (e) {
 

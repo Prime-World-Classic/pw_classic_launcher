@@ -7,14 +7,14 @@ import * as mat4 from "./glMatrix/mat4.js";
 
 import * as quat from "./glMatrix/quat.js"
 
-import {Window} from './window.js';
-import {App} from './app.js';
-import {HTTP} from './http.js';
-import {NativeAPI} from './nativeApi.js';
-import {CastleBuildingsEvents} from './castleBuildingEvents.js';
-import {Settings} from './settings.js';
-import {Sound} from './sound.js';
-import {PreloadImages} from './preloadImages.js';
+import { Window } from './window.js';
+import { App } from './app.js';
+import { HTTP } from './http.js';
+import { NativeAPI } from './nativeApi.js';
+import { CastleBuildingsEvents } from './castleBuildingEvents.js';
+import { Settings } from './settings.js';
+import { Sound } from './sound.js';
+import { PreloadImages } from './preloadImages.js';
 
 export class Castle {
 
@@ -29,7 +29,7 @@ export class Castle {
         const global = Settings.settings.globalVolume ?? 1.0;
         const music = Settings.settings.musicVolume ?? 0.5;
         const sounds = Settings.settings.soundsVolume ?? 0.3;
-    
+
         if (type == Castle.AUDIO_MUSIC) {
             return global * music;
         }
@@ -244,10 +244,10 @@ export class Castle {
 
     static phantomBuildingSize = 0;
     static phantomBuilding = {
-            id: 0,
-            rot: 0,
-            posX: 0,
-            posY: 1000
+        id: 0,
+        rot: 0,
+        posX: 0,
+        posY: 1000
     };
     static BUILDING_OUTLINE_BAD = [40, 0, 0, 2];
     static BUILDING_OUTLINE_GOOD = [0, 40, 0, 2];
@@ -255,60 +255,60 @@ export class Castle {
     static phantomBuildingIsAllowedToBuild = false;
 
     static buildingsNames = [
-        ["",""],
-        ["pearl_farm_ad","pearl_farm_doct"],
-        ["mushroom_farm_ad","mushroom_farm_doct"],
-        ["rubber_tree_ad","rubber_tree_doct"],
-        ["spinning_mill_ad","spinning_mill_doct"],
-        ["weaving_workshop_ad","weaving_workshop_doct"],
-        ["talent_garden_ad","talent_garden_doct"],
-        ["clan_house_ad","clan_house_doct"],
-        ["fair_ad","fair_doct"],
-        ["mansion_ad","mansion_doct"],
-        ["library_ad","library_doct"],
-        ["storage_ad","storage_doct"],
-        ["arena_ad","arena_doct"],
-        ["spire_ad","spire_doct"],
-        ["alcove_ad","alcove_doct"],
-        ["temple_ad","temple_doct"],
-        ["monument_ad","monument_doct"],
-        ["tea_house_ad","tea_house_doct"],
-        ["cat_house_ad","cat_house_doct"],
-        ["dog_house_ad","dog_house_doct"],
-        ["unicorn_house_ad","unicorn_house_doct"],
-        ["scarlet_flower_ad","scarlet_flower_doct"],
-        ["amber_flower_ad","amber_flower_doct"],
-        ["signpost_ad","signpost_doct"],
-        ["statue_ad","statue_doct"],
-        ["drums_ad","drums_doct"],
-        ["palm_with_bird_ad","palm_with_bird_doct"],
-        ["fountain_ad","fountain_doct"],
-        ["lantern_shop_ad","lantern_shop_doct"],
-        ["crimson_bush_ad","crimson_bush_doct"],
-        ["azure_bush_ad","azure_bush_doct"],
-        ["crimson_inflorescence_ad","crimson_inflorescence_doct"],
-        ["purple_inflorescence_ad","purple_inflorescence_doct"],
-        ["hedge_ad","hedge_doct"],
-        ["hedge_flowering_ad","hedge_flowering_doct"],
-        ["hedge_flowering2_ad","hedge_flowering2_doct"],
-        ["column_ad","column_doct"],
-        ["flower_bed_ad","flower_bed_doct"],
-        ["flower_bed2_ad","flower_bed2_doct"],
-        ["flower_bed3_ad","flower_bed3_doct"],
-        ["flower_bed4_ad","flower_bed4_doct"],
-        ["small_tree_ad","small_tree_doct"],
-        ["blooming_sakura_ad","blooming_sakura_doct"],
-        ["bonsai_ad","bonsai_doct"],
-        ["blooming_bonsai_ad","blooming_bonsai_doct"],
-        ["reed_tower_ad","reed_tower_doct"],
-        ["miniature_garden_ad","miniature_garden_doct"],
-        ["big_sakura_ad","big_sakura_doct"],
-        ["huge_cactus_ad","huge_cactus_doct"],
-        ["rafflesia_ad","rafflesia_doct"],
-        ["flytrap_ad","flytrap_doct"],
-        ["figured_reed_ad","figured_reed_doct"],
-        ["banana_palm_ad","banana_palm_doct"],
-        ["coconut_palm_ad","coconut_palm_doct"]
+        ["", ""],
+        ["pearl_farm_ad", "pearl_farm_doct"],
+        ["mushroom_farm_ad", "mushroom_farm_doct"],
+        ["rubber_tree_ad", "rubber_tree_doct"],
+        ["spinning_mill_ad", "spinning_mill_doct"],
+        ["weaving_workshop_ad", "weaving_workshop_doct"],
+        ["talent_garden_ad", "talent_garden_doct"],
+        ["clan_house_ad", "clan_house_doct"],
+        ["fair_ad", "fair_doct"],
+        ["mansion_ad", "mansion_doct"],
+        ["library_ad", "library_doct"],
+        ["storage_ad", "storage_doct"],
+        ["arena_ad", "arena_doct"],
+        ["spire_ad", "spire_doct"],
+        ["alcove_ad", "alcove_doct"],
+        ["temple_ad", "temple_doct"],
+        ["monument_ad", "monument_doct"],
+        ["tea_house_ad", "tea_house_doct"],
+        ["cat_house_ad", "cat_house_doct"],
+        ["dog_house_ad", "dog_house_doct"],
+        ["unicorn_house_ad", "unicorn_house_doct"],
+        ["scarlet_flower_ad", "scarlet_flower_doct"],
+        ["amber_flower_ad", "amber_flower_doct"],
+        ["signpost_ad", "signpost_doct"],
+        ["statue_ad", "statue_doct"],
+        ["drums_ad", "drums_doct"],
+        ["palm_with_bird_ad", "palm_with_bird_doct"],
+        ["fountain_ad", "fountain_doct"],
+        ["lantern_shop_ad", "lantern_shop_doct"],
+        ["crimson_bush_ad", "crimson_bush_doct"],
+        ["azure_bush_ad", "azure_bush_doct"],
+        ["crimson_inflorescence_ad", "crimson_inflorescence_doct"],
+        ["purple_inflorescence_ad", "purple_inflorescence_doct"],
+        ["hedge_ad", "hedge_doct"],
+        ["hedge_flowering_ad", "hedge_flowering_doct"],
+        ["hedge_flowering2_ad", "hedge_flowering2_doct"],
+        ["column_ad", "column_doct"],
+        ["flower_bed_ad", "flower_bed_doct"],
+        ["flower_bed2_ad", "flower_bed2_doct"],
+        ["flower_bed3_ad", "flower_bed3_doct"],
+        ["flower_bed4_ad", "flower_bed4_doct"],
+        ["small_tree_ad", "small_tree_doct"],
+        ["blooming_sakura_ad", "blooming_sakura_doct"],
+        ["bonsai_ad", "bonsai_doct"],
+        ["blooming_bonsai_ad", "blooming_bonsai_doct"],
+        ["reed_tower_ad", "reed_tower_doct"],
+        ["miniature_garden_ad", "miniature_garden_doct"],
+        ["big_sakura_ad", "big_sakura_doct"],
+        ["huge_cactus_ad", "huge_cactus_doct"],
+        ["rafflesia_ad", "rafflesia_doct"],
+        ["flytrap_ad", "flytrap_doct"],
+        ["figured_reed_ad", "figured_reed_doct"],
+        ["banana_palm_ad", "banana_palm_doct"],
+        ["coconut_palm_ad", "coconut_palm_doct"]
     ];
 
     static toggleMusic(layer, value) {
@@ -384,8 +384,8 @@ export class Castle {
         let shift = [Castle.gridTranslation[0], Castle.gridTranslation[1]];
         if (Castle.phantomBuilding.id > 0 && Castle.gridCursorPosX && Castle.gridCursorPosX) {
             const size = Castle.sceneBuildings[Castle.buildings[Castle.phantomBuilding.id]].size[0];
-            Castle.phantomBuilding.posX = Math.floor((shift[0]-Castle.gridCursorPosX) / 7.0 - size / 2.0);
-            Castle.phantomBuilding.posY = Math.floor((shift[1]-Castle.gridCursorPosZ) / 7.0 - size / 2.0) + 17;
+            Castle.phantomBuilding.posX = Math.floor((shift[0] - Castle.gridCursorPosX) / 7.0 - size / 2.0);
+            Castle.phantomBuilding.posY = Math.floor((shift[1] - Castle.gridCursorPosZ) / 7.0 - size / 2.0) + 17;
             Castle.phantomBuildingSize = size;
 
             Castle.phantomBuildingIsAllowedToBuild = Castle.isBuildingAllowed(Castle.phantomBuilding.posX, Castle.phantomBuilding.posY, size);
@@ -457,7 +457,7 @@ export class Castle {
             data[i * 4 + 2] = 0;   // B (синий)
             data[i * 4 + 3] = 0; // A (альфа, непрозрачность)
             if (posX < 47 && posY < 38) {
-                if (Castle.phantomBuilding.id && 
+                if (Castle.phantomBuilding.id &&
                     posX >= Castle.phantomBuilding.posX && posY >= Castle.phantomBuilding.posY &&
                     posX < Castle.phantomBuilding.posX + Castle.phantomBuildingSize && posY < Castle.phantomBuilding.posY + Castle.phantomBuildingSize
                 ) {
@@ -486,7 +486,7 @@ export class Castle {
                 }
             }
         }
-        }
+    }
 
 
     static placePhantomBuilding() {
@@ -587,7 +587,7 @@ export class Castle {
     static async loadBuildings() {
         await Castle.ReadBuildings();
         Castle.isBuildingsLoaded = true;
-        
+
         window.addEventListener('beforeunload', () => {
             Castle.WriteBuildings();
         });
@@ -643,11 +643,11 @@ export class Castle {
 
         canvas.onmouseup = Castle.stopMove;
 
-        oncontextmenu = (event) => { 
+        oncontextmenu = (event) => {
             event.preventDefault();
-            Castle.phantomBuilding.id = 0; 
-            Castle.phantomBuilding.posX = 0; 
-            Castle.phantomBuilding.posY = 1000; 
+            Castle.phantomBuilding.id = 0;
+            Castle.phantomBuilding.posX = 0;
+            Castle.phantomBuilding.posY = 1000;
             if (Castle.buildMode && Castle.outlinedBuilding) {
                 Castle.findAndDeleteBuilding(Castle.outlinedBuilding.position[0], Castle.outlinedBuilding.position[1])
             }
@@ -733,7 +733,7 @@ export class Castle {
             mat4.translate(lightViewMatrix, lightViewMatrix, smCam.camPos);
             mat4.multiply(lightViewMatrix2, Castle.flipMatr, lightViewMatrix);
             mat4.multiply(Castle.lightViewProjMatrix, lightProjMatrix, lightViewMatrix2);
-            
+
             Castle.gridTexture = Castle.gl.createTexture();
             Castle.gl.bindTexture(Castle.gl.TEXTURE_2D, Castle.gridTexture);
             Castle.gl.texImage2D(
@@ -1068,7 +1068,7 @@ export class Castle {
 
         }
         //console.log('Loaded shader ' + shaderNames[shaderId]);
-        let program = {prog: Castle.gl.createProgram(), progId: this.uniqueProgCounter++};
+        let program = { prog: Castle.gl.createProgram(), progId: this.uniqueProgCounter++ };
 
         Castle.gl.attachShader(program.prog, vertexShader);
 
@@ -1218,7 +1218,7 @@ export class Castle {
             var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
             buildingsToDraw.push({
                 mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
-                translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY-17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+                translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY - 17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
             });
         }
         if (Castle.buildMode && Castle.phantomBuilding.id > 0) {
@@ -1239,7 +1239,7 @@ export class Castle {
                 var mesh = Castle.sceneBuildings[Castle.buildings[building.id]];
                 buildingsToDraw.push({
                     outlined: true, mesh: mesh, rotation: building.rot * 1.57, position: [building.posX, building.posY], name: Castle.buildings[building.id],
-                    translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY-17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
+                    translation: [Castle.zeroTranslation[0] + (building.posX * 7.0 + mesh.size[0] / 2.0 * 7.0), 1, Castle.zeroTranslation[1] + ((building.posY - 17) * 7.0 + mesh.size[1] / 2.0 * 7.0)]
                 });
                 outlinedBuilding = buildingsToDraw.length - 1;
             } else {
@@ -1302,13 +1302,13 @@ export class Castle {
                 if (Castle.buildMode) {
                     outlineColor = Castle.BUILDING_OUTLINE_SELECTION;
                     if (Castle.phantomBuilding.id > 0) {
-                        outlineColor =  Castle.phantomBuildingIsAllowedToBuild ? Castle.BUILDING_OUTLINE_GOOD : Castle.BUILDING_OUTLINE_BAD;;
+                        outlineColor = Castle.phantomBuildingIsAllowedToBuild ? Castle.BUILDING_OUTLINE_GOOD : Castle.BUILDING_OUTLINE_BAD;;
                     }
                 }
                 for (let i = 0; i < buildingToDraw.mesh.objects.length; ++i) {
                     let outlinedTranslation = [buildingToDraw.translation[0], buildingToDraw.translation[1], buildingToDraw.translation[2]];
                     outlinedTranslation[1] -= 6.0 / buildingToDraw.mesh.size[0];
-                    Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, outlinedTranslation, outlineColor, 1.0 + (0.16 / Math.pow(buildingToDraw.mesh.size[0], 3/4)));
+                    Castle.prepareAndDrawObject(buildingToDraw.mesh.objects[i], false, buildingToDraw.rotation, outlinedTranslation, outlineColor, 1.0 + (0.16 / Math.pow(buildingToDraw.mesh.size[0], 3 / 4)));
                 }
                 Castle.gl.enable(Castle.gl.DEPTH_TEST);
                 Castle.gl.depthMask(true);
@@ -1679,7 +1679,7 @@ export class Castle {
             let texLocationSM = Castle.getUniformLocation(program, attribNameSM);
 
             Castle.gl.uniform1i(texLocationSM, textures.length + 1);
-            
+
         }
 
         Castle.gl.drawArrays(strip ? Castle.gl.TRIANGLE_STRIP : Castle.gl.TRIANGLES, 0, indexCount);

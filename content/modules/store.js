@@ -1,4 +1,4 @@
-import {DataBase} from './database.js';
+import { DataBase } from './database.js';
 
 export class Store {
 

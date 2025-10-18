@@ -1,366 +1,368 @@
-import {DOM} from './dom.js';
-import {Lang} from './lang.js';
-import {CastleNAVBAR} from './castleNavBar.js';
-import {View} from './view.js';
-import {Rank} from './rank.js';
-import {App} from './app.js';
-import {Voice} from './voice.js';
-import {Chat} from './chat.js';
-import {NativeAPI} from './nativeApi.js';
-import {MM} from './mm.js';
-import {Splash} from './splash.js';
+import { DOM } from './dom.js';
+import { Lang } from './lang.js';
+import { CastleNAVBAR } from './castleNavBar.js';
+import { View } from './view.js';
+import { Rank } from './rank.js';
+import { App } from './app.js';
+import { Voice } from './voice.js';
+import { Chat } from './chat.js';
+import { NativeAPI } from './nativeApi.js';
+import { MM } from './mm.js';
+import { Splash } from './splash.js';
 
 export class Events {
 
-    static Message(data) {
+	static Message(data) {
 
-        let body = document.createDocumentFragment();
+		let body = document.createDocumentFragment();
 
-        body.append(DOM(`${data.message}`))
+		body.append(DOM(`${data.message}`))
 
-        Splash.show(body);
+		Splash.show(body);
 
-        setTimeout(() => Splash.hide(), 3000);
+		setTimeout(() => Splash.hide(), 3000);
 
-    }
+	}
 
-    static MMReady(data) {
+	static MMReady(data) {
 
-        if (!NativeAPI.status) {
+		if (!NativeAPI.status) {
 
-            return;
+			return;
 
-        }
+		}
 
-        // NativeAPI.attention();
+		// NativeAPI.attention();
 
-        MM.ready(data);
+		MM.ready(data);
 
-    }
+	}
 
-    static MMReadyCount(data) {
+	static MMReadyCount(data) {
 
-        if (!NativeAPI.status) {
+		if (!NativeAPI.status) {
 
-            return;
+			return;
 
-        }
+		}
 
-        let find = document.getElementById('MMReady');
+		let find = document.getElementById('MMReady');
 
-        if (find) {
+		if (find) {
 
-            find.innerText = `${data.count}/${data.limit}`
+			find.innerText = `${data.count}/${data.limit}`
 
-        }
+		}
 
-    }
+	}
 
-    static MMStart(data) {
+	static MMStart(data) {
 
-        if (!NativeAPI.status) {
+		if (!NativeAPI.status) {
 
-            return;
+			return;
 
-        }
+		}
 
-        // NativeAPI.attention();
+		// NativeAPI.attention();
 
-        MM.lobby(data);
+		MM.lobby(data);
 
-    }
+	}
 
-    static MMChangeHero(data) {
+	static MMChangeHero(data) {
 
-        if (!NativeAPI.status) {
+		if (!NativeAPI.status) {
 
-            return;
-            
-        }
+			return;
 
-        MM.eventChangeHero(data);
-        
-    }
-    
-    static MMBanHero(data) {
+		}
 
-        if (!NativeAPI.status) {
+		MM.eventChangeHero(data);
 
-            return;
-            
-        }
+	}
 
-        MM.eventBanHero(data);
-        
-    }
+	static MMBanHero(data) {
 
-    static MMChat(data) {
+		if (!NativeAPI.status) {
 
-        if (!NativeAPI.status) {
+			return;
 
-            return;
+		}
 
-        }
+		MM.eventBanHero(data);
 
-        MM.chat(data);
+	}
 
-    }
+	static MMChat(data) {
 
-    static MMPosition(data) {
+		if (!NativeAPI.status) {
 
-        if (!NativeAPI.status) {
+			return;
 
-            return;
+		}
 
-        }
+		MM.chat(data);
 
-        if (MM.renderBody) {
+	}
 
-            for (let item of MM.renderBody.children) {
+	static MMPosition(data) {
 
-                if (item.dataset.player == data.id) {
+		if (!NativeAPI.status) {
 
-                    item.dataset.player = 0;
+			return;
 
-                    item.style.backgroundImage = 'none';
+		}
 
-                    item.style.transform = 'scale(1)';
+		if (MM.renderBody) {
 
-                }
+			for (let item of MM.renderBody.children) {
 
-                if (data.position != 0) {
+				if (item.dataset.player == data.id) {
 
-                    if (item.dataset.position == data.position) {
+					item.dataset.player = 0;
 
-                        let findPlayer = document.getElementById(`PLAYER${data.id}`);
+					item.style.backgroundImage = 'none';
 
-                        if (findPlayer) {
+					item.style.transform = 'scale(1)';
 
-                            item.dataset.player = data.id;
+				}
 
-                            item.style.backgroundImage = (findPlayer.dataset.hero != 0) ? `url(content/hero/${findPlayer.dataset.hero}/1.webp)` : `url(content/hero/empty.webp)`;
+				if (data.position != 0) {
 
-                            item.style.transform = 'scale(1.5)';
+					if (item.dataset.position == data.position) {
 
-                        }
+						let findPlayer = document.getElementById(`PLAYER${data.id}`);
 
-                    }
+						if (findPlayer) {
 
-                }
+							item.dataset.player = data.id;
 
-            }
+							item.style.backgroundImage = (findPlayer.dataset.hero != 0) ? `url(content/hero/${findPlayer.dataset.hero}/1.webp)` : `url(content/hero/empty.webp)`;
 
-        }
+							item.style.transform = 'scale(1.5)';
 
-    }
+						}
 
-    static MMHero(data) {
+					}
 
-        if (!NativeAPI.status) {
+				}
 
-            return;
+			}
 
-        }
+		}
 
-        MM.select(data);
-        
-    }
+	}
 
-    static MMEnd(data) {
+	static MMHero(data) {
 
-        if (!NativeAPI.status) {
+		if (!NativeAPI.status) {
 
-            return;
+			return;
 
-        }
+		}
 
-        MM.finish(data);
+		MM.select(data);
 
-    }
+	}
 
-    static PInvite(data) {
+	static MMEnd(data) {
 
-        let body = document.createDocumentFragment();
+		if (!NativeAPI.status) {
 
-        let b1 = DOM({
-            style: 'splash-content-button', event: ['click', async () => {
+			return;
 
-                await App.api.request(App.CURRENT_MM, 'joinParty', { code: data.code, version: App.PW_VERSION });
+		}
 
-                Splash.hide();
+		MM.finish(data);
 
-            }]
-        }, 'Принять');
+	}
 
-        let b2 = DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, 'Отмена');
+	static PInvite(data) {
 
-        body.append(DOM(`${data.nickname} приглашает вас в лобби`), b1, b2)
+		let body = document.createDocumentFragment();
 
-        Splash.show(body);
+		let b1 = DOM({
+			style: 'splash-content-button', event: ['click', async () => {
 
-    }
+				await App.api.request(CURRENT_MM, 'joinParty', { code: data.code, version: PW_VERSION });
 
-    static PUpdate(data) {
+				Splash.hide();
 
-        View.show('castle', data);
+			}]
+		}, 'Принять');
 
-    }
+		let b2 = DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, 'Отмена');
 
-    static PHero(data) {
+		body.append(DOM(`${data.nickname} приглашает вас в лобби`), b1, b2)
 
-        let find = document.getElementById(`PP${data.id}`);
+		Splash.show(body);
 
-        if (find) {
+	}
 
-            find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
+	static PUpdate(data) {
 
-            find.children[1].firstChild.firstChild.innerText = data.rating;
+		View.show('castle', data);
 
-            find.children[1].firstChild.firstChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+	}
 
-        }
+	static PHero(data) {
 
-    }
+		let find = document.getElementById(`PP${data.id}`);
 
-    static PExit() {
+		if (find) {
 
-        View.show('castle');
+			find.children[1].style.backgroundImage = (data.hero) ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)` : `url(content/hero/empty.webp)`;
 
-    }
+			find.children[1].firstChild.firstChild.innerText = data.rating;
 
-    static PReady(data) {
+			find.children[1].firstChild.firstChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
 
-        let find = document.getElementById(`PP${data.id}`);
+		}
 
-        if (find) {
+	}
 
-            find.children[2].firstChild.innerText = Lang.text('ready');
+	static PExit() {
 
-            find.children[2].classList.replace('party-middle-item-not-ready', 'party-middle-item-ready');
+		View.show('castle');
 
-            find.children[2].classList.replace('castle-party-middle-item-not-ready', 'castle-party-middle-item-ready');
+	}
 
-        }
+	static PReady(data) {
 
-    }
+		let find = document.getElementById(`PP${data.id}`);
 
-    static PMMActive(data) {
-        
-        CastleNAVBAR.setMode(data.mode + 1);
-        
-        MM.searchActive(data.status);
-        
-    }
+		if (find) {
 
-    static MMQueue(value) {
+			find.children[2].firstChild.innerText = Lang.text('ready');
 
-        let find = document.getElementById('MMQueue');
+			find.children[2].classList.replace('party-middle-item-not-ready', 'party-middle-item-ready');
 
-        if (find) {
+			find.children[2].classList.replace('castle-party-middle-item-not-ready', 'castle-party-middle-item-ready');
 
-            find.innerText = value;
+		}
 
-        }
+	}
 
-    }
+	static PMMActive(data) {
 
-    static MMQueueV2(data) {
-        
-        View.mmQueueMap = data;
-        document.querySelectorAll('.banner-count').forEach((el, idx) => {
-        const keys = ['pvp', 'anderkrug', 'cte', 'm4', 'pve-ep2-red', 'custom-battle'];
-        const cssKey = keys[idx];
-            if (cssKey) {
-         const val = View.getQueue(cssKey);
-         el.textContent = val;
-    }
-  });
-}
+		CastleNAVBAR.setMode(data.mode + 1);
 
-    static ADMStat(data) {
+		MM.searchActive(data.status);
 
-        document.getElementById('ADMStat').innerText = `${data.online}`;
+	}
 
-    }
+	static MMQueue(value) {
 
-    static MMKick(data) {
+		let find = document.getElementById('MMQueue');
 
-        setTimeout(() => {
+		if (find) {
 
-            MM.searchActive(false);
+			find.innerText = value;
 
-        }, 1000);
+		}
 
-        let body = document.createDocumentFragment();
+	}
 
-        let button = DOM({ style: 'splash-content-button', event: ['click', async () => Splash.hide()] }, 'Больше так не буду');
+	static MMQueueV2(data) {
 
-        body.append(DOM(`${data.party ? 'Один из участников пати был АФК, поэтому вы исключены из подбора матча' : 'Вы были исключены из матчмейкинга за АФК!'}`), button);
+		View.mmQueueMap = data;
+		document.querySelectorAll('.banner-count').forEach((el, idx) => {
+			const keys = ['pvp', 'anderkrug', 'cte', 'm4', 'pve-ep2-red', 'custom-battle'];
+			const cssKey = keys[idx];
+			if (cssKey) {
+				const val = View.getQueue(cssKey);
+				el.textContent = val;
+			}
+		});
+	}
 
-        Splash.show(body);
+	static ADMStat(data) {
 
-    }
+		document.getElementById('ADMStat').innerText = `${data.online}`;
 
-    static UChat(data) {
+	}
 
-        Chat.viewMessage(data);
-        
-    }
-    
-    static async VCall(data){
-        
-        if(data.isCaller){
-            
-            let body = document.createDocumentFragment();
-            
-            body.append(DOM(`Звонок от ${data.isCaller}?`),DOM({style:'splash-content-button',event:['click', async () => {
-                
-                try{
-                    
-                    let voice = new Voice(data.id,'',data.isCaller,true);
-                    
-                    await voice.accept(data.offer);
-                    
-                    Splash.hide();
-                    
-                }
-                catch(error){
-                    
-                    App.error(error);
-                    
-                }
-                
-            }]},'Принять'),DOM({style:'splash-content-button',event:['click', async () => Splash.hide()] },'Сбросить'));
-            
-            Splash.show(body);
-            
-        }
-        else{
-            
-            let voice = new Voice(data.id);
-            
-            await voice.accept(data.offer);
-            
-        }
-        
-    }
-    
-    static async VReady(data){
-        
-        await Voice.ready(data.id,data.answer);
-        
-    }
-    
-    static async VCandidate(data){
-        
-        await Voice.candidate(data.id,data.candidate);
-        
-    }
-    
-    static VKick(){
-        
-        Voice.destroy(true);
-        
-    }
-    
+	static MMKick(data) {
+
+		setTimeout(() => {
+
+			MM.searchActive(false);
+
+		}, 1000);
+
+		let body = document.createDocumentFragment();
+
+		let button = DOM({ style: 'splash-content-button', event: ['click', async () => Splash.hide()] }, 'Больше так не буду');
+
+		body.append(DOM(`${data.party ? 'Один из участников пати был АФК, поэтому вы исключены из подбора матча' : 'Вы были исключены из матчмейкинга за АФК!'}`), button);
+
+		Splash.show(body);
+
+	}
+
+	static UChat(data) {
+
+		Chat.viewMessage(data);
+
+	}
+
+	static async VCall(data) {
+
+		if (data.isCaller) {
+
+			let body = document.createDocumentFragment();
+
+			body.append(DOM(`Звонок от ${data.name}?`), DOM({
+				style: 'splash-content-button', event: ['click', async () => {
+
+					try {
+
+						let voice = new Voice(data.id, '', data.name, true);
+
+						await voice.accept(data.offer);
+
+						Splash.hide();
+
+					}
+					catch (error) {
+
+						App.error(error);
+
+					}
+
+				}]
+			}, 'Принять'), DOM({ style: 'splash-content-button', event: ['click', async () => Splash.hide()] }, 'Сбросить'));
+
+			Splash.show(body);
+
+		}
+		else {
+
+			let voice = new Voice(data.id, '', data.name);
+
+			await voice.accept(data.offer);
+
+		}
+
+	}
+
+	static async VReady(data) {
+
+		await Voice.ready(data.id, data.answer);
+
+	}
+
+	static async VCandidate(data) {
+
+		await Voice.candidate(data.id, data.candidate);
+
+	}
+
+	static VKick() {
+
+		Voice.destroy(true);
+
+	}
+
 }
