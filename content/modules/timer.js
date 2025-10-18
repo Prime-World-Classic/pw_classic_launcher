@@ -21,7 +21,7 @@ export class Timer {
 
 		Timer.message = name;
 
-		Timer.timeFinish = await App.api.request(CURRENT_MM, 'getTimer', { id: id, time: Date.now() });
+		Timer.timeFinish = await App.api.request(App.CURRENT_MM, 'getTimer', { id: id, time: Date.now() });
 
 		if (Timer.end()) {
 

@@ -611,7 +611,7 @@ root.appendChild(content);
             if ((MM.partyId == App.storage.data.id) && (playerX.dataset.id != App.storage.data.id) && (playerX.dataset.id != 0)) {
                 removeButton.addEventListener('click', async () => {
 
-                    await App.api.request(CURRENT_MM, 'leaderKickParty', { id: playerX.dataset.id });
+                    await App.api.request(App.CURRENT_MM, 'leaderKickParty', { id: playerX.dataset.id });
 
                 })
 
@@ -625,7 +625,7 @@ root.appendChild(content);
             if ((MM.partyId != App.storage.data.id) && (playerX.dataset.id == App.storage.data.id)) {
                 removeButton.addEventListener('click', async () => {
 
-                    await App.api.request(CURRENT_MM, 'leaveParty', { id: MM.partyId });
+                    await App.api.request(App.CURRENT_MM, 'leaveParty', { id: MM.partyId });
 
                     View.show('castle');
 
@@ -669,7 +669,7 @@ root.appendChild(content);
 
                             try {
 
-                                await App.api.request(CURRENT_MM, 'heroParty', { id: MM.partyId, hero: item2.id });
+                                await App.api.request(App.CURRENT_MM, 'heroParty', { id: MM.partyId, hero: item2.id });
 
                             }
                             catch (error) {
@@ -719,7 +719,7 @@ root.appendChild(content);
                     
                     input.addEventListener('input', async () => {
                         
-                        let request = await App.api.request(CURRENT_MM,'findUser',{name:input.value});
+                        let request = await App.api.request(App.CURRENT_MM,'findUser',{name:input.value});
                         
                         if(body.firstChild){
                             
@@ -735,7 +735,7 @@ root.appendChild(content);
                             
                             body.append(DOM({event:['click', async () => {
                                 
-                                await App.api.request(CURRENT_MM,'inviteParty',{id:item.id});
+                                await App.api.request(App.CURRENT_MM,'inviteParty',{id:item.id});
                                 
                                 App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
                                 
@@ -1573,7 +1573,7 @@ root.appendChild(content);
 
                         group.onclick = async () => {
 
-                            await App.api.request(CURRENT_MM, 'inviteParty', { id: item.id });
+                            await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
                             App.notify(`Приглашение отправлено игроку ${item.nickname}`);
 
@@ -1626,7 +1626,7 @@ root.appendChild(content);
                             bottom.append(DOM({
                                 style: 'castle-friend-add-group', event: ['click', async () => {
 
-                                    await App.api.request(CURRENT_MM, 'inviteParty', { id: item.id });
+                                    await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
                                     App.notify(`Приглашение отправлено игроку ${item.nickname}`);
 
@@ -1834,13 +1834,13 @@ root.appendChild(content);
 
             }
 
-        }, CURRENT_MM, 'top');
+        }, App.CURRENT_MM, 'top');
 
         let party = DOM({ style: 'party' }, middle);
 
         let players = new Array();
 
-        data = (data) ? data : await App.api.request(CURRENT_MM, 'loadParty');
+        data = (data) ? data : await App.api.request(App.CURRENT_MM, 'loadParty');
 
         MM.partyId = data.id;
 
@@ -1926,7 +1926,7 @@ root.appendChild(content);
 
                         }
 
-                        await App.api.request(CURRENT_MM, 'readyParty', { id: MM.partyId });
+                        await App.api.request(App.CURRENT_MM, 'readyParty', { id: MM.partyId });
 
                         status.onclick = false;
 
@@ -1963,7 +1963,7 @@ root.appendChild(content);
                 nickname.append(DOM({
                     tag: 'span', event: ['click', async () => {
 
-                        await App.api.request(CURRENT_MM, 'leaderKickParty', { id: player.dataset.id });
+                        await App.api.request(App.CURRENT_MM, 'leaderKickParty', { id: player.dataset.id });
 
                     }]
                 }, '[X]'));
@@ -1975,7 +1975,7 @@ root.appendChild(content);
                 nickname.append(DOM({
                     tag: 'span', event: ['click', async () => {
 
-                        await App.api.request(CURRENT_MM, 'leaveParty', { id: MM.partyId });
+                        await App.api.request(App.CURRENT_MM, 'leaveParty', { id: MM.partyId });
 
                         View.show('castle');
 
@@ -2012,7 +2012,7 @@ root.appendChild(content);
 
                             try {
 
-                                await App.api.request(CURRENT_MM, 'heroParty', { id: MM.partyId, hero: item.id });
+                                await App.api.request(App.CURRENT_MM, 'heroParty', { id: MM.partyId, hero: item.id });
 
                             }
                             catch (error) {
@@ -2062,7 +2062,7 @@ root.appendChild(content);
 
                     input.addEventListener('input', async () => {
 
-                        let request = await App.api.request(CURRENT_MM, 'findUser', { name: input.value });
+                        let request = await App.api.request(App.CURRENT_MM, 'findUser', { name: input.value });
 
                         if (body.firstChild) {
 
@@ -2079,7 +2079,7 @@ root.appendChild(content);
                             body.append(DOM({
                                 event: ['click', async () => {
 
-                                    await App.api.request(CURRENT_MM, 'inviteParty', { id: item.id });
+                                    await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
                                     App.notify(`Приглашение отправлено игроку ${item.nickname}`, 1000);
 
@@ -2114,7 +2114,7 @@ root.appendChild(content);
 
         let body = DOM({ style: 'main' }), history = DOM({ style: isWindow ? 'whistory' : 'history' });
 
-        let result = await App.api.request(CURRENT_MM, 'history');
+        let result = await App.api.request(App.CURRENT_MM, 'history');
 
         for (let item of result) {
 
@@ -2147,7 +2147,7 @@ root.appendChild(content);
 
         let body = DOM({ style: 'main' });
 
-        let result = await App.api.request(CURRENT_MM, 'top', { limit: 100, hero: hero, mode: mode });
+        let result = await App.api.request(App.CURRENT_MM, 'top', { limit: 100, hero: hero, mode: mode });
 
         if (!result) {
 
