@@ -1,8 +1,8 @@
-import {App} from './app.js';
-import {Chat} from './chat.js';
-import {NativeAPI} from './nativeApi.js';
-import {Settings} from './settings.js';
-import {MM} from './mm.js';
+import { App } from './app.js';
+import { Chat } from './chat.js';
+import { NativeAPI } from './nativeApi.js';
+import { Settings } from './settings.js';
+import { MM } from './mm.js';
 
 export class Lang {
     static target = 'ru';
@@ -92,7 +92,7 @@ export class Lang {
         const translationMap = new Map();
 
         for (const key of wordKeys) {
-            
+
             translationMap.set(key, Lang.text(key));
         }
 
@@ -104,7 +104,7 @@ export class Lang {
         const currentIndex = languages.indexOf(Lang.target);
         const nextIndex = (currentIndex + 1) % languages.length;
         Lang.target = languages[nextIndex];
-        Lang.clearCache(); 
+        Lang.clearCache();
         return Lang.target;
     }
 
@@ -120,7 +120,7 @@ export class Lang {
             const skinKey = `hero_${heroId}_skin_${skinIndex}_name`;
             const skinName = this.text(skinKey);
 
-            
+
             if (skinName !== skinKey) {
                 return skinName;
             }

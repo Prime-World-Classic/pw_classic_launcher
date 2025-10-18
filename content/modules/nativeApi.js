@@ -1,7 +1,7 @@
-import {App} from './app.js';
-import {Voice} from './voice.js';
-import {PWGame} from './pwgame.js';
-import {Settings} from './settings.js';
+import { App } from './app.js';
+import { Voice } from './voice.js';
+import { PWGame } from './pwgame.js';
+import { Settings } from './settings.js';
 
 export class NativeAPI {
 
@@ -75,37 +75,37 @@ export class NativeAPI {
         });
 
         NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
-        
+
         NativeAPI.voiceShortcut = new nw.Shortcut({
             key: 'Ctrl+Z', active: () => {
-                
+
                 Voice.toggleEnabledMic();
-                
+
             },
             failed: (error) => {
-                
+
                 console.log(error);
-                
+
             }
         });
-        
+
         NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceShortcut);
-        
+
         NativeAPI.voiceDestroyShortcut = new nw.Shortcut({
             key: 'Ctrl+K', active: () => {
-                
+
                 Voice.destroy();
-                
+
             },
             failed: (error) => {
-                
+
                 console.log(error);
-                
+
             }
         });
-        
+
         NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceDestroyShortcut);
-        
+
         NativeAPI.loadModules();
 
         NativeAPI.platform = NativeAPI.os.platform();
@@ -255,12 +255,12 @@ export class NativeAPI {
                     this.updated = this.lastBranchV != o;
                 }
             }
-            
+
             if (o.startsWith('Receiving objects:')) {
                 let percent = parseInt(o.substring(19, o.indexOf('%')));
-                    
-                callback({update:true,title:this.title,total:percent});
-                
+
+                callback({ update: true, title: this.title, total: percent });
+
                 NativeAPI.progress(percent / 100);
             }
         }
@@ -406,88 +406,88 @@ export class NativeAPI {
         };
 
     }
-    
-    static getMACAdress(){
-        
+
+    static getMACAdress() {
+
         let result = new Array();
-        
-        if(!NativeAPI.status){
-            
+
+        if (!NativeAPI.status) {
+
             return result;
-            
+
         }
-        
-        try{
-            
+
+        try {
+
             let networkInterfaces = NativeAPI.os.networkInterfaces();
-            
-            for(let key in networkInterfaces){
-                
-                if(['Radmin VPN'].includes(`${key}`)){
-                    
+
+            for (let key in networkInterfaces) {
+
+                if (['Radmin VPN'].includes(`${key}`)) {
+
                     continue;
-                    
+
                 }
-                
-                for(let networkInterface of networkInterfaces[key]){
-                    
-                    if(networkInterface.internal){
-                        
+
+                for (let networkInterface of networkInterfaces[key]) {
+
+                    if (networkInterface.internal) {
+
                         continue;
-                        
+
                     }
-                    
-                    if( !('mac' in networkInterface) || (!networkInterface.mac) || (networkInterface.mac == '00:00:00:00:00:00') ){
-                        
+
+                    if (!('mac' in networkInterface) || (!networkInterface.mac) || (networkInterface.mac == '00:00:00:00:00:00')) {
+
                         continue;
-                        
+
                     }
-                    
-                    if(!result.includes(`${networkInterface.mac}`)){
-                        
+
+                    if (!result.includes(`${networkInterface.mac}`)) {
+
                         result.push(`${networkInterface.mac}`);
-                        
+
                     }
-                    
+
                 }
-                
+
             }
-            
-            
+
+
         }
-        catch(error){
-            
+        catch (error) {
+
             console.log(error);
-            
+
         }
-        
+
         return result;
-        
+
     }
-    
-    static getLocale(){
-        
+
+    static getLocale() {
+
         let result = '';
-        
-        if(!NativeAPI.status){
-            
+
+        if (!NativeAPI.status) {
+
             return result;
-            
+
         }
-        
-        try{
-            
+
+        try {
+
             result = Intl.DateTimeFormat().resolvedOptions().locale;
-            
+
         }
-        catch(error){
-            
-            
-            
+        catch (error) {
+
+
+
         }
-        
+
         return result;
-        
+
     }
 
     static async ping(hostname, port = 80, timeout = 3000) {

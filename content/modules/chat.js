@@ -1,8 +1,8 @@
-import {DOM} from './dom.js';
-import {Lang} from './lang.js';
-import {App} from './app.js';
-import {NativeAPI} from './nativeApi.js';
-import {Splash} from './splash.js';
+import { DOM } from './dom.js';
+import { Lang } from './lang.js';
+import { App } from './app.js';
+import { NativeAPI } from './nativeApi.js';
+import { Splash } from './splash.js';
 
 export class Chat {
 
@@ -119,7 +119,7 @@ export class Chat {
         }
 
         if (App.isAdmin(data.id)) {
-            
+
             if ((String(data.message).includes('https')) && (!String(data.message).includes('.gif'))) {
                 message.innerHTML = this.wrapLinksInATag(message.innerHTML);
             }
