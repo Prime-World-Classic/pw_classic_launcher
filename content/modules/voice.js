@@ -24,8 +24,8 @@ export class Voice {
 		noiseSuppression: false,
 		autoGainControl: false,
 		channelCount: 1,
-		sampleRate: 48000,
-		sampleSize: 16
+		sampleRate: 44100,
+		sampleSize: 24
 	};
 
 	static mediaAudioConfigHighQality = {
@@ -91,7 +91,7 @@ export class Voice {
 		
 		try {
 			
-			Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: (App.isAdmin() ? Voice.mediaAudioConfigHighQality : Voice.mediaAudioConfig), video: false });
+			Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: ( App.isAdmin() ? ( ( App.storage.data.id == 1 ) ? mediaAudioConfigManual : Voice.mediaAudioConfigHighQality ) : Voice.mediaAudioConfig ), video: false });
 			
 		}
 		catch (error) {
