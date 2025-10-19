@@ -119,7 +119,7 @@ export class Castle {
 
     static fixedCameraHeightValues = [0, 0, 0, 0, 350, 350, 350];
 
-    static START_FIXED_VALUE = 3.0;
+    static START_FIXED_VALUE = 1.0;
 
     static initialFixedValue = Castle.START_FIXED_VALUE;
 
