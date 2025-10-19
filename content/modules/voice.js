@@ -69,7 +69,7 @@ export class Voice {
 	
 	static volumeLevel = 1.0;
 	
-	static volumeLevelStep = 0.1;
+	static volumeLevelStep = 0.2;
 
 	static init() {
 
@@ -459,6 +459,8 @@ export class Voice {
 				
 			}
 			
+			App.say(`Звук прибавлен на ${volumeLevel * 100}%`);
+			
 		}
 		else{
 			
@@ -469,6 +471,8 @@ export class Voice {
 				return;
 				
 			}
+			
+			App.say(`Звук убавлен на ${volumeLevel * 100}%`);
 			
 		}
 		
