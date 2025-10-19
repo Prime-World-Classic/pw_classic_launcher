@@ -66,6 +66,10 @@ export class Voice {
 	static cacheCandidate = new Object();
 
 	static limit = 10;
+	
+	static volumeLevel = 1.0;
+	
+	static volumeLevelStep = 0.1;
 
 	static init() {
 
@@ -440,6 +444,43 @@ export class Voice {
 		}
 
 	}
+	
+	static volumeControl(increase = false) {
+		
+		let volumeLevel = 0.0;
+		
+		if(increase){
+			
+			volumeLevel = ( Voice.volumeLevel + Voice.volumeLevelStep );
+			
+			if( volumeLevel > 1.0 ){
+				
+				return;
+				
+			}
+			
+		}
+		else{
+			
+			volumeLevel = ( Voice.volumeLevel - Voice.volumeLevelStep );
+			
+			if( volumeLevel < 0.0 ){
+				
+				return;
+				
+			}
+			
+		}
+		
+		for (let id in Voice.manager) {
+			
+			Voice.manager[id].controller.volume = volumeLevel;
+			
+		}
+		
+		Voice.volumeLevel = volumeLevel;
+		
+	}
 
 	static async association(i, users, key) {
 
@@ -517,7 +558,7 @@ export class Voice {
 
 			this.controller.controls = true;
 
-			this.controller.volume = 1.0;
+			this.controller.volume = Voice.volumeLevel;
 
 			this.controller.play();
 
