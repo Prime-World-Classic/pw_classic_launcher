@@ -10,6 +10,7 @@ import { NativeAPI } from './nativeApi.js';
 import { MM } from './mm.js';
 import { Splash } from './splash.js';
 import { Window } from './window.js';
+import { Castle } from './castle.js';
 
 export class App {
     static APP_VERSION = '0';
@@ -196,7 +197,7 @@ export class App {
 		
 		synthesis.pitch = 1.0;
 		
-		synthesis.volume = 0.5;
+		synthesis.volume = Castle.GetVolume(Castle.AUDIO_SOUNDS);
 		
 		synthesis.lang = 'ru-RU';
 		
