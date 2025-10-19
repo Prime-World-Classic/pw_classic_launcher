@@ -196,6 +196,8 @@ export class App {
 		
 		window.speechSynthesis.speak(synthesis);
 		
+		return true;
+		
 	}
 
     static ShowCurrentView() {
