@@ -178,9 +178,15 @@ export class App {
 	
 	static say(text) {
 		
-		if ('speechSynthesis' in window) {
+		if ( !('speechSynthesis' in window) ) {
 			
-			return false;
+			return;
+			
+		}
+		
+		if(window.speechSynthesis.speaking){
+			
+			window.speechSynthesis.cancel();
 			
 		}
 		
@@ -195,8 +201,6 @@ export class App {
 		synthesis.lang = 'ru-RU';
 		
 		window.speechSynthesis.speak(synthesis);
-		
-		return true;
 		
 	}
 
