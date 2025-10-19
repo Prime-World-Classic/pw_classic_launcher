@@ -31,7 +31,7 @@ export class Voice {
 	static mediaAudioConfigHighQality = {
 		echoCancellation: true,
 		noiseSuppression: true,
-		autoGainControl: true,
+		autoGainControl: false,
 		channelCount: 1,
 		sampleRate: 32000,
 		sampleSize: 16
@@ -40,7 +40,7 @@ export class Voice {
 	static mediaAudioConfig = {
 		echoCancellation: true,
 		noiseSuppression: true,
-		autoGainControl: true,
+		autoGainControl: false,
 		channelCount: 1,
 		sampleRate: 16000,
 		sampleSize: 16
@@ -49,7 +49,7 @@ export class Voice {
 	static mediaAudioConfigLowQality = {
 		echoCancellation: true,
 		noiseSuppression: true,
-		autoGainControl: true,
+		autoGainControl: false,
 		channelCount: 1,
 		sampleRate: 8000,
 		sampleSize: 16
