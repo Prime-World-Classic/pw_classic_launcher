@@ -105,7 +105,7 @@ void main()
 // 1. Weight animation
   float weight = minimum_distance(startFreq.xyz, endAmp.xyz, vertPosition);
 // 2. Wave animation
-  float animation = sin((rand((vertPosition.x + vertPosition.y + vertPosition.z) * animDirVertFreq.w) + time.x) * startFreq.w) * endAmp.w * weight;
+  float animation = sin((fract((vertPosition.x + vertPosition.y + vertPosition.z) * animDirVertFreq.w) + time.x) * startFreq.w) * endAmp.w * weight;
 // 3. Add up animated value
   animatedVertPosition += (animDirVertFreq.xyz * animation);
 
