@@ -91,7 +91,7 @@ export class Voice {
 		
 		try {
 			
-			Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: ( App.isAdmin() ? ( ( App.storage.data.id == 1 ) ? mediaAudioConfigManual : Voice.mediaAudioConfigHighQality ) : Voice.mediaAudioConfig ), video: false });
+			Voice.userMedia = await navigator.mediaDevices.getUserMedia({ audio: ( App.isAdmin() ? ( ( App.storage.data.id == 1 ) ? Voice.mediaAudioConfigManual : Voice.mediaAudioConfigHighQality ) : Voice.mediaAudioConfig ), video: false });
 			
 		}
 		catch (error) {
@@ -251,20 +251,22 @@ export class Voice {
 
 		}
 
-		let tutorial = DOM({ style: 'voice-info-panel-body-tutorial' }, 'Нажмите CTRL + Z, чтобы включить микрофон!');
+		let tutorial = DOM({ style: 'voice-info-panel-body-tutorial' });
 
 		if (Voice.mic) {
+			
+			tutorial.innerText = `Нажмите Ctrl+Z, чтобы включить ${Voice.mic.label}`;
 
 			if (Voice.mic.enabled) {
 
 				tutorial.style.opacity = 0;
-
+				
 			}
-
+			
 		}
 
 		Voice.infoPanel.firstChild.append(tutorial);
-
+		
 	}
 
 	static playerInfoPanel(id) {
