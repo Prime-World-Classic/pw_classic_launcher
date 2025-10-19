@@ -177,6 +177,7 @@ export class App {
     }
 
     static ShowCurrentView() {
+        console.log("ShowCurrentView")
         if (App.storage.data.login) {
 
             View.show('castle');
