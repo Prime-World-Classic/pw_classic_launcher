@@ -175,6 +175,28 @@ export class App {
         Voice.init();
 
     }
+	
+	static say(text) {
+		
+		if ('speechSynthesis' in window) {
+			
+			return false;
+			
+		}
+		
+		let synthesis = new SpeechSynthesisUtterance(text);
+		
+		synthesis.rate = 1.0;
+		
+		synthesis.pitch = 1.0;
+		
+		synthesis.volume = 0.5;
+		
+		synthesis.lang = 'ru-RU';
+		
+		window.speechSynthesis.speak(synthesis);
+		
+	}
 
     static ShowCurrentView() {
         if (App.storage.data.login) {
