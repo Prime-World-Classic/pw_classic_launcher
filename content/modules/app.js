@@ -131,26 +131,21 @@ export class App {
             if (e.key === 'Escape') {
                 e.preventDefault();
                 e.stopPropagation();
-                
-                console.log('Escape pressed'); // для отладки
-                
+                    
                 // 1. Сначала закрываем Splash если открыт
                 if (typeof Splash !== 'undefined' && Splash.body && Splash.body.style.display === 'flex') {
-                    console.log('Closing Splash');
                     Splash.hide();
                     return;
                 }
                 
                 // 2. Затем закрываем окна по одному в обратном порядке
                 if (typeof Window !== 'undefined' && Window.anyOpen && Window.anyOpen()) {
-                    console.log('Closing last window');
                     Window.closeLast(); // Закрываем только последнее окно
                 }
                 // 3. Если окон нет - открываем настройки
                 else {
-                    console.log('No windows open - opening settings');
                     if (typeof Window !== 'undefined' && Window.show) {
-                        Window.show('main', 'settings');
+                        Window.show('main', 'menu');
                     }
                 }
             }
