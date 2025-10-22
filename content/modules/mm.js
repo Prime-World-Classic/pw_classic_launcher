@@ -39,6 +39,7 @@ export class MM {
         Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
         Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
         document.body.style.display = 'none';
+		NativeAPI.createOverlayWindow();  // Создать оверлей с голосовой панелью
         NativeAPI.window.hide();
 
         NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
@@ -48,6 +49,7 @@ export class MM {
         Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
         Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
         document.body.style.display = 'block';
+		NativeAPI.closeOverlayWindow();  // Закрыть оверлей
 
         if (NativeAPI.status) {
             try {

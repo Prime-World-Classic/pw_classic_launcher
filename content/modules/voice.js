@@ -3,6 +3,7 @@ import { App } from './app.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Castle } from './castle.js';
+import { NativeAPI } from './nativeApi.js';
 
 export class Voice {
 
@@ -222,56 +223,39 @@ export class Voice {
 	}
 
 	static updateInfoPanel() {
-
 		while (Voice.infoPanel.firstChild.firstChild) {
-
 			Voice.infoPanel.firstChild.firstChild.remove();
-
 		}
-
 		let level = DOM({ style: 'voice-info-panel-body-item-bar-level' });
-
 		let bar = DOM({ style: 'voice-info-panel-body-item-bar' }, level);
-
 		if (Voice.mic) {
-
 			Voice.indication(Voice.userMedia, (percent) => {
-
 				level.style.width = `${percent}%`;
-
+				// ДОБАВЛЕНО: Синхронизировать уровень громкости с оверлеем в реальном времени
+				if (NativeAPI.overlayWindow && NativeAPI.overlayWindow.window) {
+					NativeAPI.overlayWindow.window.postMessage({ type: 'updateLevel', percent: percent }, '*');
+				}
 			});
-
-		}
-		else {
-
+		} else {
 			bar.classList.add('voice-info-panel-body-item-nostream');
-
 		}
-
 		Voice.infoPanel.firstChild.append(DOM({ style: 'voice-info-panel-body-item' }, DOM({ style: 'voice-info-panel-body-item-name', event: ['click', () => Voice.toggleEnabledMic()] }, App.storage.data.login), DOM({ style: 'voice-info-panel-body-item-status' }, bar)));
-
 		for (let id in Voice.manager) {
-
 			Voice.playerInfoPanel(id);
-
 		}
-
 		let tutorial = DOM({ style: 'voice-info-panel-body-tutorial' });
-
 		if (Voice.mic) {
-			
 			tutorial.innerText = `Нажмите Ctrl+Z, чтобы включить ${Voice.mic.label}`;
-
 			if (Voice.mic.enabled) {
-
 				tutorial.style.opacity = 0;
-				
 			}
-			
 		}
-
 		Voice.infoPanel.firstChild.append(tutorial);
-		
+		// ДОБАВЛЕНО: Синхронизировать с оверлеем
+		if (NativeAPI.overlayWindow && NativeAPI.overlayWindow.window) {
+			let html = Voice.infoPanel.innerHTML;
+			NativeAPI.overlayWindow.window.postMessage({ type: 'updatePanel', html: html }, '*');
+		}
 	}
 
 	static playerInfoPanel(id) {
