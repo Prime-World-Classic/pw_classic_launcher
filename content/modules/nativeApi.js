@@ -26,7 +26,7 @@ export class NativeAPI {
 
     };
 
-    static overlayWindow = null;  // Добавлено: переменная для хранения ссылки на окно-оверлей
+    static overlayProcess = null;  // ДОБАВЛЕНО: Переменная для процесса exe
 
     static setDefaultWindow() {
 
@@ -578,190 +578,59 @@ export class NativeAPI {
         }
     }
 
-	
-    // Добавлено: Метод для создания окна-оверлея
-    // Добавлено: Метод для создания окна-оверлея
-	// Добавлено: Метод для создания окна-оверлея
-	// Добавлено: Метод для создания окна-оверлея
-	// Добавлено: Метод для создания окна-оверлея
-	static createOverlayWindow() {
-		if (this.overlayWindow) return;
-
-		// Создаём новое окно-оверлей с callback для получения объекта окна
-		nw.Window.open('', {
-			frame: false,              // Без рамок
-			transparent: true,         // Прозрачное
-			always_on_top: true,       // Поверх всех окон
-			show: false,               // Не показывать сразу
-			width: 200,                // Меньший размер под панель
-			height: 400,
-			x: 0,                      // Позиция в левом верхнем углу
-			y: 100
-		}, (win) => {
-			this.overlayWindow = win;
-
-			win.on('loaded', () => {
-				let doc = win.window.document;
-				doc.body.innerHTML = '<div id="overlay-panel"></div>';
-				doc.body.style.margin = '0';
-				doc.body.style.padding = '0';
-				doc.body.style.background = 'transparent';  // Полностью прозрачный фон для пропуска кликов
-				doc.body.style.pointerEvents = 'none';      // Пропускать клики
-
-				let panel = doc.getElementById('overlay-panel');
-				panel.style.position = 'fixed';
-				panel.style.left = '0';
-				panel.style.top = '0';
-				panel.style.width = '100%';
-				panel.style.height = '100%';
-				panel.style.zIndex = '9999';
-				panel.style.pointerEvents = 'none';  // Пропускать клики
-
-				// Добавляем CSS для голосовой панели
-				let style = doc.createElement('style');
-				style.textContent = `
-					.voice-info-panel{
-						position:fixed;
-						left:0%;
-						top:0;
-						width:100%;
-						height:100%;
-						display:flex;
-						flex-flow:column nowrap;
-						justify-content:center;
-						z-index:9996;
-					}
-					.voice-info-panel-body{
-						width:100%;
-						padding: 2vh 1vw;
-						z-index:9996;
-					}
-					.voice-info-panel-body-tutorial{
-						font-size:clamp(0.5em, 0.3vw, 0.5em);
-						color:#f0f0f0;
-						text-shadow:0 0 0.5em rgba(217, 70, 239, 0.5);
-						margin:0.3vh;
-					}
-					.voice-info-panel-body-item{
-						display:flex;
-						margin-bottom:1vh;
-						flex-flow:column nowrap;
-					}
-					.voice-info-panel-body-item-nostream{
-						animation:pulse 2s infinite;
-					}
-					.voice-info-panel-body-item-name{
-						font-size:clamp(0.5em, 0.5vw, 1em);
-						font-weight:bold;
-						color:#f0f0f0;
-						margin-bottom:0.1vh;
-						white-space:nowrap;
-						overflow:hidden;
-						text-overflow:ellipsis;
-						text-shadow:0 0 0.5em rgba(217, 70, 239, 0.5);
-					}
-					.voice-info-panel-body-item-status{
-						display:flex;
-						align-items:center;
-						gap:1vw;
-					}
-					.voice-info-panel-body-item-bar{
-						flex-grow:1;
-						height:0.7em;
-						background:rgba(255, 255, 255, 0.1);
-						border-radius:0.4em;
-						overflow:hidden;
-						position:relative;
-						box-shadow:inset 0 0 0.5em rgba(0, 0, 0, 0.3);
-					}
-					.voice-info-panel-body-item-bar-level{
-						height:100%;
-						background:linear-gradient(90deg, #8b5cf6, #d946ef, #ec4899);
-						border-radius:0.4em;
-						width:0%;
-						transition:width 0.1s ease;
-						position: relative;
-						overflow: hidden;
-					}
-					.voice-info-panel-body-item-bar-level::before {
-						content: '';
-						position: absolute;
-						top: 0;
-						left: -100%;
-						width: 100%;
-						height: 100%;
-						background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-						animation:volumeShine 2s infinite;
-					}
-					@keyframes pulse {
-						0% { opacity: 1; }
-						50% { opacity: 0.5; }
-						100% { opacity: 1; }
-					}
-					@keyframes volumeShine {
-						0% { left: -100%; }
-						100% { left: 100%; }
-					}
-				`;
-				doc.head.append(style);
-
-				// Логика для Ctrl+X: зажатие делает кликабельным и перетаскиваемым
-				let ctrlPressed = false;
-				doc.addEventListener('keydown', (e) => {
-					if (e.ctrlKey && e.key.toLowerCase() === 'x') {
-						ctrlPressed = true;
-						doc.body.style.pointerEvents = 'auto';
-						panel.style.webkitAppRegion = 'drag';  // Разрешить перетаскивание
-						panel.style.cursor = 'move';
-					}
-				});
-				doc.addEventListener('keyup', (e) => {
-					if (e.key.toLowerCase() === 'x' || !e.ctrlKey) {
-						ctrlPressed = false;
-						doc.body.style.pointerEvents = 'none';
-						panel.style.webkitAppRegion = 'no-drag';  // Запретить перетаскивание
-						panel.style.cursor = 'default';
-					}
-				});
-
-				// Слушаем сообщения от основного окна
-				win.window.addEventListener('message', (e) => {
-					if (e.data.type === 'updatePanel') {
-						panel.innerHTML = e.data.html;
-						panel.style.display = 'flex';
-					} else if (e.data.type === 'updateLevel') {
-						// Обновить уровень громкости в оверлее
-						let levelBar = panel.querySelector('.voice-info-panel-body-item-bar-level');
-						if (levelBar) {
-							levelBar.style.width = `${e.data.percent}%`;
-							console.log('Обновлён уровень в оверлее:', e.data.percent);  // ДОБАВЛЕНО: Для отладки
-						}
-					}
-				});
-
-				win.show();  // Показать окно-оверлей
-
-				// Отправить начальный HTML панели
-				if (Voice.infoPanel) {
-					win.window.postMessage({ type: 'updatePanel', html: Voice.infoPanel.innerHTML }, '*');
-				}
-			});
-
-			win.on('closed', () => {
-				this.overlayWindow = null;
-			});
-		});
-	}
-
-	
-	catch (error) {
-        console.error('Ошибка при создании overlay окна:', error);
-    }
-    // Добавлено: Метод для закрытия окна-оверлея
-    static closeOverlayWindow() {
-        if (this.overlayWindow) {
-            this.overlayWindow.close();
-            this.overlayWindow = null;
+    // ДОБАВЛЕНО: Метод для запуска exe (вызывается в gameRunEvent)
+    static startOverlayExe() {
+        if (NativeAPI.overlayProcess) return;
+        try {
+            NativeAPI.overlayProcess = NativeAPI.childProcess.spawn('overlay.exe', [], { cwd: process.cwd() });
+            NativeAPI.overlayProcess.on('close', () => {
+                NativeAPI.overlayProcess = null;
+            });
+        } catch (e) {
+            App.error('Не удалось запустить overlay.exe: ' + e);
         }
     }
+
+    // ДОБАВЛЕНО: Метод для закрытия exe (вызывается в gameStopEvent)
+    static stopOverlayExe() {
+        if (NativeAPI.overlayProcess) {
+            NativeAPI.overlayProcess.kill();
+            NativeAPI.overlayProcess = null;
+        }
+    }
+	
+	// ДОБАВЛЕНО: TCP сервер для передачи данных в C++
+	static tcpServer = null;
+	static tcpClients = new Set();
+	static startTcpServer() {
+		if (NativeAPI.tcpServer) return;
+		NativeAPI.tcpServer = NativeAPI.net.createServer((socket) => {
+			NativeAPI.tcpClients.add(socket);
+			socket.on('close', () => NativeAPI.tcpClients.delete(socket));
+		});
+		NativeAPI.tcpServer.listen(12345, '127.0.0.1');
+		console.log('TCP сервер запущен на 12345');
+	}
+	
+	static stopTcpServer() {
+		if (NativeAPI.tcpServer) {
+			for (let client of NativeAPI.tcpClients) {
+				client.destroy();
+			}
+			NativeAPI.tcpClients.clear();
+			NativeAPI.tcpServer.close();
+			NativeAPI.tcpServer = null;
+			console.log('TCP сервер остановлен');
+		}
+	}
+	
+	static sendToClients(data) {
+		for (let client of NativeAPI.tcpClients) {
+			try {
+				client.write(JSON.stringify(data));
+			} catch (e) {
+				NativeAPI.tcpClients.delete(client);
+			}
+		}
+	}
 }
