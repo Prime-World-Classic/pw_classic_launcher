@@ -39,28 +39,30 @@ export class MM {
         Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
         Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
         document.body.style.display = 'none';
+		NativeAPI.createOverlayWindow();  // Создать оверлей с голосовой панелью
         NativeAPI.window.hide();
-        // ДОБАВЛЕНО: Запустить exe
-		NativeAPI.startTcpServer();
-        NativeAPI.startOverlayExe();
+
+        NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
     }
+
     static gameStopEvent() {
         Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
         Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
         document.body.style.display = 'block';
+		NativeAPI.closeOverlayWindow();  // Закрыть оверлей
+
         if (NativeAPI.status) {
             try {
                 Settings.ApplySettings();
+
                 NativeAPI.window.show();
-                NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
+                NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
             } catch (e) {
                 App.error(e);
             }
         }
+
         View.show('castle');
-		NativeAPI.stopTcpServer();  // ДОБАВЛЕНО: Остановка TCP сервера
-        // ДОБАВЛЕНО: Закрыть exe
-        NativeAPI.stopOverlayExe();
     }
 
     static initView() {
