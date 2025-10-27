@@ -26,7 +26,7 @@ export class Voice {
 		autoGainControl: false,
 		channelCount: 1,
 		sampleRate: 44100,
-		sampleSize: 24
+		sampleSize: 16
 	};
 
 	static mediaAudioConfigHighQality = {
