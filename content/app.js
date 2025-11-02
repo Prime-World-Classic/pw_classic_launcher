@@ -2411,19 +2411,14 @@ root.appendChild(content);
       ],
     });
 
-    let clan = DOM({
-      style: ["clan", "button-outline"],
-      title: "Кланы",
-      event: ["click", () => Window.show("main", "clan")],
-    });
+		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
 
-    let farm = DOM({
-      style: ["castle-farm", "button-outline"],
-      title: "Фарм",
-      event: ["click", () => Window.show("main", "farm")],
-    });
+		
 
-    let input = DOM({ style: "castle-input", tag: "input" });
+		let farm = DOM({ style: ['castle-farm', 'button-outline'], title: 'Фарм', event: ['click', () => Window.show('main', 'farm')] });
+
+		
+		let input = DOM({ style: 'castle-input', tag: 'input' });
 
     input.type = "range";
 
@@ -6919,12 +6914,19 @@ class Frame {
     document.body.prepend(DOM({ style: "frame" }, Frame.body));
     let test = DOM({ tag: "div" }, "width:100%");
 
-    test.setAttribute(
-      "style",
-      "width:100%;background:green;text-align:center;font-size:5cqw",
-    );
-    Frame.body.append(test);
-  }
+		test.setAttribute('style', 'width:100%;background:green;text-align:center;font-size:5cqw');
+		Frame.body.append(test);
+
+	}
+
+	static clan() {
+
+
+
+	}
+
+
+
 }
 
 class Winrate {
@@ -12335,16 +12337,14 @@ class NativeAPI {
   }
 }
 
+
 class CastleBuildingsEvents {
-  static library() {
-    Window.show("main", "inventory");
-  }
-  static talent_farm() {
-    Window.show("main", "farm");
-  }
-  static clan_house() {
-    Window.show("main", "clan");
-  }
+	static library() {
+		Window.show('main', 'inventory');
+	}
+	static talent_farm() {
+		Window.show('main', 'farm');
+	}
 }
 
 class Castle {
