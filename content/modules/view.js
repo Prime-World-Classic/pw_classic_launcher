@@ -1537,24 +1537,7 @@ root.appendChild(content);
             for (let item of result) {
 
                 const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, item.nickname));
-                heroName.prepend(DOM({
-                    tag: 'span', event: ['click', async () => {
-
-                        try {
-
-                            let voice = new Voice(item.id, 'friend', item.nickname, true);
-
-                            await voice.call();
-
-                        }
-                        catch (error) {
-
-                            App.error(error);
-
-                        }
-
-                    }]
-                }, '☎️ '));
+				
                 if (item.nickname.length > 10) {
                     heroName.firstChild.classList.add('castle-name-autoscroll');
                 }
@@ -1568,11 +1551,15 @@ root.appendChild(content);
                 if (item.status == 1) {
 
                     let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? 'Группа' : 'Не в сети');
+					
+					let call = DOM({ style: 'castle-friend-add-group' }, 'Звонок');
 
                     if (!item.online) {
-
-                        group.style.filter = 'grayscale(1)';
-
+						
+						group.style.filter = 'grayscale(1)';
+						
+						call.style.filter = 'grayscale(1)';
+						
                     }
                     else {
 
@@ -1581,9 +1568,26 @@ root.appendChild(content);
                             await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
                             App.notify(`Приглашение отправлено игроку ${item.nickname}`);
-
+							
                         }
-
+						
+						call.onclick = async () => {
+							
+							try {
+								
+								let voice = new Voice(item.id, 'friend', item.nickname, true);
+								
+								await voice.call();
+								
+							}
+							catch (error) {
+								
+								App.error(error);
+								
+							}
+							
+						}
+						
                     }
 
                     friend.oncontextmenu = () => {
@@ -1612,7 +1616,7 @@ root.appendChild(content);
 
                     }
 
-                    bottom.append(group);
+                    bottom.append(call,group);
 
                 }
                 else if (item.status == 2) {
