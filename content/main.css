@@ -333,10 +333,12 @@ input::placeholder{
 	background-repeat: no-repeat;
 	background-color: transparent;
 	padding: 1.5vmin 0;
+	color:#fff;
 }
 
 .login-box-forma-inputs input{
 	background:rgba(255,255,255,0.5);
+	color: rgba(0,0,0,0.9);
 }
 
 .login-box-forma-inputs input, .login-box-forma-inputs select{
@@ -349,7 +351,6 @@ input::placeholder{
 	font: 1.5rem / 1 Tahoma;
 	border:none;
 	border-radius:5vh;
-	color:#fff;
 	text-align:center;
 }
 
