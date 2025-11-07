@@ -14,7 +14,7 @@ export const en = {
 		docts: "Empire of the Docts",
 		fight: "Fight!",
 		enterTextAndPressEnter: "Enter the text and press Enter",
-		ready: "Take the fight!",
+		ready: "Ready!",
 		ready2: "Confirm the hero's choice",
 		cancel: "Cancel",
 		library: "Library",
