@@ -15,7 +15,7 @@ export const ru = {
 		docts: 'Империя Доктов',
 		fight: 'В бой!',
 		enterTextAndPressEnter: 'Введите текст и нажмите Enter',
-		ready: 'Принять бой!',
+		ready: 'Готов!',
 		ready2: 'Подтвердить выбор героя',
 		cancel: 'Отменить',
 		library: 'Библиотека',
