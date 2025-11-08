@@ -1645,7 +1645,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	text-align:center;
 	color:rgba(255,255,255,0.9);
 	position: relative;
-	bottom: 0;
+	bottom: 20cqh;
 	
 }
 

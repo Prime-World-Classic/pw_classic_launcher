@@ -1042,27 +1042,6 @@ export class View {
 
     static async castleQuest() {
 
-        let body = DOM({ style: 'quest' });
-
-        const list = DOM({ style: 'quest-list' });
-        const PAGE = 4;
-        let start = 0;
-        const items = [];
-
-        const btnUp = DOM({
-            style: ['quest-arrow', 'quest-arrow-up'],
-            event: ['click', () => { if (start > 0) { start--; render(); } }]
-        });
-
-        const btnDown = DOM({
-            style: ['quest-arrow', 'quest-arrow-down'],
-            event: ['click', () => {
-                if (start < Math.max(0, items.length - PAGE)) { start++; render(); }
-            }]
-        });
-
-        body.append(btnUp, list, btnDown); // порядок: ▲ список ▼
-
         let request = [
             {
                 id: 1,
@@ -1097,7 +1076,7 @@ export class View {
                 rewardText: '+1 кристалл прайма',
                 reward: {'crystal': 1},
                 prompt: '',
-                status: 0,
+                status: 2,
                 timer: (Date.now() + 86400000)
             },
             {
@@ -1125,6 +1104,32 @@ export class View {
                 timer: (Date.now() + (86400000 * 30))
             }
         ];
+
+        let body = DOM({ style: 'quest' });
+
+        const list = DOM({ style: 'quest-list' });
+        const PAGE = 4;
+        let start = 0;
+        const items = [];
+
+        const btnUp = DOM({
+            style: ['quest-arrow', 'quest-arrow-up'],
+            event: ['click', () => { if (start > 0) { start--; render(); } }]
+        });
+
+        const btnDown = DOM({
+            style: ['quest-arrow', 'quest-arrow-down'],
+            event: ['click', () => {
+                if (start < Math.max(0, items.length - PAGE)) { start++; render(); }
+            }]
+        });
+
+
+        if (request.length > PAGE) {
+            body.append(btnUp, list, btnDown); // порядок: ▲ список ▼
+        } else {
+            body.append(list); // порядок: ▲ список ▼
+        }
 
         for (let item of request) {
 
@@ -1154,8 +1159,9 @@ export class View {
                         Window.show('main', 'quest', item);
                     }]
                 },
-                DOM({ style: 'quest-item-portrait-background' }, hero, DOM({ style: item.status == 0 ? 'quest-item-exclamation' :  'quest-item-completed'})),
-                timer
+                DOM({ style: 'quest-item-portrait-background' }, hero,
+                     item.status == 1 ? "" : DOM({ style: item.status == 0 ? 'quest-item-exclamation' : 'quest-item-completed'})),
+                item.status == 1 ? timer : ""
             );
 
             items.push(quest);
