@@ -97,12 +97,12 @@ export class Window {
 		let view = await View.inventory(true);
 		return DOM({ id: 'winventory' }, view);
 	}
-	/*
-	static async quest(questId,cloneNode,test) {
-		let view = await View.quest(questId,cloneNode,test);
-		
+	
+	static async quest(questId, cloneNode, test) {
+		let view = await View.quest(questId, cloneNode, test);
+		return DOM({ id: 'wquest' }, view);
 	}
-	*/
+	
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
