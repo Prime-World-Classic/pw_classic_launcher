@@ -1085,7 +1085,7 @@ export class View {
                 rewardText: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
                 reward: {'crystal': 1},
                 prompt: 'Получить сведения в тамбуре, могут только герои класса — Убийца.',
-                status: 0,
+                status: 1,
                 timer: (Date.now() + 86400000)
             },
             {
@@ -1154,7 +1154,7 @@ export class View {
                         Window.show('main', 'quest', item);
                     }]
                 },
-                DOM({ style: 'quest-item-portrait-background' }, hero, DOM({ style: 'quest-item-exclamation' })),
+                DOM({ style: 'quest-item-portrait-background' }, hero, DOM({ style: item.status == 0 ? 'quest-item-exclamation' :  'quest-item-completed'})),
                 timer
             );
 
