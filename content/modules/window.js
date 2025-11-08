@@ -136,6 +136,12 @@ export class Window {
 		}
 
 		const avatar = DOM({ style: 'wquest__avatar' });
+		const avatarContainer = DOM({ style: 'quest_container' }, avatar);
+		avatarContainer.style.backgroundImage = `url("content/img/quest/1.png")`;
+		avatarContainer.style.backgroundSize = 'cover, contain';
+		avatarContainer.style.backgroundPosition = 'center, center';
+		avatarContainer.style.backgroundRepeat = 'no-repeat, no-repeat';
+
 		avatar.style.backgroundImage = `url("content/hero/${item.heroId}/1.webp")`;
 		avatar.style.backgroundSize = 'cover, contain';
 		avatar.style.backgroundPosition = 'center, center';
@@ -145,7 +151,7 @@ export class Window {
 		content.appendChild(body);
 		content.appendChild(objective);
 		content.appendChild(rewards);
-		content.appendChild(avatar);
+		content.appendChild(avatarContainer);
 		root.appendChild(content);
 
 		return root;
