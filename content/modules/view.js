@@ -318,135 +318,6 @@ export class View {
 
     }
 
-    static async quest(questId, cloneNode, item) {
-        let root = document.querySelector('#wquest');
-        if (root) {
-            if (root.__wquestEscDown) document.removeEventListener('keydown', root.__wquestEscDown, true);
-            if (root.__wquestEscUp) document.removeEventListener('keyup', root.__wquestEscUp, true);
-            root.remove();
-        }
-
-        root = DOM({ id: 'wquest' });
-        document.body.appendChild(root);
-
-        const giverId = (item.giverId ?? item.questGiverId ?? item.heroId);
-        const candidates = [`content/hero/${giverId}/1.webp`];
-
-        const pickExistingImage = (urls) => new Promise(res => {
-            const tryNext = (i = 0) => {
-                if (i >= urls.length) return res(null);
-                const im = new Image(); im.onload = () => res(urls[i]); im.onerror = () => tryNext(i + 1); im.src = urls[i];
-            };
-            tryNext();
-        });
-
-        const parseRewards = (rewardStr) => {
-            const out = []; const s = String(rewardStr || '').toLowerCase();
-            if (s.includes('кристал') || s.includes('прайм')) {
-                const m = s.match(/\+?\s*(\d+)\s*(?:кристал|кристалл|кристаллов|прайм)/i);
-                const hasN = /(^|\s)n(\s|$)/i.test(rewardStr) || /n\s*количество/i.test(rewardStr);
-                out.push({ type: 'prime', label: m ? String(+m[1]) : (hasN ? 'N' : '—') });
-            }
-            if (s.includes('звезд') || s.includes('звёзд') || s.includes('звезда')) {
-                const m = s.match(/\+?\s*(\d+)\s*зв/i); out.push({ type: 'star', label: m ? String(+m[1]) : '—' });
-            }
-            if (!out.length) { const m = s.match(/\d+/); if (m) out.push({ type: 'generic', label: String(+m[0]) }); }
-            return out;
-        };
-
-        const content = DOM({ tag: 'div' }); content.classList.add('wquest__content');
-
-        const titlebar = DOM({ tag: 'div' }); titlebar.classList.add('wquest__titlebar');
-        const h3 = DOM({ tag: 'h3' }); h3.classList.add('wquest__title'); h3.textContent = item.title || 'Задание';
-
-        titlebar.appendChild(h3);
-
-        const body = DOM({ tag: 'div' }); body.classList.add('wquest__body'); body.textContent = item.description || '';
-
-        const objective = DOM({ tag: 'div' }); objective.classList.add('wquest__objective');
-        const objText = DOM({ tag: 'div' }); objText.classList.add('wquest__objective-text');
-        objText.textContent = item.target || 'Выполните условие задания.';
-        objective.appendChild(objText);
-
-        const tokens = parseRewards(item.reward);
-        const rewards = DOM({ tag: 'div' }); rewards.classList.add('wquest__rewards');
-        tokens.forEach(t => {
-            const chip = DOM({ tag: 'div' }); chip.classList.add('wquest__chip');
-            const icon = DOM({ tag: 'div' }); icon.classList.add('wquest__chip-icon');
-            const val = DOM({ tag: 'div' }); val.classList.add('wquest__chip-value'); val.textContent = t.label;
-            chip.appendChild(icon); chip.appendChild(val);
-            rewards.appendChild(chip);
-        });
-
-        const avatar = DOM({ tag: 'div' });
-        avatar.classList.add('wquest__avatar');
-
-        const fallback1 = `content/hero/${giverId}/1.webp`;
-        const fallback2 = `content/img/queue/321.png`;
-
-        pickExistingImage(candidates).then(url => {
-            const mainImg = url || fallback1;
-
-            avatar.style.backgroundImage = `url("${mainImg}"), url("${fallback2}")`;
-            avatar.style.backgroundSize = 'cover, contain';
-            avatar.style.backgroundPosition = 'center, center';
-            avatar.style.backgroundRepeat = 'no-repeat, no-repeat';
-        });
-
-        content.appendChild(titlebar);
-        content.appendChild(body);
-        content.appendChild(objective);
-        content.appendChild(rewards);
-        content.appendChild(avatar);
-        root.appendChild(content);
-
-
-        const closeQuest = () => {
-            if (!root) return;
-            if (root.__wquestEscDown) document.removeEventListener('keydown', root.__wquestEscDown, true);
-            if (root.__wquestEscUp) document.removeEventListener('keyup', root.__wquestEscUp, true);
-            root.remove();
-            root = null;
-        };
-
-        const escTrap = (e) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                e.stopPropagation();
-                closeQuest();
-                return false;
-            }
-        };
-        document.addEventListener('keydown', escTrap, true);
-        document.addEventListener('keyup', escTrap, true);
-        root.__wquestEscDown = escTrap;
-        root.__wquestEscUp = escTrap;
-
-        closeBtn.addEventListener('click', closeQuest);
-
-        const builtInClose = root.querySelector('.modal-close,[data-close],.btn-close');
-        if (builtInClose && !builtInClose.__wquestBound) {
-            builtInClose.__wquestBound = true;
-            builtInClose.addEventListener('click', closeQuest);
-        }
-
-        return root;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     static async castlePlay() {
 
@@ -1199,7 +1070,8 @@ export class View {
                 title: 'Смена власти',
                 description: 'Ты силён. Я видел твои победы. Но сила без амбиций — лишь пустой звук. Один герой, возомнил себя наследником трона. Убери его. Докажи, что настоящая сила — в умении вовремя нанести удар.',
                 target: 'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье не меньше трёх раз за один бой. Ваш герой не должен умереть от жертвы.',
-                reward: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
+                rewardText: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
+                reward: {'crystal': 1},
                 prompt: 'Получить сведения в тамбуре, могут только герои класса — Убийца.',
                 status: 0,
                 timer: (Date.now() + 86400000)
@@ -1210,7 +1082,8 @@ export class View {
                 title: 'Право сильнейшего',
                 description: 'Пограничье видело немало поединков, но истинных воинов среди них — единицы. Один из героев запятнал свою честь, используя запрещённые приёмы в бою. Он должен быть остановлен твоим мастерством. Сразись с ним и докажи, что сила без чести — ничто. Победи его в честном дуэли, и твоя награда будет достойной.',
                 target: 'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье за один бой. Ваш герой не должен умереть до того, как устранит жертву.',
-                reward: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
+                rewardText: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
+                reward: {'crystal': 1},
                 prompt: 'Получить сведения в тамбуре, могут только герои класса — Убийца.',
                 status: 0,
                 timer: (Date.now() + 86400000)
@@ -1221,7 +1094,8 @@ export class View {
                 title: 'Воздаяние Неуязвимому',
                 description: 'Мой взор пронзает битвы и интриги этого мира, и я видела, как твоя сила обратила в бегство тех, кто возжелал твоей погибели. Они думали, что ты — добыча. Они ошиблись. Ты — испытание, которое они не смогли пройти. Их неудача — доказательство твоей избранности. И за это достоинство ты должен быть вознаграждён. Прими мой дар — не как плату за убийство, но как признание твоей несокрушимости',
                 target: 'Выжить в условиях PvP-охоты',
-                reward: '+1 кристалл прайма',
+                rewardText: '+1 кристалл прайма',
+                reward: {'crystal': 1},
                 prompt: '',
                 status: 0,
                 timer: (Date.now() + 86400000)
@@ -1232,7 +1106,8 @@ export class View {
                 title: 'Сила единства',
                 description: 'Приветствую тебя, дитя Света! Этот мир держится не только на силе клинка, но и на взаимопомощи. Я вижу, как ты сражаешься, но истинная мощь проявляется, когда мы поддерживаем друг друга. Твои союзники нуждаются в твоей помощи — исцелении, защите, усилении. Окажи 1000 поддержек в битвах, и я покажу тебе, какую силу рождает настоящее единство.',
                 target: 'Оказать 1000 поддержек союзным героям.',
-                reward: '+100 кристаллов прайма',
+                rewardText: '+100 кристаллов прайма',
+                reward: {'crystal': 1},
                 prompt: '',
                 status: 0,
                 timer: (Date.now() + (86400000 * 30))
@@ -1243,7 +1118,8 @@ export class View {
                 title: 'Путь Превосходства',
                 description: 'Приветствую, испытующий! Мир Прайма рожден из хаоса и крови. Сила — единственный язык, который здесь понимают все. Ты уже показал себя в битвах, но настоящая мощь требует жертв. Я бросаю тебе вызов: соверши 1000 убийств. Пусть каждый поверженный враг станет твоим шагом к величию. Докажи, что ты достоин называться истинным чемпионом Прая!',
                 target: 'Совершить 1000 убийств вражеских героев.',
-                reward: '+100 кристаллов прайма',
+                rewardText: '+100 кристаллов прайма',
+                reward: {'crystal': 1},
                 prompt: '',
                 status: 0,
                 timer: (Date.now() + (86400000 * 30))
@@ -1275,7 +1151,7 @@ export class View {
                     event: ['click', () => {
                         // Удаляем возможные предыдущие окна и не передаём превью-ноду
                         document.querySelectorAll('#wquest').forEach(n => n.remove());
-                        Window.show('main', 'quest', item.id, null, item);
+                        Window.show('main', 'quest', item);
                     }]
                 },
                 DOM({ style: 'quest-item-portrait-background' }, hero, DOM({ style: 'quest-item-exclamation' })),
