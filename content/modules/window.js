@@ -152,6 +152,9 @@ export class Window {
 		content.appendChild(objective);
 		content.appendChild(rewards);
 		content.appendChild(avatarContainer);
+		content.appendChild(DOM({style: "quest-accept-button", event: ['click', () => {
+			// 
+		}]}, DOM({style: "quest-button-text"}, "Принять")))
 		root.appendChild(content);
 
 		return root;
