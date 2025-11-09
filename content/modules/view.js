@@ -1096,6 +1096,8 @@ export class View {
 
             let timer = DOM({ style: 'quest-item-timer' });
             const tick = () => {
+				
+				item.timer = (item.timer - 1000);
                 const ms = item.timer;
                 const sec = Math.max(0, Math.floor(ms / 1000));
                 const h = Math.floor(sec / 3600);
