@@ -100,8 +100,6 @@ export class Window {
 	
 	static async quest(item) {
 		
-		//let quest = item;
-		
 		let quest = await App.api.request('quest','get',{id:item.id});
 		
 		let root = DOM({ id: 'wquest' });
