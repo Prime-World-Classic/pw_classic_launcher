@@ -44,7 +44,7 @@ export class View {
 
     static updateProgress = false;
 	
-	static castleQuestBody = DOM({ style: 'quest' });
+	static castleQuestBody = DOM({ style: ['quest', 'left-offset-no-shift'] });
 	
 	static castleTotalCrystal = DOM({ tag: 'div', style: ['question-icon'] },DOM({style: 'quest-counter'},''));
 	
