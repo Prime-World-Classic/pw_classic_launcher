@@ -43,6 +43,8 @@ export class View {
     static defaultOptionAnimation = { duration: 150, fill: 'both', easing: 'ease-out' };
 
     static updateProgress = false;
+	
+	static castleQuestBody = DOM({ style: 'quest' });
 
     static setCss(name = 'content/style.css') {
 
@@ -264,9 +266,18 @@ export class View {
 
         }
 
-        body.append(backgroundImage, Castle.canvas);
-
-        body.append(await View.castleQuest());
+        body.append(backgroundImage, Castle.canvas, View.castleQuestBody);
+		
+		try{
+			
+			await View.castleQuestUpdate();
+			
+		}
+		catch(error){
+			
+			App.error(error);
+			
+		}
 
         try {
 
@@ -1040,73 +1051,16 @@ export class View {
         }
     }
 
-    static async castleQuest() {
-
-        let request = [
-            {
-                id: 1,
-                heroId: 16,
-                title: 'Смена власти',
-                description: 'Ты силён. Я видел твои победы. Но сила без амбиций — лишь пустой звук. Один герой, возомнил себя наследником трона. Убери его. Докажи, что настоящая сила — в умении вовремя нанести удар.',
-                target: 'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье не меньше трёх раз за один бой. Ваш герой не должен умереть от жертвы.',
-                rewardText: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
-                reward: {'crystal': 1},
-                prompt: 'Получить сведения в тамбуре, могут только герои класса — Убийца.',
-                status: 0,
-                timer: (Date.now() + 86400000)
-            },
-            {
-                id: 2,
-                heroId: 1,
-                title: 'Право сильнейшего',
-                description: 'Пограничье видело немало поединков, но истинных воинов среди них — единицы. Один из героев запятнал свою честь, используя запрещённые приёмы в бою. Он должен быть остановлен твоим мастерством. Сразись с ним и докажи, что сила без чести — ничто. Победи его в честном дуэли, и твоя награда будет достойной.',
-                target: 'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье за один бой. Ваш герой не должен умереть до того, как устранит жертву.',
-                rewardText: '+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
-                reward: {'crystal': 1},
-                prompt: 'Получить сведения в тамбуре, могут только герои класса — Убийца.',
-                status: 1,
-                timer: (Date.now() + 86400000)
-            },
-            {
-                id: 3,
-                heroId: 38,
-                title: 'Воздаяние Неуязвимому',
-                description: 'Мой взор пронзает битвы и интриги этого мира, и я видела, как твоя сила обратила в бегство тех, кто возжелал твоей погибели. Они думали, что ты — добыча. Они ошиблись. Ты — испытание, которое они не смогли пройти. Их неудача — доказательство твоей избранности. И за это достоинство ты должен быть вознаграждён. Прими мой дар — не как плату за убийство, но как признание твоей несокрушимости',
-                target: 'Выжить в условиях PvP-охоты',
-                rewardText: '+1 кристалл прайма',
-                reward: {'crystal': 1},
-                prompt: '',
-                status: 2,
-                timer: (Date.now() + 86400000)
-            },
-            {
-                id: 4,
-                heroId: 13,
-                title: 'Сила единства',
-                description: 'Приветствую тебя, дитя Света! Этот мир держится не только на силе клинка, но и на взаимопомощи. Я вижу, как ты сражаешься, но истинная мощь проявляется, когда мы поддерживаем друг друга. Твои союзники нуждаются в твоей помощи — исцелении, защите, усилении. Окажи 1000 поддержек в битвах, и я покажу тебе, какую силу рождает настоящее единство.',
-                target: 'Оказать 1000 поддержек союзным героям.',
-                rewardText: '+100 кристаллов прайма',
-                reward: {'crystal': 1},
-                prompt: '',
-                status: 0,
-                timer: (Date.now() + (86400000 * 30))
-            },
-            {
-                id: 5,
-                heroId: 3,
-                title: 'Путь Превосходства',
-                description: 'Приветствую, испытующий! Мир Прайма рожден из хаоса и крови. Сила — единственный язык, который здесь понимают все. Ты уже показал себя в битвах, но настоящая мощь требует жертв. Я бросаю тебе вызов: соверши 1000 убийств. Пусть каждый поверженный враг станет твоим шагом к величию. Докажи, что ты достоин называться истинным чемпионом Прая!',
-                target: 'Совершить 1000 убийств вражеских героев.',
-                rewardText: '+100 кристаллов прайма',
-                reward: {'crystal': 1},
-                prompt: '',
-                status: 0,
-                timer: (Date.now() + (86400000 * 30))
-            }
-        ];
-
-        let body = DOM({ style: 'quest' });
-
+    static async castleQuestUpdate() {
+		
+		let request = await App.api.request('quest','list');
+		
+		while(View.castleQuestBody.firstChild){
+			
+			View.castleQuestBody.firstChild.remove();
+			
+		}
+		
         const list = DOM({ style: 'quest-list' });
         const PAGE = 4;
         let start = 0;
@@ -1126,9 +1080,9 @@ export class View {
 
 
         if (request.length > PAGE) {
-            body.append(btnUp, list, btnDown); // порядок: ▲ список ▼
+            View.castleQuestBody.append(btnUp, list, btnDown); // порядок: ▲ список ▼
         } else {
-            body.append(list); // порядок: ▲ список ▼
+            View.castleQuestBody.append(list); // порядок: ▲ список ▼
         }
 
         for (let item of request) {
@@ -1138,7 +1092,7 @@ export class View {
 
             let timer = DOM({ style: 'quest-item-timer' });
             const tick = () => {
-                const ms = item.timer - Date.now();
+                const ms = item.timer;
                 const sec = Math.max(0, Math.floor(ms / 1000));
                 const h = Math.floor(sec / 3600);
                 const m = Math.floor((sec % 3600) / 60);
@@ -1177,12 +1131,11 @@ export class View {
             btnUp.classList.toggle('disabled', noScroll || start === 0);
             btnDown.classList.toggle('disabled', noScroll || start >= maxStart);
         }
-
+		
         render();
-        return body;
+		
     }
-
-
+	
     static bodyCastleBuildings() {
 
         while (View.castleBottom.firstChild) {
