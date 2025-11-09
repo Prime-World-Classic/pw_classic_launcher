@@ -100,7 +100,7 @@ export class Window {
 	
 	static async quest(item) {
 		
-		let quest = await App.api.request('quest','get',{id:item.id});
+		let quest = item; //await App.api.request('quest','get',{id:item.id});
 		
 		let root = DOM({ id: 'wquest' });
 		
@@ -116,6 +116,11 @@ export class Window {
 		const objective = DOM({ style: 'wquest__objective' });
 		const objText = DOM({ style: 'wquest__objective' }, quest.target);
 		objective.appendChild(objText);
+
+		if (quest.total) {
+			const counter = DOM({}, quest.score, " / ", quest.total);
+			objText.append(counter);
+		}
 
 		const tokens = item.reward;
 		const rewards = DOM({ style: 'wquest__rewards' });
