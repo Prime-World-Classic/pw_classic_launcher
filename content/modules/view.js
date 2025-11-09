@@ -1057,7 +1057,7 @@ export class View {
     static async castleQuestUpdate() {
 		
 		let request = await App.api.request('quest','list');
-
+/*
         request = [
             {
                 id: 1,
@@ -1122,7 +1122,7 @@ export class View {
                 timer: (Date.now() + (86400000 * 30))
             }
         ];
-		
+	*/	
 		while(View.castleQuestBody.firstChild){
 			
 			View.castleQuestBody.firstChild.remove();
