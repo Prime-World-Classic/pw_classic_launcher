@@ -3444,6 +3444,28 @@ border-radius:5px;
 	display: flex;
 	align-items: center;
 }
+#wshop {
+  position:absolute;
+  left:50%;
+  top:15cqh;
+  transform:translateX(-50%);
+  z-index:9999;
+  width:80cqh;
+  max-width:92vw;
+  height:auto;
+  border-radius:2cqh;
+  border:0.25cqh solid rgb(208,180,96);
+  background-image:linear-gradient(to bottom, rgba(4,32,42,.96), rgba(18,69,73,.92) 40%, rgba(21,51,59,.90) 60%, rgba(18,69,73,.92));
+  box-shadow:0 0.6cqh 1.8cqh rgba(0,0,0,.45), inset 0 0 0.7cqh rgba(255,255,255,.06);
+  display:grid;
+  grid-template-rows:auto auto auto auto;
+  gap:1.6cqh;
+  padding:3.6cqh 3.6cqh 2.6cqh 14cqh;
+  color:#e7f7f9;
+  text-align:left;
+  overflow:visible;
+}
+
 #wquest{
   position:absolute;
   left:50%;

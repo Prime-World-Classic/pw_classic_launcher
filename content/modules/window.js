@@ -97,6 +97,11 @@ export class Window {
 		let view = await View.inventory(true);
 		return DOM({ id: 'winventory' }, view);
 	}
+
+	static async shop() {
+		let wnd = DOM({id: 'wshop'});
+		return wnd;
+	}
 	
 	static async quest(item) {
 		
