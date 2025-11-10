@@ -275,23 +275,41 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
   z-index: 2;
 }
 
-.question-icon {
-  margin-top: -2.6cqh;
-  margin-right: 1.2cqh;
+@keyframes questionPulse {
+  0%   { transform: scale(1.00) }
+  100% { transform: scale(1.02) }
+}
+.crystal-container {
   position: absolute;   
-  width: 9vh;
-  height: 9vh;
-  background: url('./img/queue/Cristal.png') no-repeat center/contain;
   top: 0.4cqh;   
   left: -8.5cqh; 
+  margin-top: -2.6cqh;
+  margin-right: 1.2cqh;
+  width: 9vh;
+  height: 9vh;
+  container-type: size;
+}
+.crystal-container-anim {
+  animation: questionPulse .45s ease-in-out alternate infinite,
+             medalTwinkleHover 2.4s ease-in-out infinite;
+}
+.question-icon {
+	width: 100cqw;
+	height: 100cqh;
+  background: url('./img/queue/Cristal.png') no-repeat center/contain;
   z-index: 5;
   display: flex;
   flex-direction: column;
 }
 
+
+.question-icon:hover  {
+	filter: brightness(120%);
+}
+
 .quest-counter {
-    font-size: 1.6cqh;
-	line-height: 3.2cqh;
+    font-size: 1.6vh;
+	line-height: 3.2vh;
 	font-weight: 800;
     color: #ffffffab;
 	margin-left: auto;
