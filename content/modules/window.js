@@ -159,7 +159,7 @@ export class Window {
 			item.style.backgroundImage = `url("content/${ Shop.items[rItem.id].img }")`;
 			category[Shop.items[rItem.id].category].appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: 
 				['click', async () => App.error(`Экипировочка ${Shop.items[rItem.id].name}`)]
-			}, rItem.equipped == 0 ? Lang.text("shop_use") : Lang.text("shop_in_use"))));
+			}, rItem.equipped == false ? Lang.text("shop_use") : Lang.text("shop_in_use"))));
 		}
 		
 		let shopHeader = DOM({style: 'shop_header'}, 
