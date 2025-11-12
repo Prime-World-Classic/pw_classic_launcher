@@ -99,17 +99,7 @@ export class Window {
 		return DOM({ id: 'winventory' }, view);
 	}
 
-	static async shop() {
-		// available: - приобретено ли уже
-		let request = [
-			{ id: 0, available: true, price: 220 }, // скин
-			{ id: 1, available: true, price: 10 }, // флаги
-			{ id: 2, available: false, price: 10 },
-			{ id: 3, available: true, price: 10 },
-			{ id: 4, available: true, price: 10 },
-			{ id: 5, available: false, price: 100 }, // рамка
-		];
-
+	static processShopAndCollection(request, isShop) {
 		let category = {
 			skin: DOM({style: 'shop_items'}),
 			flag: DOM({style: 'shop_items'}),
@@ -117,12 +107,30 @@ export class Window {
 		}
 		
 		for (const rItem of request) {
-			let itemName = DOM({style: 'shop_item_name'}, Lang.text(Shop.items[rItem.id].name))
 			let item = DOM({style: 'shop_item_img'});
 			item.style.backgroundImage = `url("content/${ Shop.items[rItem.id].img }")`;
-			category[Shop.items[rItem.id].category].appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: 
-				['click', async () => App.error(`Покупочка ${Shop.items[rItem.id].name}`)]
-			}, DOM({style: 'shop_item_price_icon'}), rItem.price)));
+
+			category[Shop.items[rItem.id].category].appendChild(
+				DOM({style: 'shop_item'}, 
+					DOM({style: 'shop_item_name'}, Lang.text(Shop.items[rItem.id].name)), 
+					item, 
+					DOM(
+						{style: 'shop_item_price_container', event: ['click', async () => {
+							if (isShop) {
+								App.error(`Покупочка ${Shop.items[rItem.id].name}`)
+							} else {
+								App.error(`Экипировочка ${Shop.items[rItem.id].name}`)
+							}
+						}]}, 
+						isShop ? DOM({style: 'shop_item_price'},
+							DOM({style: 'shop_item_price_icon'}), 
+							rItem.price
+						) : DOM({style: 'shop_item_price'},
+							rItem.equipped == false ? Lang.text("shop_use") : Lang.text("shop_in_use")
+						)
+					)
+				)
+			);
 		}
 		
 		let shopHeader = DOM({style: 'shop_header'}, 
@@ -136,6 +144,18 @@ export class Window {
 		return wnd;
 	}
 
+	static async shop() {
+		// available: - приобретено ли уже
+		let request = [
+			{ id: 0, available: true, price: 220 }, // скин
+			{ id: 1, available: true, price: 10 }, // флаги
+			{ id: 2, available: false, price: 10 },
+			{ id: 3, available: true, price: 10 },
+			{ id: 5, available: false, price: 100 }, // рамка
+		];
+		return this.processShopAndCollection(request, true);
+	}
+
 	static async collection() {
 		// equipped - делает кнопку активации недоступной
 		let request = [
@@ -146,31 +166,7 @@ export class Window {
 			{ id: 4, equipped: false },
 			{ id: 5, equipped: true }, // рамка
 		];
-
-		let category = {
-			skin: DOM({style: 'shop_items'}),
-			flag: DOM({style: 'shop_items'}),
-			frame: DOM({style: 'shop_items'}),
-		}
-		
-		for (const rItem of request) {
-			let itemName = DOM({style: 'shop_item_name'}, Lang.text(Shop.items[rItem.id].name))
-			let item = DOM({style: 'shop_item_img'});
-			item.style.backgroundImage = `url("content/${ Shop.items[rItem.id].img }")`;
-			category[Shop.items[rItem.id].category].appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: 
-				['click', async () => App.error(`Экипировочка ${Shop.items[rItem.id].name}`)]
-			}, rItem.equipped == false ? Lang.text("shop_use") : Lang.text("shop_in_use"))));
-		}
-		
-		let shopHeader = DOM({style: 'shop_header'}, 
-			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'shop')]}, Lang.text('shop_shop')), 
-			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'collection')]}, Lang.text('shop_collection')));
-		
-		let skins = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_skins')), category.skin);
-		let flags = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_flags')), category.flag);
-		let frames = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_frames')), category.frame);
-		let wnd = DOM({id: 'wshop'}, shopHeader, DOM({style: 'shop_with_scroll'}, skins, flags, frames));
-		return wnd;
+		return this.processShopAndCollection(request, false);
 	}
 	
 	static async quest(item) {

@@ -1786,6 +1786,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .shop_item_name {
+	width: 120cqw;
 	text-align: center;
 }
 
@@ -1795,6 +1796,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	margin: 10cqw;
 	background-size: contain;
 	background-repeat: no-repeat;
+}
+
+.shop_item_price_container {
 }
 
 .shop_item_price {
