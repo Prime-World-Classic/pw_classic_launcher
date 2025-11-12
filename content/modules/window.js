@@ -25,6 +25,7 @@ export class Window {
 			title: Lang.text('titleClose'),
 			event: ['click', () => {
 				Window.close(category);
+				requestAnimationFrame(() => Voice.updatePanelPosition());
 			}]
 		},
 			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: Lang.text('titleClose'), style: 'close-image-style' }));
