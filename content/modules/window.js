@@ -100,13 +100,14 @@ export class Window {
 	}
 
 	static async shop() {
+		// available: - приобретено ли уже
 		let request = [
-			{ id: 0, price: 220 }, // скин
-			{ id: 1, price: 10 }, // флаги
-			{ id: 2, price: 10 },
-			{ id: 3, price: 10 },
-			{ id: 4, price: 10 },
-			{ id: 5, price: 100 }, // рамка
+			{ id: 0, available: true, price: 220 }, // скин
+			{ id: 1, available: true, price: 10 }, // флаги
+			{ id: 2, available: false, price: 10 },
+			{ id: 3, available: true, price: 10 },
+			{ id: 4, available: true, price: 10 },
+			{ id: 5, available: false, price: 100 }, // рамка
 		];
 
 		let category = {
