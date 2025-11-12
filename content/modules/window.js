@@ -137,13 +137,14 @@ export class Window {
 	}
 
 	static async collection() {
+		// equipped - делает кнопку активации недоступной
 		let request = [
-			{ id: 0, equipped: 0 }, // скин
-			{ id: 1, equipped: 0 }, // флаги
-			{ id: 2, equipped: 1 },
-			{ id: 3, equipped: 0 },
-			{ id: 4, equipped: 0 },
-			{ id: 5, equipped: 1 }, // рамка
+			{ id: 0, equipped: false }, // скин
+			{ id: 1, equipped: false }, // флаги
+			{ id: 2, equipped: true },
+			{ id: 3, equipped: false },
+			{ id: 4, equipped: false },
+			{ id: 5, equipped: true }, // рамка
 		];
 
 		let category = {
