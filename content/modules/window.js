@@ -8,6 +8,7 @@ import { Castle } from './castle.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Splash } from './splash.js';
+import { Shop } from './shop.js';
 
 export class Window {
 	static windows = {}
@@ -99,37 +100,74 @@ export class Window {
 	}
 
 	static async shop() {
-		let request = {
-			skins: [ { name: 'Детоняша', img: 'hero/65/2', price: 220 } ],
-			flags: [ 
-				{ name: 'Адорнийцы', img: 'flags/adornia', price: 10 },
-				{ name: 'Докты', img: 'flags/dokt', price: 10 },
-				{ name: 'Прайм', img: 'flags/prime', price: 10 },
-				{ name: 'Рак', img: 'flags/rak', price: 10 },
-			],
-			frames: [
-				{ name: 'Классическая', img: 'frames/1', price: 100 },
-			],
-		};
-		function processRequest(category, dom) {
-			for (const rItem of request[category]) {
-				let itemName = DOM({style: 'shop_item_name'}, rItem.name)
-				let item = DOM({style: 'shop_item_img'});
-				item.style.backgroundImage = `url("content/${rItem.img}.webp")`;
-				dom.appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: ['click', async () => App.error(`Покупочка ${rItem.name}`)]}, DOM({style: 'shop_item_price_icon'}), rItem.price)));
-			}
-		}
+		let request = [
+			{ id: 0, price: 220 }, // скин
+			{ id: 1, price: 10 }, // флаги
+			{ id: 2, price: 10 },
+			{ id: 3, price: 10 },
+			{ id: 4, price: 10 },
+			{ id: 5, price: 100 }, // рамка
+		];
 
-		let skinItems = DOM({style: 'shop_items'});
-		let flagItems = DOM({style: 'shop_items'});
-		let frameItems = DOM({style: 'shop_items'});
-		processRequest('skins', skinItems);
-		processRequest('flags', flagItems);
-		processRequest('frames', frameItems);
-		let skins = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_skins')), skinItems);
-		let flags = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_flags')), flagItems);
-		let frames = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_frames')), frameItems);
-		let wnd = DOM({id: 'wshop'}, DOM({style: 'shop_with_scroll'}, skins, flags, frames));
+		let category = {
+			skin: DOM({style: 'shop_items'}),
+			flag: DOM({style: 'shop_items'}),
+			frame: DOM({style: 'shop_items'}),
+		}
+		
+		for (const rItem of request) {
+			let itemName = DOM({style: 'shop_item_name'}, Lang.text(Shop.items[rItem.id].name))
+			let item = DOM({style: 'shop_item_img'});
+			item.style.backgroundImage = `url("content/${ Shop.items[rItem.id].img }")`;
+			category[Shop.items[rItem.id].category].appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: 
+				['click', async () => App.error(`Покупочка ${Shop.items[rItem.id].name}`)]
+			}, DOM({style: 'shop_item_price_icon'}), rItem.price)));
+		}
+		
+		let shopHeader = DOM({style: 'shop_header'}, 
+			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'shop')]}, Lang.text('shop_shop')), 
+			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'collection')]}, Lang.text('shop_collection')));
+
+		let skins = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_skins')), category.skin);
+		let flags = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_flags')), category.flag);
+		let frames = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_frames')), category.frame);
+		let wnd = DOM({id: 'wshop'}, shopHeader, DOM({style: 'shop_with_scroll'}, skins, flags, frames));
+		return wnd;
+	}
+
+	static async collection() {
+		let request = [
+			{ id: 0, equipped: 0 }, // скин
+			{ id: 1, equipped: 0 }, // флаги
+			{ id: 2, equipped: 1 },
+			{ id: 3, equipped: 0 },
+			{ id: 4, equipped: 0 },
+			{ id: 5, equipped: 1 }, // рамка
+		];
+
+		let category = {
+			skin: DOM({style: 'shop_items'}),
+			flag: DOM({style: 'shop_items'}),
+			frame: DOM({style: 'shop_items'}),
+		}
+		
+		for (const rItem of request) {
+			let itemName = DOM({style: 'shop_item_name'}, Lang.text(Shop.items[rItem.id].name))
+			let item = DOM({style: 'shop_item_img'});
+			item.style.backgroundImage = `url("content/${ Shop.items[rItem.id].img }")`;
+			category[Shop.items[rItem.id].category].appendChild(DOM({style: 'shop_item'}, itemName, item, DOM({style: 'shop_item_price', event: 
+				['click', async () => App.error(`Экипировочка ${Shop.items[rItem.id].name}`)]
+			}, rItem.equipped == 0 ? Lang.text("shop_use") : Lang.text("shop_in_use"))));
+		}
+		
+		let shopHeader = DOM({style: 'shop_header'}, 
+			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'shop')]}, Lang.text('shop_shop')), 
+			DOM({style: 'shop_header_item', event: ['click', async () => Window.show('main', 'collection')]}, Lang.text('shop_collection')));
+		
+		let skins = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_skins')), category.skin);
+		let flags = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_flags')), category.flag);
+		let frames = DOM({style: 'shop_category'}, DOM({style: 'shop_category_header'}, Lang.text('shop_frames')), category.frame);
+		let wnd = DOM({id: 'wshop'}, shopHeader, DOM({style: 'shop_with_scroll'}, skins, flags, frames));
 		return wnd;
 	}
 	
