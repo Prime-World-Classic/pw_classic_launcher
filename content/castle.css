@@ -1874,7 +1874,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	text-align: center;
 	text-shadow: 1cqw 1cqw 5cqw black, -1cqw 1cqw 5cqw black, 1cqw -1cqw 5cqw black, -1cqw -1cqw 5cqw black;
 	overflow: hidden;
-	white-space: nowrap;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 }
 
 .shop_item_img {

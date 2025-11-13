@@ -115,11 +115,10 @@ export class Window {
 			let item = DOM({style: 'shop_item_img'});
 			item.style.backgroundImage = `url("content/${ Shop[categoryName][rItem.targetId].icon }")`;
 			const translatedName = Lang.text(Shop[categoryName][rItem.targetId].name);
-			const nameTags = translatedName.length > 9 ? ['shop_item_name', 'castle-name-autoscroll'] : ['shop_item_name'] 
 			category[categoryName].appendChild(
 				DOM({style: rItem.enabled ? 'shop_item' : 'shop_item_disabled'}, 
 					item, 
-					DOM({style: nameTags}, translatedName), 
+					DOM({style: 'shop_item_name', title: translatedName}, translatedName), 
 					DOM(
 						{style: 'shop_item_price_container', event: ['click', async () => {
 							if (!rItem.enabled) { return; }
@@ -179,17 +178,11 @@ export class Window {
 		// enabled: - не приобретено ли уже? делает кнопку активации недоступной
 		let request = [
 			{ targetId: 0, categoryId: 0, enabled: true, price: 220 }, // скин
-			{ targetId: 1, categoryId: 1, enabled: true, price: 10 }, // флаги
-			{ targetId: 2, categoryId: 1, enabled: false, price: 10 },
-			{ targetId: 3, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 4, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 5, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 6, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 7, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 8, categoryId: 1, enabled: true, price: 10 },
-			{ targetId: 9, categoryId: 1, enabled: true, price: 10 },
 			{ targetId: 0, categoryId: 2, enabled: false, price: 100 }, // рамка
 		];
+		for (const f of Shop.flag) {
+			request.push({ targetId: f.id, price: 10, categoryId: 1, enabled: true})
+		}
 		return this.processShopAndCollection(request, true);
 	}
 
@@ -197,17 +190,11 @@ export class Window {
 		// enabled - не экипировано ли уже? делает кнопку активации недоступной
 		let request = [
 			{ targetId: 0, categoryId: 0, enabled: true}, // скин
-			{ targetId: 1, categoryId: 1, enabled: true}, // флаги
-			{ targetId: 2, categoryId: 1, enabled: false},
-			{ targetId: 3, categoryId: 1, enabled: true},
-			{ targetId: 4, categoryId: 1, enabled: true},
-			{ targetId: 5, categoryId: 1, enabled: true},
-			{ targetId: 6, categoryId: 1, enabled: true},
-			{ targetId: 7, categoryId: 1, enabled: true},
-			{ targetId: 8, categoryId: 1, enabled: true},
-			{ targetId: 9, categoryId: 1, enabled: true},
 			{ targetId: 0, categoryId: 2, enabled: false}, // рамка
 		];
+		for (const f of Shop.flag) {
+			request.push({ targetId: f.id, categoryId: 1, enabled: f.id % 2 == 1})
+		}
 		return this.processShopAndCollection(request, false);
 	}
 	
