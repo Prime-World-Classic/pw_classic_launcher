@@ -9,6 +9,8 @@ import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Splash } from './splash.js';
 import { Shop } from './shop.js';
+import { Voice } from './voice.js';
+
 
 export class Window {
 	static windows = {}
@@ -23,6 +25,7 @@ export class Window {
 			title: Lang.text('titleClose'),
 			event: ['click', () => {
 				Window.close(category);
+				requestAnimationFrame(() => Voice.updatePanelPosition());
 			}]
 		},
 			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: Lang.text('titleClose'), style: 'close-image-style' }));
@@ -80,6 +83,7 @@ export class Window {
 	}
 	static async build(heroId, targetId = 0, isWindow = false) {
 		let viewBuild = await View.build(heroId, targetId, isWindow);
+		requestAnimationFrame(() => Voice.updatePanelPosition());
 		return DOM({ id: 'wbuild' }, viewBuild);
 	}
 	static async top(hero = 0, mode = 0) {
