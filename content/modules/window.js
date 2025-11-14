@@ -151,7 +151,7 @@ export class Window {
 						isEnabled = false;
 				}
 			};
-			category[categoryName].appendChild(DOM({ style: isEnabled ? 'shop_item' : 'shop_item_disabled' },
+			category[categoryName].appendChild(DOM({ style: isEnabled ? 'shop_item' : isShop ? 'shop_item_disabled' : 'shop_item_equipped' },
 				DOM({style: 'shop_item_img_container'}, shopItemBackground, item),
 				DOM({ style: 'shop_item_name', title: translatedName }, translatedName),
 				DOM(
@@ -229,7 +229,7 @@ export class Window {
 		}
 		for (let fid in Shop.frame) {
 			const f = Shop.frame[fid];
-			request.push({ id: fid, price: 100, categoryId: 2, enabled: true})
+			request.push({ id: fid, price: 100, categoryId: 2, enabled: fid != 1})
 		}
 		for (let fid in Shop.flag) {
 			const f = Shop.flag[fid];
