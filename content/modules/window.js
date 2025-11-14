@@ -181,7 +181,9 @@ export class Window {
 			{ id: 0, categoryId: 2, enabled: false, price: 100 }, // рамка
 		];
 		for (const f of Shop.flag) {
-			request.push({ id: f.id, price: 100, categoryId: 1, enabled: true})
+			if (f.type == 'customFlags') {
+				request.push({ id: f.id, price: 100, categoryId: 1, enabled: true})
+			}
 		}
 		return this.processShopAndCollection(request, true);
 	}
