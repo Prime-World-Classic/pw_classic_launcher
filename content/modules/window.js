@@ -187,36 +187,30 @@ export class Window {
 						style: 'shop_item_price_container', event: ['click', async () => {
 							if (!isEnabled) { return; }
 							if (isShop) {
-								Window.close('main');
-								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, item), DOM({ style: 'splash-item-text' }, `Купить ${translatedName}`, DOM({ tag: 'br' }), `за ${rItem.price}`, DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), `?`),
+								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), DOM({ style: 'splash-item-text' }, `Купить ${translatedName}`, DOM({ tag: 'br' }), `за ${rItem.price}`, DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), `?`),
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
 											App.error(`Покупочка ${Shop[categoryName][rItem.id].name}`); // TODO: REQUEST
-											Window.show('main', 'shop');
 										}]
 									}, "Купить"),
 									DOM({
 										style: 'splash-content-button-red', event: ['click', async () => {
 											Splash.hide();
-											Window.show('main', 'shop');
 										}]
 									}, "Отмена")
 								))
 							} else {
-								Window.close('main');
-								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, item), `Экипировать ${translatedName}?`,
+								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), `Экипировать ${translatedName}?`,
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
 											App.error(`Экипировочка ${Shop[categoryName][rItem.id].name}`); // TODO: REQUEST
-											Window.show('main', 'collection');
 										}]
 									}, "Экипировать"),
 									DOM({
 										style: 'splash-content-button-red', event: ['click', async () => {
 											Splash.hide();
-											Window.show('main', 'collection');
 										}]
 									}, "Отмена")
 								))
