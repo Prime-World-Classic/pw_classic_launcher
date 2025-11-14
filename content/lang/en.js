@@ -567,6 +567,7 @@ export const en = {
 		hero_60_skin_2_name: "Hologram",
 		hero_62_skin_2_name: "Warlock",
 		hero_63_skin_2_name: "Cursed Countess",
+		hero_65_skin_2_name: "Explonya",    
 
 			//Стата талантов
 		sr: 'Strength/Intellect',
