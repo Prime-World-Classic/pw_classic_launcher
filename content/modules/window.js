@@ -205,7 +205,7 @@ export class Window {
 			)
 			);
 		}
-		let shopSeparator = DOM({ style: 'shop_separator' }, DOM({ style: 'shop_separator_left' }), DOM({ style: 'shop_separator_center' }), DOM({ style: 'shop_separator_right' }));
+		let shopSeparator = DOM({ style: 'shop_separator' }, DOM({ style: 'shop_separator_center' }), DOM({ style: 'shop_separator_left' }), DOM({ style: 'shop_separator_right' }));
 
 		let shopHeader = DOM({ style: 'shop_header' },
 			DOM({ style: ['shop_header_item', isShop ? 'shop_header_selected' : 'shop_header_not_selected'], event: ['click', async () => Window.show('main', 'shop')] }, Lang.text('shop_shop')),
