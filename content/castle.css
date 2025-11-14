@@ -1863,6 +1863,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	justify-content: start;
 	align-items: center;
 	position:relative;
+	filter: drop-shadow(0 0 1cqh rgba(10,255,200,0.5));
 }
 
 .shop_item_disabled {
@@ -1870,11 +1871,11 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .shop_item_equipped .shop_item_img_container {
-	filter: drop-shadow(0 0 5cqh rgba(10,255,200))
+	filter: drop-shadow(0 0 5cqh rgba(10,255,200));
 }
 
 .shop_item_equipped .shop_item_price_container {
-	filter: hue-rotate(-70deg) saturate(2.5)
+	filter: hue-rotate(-70deg) saturate(2.5);
 }
 
 .shop_item_img_container {
