@@ -68,7 +68,19 @@ export const en = {
 		fullscreenDisabled:'Window mode enabled',
 		talentConflict:'The selected talent conflicts with another talent in the build!!',
 		smartcastDescription:'Right-click on the talent in this lane to turn on/off the smartcast (using the skill without confirmation)',
-
+		
+		//Друзья
+		
+		callAFriend:"Call",
+		inviteToAGroup:"Party",
+		friendIsOffline:"Offline",
+		friendAccept:"Accept",
+		friendDecline:"Decline",
+		friendRemove:"Remove",
+		friendCancle:"Cancle",
+		friendRemoveText:"Remove {nickname} from friends?",
+		friendAcceptText:"Invitation sent to {nickname}",
+		
 		// Квесты
 		qDays: "d.",
 
