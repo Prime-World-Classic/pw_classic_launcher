@@ -83,11 +83,16 @@ export const en = {
 		shop_flags: "Flags",
 		shop_frames: "Frames",
 		bomber_S1: "Explonya",     
-		flag_adornia: "Adornia",  
-		flag_doct: "Doct",     
-		flag_prime: "Prime",    
-		flag_rak: "Crab",      
-		frame_classic: "Classic", 
+		
+		frame_0: "Classic", 
+		frame_1: "Summber", 
+		frame_2: "Autumn", 
+		frame_3: "Winter", 
+		frame_4: "Spring", 
+		frame_5: "Caves", 
+		frame_6: "Secrets", 
+		frame_7: "Dragons", 
+		frame_8: "Interseason", 
 
 		// Переводы
 		select_faction: "Select faction",
