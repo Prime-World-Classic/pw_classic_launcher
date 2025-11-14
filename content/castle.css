@@ -1912,6 +1912,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	height: 10cqh;
 	container-type: size;
 	justify-self: center;
+	position: relative;
 }
 .splash-item-text {
 	display: flex;
