@@ -83,11 +83,16 @@ export const ru = {
 		shop_flags: "Флаги",
 		shop_frames: "Рамки",
 		bomber_S1: "Детоняша",     
-		flag_adornia: "Адорния",  
-		flag_doct: "Докт",     
-		flag_prime: "Прайм",    
-		flag_rak: "Рак",      
-		frame_classic: "Классика", 
+		
+		frame_0: "Классический", 
+		frame_1: "Летний", 
+		frame_2: "Осенний", 
+		frame_3: "Зимний", 
+		frame_4: "Весенний", 
+		frame_5: "Подземелий", 
+		frame_6: "Тайн", 
+		frame_7: "Драконов", 
+		frame_8: "Межсезонье", 
 
 
 		// Переводы

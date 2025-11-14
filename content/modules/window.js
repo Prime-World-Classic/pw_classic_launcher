@@ -113,6 +113,9 @@ export class Window {
 		for (const rItem of request) {
 			const categoryName = Shop.categories[rItem.categoryId]
 			let item = DOM({style: 'shop_item_img'});
+			console.log(categoryName)
+			console.log(rItem)
+			console.log(Shop[categoryName][rItem.id])
 			item.style.backgroundImage = `url("content/${ Shop[categoryName][rItem.id].icon }")`;
 			const translatedName = Lang.text(Shop[categoryName][rItem.id].name);
 			category[categoryName].appendChild(
@@ -177,12 +180,19 @@ export class Window {
 	static async shop() {
 		// enabled: - не приобретено ли уже? делает кнопку активации недоступной
 		let request = [
-			{ id: 0, categoryId: 0, enabled: true, price: 220 }, // скин
-			{ id: 0, categoryId: 2, enabled: false, price: 100 }, // рамка
 		];
-		for (const f of Shop.flag) {
+		for (let fid in Shop.skin) {
+			const f = Shop.skin[fid];
+			request.push({ id: fid, price: 220, categoryId: 0, enabled: true})
+		}
+		for (let fid in Shop.frame) {
+			const f = Shop.frame[fid];
+			request.push({ id: fid, price: 100, categoryId: 2, enabled: true})
+		}
+		for (let fid in Shop.flag) {
+			const f = Shop.flag[fid];
 			if (f.type == 'customFlags') {
-				request.push({ id: f.id, price: 100, categoryId: 1, enabled: true})
+				request.push({ id: fid, price: 100, categoryId: 1, enabled: true})
 			}
 		}
 		return this.processShopAndCollection(request, true);
@@ -191,11 +201,20 @@ export class Window {
 	static async collection() {
 		// enabled - не экипировано ли уже? делает кнопку активации недоступной
 		let request = [
-			{ id: 0, categoryId: 0, enabled: true}, // скин
-			{ id: 0, categoryId: 2, enabled: false}, // рамка
 		];
-		for (const f of Shop.flag) {
-			request.push({ id: f.id, categoryId: 1, enabled: f.id % 2 == 1})
+		for (let fid in Shop.skin) {
+			const f = Shop.skin[fid];
+			request.push({ id: fid, price: 220, categoryId: 0, enabled: true})
+		}
+		for (let fid in Shop.frame) {
+			const f = Shop.frame[fid];
+			request.push({ id: fid, categoryId: 2, enabled: fid != 1})
+		}
+		for (let fid in Shop.flag) {
+			const f = Shop.flag[fid];
+			if (f.type == 'customFlags') {
+				request.push({ id: fid, categoryId: 1, enabled: fid != 1})
+			}
 		}
 		return this.processShopAndCollection(request, false);
 	}
