@@ -1923,10 +1923,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	position: relative;
 }
 .splash-item-text {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
+	display: block;
+	word-wrap: normal;
 }
 
 .shop_item_price_container {
@@ -1963,8 +1961,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-image: url('img/queue/DiamondBlue.png');
 	background-repeat: no-repeat;
 }
-.splash-item-text .shop_item_price_icon{
+.splash_shop_item_price_icon {
+	position: relative;
+	top: 1cqh;
 	width: 5cqh;
 	height: 5cqh;
-	background-size: 5cqh;
 }

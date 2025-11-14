@@ -160,7 +160,7 @@ export class Window {
 							if (!isEnabled) { return; }
 							if (isShop) {
 								Window.close('main');
-								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, item), DOM({ style: 'splash-item-text' }, `Купить ${translatedName} за ${rItem.price}`, DOM({ style: 'splash-item-text' }, DOM({ style: 'shop_item_price_icon' }), "?")),
+								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, item), DOM({ style: 'splash-item-text' }, `Купить ${translatedName}`, DOM({ tag: 'br' }), `за ${rItem.price}`, DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), `?`),
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
