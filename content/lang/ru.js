@@ -68,7 +68,19 @@ export const ru = {
 		fullscreenDisabled:'Включен оконный режим',
 		talentConflict:'Выбранный талант конфликтует с другим талантом в билде!!',
 		smartcastDescription:'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)',
-
+		
+		//Друзья
+		
+		callAFriend:"Звонок",
+		inviteToAGroup:"Группа",
+		friendIsOffline:"Не в сети",
+		friendAccept:"Принять",
+		friendDecline:"Отклонить",
+		friendRemove:"Удалить",
+		friendCancle:"Отмена",
+		friendRemoveText:"Удалить {nickname} из друзей?",
+		friendAcceptText:"Приглашение отправлено игроку {nickname}",
+		
 		// Квесты
 		qDays: "д.",
 
