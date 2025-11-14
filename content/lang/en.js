@@ -89,9 +89,9 @@ export const en = {
 		frame_2: "Autumn", 
 		frame_3: "Winter", 
 		frame_4: "Spring", 
-		frame_5: "Caves", 
-		frame_6: "Secrets", 
-		frame_7: "Dragons", 
+		frame_5: "Cave", 
+		frame_6: "Secret", 
+		frame_7: "Dragon", 
 		frame_8: "Interseason", 
 
 		// Переводы
