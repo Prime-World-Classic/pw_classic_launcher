@@ -104,7 +104,7 @@ export class Window {
 	}
 
 	static processShopAndCollection(request, isShop) {
-		let topHeroVictoryCount = { heroId: 34, victoryCount: 100 };
+		let topHeroVictoryCount = { heroId: 34, victoryCount: 100 }; // TODO: await App.api.request(App.CURRENT_MM, 'getHeroWithVictoryCount', { userId:  });
 		let category = {
 			skin: DOM({ style: 'shop_items' }),
 			flag: DOM({ style: 'shop_items' }),
