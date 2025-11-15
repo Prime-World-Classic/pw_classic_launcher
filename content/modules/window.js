@@ -249,7 +249,7 @@ export class Window {
 		];
 		for (let fid in Shop.skin) {
 			const f = Shop.skin[fid];
-			request.push({ id: fid, price: 220, categoryId: 0, enabled: true})
+			request.push({ id: fid, price: 220, categoryId: 3, enabled: true})
 		}
 		for (let fid in Shop.frame) {
 			const f = Shop.frame[fid];
@@ -270,7 +270,7 @@ export class Window {
 		];
 		for (let fid in Shop.skin) {
 			const f = Shop.skin[fid];
-			request.push({ id: fid, price: 220, categoryId: 0, enabled: true})
+			request.push({ id: fid, price: 220, categoryId: 3, enabled: true})
 		}
 		for (let fid in Shop.frame) {
 			const f = Shop.frame[fid];
