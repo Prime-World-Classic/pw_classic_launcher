@@ -1,6 +1,10 @@
 
 export class Shop {
-    static categories = ['skin', 'flag', 'frame']
+    static categories = {
+        1: 'flag',
+        2: 'frame',
+        3: 'skin',
+    }
     static skin = {
         1: { 'name': 'bomber_S1', 'icon': 'hero/65/2.webp' },
     }
