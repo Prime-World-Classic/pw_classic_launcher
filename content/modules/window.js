@@ -119,14 +119,11 @@ export class Window {
 			const isSkin = categoryName == 'skin';
 			let item = DOM({ style: isFrame ? 'shop_item_img_frame' : 'shop_item_img' });
 			let itemSrc = DOM({ style: 'shop_item_img' });
-			console.log(categoryName)
-			console.log(rItem)
-			console.log(Shop[categoryName][rItem.id])
-			item.style.backgroundImage = `url("content/${Shop[categoryName][rItem.id].icon}")`;
-			const translatedName = Lang.text(Shop[categoryName][rItem.id].name);
+			item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}")`;
+			const translatedName = Lang.text(Shop.shopItems[rItem.id].name);
 			let srcTranslatedName = "";
 			if (isSkin) {
-				const heroId = Shop[categoryName][rItem.id].icon.split('/')[1];
+				const heroId = Shop.shopItems[rItem.id].icon.split('/')[1];
 				itemSrc.style.backgroundImage = `url("content/hero/${heroId}/1.webp")`;
 				srcTranslatedName = Lang.text(`hero_${heroId}_name`);
 			}
@@ -149,14 +146,14 @@ export class Window {
 						frameType = 4;
 					}
 					if (frameType) {
-						item.style.backgroundImage = `url("content/${Shop[categoryName][rItem.id].icon}${frameType}.png")`;
+						item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${frameType}.png")`;
 					} else {
-						item.style.backgroundImage = `url("content/${Shop[categoryName][rItem.id].icon}${1}.png")`;
+						item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
 						isEnabled = false;
 					}
 				} else {
-					shopItemBackground.style.backgroundImage = `url("content/${Shop[categoryName][rItem.id].icon}${1}.png")`;
-					item.style.backgroundImage = `url("content/${Shop[categoryName][rItem.id].icon}${1}.png")`;
+					shopItemBackground.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
+					item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
 				}
 			} 
 			if (isFlag) {
@@ -191,7 +188,7 @@ export class Window {
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
-											App.error(`Покупочка ${Shop[categoryName][rItem.id].name}`); // TODO: REQUEST
+											App.error(`Покупочка ${Shop.shopItems[rItem.id].name}`); // TODO: REQUEST
 										}]
 									}, "Купить"),
 									DOM({
@@ -205,7 +202,7 @@ export class Window {
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
-											App.error(`Экипировочка ${Shop[categoryName][rItem.id].name}`); // TODO: REQUEST
+											App.error(`Экипировочка ${Shop.shopItems[rItem.id].name}`); // TODO: REQUEST
 										}]
 									}, "Экипировать"),
 									DOM({
@@ -247,19 +244,9 @@ export class Window {
 		// enabled: - не приобретено ли уже? делает кнопку активации недоступной
 		let request = [
 		];
-		for (let fid in Shop.skin) {
-			const f = Shop.skin[fid];
-			request.push({ id: fid, price: 220, categoryId: 3, enabled: true})
-		}
-		for (let fid in Shop.frame) {
-			const f = Shop.frame[fid];
-			request.push({ id: fid, price: 100, categoryId: 2, enabled: fid != 1})
-		}
-		for (let fid in Shop.flag) {
-			const f = Shop.flag[fid];
-			if (f.type == 'customFlags') {
-				request.push({ id: fid, price: 100, categoryId: 1, enabled: true})
-			}
+		for (let fid = 0; fid < Shop.shopItems.length; ++fid) {
+			const f = Shop.shopItems[fid];
+			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
 		}
 		return this.processShopAndCollection(request, true);
 	}
@@ -268,19 +255,9 @@ export class Window {
 		// enabled - не экипировано ли уже? делает кнопку активации недоступной
 		let request = [
 		];
-		for (let fid in Shop.skin) {
-			const f = Shop.skin[fid];
-			request.push({ id: fid, price: 220, categoryId: 3, enabled: true})
-		}
-		for (let fid in Shop.frame) {
-			const f = Shop.frame[fid];
-			request.push({ id: fid, categoryId: 2, enabled: fid != 1})
-		}
-		for (let fid in Shop.flag) {
-			const f = Shop.flag[fid];
-			if (f.type == 'customFlags') {
-				request.push({ id: fid, categoryId: 1, enabled: fid != 1})
-			}
+		for (let fid = 0; fid < Shop.shopItems.length; ++fid) {
+			const f = Shop.shopItems[fid];
+			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
 		}
 		return this.processShopAndCollection(request, false);
 	}
