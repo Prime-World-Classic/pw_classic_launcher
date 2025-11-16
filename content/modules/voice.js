@@ -3,6 +3,7 @@ import { App } from './app.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Castle } from './castle.js';
+import { Lang } from './lang.js';
 
 export class Voice {
 
@@ -73,15 +74,17 @@ export class Voice {
 	static volumeLevelStep = 0.2;
 
 	static init() {
-
+		
 		if (!Voice.infoPanel) {
-
-			Voice.infoPanel = DOM({ style: 'voice-info-panel' }, DOM({ style: 'voice-info-panel-body' }));
-
+			
+			Voice.infoPanel = DOM({ style: ['voice-info-panel', 'left-offset-with-shift'] }, DOM({ style: 'voice-info-panel-body' }));
+			
 		}
-
+		
 		document.body.append(Voice.infoPanel);
-
+		
+		requestAnimationFrame(() => Voice.updatePanelPosition());
+		
 	}
 
 	static async initLocalMedia() {
@@ -101,7 +104,7 @@ export class Voice {
 		}
 		catch (error) {
 			
-			return App.error(`Не можем получить доступ к медиа устройствам: ${error}`);
+			return App.error(Lang.text('mediaDevicesError').replace('{error}', error));
 			
 		}
 		
@@ -114,19 +117,19 @@ export class Voice {
 		}
 		catch (error) {
 			
-			return App.error(`Не можем получить дорожки потоков: ${error}`);
+			return App.error(Lang.text('streamTracksError').replace('{error}', error));
 			
 		}
 		
 		if (!tracks.length) {
 			
-			return App.error('Отсутствие медиа потоков');
+			return App.error(Lang.text('mediaTracksLack'));
 			
 		}
 		
 		if (tracks[0].kind != 'audio') {
 			
-			return App.error('Не можем найти микрофон по умолчанию');
+			return App.error(Lang.text('cantDefaultMic'));
 			
 		}
 		
@@ -148,7 +151,7 @@ export class Voice {
 		
 		if (!Voice.mic) {
 			
-			return App.error('Мы не смогли определить ваш микрофон по умолчанию');
+			return App.error(Lang.text('cantDefaultMic'));
 			
 		}
 		
@@ -158,17 +161,19 @@ export class Voice {
 
 			Sound.play('content/sounds/voice/enabled.mp3',{ id: 'Voice_enabled', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
 
-			Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
+			//Voice.infoPanel.firstChild.lastChild.style.opacity = 0;
 
 		}
 		else {
 
 			Sound.play('content/sounds/voice/disabled.mp3',{ id: 'Voice_disabled', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
 
-			Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
+			//Voice.infoPanel.firstChild.lastChild.style.opacity = 1;
 
 		}
-
+		
+		Voice.updateInfoPanel();
+	 
 	}
 
 	static indication(source, callback) {
@@ -255,17 +260,19 @@ export class Voice {
 			Voice.playerInfoPanel(id);
 
 		}
-
+		
 		let tutorial = DOM({ style: 'voice-info-panel-body-tutorial' });
 
 		if (Voice.mic) {
 			
-			tutorial.innerText = `Нажмите Ctrl+Z, чтобы включить ${Voice.mic.label}`;
-
 			if (Voice.mic.enabled) {
-
-				tutorial.style.opacity = 0;
 				
+				tutorial.innerText = Lang.text('hotkeyDropCalls') + '\n' + Lang.text('hotkeyVolumeControl');
+					
+			} else {
+				
+				tutorial.innerText = Lang.text('hotkeyDropCalls') + '\n' + Lang.text('hotkeyVolumeControl')  + '\n────────────\n' + Lang.text('enableMic').replace('{Voice.mic.label}', Voice.mic.label);
+					
 			}
 			
 		}
@@ -284,9 +291,9 @@ export class Voice {
 
 			switch (Voice.manager[id].peer.connectionState) {
 
-				case 'new': status = 'ожидание ответа'; break;
+				case 'new': status = Lang.text('waitingResponse'); break;
 
-				case 'connecting': status = 'соединение'; break;
+				case 'connecting': status = Lang.text('voiceConnecting'); break;
 
 				default: status = Voice.manager[id].peer.connectionState; break;
 
@@ -417,7 +424,7 @@ export class Voice {
 		
 		if(say){
 			
-			App.say(`Звонки успешно сброшены за исключением ваших друзей`);
+			App.say(Lang.text('callsDropped'));
 			
 		}
 
@@ -492,12 +499,30 @@ export class Voice {
 		Voice.volumeLevel = volumeLevel;
 		
 	}
+	
+	static updatePanelPosition() {
+		
+		if (!Voice.infoPanel) return;
+		
+		const isBuildWindowOpen = document.getElementById('wbuild') !== null;
+		
+		if (isBuildWindowOpen) {
+			
+			Voice.infoPanel.classList.remove('left-offset-with-shift');
+			
+		} else {
+			
+			Voice.infoPanel.classList.add('left-offset-with-shift');
+			
+		}
+		
+	}
 
 	static async association(i, users, key) {
 
 		if (Settings.settings.novoice) {
 
-			throw 'Голосовая связь отключена';
+			throw Lang.text('voiceDisabled');
 
 		}
 
@@ -637,7 +662,7 @@ export class Voice {
 
 		if (Settings.settings.novoice) {
 
-			throw 'Голосовая связь отключена';
+			throw Lang.text('voiceDisabled');
 
 		}
 
@@ -685,7 +710,7 @@ export class Voice {
 
 		if (Settings.settings.novoice) {
 
-			throw 'Голосовая связь отключена';
+			throw Lang.text('voiceDisabled');
 
 		}
 

@@ -8,6 +8,11 @@ import { Castle } from './castle.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Splash } from './splash.js';
+import { Shop } from './shop.js';
+import { Voice } from './voice.js';
+import { MM } from './mm.js';
+import { Build } from './build.js';
+
 
 export class Window {
 	static windows = {}
@@ -22,6 +27,7 @@ export class Window {
 			title: Lang.text('titleClose'),
 			event: ['click', () => {
 				Window.close(category);
+				requestAnimationFrame(() => Voice.updatePanelPosition());
 			}]
 		},
 			DOM({ tag: 'img', src: 'content/icons/close-cropped.svg', alt: Lang.text('titleClose'), style: 'close-image-style' }));
@@ -79,6 +85,7 @@ export class Window {
 	}
 	static async build(heroId, targetId = 0, isWindow = false) {
 		let viewBuild = await View.build(heroId, targetId, isWindow);
+		requestAnimationFrame(() => Voice.updatePanelPosition());
 		return DOM({ id: 'wbuild' }, viewBuild);
 	}
 	static async top(hero = 0, mode = 0) {
@@ -97,12 +104,297 @@ export class Window {
 		let view = await View.inventory(true);
 		return DOM({ id: 'winventory' }, view);
 	}
-	/*
-	static async quest(questId,cloneNode,test) {
-		let view = await View.quest(questId,cloneNode,test);
-		
+
+	static async processShopAndCollection(request, isShop) {
+		//let req = await App.api.request(App.CURRENT_MM, 'getHeroWithVictoryCount');
+		let topHeroVictoryCount =  { heroId: 1, skinId: 1, frameId: 0 }; 
+		try {
+			topHeroVictoryCount = await App.api.request(App.CURRENT_MM, 'getHeroWithFrameId');
+		} 
+		catch (e) {
+			App.error(e);
+		}
+		let category = {
+			skin: DOM({ style: 'shop_items' }),
+			flag: DOM({ style: 'shop_items' }),
+			frame: DOM({ style: 'shop_items' }),
+		}
+		let additionalMessage = DOM({style: 'shop_category_hint'}, );
+
+		for (const rItem of request) {
+			let isEnabled = rItem.enabled;
+			const categoryName = Shop.categories[rItem.categoryId];
+			const isFrame = categoryName == 'frame';
+			const isFlag = categoryName == 'flag';
+			const isSkin = categoryName == 'skin';
+			let item = DOM({ style: isFrame ? 'shop_item_img_frame' : 'shop_item_img' });
+			let itemSrc = DOM({ style: 'shop_item_img' });
+			let itemIcon = Shop.getIcon(rItem.categoryId, isFrame ? `${rItem.externalId}/${topHeroVictoryCount.frameId}` : rItem.externalId);
+			item.style.backgroundImage = itemIcon[0];
+			let itemName = Shop.getName(rItem.categoryId, rItem.externalId);
+			const translatedName = Lang.text(itemName[0]);
+			let srcTranslatedName = "";
+			let frameItems = [item.cloneNode(),item.cloneNode(),item.cloneNode(),item.cloneNode()]
+			if (isSkin) {
+				itemSrc.style.backgroundImage = itemIcon[1]; //`url("content/hero/${heroId}/1.webp")`;
+				srcTranslatedName = Lang.text(itemName[1]);
+				let heroId_skinId = rItem.externalId.split('/');
+				let heroId = heroId_skinId[0];
+				let skinId = heroId_skinId[1];
+				if (!isShop) {
+					const currentHeroSkin = MM.hero.filter((hero) => { return hero.id == heroId })[0].skin;
+					isEnabled = currentHeroSkin != skinId;
+				}
+			}
+			let shopItemBackground = DOM();
+			if (isFrame) {
+				shopItemBackground = DOM({ style: 'shop_item_img' });
+				shopItemBackground.style.backgroundImage = `url("content/hero/${topHeroVictoryCount.heroId}/${topHeroVictoryCount.skinId}.webp")`;
+				frameItems[1].style.backgroundImage = itemIcon[1];
+				frameItems[2].style.backgroundImage = itemIcon[2];
+				frameItems[3].style.backgroundImage = itemIcon[3];
+				topHeroVictoryCount.frameId = 1;
+				if (topHeroVictoryCount.frameId > 0) {
+					let targetShopItem = frameItems[topHeroVictoryCount.frameId - 1];
+					targetShopItem.classList.add('shop_item_frame_animated');
+				}
+			} 
+			if (isFlag) {
+				shopItemBackground = DOM({ style: 'shop_item_img_flag' });
+				shopItemBackground.style.backgroundImage = item.style.backgroundImage;
+				item.style.backgroundImage = `url("content/img/b7.png")`
+			}
+			if (isSkin) {
+				shopItemBackground = DOM({ style: 'shop_item_img_skin' });
+				shopItemBackground.style.backgroundImage = `url("content/img/b2.png")`
+			}
+			let shopItemContainerStyle = [isEnabled ? 'shop_item_container' : isShop ? 'shop_item_container_disabled' : 'shop_item_container_equipped'];
+			if (isSkin) {
+				shopItemContainerStyle.push('show_item_container_double');
+			}
+			if (isFrame) {
+				shopItemContainerStyle.push('show_item_container_quadruple');
+			}
+			let shopItem = DOM({style: shopItemContainerStyle, title: translatedName}, 
+				isSkin ? DOM({ style: 'shop_item' },
+					DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), itemSrc),
+					DOM({ style: 'shop_item_name' }, isSkin ? srcTranslatedName : '')
+				) : DOM(),
+				!isFrame ? DOM({ style: 'shop_item' },
+					DOM({style: 'shop_item_img_container'}, shopItemBackground, item),
+					DOM({ style: 'shop_item_name' }, isSkin ? translatedName : isFrame ? Lang.text('frame_req_1') :'')
+				) : DOM(),
+				isFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[0]), DOM({ style: 'shop_item_name' }, Lang.text('frame_req_1'))) : DOM(),
+				isFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[1]), DOM({ style: 'shop_item_name' }, Lang.text('frame_req_2'))) : DOM(),
+				isFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[2]), DOM({ style: 'shop_item_name' }, Lang.text('frame_req_3'))) : DOM(),
+				isFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[3]), DOM({ style: 'shop_item_name' }, Lang.text('frame_req_4'))) : DOM(),
+				isSkin ? DOM({style: 'shop_item_arrow'}) : DOM(),
+				DOM(
+					{
+						style: 'shop_item_price_container', event: ['click', async () => {
+							if (!shopItem.classList.contains('shop_item_container')) { return; }
+							if (isShop) {
+								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), DOM({ style: 'splash-item-text' }, `Купить `, DOM({style: 'splash-shop-item-name'}, `${translatedName}`), DOM({ tag: 'br' }), `за ${rItem.price}`, DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), `?`, DOM({}, additionalMessage)),
+									DOM({
+										style: 'splash-content-button', event: ['click', async () => {
+											Splash.hide();
+											let crystalLeft;
+											try {
+												crystalLeft = await App.api.request('shop','buy',{id:rItem.id});
+											}
+											catch (e) {
+												App.error(e);
+												return;
+											}
+											View.castleTotalCrystal.firstChild.innerText = crystalLeft;
+											shopItem.classList.add('shop_item_container_disabled');
+											shopItem.classList.remove('shop_item_container');
+										}]
+									}, "Купить"),
+									DOM({
+										style: 'splash-content-button-red', event: ['click', async () => {
+											Splash.hide();
+										}]
+									}, "Отмена")
+								))
+							} else {
+								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), `Экипировать `, DOM({style: 'splash-shop-item-name'}, `${translatedName}`), "?",
+									DOM({
+										style: 'splash-content-button', event: ['click', async () => {
+											Splash.hide();
+											try {
+												if (isSkin) {
+													let heroId_skinId = rItem.externalId.split('/');
+													let heroId = heroId_skinId[0];
+													let skinId = heroId_skinId[1];
+													await Build.changeSkinForHero(heroId, skinId);
+												} else {
+													await App.api.request('shop','apply',{id:rItem.id});
+												}
+											}
+											catch (e) {
+												App.error(e);
+												return;
+											}
+											shopItem.classList.add('shop_item_container_equipped');
+											shopItem.classList.remove('shop_item_container');
+											shopItem.lastChild.firstChild.innerText = Lang.text("shop_in_use");
+											for (const collectionItem of category[categoryName].childNodes) {
+												if (collectionItem != shopItem) {
+													collectionItem.classList.add('shop_item_container');
+													collectionItem.classList.remove('shop_item_container_equipped');
+													collectionItem.lastChild.firstChild.innerText = Lang.text("shop_use");
+												}
+											}
+										}]
+									}, "Экипировать"),
+									DOM({
+										style: 'splash-content-button-red', event: ['click', async () => {
+											Splash.hide();
+										}]
+									}, "Отмена")
+								))
+							}
+						}]
+					},
+					isShop ? DOM({ style: 'shop_item_price' },
+						DOM({ style: 'shop_item_price_icon' }),
+						rItem.price
+					) : DOM({ style: 'shop_item_price' },
+						isEnabled ? Lang.text("shop_use") : Lang.text("shop_in_use")
+					)
+				)
+			)
+			category[categoryName].appendChild(shopItem);
+		}
+		let shopSeparator = DOM({ style: 'shop_separator' }, DOM({ style: 'shop_separator_left' }), DOM({ style: 'shop_separator_right' }), DOM({ style: 'shop_separator_center' }));
+
+		let shopHeader = DOM({ style: 'shop_header' },
+			DOM({ style: ['shop_header_item', isShop ? 'shop_header_selected' : 'shop_header_not_selected'], event: ['click', async () => Window.show('main', 'shop')] }, Lang.text('shop_shop')),
+			DOM({ style: ['shop_header_item', !isShop ? 'shop_header_selected' : 'shop_header_not_selected'], event: ['click', async () => Window.show('main', 'collection')] }, Lang.text('shop_collection')),
+			shopSeparator.cloneNode(true));
+
+		let skins = DOM({ style: category.skin.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_skins')), category.skin);
+		let flags = DOM({ style: category.flag.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_flags')), category.flag);
+		let frames = DOM({ style: category.frame.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_frames'), additionalMessage), category.frame);
+		if (App.isAdmin()) {
+			let wnd = DOM({ id: 'wshop' }, shopHeader, DOM({ style: 'shop_with_scroll' }, skins, flags, frames));
+			return wnd;
+        }
 	}
-	*/
+
+	static async shop() {
+		let request = await App.api.request('shop','available');
+		return await this.processShopAndCollection(request, true);
+	}
+
+	static async collection() {
+		let request = await App.api.request('shop','purchase');
+
+		return await this.processShopAndCollection(request, false);
+	}
+	
+	static async quest(item) {
+		
+		let quest = await App.api.request('quest','get',{id:item.id});
+		
+		let root = DOM({ id: 'wquest' });
+		
+		const content = DOM({ style: 'wquest__content' });
+
+		const titlebar = DOM({ style: 'wquest__titlebar' });
+		const h3 = DOM({ tag: 'h3', style: 'wquest__title' }, quest.title);
+
+		titlebar.appendChild(h3);
+
+		const body = DOM({ style: 'wquest__body' }, quest.description);
+
+		const objective = DOM({ style: 'wquest__objective' });
+		const objText = DOM({ style: 'wquest__objective' }, quest.target);
+		objective.appendChild(objText);
+
+		if (quest.total) {
+			const counter = DOM({}, quest.score, " / ", quest.total);
+			objText.append(counter);
+		}
+
+		const tokens = item.reward;
+		const rewards = DOM({ style: 'wquest__rewards' });
+		for (let reward in item.reward) {
+			const chip = DOM({ style: 'wquest__chip' }); 
+			const icon = DOM({ style: 'wquest__chip-icon' });
+			let iconUrl = "";
+			switch (reward) {
+				case 'crystal':
+					iconUrl = `url("content/img/queue/DiamondBlue.png")`
+					break;
+				default:
+					iconUrl = `url("content/img/queue/Spravka.png")`
+			}
+			icon.style.backgroundImage = iconUrl;
+
+			const val = DOM({ style: 'wquest__chip-value' }, item.reward[reward]);
+			chip.appendChild(icon); 
+			chip.appendChild(val);
+			rewards.appendChild(chip);
+		}
+
+		const avatar = DOM({ style: 'wquest__avatar' });
+		const avatarContainer = DOM({ style: 'quest_container' }, avatar);
+		avatarContainer.style.backgroundImage = `url("content/img/quest/1.png")`;
+		avatarContainer.style.backgroundSize = 'cover, contain';
+		avatarContainer.style.backgroundPosition = 'center, center';
+		avatarContainer.style.backgroundRepeat = 'no-repeat, no-repeat';
+
+		avatar.style.backgroundImage = `url("content/hero/${item.heroId}/1.webp")`;
+		avatar.style.backgroundSize = 'cover, contain';
+		avatar.style.backgroundPosition = 'center, center';
+		avatar.style.backgroundRepeat = 'no-repeat, no-repeat';
+
+		content.appendChild(titlebar);
+		content.appendChild(body);
+		content.appendChild(objective);
+		content.appendChild(rewards);
+		content.appendChild(avatarContainer);
+		
+		switch(quest.status){
+			
+			case 0:
+			
+			content.appendChild(DOM({style: "quest-accept-button", event: ['click', async () => {
+				
+				await App.api.request('quest','start',{id:quest.id});
+				
+				Window.close('main');
+				
+				View.castleQuestUpdate();
+				
+			}]}, DOM({style: "quest-button-text"},'Начать')));
+			
+			break;
+			
+			case 2:
+			
+			content.appendChild(DOM({style: "quest-accept-button", event: ['click', async () => {
+				
+				await App.api.request('quest','finish',{id:quest.id});
+				
+				Window.close('main');
+				
+				View.castleQuestUpdate();
+				
+			}]}, DOM({style: "quest-button-text"},'Завершить')));
+			
+			
+			break;
+			
+		}
+		
+		root.appendChild(content);
+
+		return root;
+	}
+	
 	static async menu() {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),

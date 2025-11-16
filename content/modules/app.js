@@ -11,11 +11,12 @@ import { MM } from './mm.js';
 import { Splash } from './splash.js';
 import { Window } from './window.js';
 import { Castle } from './castle.js';
+import { Lang } from './lang.js';
 
 export class App {
     static APP_VERSION = '0';
 
-    static PW_VERSION = '2.10.3';
+    static PW_VERSION = '2.11.1';
 
     static CURRENT_MM = 'mmtest'
 
@@ -63,7 +64,7 @@ export class App {
 
         setTimeout(() => {
             if (this.bestHost == -1) {
-                App.error("Нет соединения с API сервером Prime World Classic");
+                App.error(Lang.text('apiConnectionError'));
             }
         }, 30000);
     }
@@ -130,6 +131,7 @@ export class App {
 		
 		document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+				requestAnimationFrame(() => Voice.updatePanelPosition());
                 e.preventDefault();
                 e.stopPropagation();
                     
@@ -199,7 +201,7 @@ export class App {
 		
 		synthesis.volume = Castle.GetVolume(Castle.AUDIO_SOUNDS);
 		
-		synthesis.lang = 'ru-RU';
+		synthesis.lang = Lang.text('synthesisLang');
 		
 		window.speechSynthesis.speak(synthesis);
 		
@@ -246,7 +248,7 @@ export class App {
 
             login.setAttribute('style', 'background:rgba(255,0,0,0.3)');
 
-            return App.error('Необходимо указать логин');
+            return App.error(Lang.text('loginRequiredError'));
 
         }
 
@@ -254,7 +256,7 @@ export class App {
 
             password.setAttribute('style', 'background:rgba(255,0,0,0.3)');
 
-            return App.error('Необходимо указать пароль');
+            return App.error(Lang.text('passwordRequiredError'));
 
         }
 
@@ -296,9 +298,9 @@ export class App {
 
         let template = document.createDocumentFragment();
 
-        let title = DOM({ tag: 'div', style: 'castle-menu-text' }, 'Сменить никнейм можно один раз в две недели');
+        let title = DOM({ tag: 'div', style: 'castle-menu-text' }, Lang.text('nicknameChangeCooldown'));
 
-        let name = DOM({ tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
+        let name = DOM({ tag: 'input', placeholder: Lang.text('nicknamePlaceholder'), value: App.storage.data.login });
 
         let button = DOM({
             style: 'splash-content-button', event: ['click', async () => {
@@ -339,7 +341,7 @@ export class App {
             }
 
             ]
-        }, 'Применить');
+        }, Lang.text('apply'));
 
         template.append(title, name, button, close);
 
@@ -354,7 +356,7 @@ export class App {
         let template = document.createDocumentFragment();
 
 
-        const title = DOM({ tag: 'h2', style: 'faction-title' }, 'Выбор Фракции');
+        const title = DOM({ tag: 'h2', style: 'faction-title' }, Lang.text('select_faction'));
         Object.assign(title.style, {
             textAlign: 'center',
             color: '#fff',
@@ -378,8 +380,8 @@ export class App {
 
 
         const factions = [
-            { id: 1, name: 'Адорнийцы', icon: 'Elf_logo_over.webp' },
-            { id: 2, name: 'Докты', icon: 'Human_logo_over2.webp' }
+            { id: 1, name: Lang.text('adorians'), icon: 'Elf_logo_over.webp' },
+            { id: 2, name: Lang.text('dokts'), icon: 'Human_logo_over2.webp' }
         ];
 
 
@@ -472,7 +474,7 @@ export class App {
                 View.show('castle');
                 Splash.hide();
             }]
-        }, 'Применить');
+        }, Lang.text('apply'));
 
         const resizeHandler = () => {
             const iconSize = calculateIconSize();
@@ -496,7 +498,7 @@ export class App {
 
         if ((!fraction.value) || (!invite.value) || (!login.value) || (!password.value) || (!password2.value)) {
 
-            return App.error('Не все значения указаны');
+            return App.error(Lang.text('missingValuesError'));
 
         }
 
@@ -506,7 +508,7 @@ export class App {
 
             password2.setAttribute('style', 'background:rgba(255,0,0,0.3)');
 
-            return App.error('Пароли не совпадают');
+            return App.error(Lang.text('passwordsMismatchError'));
 
         }
 

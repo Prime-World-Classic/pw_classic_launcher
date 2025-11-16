@@ -43,7 +43,17 @@ export class View {
     static defaultOptionAnimation = { duration: 150, fill: 'both', easing: 'ease-out' };
 
     static updateProgress = false;
+	
+	static castleQuestBody = DOM({ style: ['quest', 'left-offset-no-shift'] });
+	
+	static castleTotalCrystal = DOM({ tag: 'div', style: ['question-icon'] }, DOM({style: 'quest-counter'},''));
 
+    static castleCrystalContainer = DOM({style: ['crystal-container', 'crystal-container-anim'], 
+        event: ['click', () => {
+            View.castleCrystalContainer.classList.remove('crystal-container-anim');
+            Window.show('main', 'shop');
+        }] }, View.castleTotalCrystal);
+	
     static setCss(name = 'content/style.css') {
 
         let css = DOM({ tag: 'link', rel: 'stylesheet', href: name });
@@ -264,9 +274,18 @@ export class View {
 
         }
 
-        body.append(backgroundImage, Castle.canvas);
-
-        //body.append(await View.castleQuest());
+        body.append(backgroundImage, Castle.canvas, View.castleQuestBody);
+		
+		try{
+			
+			await View.castleQuestUpdate();
+			
+		}
+		catch(error){
+			
+			App.error(error);
+			
+		}
 
         try {
 
@@ -317,140 +336,6 @@ export class View {
         return body;
 
     }
-    /*
-static async quest(questId, cloneNode, item) {
-  let root = document.querySelector('#wquest');
-  if (root) {
-    if (root.__wquestEscDown)  document.removeEventListener('keydown', root.__wquestEscDown, true);
-    if (root.__wquestEscUp)    document.removeEventListener('keyup',   root.__wquestEscUp,   true);
-    root.remove();
-  }
-
-  root = DOM({ id: 'wquest' });
-  document.body.appendChild(root);
-
-  const giverId = (item.giverId ?? item.questGiverId ?? item.heroId);
-  const candidates = [`content/hero/${giverId}/1.webp`];
-
-  const pickExistingImage = (urls) => new Promise(res => {
-    const tryNext = (i=0) => { if (i>=urls.length) return res(null);
-      const im = new Image(); im.onload=()=>res(urls[i]); im.onerror=()=>tryNext(i+1); im.src=urls[i]; };
-    tryNext();
-  });
-
-  const parseRewards = (rewardStr) => {
-    const out = []; const s = String(rewardStr || '').toLowerCase();
-    if (s.includes('кристал') || s.includes('прайм')) {
-      const m = s.match(/\+?\s*(\d+)\s*(?:кристал|кристалл|кристаллов|прайм)/i);
-      const hasN = /(^|\s)n(\s|$)/i.test(rewardStr) || /n\s*количество/i.test(rewardStr);
-      out.push({ type:'prime', label: m ? String(+m[1]) : (hasN ? 'N' : '—') });
-    }
-    if (s.includes('звезд') || s.includes('звёзд') || s.includes('звезда')) {
-      const m = s.match(/\+?\s*(\d+)\s*зв/i); out.push({ type:'star', label: m ? String(+m[1]) : '—' });
-    }
-    if (!out.length) { const m = s.match(/\d+/); if (m) out.push({ type:'generic', label:String(+m[0]) }); }
-    return out;
-  };
-
-  const content = DOM({ tag:'div' }); content.classList.add('wquest__content');
-
-  const titlebar = DOM({ tag:'div' }); titlebar.classList.add('wquest__titlebar');
-  const h3 = DOM({ tag:'h3' }); h3.classList.add('wquest__title'); h3.textContent = item.title || 'Задание';
-
-  const closeBtn = DOM({ tag:'button' });
-  closeBtn.type = 'button';
-  closeBtn.classList.add('close-button', 'wquest__close');
-  closeBtn.setAttribute('aria-label', 'Закрыть');
-  closeBtn.style.backgroundImage = closeBtn.style.backgroundImage || "url('content/icons/close-cropped.svg')";
-
-  titlebar.appendChild(h3);
-  titlebar.appendChild(closeBtn);
-
-  const body = DOM({ tag:'div' }); body.classList.add('wquest__body'); body.textContent = item.description || '';
-
-  const objective = DOM({ tag:'div' }); objective.classList.add('wquest__objective');
-  const objText = DOM({ tag:'div' }); objText.classList.add('wquest__objective-text');
-  objText.textContent = item.target || 'Выполните условие задания.';
-  objective.appendChild(objText);
-
-  const tokens = parseRewards(item.reward);
-  const rewards = DOM({ tag:'div' }); rewards.classList.add('wquest__rewards');
-  tokens.forEach(t => {
-    const chip = DOM({ tag:'div' }); chip.classList.add('wquest__chip');
-    const icon = DOM({ tag:'div' }); icon.classList.add('wquest__chip-icon');
-    const val  = DOM({ tag:'div' }); val.classList.add('wquest__chip-value'); val.textContent = t.label;
-    chip.appendChild(icon); chip.appendChild(val);
-    rewards.appendChild(chip);
-  });
-
- const avatar = DOM({ tag:'div' });
-avatar.classList.add('wquest__avatar');
-
-const fallback1 = `content/hero/${giverId}/1.webp`; 
-const fallback2 = `content/img/queue/321.png`; 
-
-pickExistingImage(candidates).then(url => {
-  const mainImg = url || fallback1;
-
-  avatar.style.backgroundImage = `url("${mainImg}"), url("${fallback2}")`;
-  avatar.style.backgroundSize = 'cover, contain';        
-  avatar.style.backgroundPosition = 'center, center';    
-  avatar.style.backgroundRepeat = 'no-repeat, no-repeat';
-});
-
-content.appendChild(titlebar);
-content.appendChild(body);
-content.appendChild(objective);
-content.appendChild(rewards);
-content.appendChild(avatar);
-root.appendChild(content);
-
-
-  const closeQuest = () => {
-    if (!root) return;
-    if (root.__wquestEscDown) document.removeEventListener('keydown', root.__wquestEscDown, true);
-    if (root.__wquestEscUp)   document.removeEventListener('keyup',   root.__wquestEscUp,   true);
-    root.remove();
-    root = null;
-  };
-
-  const escTrap = (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      closeQuest();
-      return false;
-    }
-  };
-  document.addEventListener('keydown', escTrap, true);
-  document.addEventListener('keyup',   escTrap, true);
-  root.__wquestEscDown = escTrap;
-  root.__wquestEscUp   = escTrap;
-
-  closeBtn.addEventListener('click', closeQuest);
-
-  const builtInClose = root.querySelector('.modal-close,[data-close],.btn-close');
-  if (builtInClose && !builtInClose.__wquestBound) {
-    builtInClose.__wquestBound = true;
-    builtInClose.addEventListener('click', closeQuest);
-  }
-
-  return root;
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     static async castlePlay() {
@@ -873,7 +758,7 @@ root.appendChild(content);
             });
 
             if (disabled) {
-                medal.title = 'Режим временно недоступен';
+                medal.title = Lang.text('titlestatisticmodeUnavailable');
             } else {
                 medal.title = Lang.text('titlestatisticmode');
                 medal.setAttribute('role', 'button');
@@ -943,7 +828,6 @@ root.appendChild(content);
         statCircle.append(statsBtn, divisionBadgeUnderStat);
         statWrapper.append(statRect, statCircle);
 
-        const questionIcon = DOM({ tag: 'div', style: ['question-icon'] });
 
         // подсказка слева
         const tooltipWrap = DOM({ tag: 'div', style: ['tooltip-wrap-left'] });
@@ -953,7 +837,8 @@ root.appendChild(content);
         tooltipBubble.append(tooltipText);
         tooltipWrap.append(tooltipBubble);
 
-        banner.append(statWrapper);
+        banner.append(statWrapper,View.castleCrystalContainer);
+
         return DOM({ style: 'castle-banner-online-wrapper' }, banner);
     }
 
@@ -1173,139 +1058,98 @@ root.appendChild(content);
             View.arrows.rd.classList.remove('castle-bottom-content-btn-disable');
         }
     }
-    /*
-    static async castleQuest(){
 
-  let body = DOM({ style:'quest' });
+    static async castleQuestUpdate() {
+		
+		let request = await App.api.request('quest','list');
+		
+		View.castleTotalCrystal.firstChild.innerText = request.crystal;
+		
+		while(View.castleQuestBody.firstChild){
+			
+			View.castleQuestBody.firstChild.remove();
+			
+		}
+		
+        const list = DOM({ style: 'quest-list' });
+        const PAGE = 4;
+        let start = 0;
+        const items = [];
 
-  const list   = DOM({ style:'quest-list' });
-  const PAGE   = 4;
-  let   start  = 0;
-  const items  = [];
+        const btnUp = DOM({
+            style: ['quest-arrow', 'quest-arrow-up'],
+            event: ['click', () => { if (start > 0) { start--; render(); } }]
+        });
 
-  const btnUp = DOM({
-    style: ['quest-arrow','quest-arrow-up'],
-    event: ['click', () => { if (start > 0) { start--; render(); } }]
-  });
+        const btnDown = DOM({
+            style: ['quest-arrow', 'quest-arrow-down'],
+            event: ['click', () => {
+                if (start < Math.max(0, items.length - PAGE)) { start++; render(); }
+            }]
+        });
 
-  const btnDown = DOM({
-    style: ['quest-arrow','quest-arrow-down'],
-    event: ['click', () => {
-      if (start < Math.max(0, items.length - PAGE)) { start++; render(); }
-    }]
-  });
 
-  body.append(btnUp, list, btnDown); // порядок: ▲ список ▼
+        if (request.quests.length > PAGE) {
+            View.castleQuestBody.append(btnUp, list, btnDown); // порядок: ▲ список ▼
+        } else {
+            View.castleQuestBody.append(list); // порядок: ▲ список ▼
+        }
 
-  let request = [
-    {
-      id:1,
-      heroId:16,
-      title:'Смена власти',
-      description:'Ты силён. Я видел твои победы. Но сила без амбиций — лишь пустой звук. Один герой, возомнил себя наследником трона. Убери его. Докажи, что настоящая сила — в умении вовремя нанести удар.',
-      target:'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье не меньше трёх раз за один бой. Ваш герой не должен умереть от жертвы.',
-      reward:'+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
-      prompt:'Получить сведения в тамбуре, могут только герои класса — Убийца.',
-      status:0,
-      timer:(Date.now() + 86400000)
-    },
-    {
-      id:2,
-      heroId:1,
-      title:'Право сильнейшего',
-      description:'Пограничье видело немало поединков, но истинных воинов среди них — единицы. Один из героев запятнал свою честь, используя запрещённые приёмы в бою. Он должен быть остановлен твоим мастерством. Сразись с ним и докажи, что сила без чести — ничто. Победи его в честном дуэли, и твоя награда будет достойной.',
-      target:'Получить сведения в тамбуре, идентифицировать героя и устранить жертву на поле боя в пограничье за один бой. Ваш герой не должен умереть до того, как устранит жертву.',
-      reward:'+ N количество кристаллов прайма, где N — уровень винрейта жертвы.',
-      prompt:'Получить сведения в тамбуре, могут только герои класса — Убийца.',
-      status:0,
-      timer:(Date.now() + 86400000)
-    },
-    {
-      id:3,
-      heroId:38,
-      title:'Воздаяние Неуязвимому',
-      description:'Мой взор пронзает битвы и интриги этого мира, и я видела, как твоя сила обратила в бегство тех, кто возжелал твоей погибели. Они думали, что ты — добыча. Они ошиблись. Ты — испытание, которое они не смогли пройти. Их неудача — доказательство твоей избранности. И за это достоинство ты должен быть вознаграждён. Прими мой дар — не как плату за убийство, но как признание твоей несокрушимости',
-      target:'Выжить в условиях PvP-охоты',
-      reward:'+1 кристалл прайма',
-      prompt:'',
-      status:0,
-      timer:(Date.now() + 86400000)
-    },
-    {
-      id:4,
-      heroId:13,
-      title:'Сила единства',
-      description:'Приветствую тебя, дитя Света! Этот мир держится не только на силе клинка, но и на взаимопомощи. Я вижу, как ты сражаешься, но истинная мощь проявляется, когда мы поддерживаем друг друга. Твои союзники нуждаются в твоей помощи — исцелении, защите, усилении. Окажи 1000 поддержек в битвах, и я покажу тебе, какую силу рождает настоящее единство.',
-      target:'Оказать 1000 поддержек союзным героям.',
-      reward:'+100 кристаллов прайма',
-      prompt:'',
-      status:0,
-      timer:(Date.now() + (86400000 * 30))
-    },
-    {
-      id:5,
-      heroId:3,
-      title:'Путь Превосходства',
-      description:'Приветствую, испытующий! Мир Прайма рожден из хаоса и крови. Сила — единственный язык, который здесь понимают все. Ты уже показал себя в битвах, но настоящая мощь требует жертв. Я бросаю тебе вызов: соверши 1000 убийств. Пусть каждый поверженный враг станет твоим шагом к величию. Докажи, что ты достоин называться истинным чемпионом Прая!',
-      target:'Совершить 1000 убийств вражеских героев.',
-      reward:'+100 кристаллов прайма',
-      prompt:'',
-      status:0,
-      timer:(Date.now() + (86400000 * 30))
+        for (let item of request.quests) {
+
+            let hero = DOM({ style: 'quest-item-hero' }, DOM({ style: 'quest-item-portrait-glass' }));
+            hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
+
+            let timer = DOM({ style: 'quest-item-timer' });
+            const tick = () => {
+				item.timer = (item.timer - 1000);
+                const totalMilliseconds = item.timer;
+                const days = Math.floor(totalMilliseconds / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((totalMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((totalMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((totalMilliseconds % (1000 * 60)) / 1000);
+
+                const formattedDays = days ? String(days).padStart(2, '0') + ` ${Lang.text('qDays')}` : '';
+                const formattedHours = String(hours).padStart(2, '0');
+                const formattedMinutes = String(minutes).padStart(2, '0');
+                const formattedSeconds = String(seconds).padStart(2, '0');
+                timer.textContent = `${formattedDays} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+
+            let quest = DOM(
+                {
+                    style: 'quest-item',
+                    event: ['click', () => {
+                        // Удаляем возможные предыдущие окна и не передаём превью-ноду
+                        document.querySelectorAll('#wquest').forEach(n => n.remove());
+                        Window.show('main', 'quest', item);
+                    }]
+                },
+                DOM({ style: 'quest-item-portrait-background' }, hero,
+                     item.status == 1 ? "" : DOM({ style: item.status == 0 ? 'quest-item-exclamation' : 'quest-item-completed'})),
+                item.status == 1 ? timer : ""
+            );
+
+            items.push(quest);
+            if (items.length <= PAGE) list.append(quest);
+        }
+
+        function render() {
+            list.innerHTML = '';
+            const end = Math.min(start + PAGE, items.length);
+            for (let i = start; i < end; i++) list.append(items[i]);
+            const maxStart = Math.max(0, items.length - PAGE);
+            const noScroll = items.length <= PAGE;
+            btnUp.classList.toggle('disabled', noScroll || start === 0);
+            btnDown.classList.toggle('disabled', noScroll || start >= maxStart);
+        }
+		
+        render();
+		
     }
-  ];
-
-  for (let item of request) {
-
-    let hero = DOM({ style:'quest-item-hero' }, DOM({ style:'quest-item-portrait-glass' }));
-    hero.style.backgroundImage = `url(content/hero/${item.heroId}/1.webp)`;
-
-    let timer = DOM({ style:'quest-item-timer' });
-    const tick = () => {
-      const ms  = item.timer - Date.now();
-      const sec = Math.max(0, Math.floor(ms / 1000));
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = sec % 60;
-      timer.textContent = h > 0
-        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-        : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    };
-    tick();
-    setInterval(tick, 1000);
-
-    let quest = DOM(
-      {
-        style:'quest-item',
-        event:['click', () => {
-          // Удаляем возможные предыдущие окна и не передаём превью-ноду
-          document.querySelectorAll('#wquest').forEach(n => n.remove());
-          Window.show('main','quest', item.id, null, item);
-        }]
-      },
-      DOM({ style:'quest-item-portrait-background' }, hero, DOM({ style:'quest-item-exclamation' })),
-      timer
-    );
-
-    items.push(quest);
-    if (items.length <= PAGE) list.append(quest);
-  }
-
-  function render() {
-    list.innerHTML = '';
-    const end = Math.min(start + PAGE, items.length);
-    for (let i = start; i < end; i++) list.append(items[i]);
-    const maxStart = Math.max(0, items.length - PAGE);
-    const noScroll = items.length <= PAGE;
-    btnUp.classList.toggle('disabled', noScroll || start === 0);
-    btnDown.classList.toggle('disabled', noScroll || start >= maxStart);
-  }
-
-  render();
-  return body;
-}
-*/
-
+	
     static bodyCastleBuildings() {
 
         while (View.castleBottom.firstChild) {
@@ -1416,7 +1260,7 @@ root.appendChild(content);
             let buttonAdd = DOM({
                 style: 'castle-friend-item',
                 onclick: () => {
-                    let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+                    let input = DOM({ tag: 'input', style: 'search-input', placeholder: Lang.text('friendNicknamePlaceholder')});
                     let body = DOM({ style: 'search-body' });
 
                     // Создаём крестик для закрытия (как в buildSelectName)
@@ -1532,24 +1376,7 @@ root.appendChild(content);
             for (let item of result) {
 
                 const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, item.nickname));
-                heroName.prepend(DOM({
-                    tag: 'span', event: ['click', async () => {
-
-                        try {
-
-                            let voice = new Voice(item.id, 'friend', item.nickname, true);
-
-                            await voice.call();
-
-                        }
-                        catch (error) {
-
-                            App.error(error);
-
-                        }
-
-                    }]
-                }, '☎️ '));
+				
                 if (item.nickname.length > 10) {
                     heroName.firstChild.classList.add('castle-name-autoscroll');
                 }
@@ -1562,12 +1389,16 @@ root.appendChild(content);
 
                 if (item.status == 1) {
 
-                    let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? 'Группа' : 'Не в сети');
+                    let group = DOM({ style: 'castle-friend-add-group' }, (item.online) ? Lang.text('inviteToAGroup') : Lang.text('friendIsOffline'));
+					
+					let call = DOM({ style: 'castle-friend-add-group' }, Lang.text('callAFriend'));
 
                     if (!item.online) {
-
-                        group.style.filter = 'grayscale(1)';
-
+						
+						group.style.filter = 'grayscale(1)';
+						
+						call.style.filter = 'grayscale(1)';
+						
                     }
                     else {
 
@@ -1575,10 +1406,27 @@ root.appendChild(content);
 
                             await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
-                            App.notify(`Приглашение отправлено игроку ${item.nickname}`);
-
+                            App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
+							
                         }
-
+						
+						call.onclick = async () => {
+							
+							try {
+								
+								let voice = new Voice(item.id, 'friend', item.nickname, true);
+								
+								await voice.call();
+								
+							}
+							catch (error) {
+								
+								App.error(error);
+								
+							}
+							
+						}
+						
                     }
 
                     friend.oncontextmenu = () => {
@@ -1595,11 +1443,11 @@ root.appendChild(content);
                                 Splash.hide();
 
                             }]
-                        }, 'Удалить');
+                        }, Lang.text('friendRemove'));
 
-                        let b2 = DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, 'Отмена');
+                        let b2 = DOM({ style: 'splash-content-button', event: ['click', () => Splash.hide()] }, Lang.text('friendCancle'));
 
-                        body.append(DOM(`Удалить ${item.nickname} из друзей?`), b1, b2);
+                        body.append(DOM(Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), b1, b2);
 
                         Splash.show(body);
 
@@ -1607,7 +1455,7 @@ root.appendChild(content);
 
                     }
 
-                    bottom.append(group);
+                    bottom.append(call,group);
 
                 }
                 else if (item.status == 2) {
@@ -1628,13 +1476,13 @@ root.appendChild(content);
 
                                     await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
 
-                                    App.notify(`Приглашение отправлено игроку ${item.nickname}`);
+                                    App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
 
                                 }]
-                            }, 'Группа'));
+                            }, Lang.text('inviteToAGroup')));
 
                         }]
-                    }, 'Принять'), DOM({
+                    }, Lang.text('friendAccept')), DOM({
                         style: 'castle-friend-cancel', event: ['click', async () => {
 
                             await App.api.request('friend', 'remove', { id: item.id });
@@ -1642,12 +1490,12 @@ root.appendChild(content);
                             friend.remove();
 
                         }]
-                    }, 'Отклонить'));
+                    }, Lang.text('friendDecline')));
 
                 }
                 else if (item.status == 3) {
 
-                    friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, 'Ожидание')));
+                    friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('friendAcceptWaiting'))));
 
                     friend.style.filter = 'grayscale(1)';
 
@@ -2157,7 +2005,7 @@ root.appendChild(content);
 
         let top = DOM({ style: isSplah ? 'wtop-scroll' : 'top-scroll' },
             DOM({
-                style: 'top-filter', title: 'Выберите героя, чтобы отсортировать игроков зала славы', event: ['click', async () => {
+                style: 'top-filter', title: Lang.text('titleClickToViewHeroRating'), event: ['click', async () => {
 
                     let request = await App.api.request('build', 'heroAll');
 
@@ -2202,6 +2050,10 @@ root.appendChild(content);
 
                 }]
             }, DOM({ tag: 'div' }), DOM({ tag: 'div' })));
+			
+			const topFilter = top.querySelector('.top-filter');
+			
+			topFilter.style.setProperty('--filter-text', `'${Lang.text('clickToViewHeroRating')}'`);
 
         top.firstChild.classList.add('animation1');
 
@@ -2446,7 +2298,9 @@ root.appendChild(content);
     static async build(heroId, targetId = 0, isWindow = false) {
 
         const body = DOM({ style: 'build-horizontal' });
-
+		
+		requestAnimationFrame(() => Voice.updatePanelPosition());
+		
         await Build.init(heroId, targetId, isWindow);
 
         body.append(
@@ -2463,7 +2317,7 @@ root.appendChild(content);
                 ),
                 DOM({ style: 'build-active-bar-container' },
                     Build.activeBarView,
-                    DOM({ style: 'build-active-bar-hint' }, 'Нажмите правой кнопкой мыши на талант в этой полосе чтобы включить/выключить смарткаст (применение навыка без подтверждения)')
+                    DOM({ style: 'build-active-bar-hint' }, Lang.text('smartcastDescription'))
                 )
             ),
             DOM({ style: 'build-right' },
