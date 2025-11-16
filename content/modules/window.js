@@ -150,12 +150,12 @@ export class Window {
 			if (isSkin) {
 				shopItemContainerStyle.push('show_item_container_double');
 			}
-			let shopItem = DOM({style: shopItemContainerStyle}, 
+			let shopItem = DOM({style: shopItemContainerStyle, title: translatedName}, 
 				isSkin ? DOM({ style: 'shop_item' },
 					DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), itemSrc),
 					DOM({ style: 'shop_item_name' }, isSkin ? srcTranslatedName : '')
 				) : DOM(),
-				DOM({ style: 'shop_item', title: translatedName },
+				DOM({ style: 'shop_item' },
 					DOM({style: 'shop_item_img_container'}, shopItemBackground, item),
 					DOM({ style: 'shop_item_name' }, isSkin ? translatedName : '')
 				),
