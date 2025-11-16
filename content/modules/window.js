@@ -248,25 +248,11 @@ export class Window {
 	}
 
 	static async shop() {
-		// enabled: - не приобретено ли уже? делает кнопку активации недоступной
-		let request = [
-		];
-		for (let fid = 0; fid < Shop.shopItems.length; ++fid) {
-			const f = Shop.shopItems[fid];
-			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
-		}
 		request = await App.api.request('shop','available');
 		return await this.processShopAndCollection(request, true);
 	}
 
 	static async collection() {
-		// enabled - не экипировано ли уже? делает кнопку активации недоступной
-		let request = [
-		];
-		for (let fid = 0; fid < Shop.shopItems.length; ++fid) {
-			const f = Shop.shopItems[fid];
-			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
-		}
 		request = await App.api.request('shop','purchase');
 
 		return await this.processShopAndCollection(request, false);
