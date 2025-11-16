@@ -103,8 +103,9 @@ export class Window {
 		return DOM({ id: 'winventory' }, view);
 	}
 
-	static processShopAndCollection(request, isShop) {
-		let topHeroVictoryCount = { heroId: 34, victoryCount: 100 }; // TODO: await App.api.request(App.CURRENT_MM, 'getHeroWithVictoryCount', { userId:  });
+	static async processShopAndCollection(request, isShop) {
+		//let req = await App.api.request(App.CURRENT_MM, 'getHeroWithVictoryCount');;
+		let topHeroVictoryCount = { heroId: 34, skinId: 1, frameType: 4 }; // TODO: await App.api.request(App.CURRENT_MM, 'getHeroWithVictoryCount');
 		let category = {
 			skin: DOM({ style: 'shop_items' }),
 			flag: DOM({ style: 'shop_items' }),
@@ -119,41 +120,21 @@ export class Window {
 			const isSkin = categoryName == 'skin';
 			let item = DOM({ style: isFrame ? 'shop_item_img_frame' : 'shop_item_img' });
 			let itemSrc = DOM({ style: 'shop_item_img' });
-			item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}")`;
-			const translatedName = Lang.text(Shop.shopItems[rItem.id].name);
+			let itemIcon = Shop.getIcon(rItem.categoryId, isFrame ? `${rItem.externalId}/${topHeroVictoryCount.frameType}` : rItem.externalId);
+			item.style.backgroundImage = itemIcon[0];
+			let itemName = Shop.getName(rItem.categoryId, rItem.externalId);
+			const translatedName = Lang.text(itemName[0]);
 			let srcTranslatedName = "";
 			if (isSkin) {
-				const heroId = Shop.shopItems[rItem.id].icon.split('/')[1];
-				itemSrc.style.backgroundImage = `url("content/hero/${heroId}/1.webp")`;
-				srcTranslatedName = Lang.text(`hero_${heroId}_name`);
+				itemSrc.style.backgroundImage = itemIcon[1]; //`url("content/hero/${heroId}/1.webp")`;
+				srcTranslatedName = Lang.text(itemName[1]);
 			}
 			let shopItemBackground = DOM();
 			if (isFrame) {
 				shopItemBackground = DOM({ style: 'shop_item_img' });
-				let frameType = 0;
-				if (topHeroVictoryCount && topHeroVictoryCount.heroId) {
-					shopItemBackground.style.backgroundImage = `url("content/hero/${topHeroVictoryCount.heroId}/1.webp")`
-					if (topHeroVictoryCount.victoryCount >= 25) {
-						frameType = 1;
-					}
-					if (topHeroVictoryCount.victoryCount >= 50) {
-						frameType = 2;
-					}
-					if (topHeroVictoryCount.victoryCount >= 75) {
-						frameType = 3;
-					}
-					if (topHeroVictoryCount.victoryCount >= 100) {
-						frameType = 4;
-					}
-					if (frameType) {
-						item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${frameType}.png")`;
-					} else {
-						item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
-						isEnabled = false;
-					}
-				} else {
-					shopItemBackground.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
-					item.style.backgroundImage = `url("content/${Shop.shopItems[rItem.id].icon}${1}.png")`;
+				shopItemBackground.style.backgroundImage = `url("content/hero/${topHeroVictoryCount.heroId}/${topHeroVictoryCount.skinId}.webp")`
+				if (topHeroVictoryCount.frameType == 0) {
+					isEnabled = false;
 				}
 			} 
 			if (isFlag) {
@@ -221,10 +202,12 @@ export class Window {
 											}
 											shopItem.classList.add('shop_item_container_equipped');
 											shopItem.classList.remove('shop_item_container');
+											shopItem.lastChild.firstChild.innerText = Lang.text("shop_in_use");
 											for (const collectionItem of category[categoryName].childNodes) {
 												if (collectionItem != shopItem) {
 													collectionItem.classList.add('shop_item_container');
 													collectionItem.classList.remove('shop_item_container_equipped');
+													collectionItem.lastChild.firstChild.innerText = Lang.text("shop_use");
 												}
 											}
 										}]
@@ -273,7 +256,7 @@ export class Window {
 			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
 		}
 		request = await App.api.request('shop','available');
-		return this.processShopAndCollection(request, true);
+		return await this.processShopAndCollection(request, true);
 	}
 
 	static async collection() {
@@ -286,7 +269,7 @@ export class Window {
 		}
 		request = await App.api.request('shop','purchase');
 
-		return this.processShopAndCollection(request, false);
+		return await this.processShopAndCollection(request, false);
 	}
 	
 	static async quest(item) {
