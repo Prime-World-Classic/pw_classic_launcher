@@ -255,9 +255,9 @@ export class Window {
 			DOM({ style: ['shop_header_item', !isShop ? 'shop_header_selected' : 'shop_header_not_selected'], event: ['click', async () => Window.show('main', 'collection')] }, Lang.text('shop_collection')),
 			shopSeparator.cloneNode(true));
 
-		let skins = DOM({ style: 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_skins')), category.skin);
-		let flags = DOM({ style: 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_flags')), category.flag);
-		let frames = DOM({ style: 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_frames')), category.frame);
+		let skins = DOM({ style: category.skin.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_skins')), category.skin);
+		let flags = DOM({ style: category.flag.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_flags')), category.flag);
+		let frames = DOM({ style: category.frame.childNodes.length == 0 ? 'shop_category_hidden' : 'shop_category' }, DOM({ style: 'shop_category_header' }, Lang.text('shop_frames')), category.frame);
 		if (App.isAdmin()) {
 			let wnd = DOM({ id: 'wshop' }, shopHeader, DOM({ style: 'shop_with_scroll' }, skins, flags, frames));
 			return wnd;
