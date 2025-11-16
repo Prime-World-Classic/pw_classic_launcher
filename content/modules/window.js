@@ -248,6 +248,7 @@ export class Window {
 			const f = Shop.shopItems[fid];
 			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
 		}
+		request = await App.api.request('shop','available');
 		return this.processShopAndCollection(request, true);
 	}
 
