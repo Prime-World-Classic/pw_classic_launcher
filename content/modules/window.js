@@ -172,23 +172,33 @@ export class Window {
 			let shopItem = DOM({style: shopItemContainerStyle}, 
 				isSkin ? DOM({ style: 'shop_item' },
 					DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), itemSrc),
-					DOM({ style: 'shop_item_name', title: translatedName }, isSkin ? srcTranslatedName : '')
+					DOM({ style: 'shop_item_name' }, isSkin ? srcTranslatedName : '')
 				) : DOM(),
-				DOM({ style: 'shop_item' },
+				DOM({ style: 'shop_item', title: translatedName },
 					DOM({style: 'shop_item_img_container'}, shopItemBackground, item),
-					DOM({ style: 'shop_item_name', title: translatedName }, isSkin ? translatedName : '')
+					DOM({ style: 'shop_item_name' }, isSkin ? translatedName : '')
 				),
 				isSkin ? DOM({style: 'shop_item_arrow'}) : DOM(),
 				DOM(
 					{
 						style: 'shop_item_price_container', event: ['click', async () => {
-							if (!isEnabled) { return; }
+							if (!shopItem.classList.contains('shop_item_container')) { return; }
 							if (isShop) {
 								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), DOM({ style: 'splash-item-text' }, `Купить ${translatedName}`, DOM({ tag: 'br' }), `за ${rItem.price}`, DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), `?`),
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
-											App.error(`Покупочка ${Shop.shopItems[rItem.id].name}`); // TODO: REQUEST
+											let crystalLeft;
+											try {
+												crystalLeft = await App.api.request('shop','buy',{id:rItem.id});
+											}
+											catch (e) {
+												App.error(e);
+												return;
+											}
+											View.castleTotalCrystal.firstChild.innerText = crystalLeft;
+											shopItem.classList.add('shop_item_container_disabled');
+											shopItem.classList.remove('shop_item_container');
 										}]
 									}, "Купить"),
 									DOM({
@@ -202,7 +212,21 @@ export class Window {
 									DOM({
 										style: 'splash-content-button', event: ['click', async () => {
 											Splash.hide();
-											App.error(`Экипировочка ${Shop.shopItems[rItem.id].name}`); // TODO: REQUEST
+											try {
+												await App.api.request('shop','apply',{id:rItem.id});
+											}
+											catch (e) {
+												App.error(e);
+												return;
+											}
+											shopItem.classList.add('shop_item_container_equipped');
+											shopItem.classList.remove('shop_item_container');
+											for (const collectionItem of category[categoryName].childNodes) {
+												if (collectionItem != shopItem) {
+													collectionItem.classList.add('shop_item_container');
+													collectionItem.classList.remove('shop_item_container_equipped');
+												}
+											}
 										}]
 									}, "Экипировать"),
 									DOM({
@@ -260,6 +284,8 @@ export class Window {
 			const f = Shop.shopItems[fid];
 			request.push({ id: fid, price: 100, categoryId: f.categoryId, enabled: true})
 		}
+		request = await App.api.request('shop','purchase');
+
 		return this.processShopAndCollection(request, false);
 	}
 	
