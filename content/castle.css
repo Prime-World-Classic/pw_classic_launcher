@@ -1755,7 +1755,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	width: 100cqw;
 	display: flex;
 	flex-direction: column;
-  	overflow-y: scroll;
+  	overflow-y: auto;
 	overflow-x: hidden;
 	scrollbar-color: rgb(234, 230, 123) rgba(255, 166, 0, 0);
   	scrollbar-width: 1cqw;
