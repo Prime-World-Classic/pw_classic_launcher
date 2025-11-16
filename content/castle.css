@@ -1838,6 +1838,9 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	border-left:0.1cqh solid rgba(0, 255, 255, 0.5)cyan;
 	border-right:0.1cqh solid rgba(0, 255, 255, 0.5);
 }
+.shop_category_hidden {
+	display: none;
+}
 
 .shop_category_header {
 	font-size: 3cqh;
