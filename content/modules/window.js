@@ -248,12 +248,12 @@ export class Window {
 	}
 
 	static async shop() {
-		request = await App.api.request('shop','available');
+		let request = await App.api.request('shop','available');
 		return await this.processShopAndCollection(request, true);
 	}
 
 	static async collection() {
-		request = await App.api.request('shop','purchase');
+		let request = await App.api.request('shop','purchase');
 
 		return await this.processShopAndCollection(request, false);
 	}
