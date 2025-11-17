@@ -201,10 +201,10 @@ export class Window {
 							if (isShop) {
 								Splash.show(DOM({}, DOM({ style: 'splash-item-container' }, 
 									isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), 
-									DOM({ style: 'splash-item-text' }, `Купить `, 
+									DOM({ style: 'splash-item-text' }, Lang.text('windowShopBuyItem'), 
 										DOM({style: 'splash-shop-item-name'}, `${translatedName}`), 
 										DOM({ tag: 'br' }), 
-										`за ${rItem.price}`, 
+										Lang.text('windowShopItemPrice').replace('{rItem.price}', rItem.price), 
 										DOM({ tag: 'img', src: 'content/img/queue/DiamondBlue.png', style: 'splash_shop_item_price_icon' }), 
 										`?`, DOM({}, additionalMessage)),
 									DOM({
@@ -228,17 +228,17 @@ export class Window {
 											shopItem.classList.add('shop_item_container_disabled');
 											shopItem.classList.remove('shop_item_container');
 										}]
-									}, "Купить"),
+									}, Lang.text('windowShopBuy')),
 									DOM({
 										style: 'splash-content-button-red', event: ['click', async () => {
 											Splash.hide();
 										}]
-									}, "Отмена")
+									}, Lang.text('windowShopCancel'))
 								))
 							} else {
 								Splash.show(DOM({}, 
 									DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), 
-									`Экипировать `, 
+									Lang.text('windowShopEquipItem'), 
 									DOM({style: 'splash-shop-item-name'}, `${translatedName}`), 
 									"?",
 									DOM({}, additionalMessage),
@@ -274,12 +274,12 @@ export class Window {
 												}
 											}
 										}]
-									}, "Экипировать"),
+									}, Lang.text('windowShopEquip')),
 									DOM({
 										style: 'splash-content-button-red', event: ['click', async () => {
 											Splash.hide();
 										}]
-									}, "Отмена")
+									}, Lang.text('windowShopCancel'))
 								))
 							}
 						}]
