@@ -132,7 +132,7 @@ export class Window {
 			let itemIcon = Shop.getIcon(rItem.categoryId, isFrame ? `${rItem.externalId}/${topHeroVictoryCount.frameId}` : rItem.externalId);
 			item.style.backgroundImage = itemIcon[0];
 			let itemName = Shop.getName(rItem.categoryId, rItem.externalId);
-			const translatedName = Lang.text(itemName[0]);
+			const translatedName = isFlag ? rItem.externalId : Lang.text(itemName[0]);
 			let srcTranslatedName = "";
 			let frameItems = [item.cloneNode(),item.cloneNode(),item.cloneNode(),item.cloneNode()]
 			if (isSkin) {
@@ -186,7 +186,7 @@ export class Window {
 				) : DOM(),
 				!isFrame ? DOM({ style: 'shop_item' },
 					DOM({style: 'shop_item_img_container'}, shopItemBackground, item),
-					DOM({ style: 'shop_item_name' }, isSkin ? translatedName : isFrame ? Lang.text('frame_req_1') : '')
+					DOM({ style: 'shop_item_name' }, isSkin || isFlag ? translatedName : isFrame ? Lang.text('frame_req_1') : '')
 				) : DOM(),
 				isFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[0]), DOM({ style: 'shop_item_name' }, showQuadFrame ? Lang.text('frame_req_1') : Lang.text('frame_no_frame'))) : DOM(),
 				showQuadFrame ? DOM({ style: 'shop_item' }, DOM({style: 'shop_item_img_container'}, shopItemBackground.cloneNode(), frameItems[1]), DOM({ style: 'shop_item_name' }, Lang.text('frame_req_2'))) : DOM(),
