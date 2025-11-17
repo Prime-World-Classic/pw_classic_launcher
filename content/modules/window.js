@@ -315,6 +315,7 @@ export class Window {
 
 	static async shop() {
 		let request = await App.api.request('shop','available');
+		request.sort((x,y) => x.id - y.id );
 		return await this.processShopAndCollection(request, true);
 	}
 
