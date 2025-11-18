@@ -6,6 +6,28 @@ export class Shop {
         2: 'frame',
         3: 'skin',
     }
+    static timeBeforeUpdate = 0;
+    static requireAnimation = true;
+
+    static getCurrentDateMsk() {
+
+		const hour = 60 * 60 * 1000;
+
+		const dateNow = new Date();
+
+		const dateNowMsk = new Date(dateNow.getTime() + 3 * hour);
+
+		return new Date(Date.UTC(dateNowMsk.getFullYear(), dateNowMsk.getMonth(), dateNowMsk.getDate()));
+
+    }
+
+    static async retrieveLastUpdate(){
+
+        Shop.timeBeforeUpdate = await App.api.request('shop','getTimeBeforeUpdateForUser');
+
+        this.requireAnimation = Shop.timeBeforeUpdate <= 0;
+        
+    }
 
     static getIcon(categoryId, externalId) {
         switch (categoryId) {
