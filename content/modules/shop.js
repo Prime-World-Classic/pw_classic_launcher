@@ -1,4 +1,5 @@
 import { App } from './app.js';
+import { Castle } from './castle.js';
 import { View } from './view.js';
 
 export class Shop {
@@ -21,8 +22,14 @@ export class Shop {
 
     }
 
-    static async retrieveLastUpdate(){
+    static notifyShopIsUpdated() {
+        if (View.castleCrystalContainer) {
+            View.castleCrystalContainer.classList.add('crystal-container-anim');
+        }
+        Castle.SetBuildingNotification('fair', true);
+    }
 
+    static async retrieveLastUpdate(){
         Shop.timeBeforeUpdate = await App.api.request('shop','getTimeBeforeUpdateForUser');
         if (Shop.timeoutEvent) {
             clearTimeout(Shop.timeoutEvent);
@@ -30,16 +37,12 @@ export class Shop {
 
         if (Shop.timeBeforeUpdate > 0) {
             Shop.timeoutEvent = setTimeout(_ => {
-                if (View.castleCrystalContainer) {
-                    View.castleCrystalContainer.classList.add('crystal-container-anim');
-                }
+                Shop.notifyShopIsUpdated();
             }, Shop.timeBeforeUpdate);
         } else {
             Shop.requireAnimation = true;
             setTimeout(_ => {
-                if (View.castleCrystalContainer) {
-                    View.castleCrystalContainer.classList.add('crystal-container-anim');
-                }
+                Shop.notifyShopIsUpdated();
             }, 1000);
         }
         

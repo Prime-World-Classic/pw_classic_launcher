@@ -322,7 +322,7 @@ export class Window {
 
 			function checkUpdate() {
 				setTimeout(_ => {
-					if (!wnd) {
+					if (!('main' in Window.windows) || !(Window.windows['main'].id == 'wshop')) {
 						return;
 					}
 
