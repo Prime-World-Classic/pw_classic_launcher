@@ -1916,8 +1916,10 @@ export class Castle {
         }
         // Удалить здания, которые уже удалены
         for (let uid in Castle.buildingBubblesDoms) {
-            if (!Castle.placedBuildings.find(obj => obj.uniqueId)) {
+            if (!Castle.placedBuildings.find(obj => obj.uniqueId == uid)) {
+                Castle.buildingBubbles.removeChild(Castle.buildingBubblesDoms[uid]);
                 delete Castle.buildingBubblesDoms[uid];
+
             }
         }
         for (const building of Castle.placedBuildings) {
