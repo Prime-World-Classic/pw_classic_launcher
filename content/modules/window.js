@@ -108,6 +108,7 @@ export class Window {
 	}
 
 	static async processShopAndCollection(request, isShop) {
+        View.castleCrystalContainer.classList.remove('crystal-container-anim');
 		let topHeroVictoryCount =  { heroId: 1, skinId: 1, frameId: 0 }; 
 		try {
 			topHeroVictoryCount = await App.api.request(App.CURRENT_MM, 'getHeroWithFrameId');

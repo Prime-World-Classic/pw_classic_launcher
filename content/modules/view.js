@@ -838,7 +838,6 @@ export class View {
 
         View.castleCrystalContainer = DOM({style: ['crystal-container', Shop.requireAnimation ? 'crystal-container-anim' : '_dummy_'], 
         event: ['click', () => {
-            View.castleCrystalContainer.classList.remove('crystal-container-anim');
             Window.show('main', 'shop');
         }] }, View.castleTotalCrystal);
 
