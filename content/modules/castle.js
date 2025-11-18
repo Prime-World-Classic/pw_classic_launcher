@@ -15,6 +15,7 @@ import { CastleBuildingsEvents } from './castleBuildingEvents.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { PreloadImages } from './preloadImages.js';
+import { DOM } from "./dom.js";
 
 export class Castle {
 
@@ -101,7 +102,9 @@ export class Castle {
 
     static zeroTranslation = [1072, 1360];
 
-    static gridTranslation;
+    static gridTranslation = [0, 0];
+
+    static gridTranslationY = 0;
 
     static cursorPosition = [0, 0];
 
@@ -350,6 +353,8 @@ export class Castle {
     ];
 
     static placedBuildings = [];
+
+    static buildingBubblesDoms = {};
 
     static allowedToBuildGridTex = new Uint8Array(64 * 64 * 4).fill(0);
     static allowedToBuildGrid = Array.from(Array(47), () => new Array(38));
@@ -605,7 +610,6 @@ export class Castle {
             }
         }
     }
-
 
     static placePhantomBuilding() {
         if (Castle.phantomBuildingIsAllowedToBuild) {
@@ -1307,6 +1311,8 @@ export class Castle {
 
             Castle.gridTranslation = [gridTransform[3], gridTransform[11]];
 
+            Castle.gridTranslationY = gridTransform[7]
+
         } else {
             Castle.gridTranslation = [0, 0];
         }
@@ -1586,11 +1592,13 @@ export class Castle {
 
         vec3.normalize(camForwNew, camForwNew);
 
-        var t = -(camPos[1] + 27) / camForwNew[1];
+        var t = -(camPos[1] + Castle.gridTranslationY) / camForwNew[1];
 
         Castle.gridCursorPosX = camPos[0] + t * camForwNew[0] + (Castle.zeroTranslation[0] + Castle.gridTranslation[0]);
 
         Castle.gridCursorPosZ = camPos[2] + t * camForwNew[2] + (Castle.zeroTranslation[1] + Castle.gridTranslation[1]);
+
+        Castle.UpdateBuildingBubbles();
 
     }
     static setupMainCam(program) {
@@ -1872,6 +1880,64 @@ export class Castle {
 
         Castle.gl.drawArrays(strip ? Castle.gl.TRIANGLE_STRIP : Castle.gl.TRIANGLES, 0, indexCount);
 
+    }
+    
+    static convertBuildingPosToViewCoord(posX, posY) {
+        let viewPos = new Float32Array(4);
+        let bubblePos = [
+            Castle.zeroTranslation[0] + posX * 7, // тут тоже чёта не сошлось
+            Castle.gridTranslationY + 30, // иконку повесим над зданием в 30 метрах
+            Castle.zeroTranslation[1] - 130 + posY * 7, // не сошлись какие-то числа, пришлось подгонять
+            1
+        ];
+        let viewProjTransp = new Float32Array(16);
+        mat4.transpose(viewProjTransp, Castle.viewProjMatr);
+        vec4.transformMat4(viewPos, bubblePos, Castle.viewProjMatr);
+        let output = [(viewPos[0] / viewPos[3] + 1) * Castle.canvasWidth / 2, (1 - viewPos[1] / viewPos[3]) * Castle.canvasHeight / 2 ];
+        //let output = [viewPos[0] / viewPos[3] * Castle.canvasWidth, viewPos[1] / viewPos[3] * Castle.canvasHeight, viewPos[2] / viewPos[3]];
+        return output;
+    }
+
+    static buildingUniqueIdCounter = 0;
+
+    static buildingBubbleStatuses = {};
+
+    static SetBuildingNotification(buildingName, notificationStatus) {
+        Castle.buildingBubbleStatuses[buildingName] = notificationStatus;
+    }
+
+    static UpdateBuildingBubbles() {
+        // Добавить все новые здания
+        for (let b = 0; b < Castle.placedBuildings.length; ++b) {
+            if (!('uniqueId' in Castle.placedBuildings[b])) {
+                Castle.placedBuildings[b].uniqueId = Castle.buildingUniqueIdCounter;
+                Castle.buildingUniqueIdCounter++;
+            }
+        }
+        // Удалить здания, которые уже удалены
+        for (let uid in Castle.buildingBubblesDoms) {
+            if (!Castle.placedBuildings.find(obj => obj.uniqueId)) {
+                delete Castle.buildingBubblesDoms[uid];
+            }
+        }
+        for (const building of Castle.placedBuildings) {
+            const buildingName = Castle.buildings[building.id];
+            if (buildingName in CastleBuildingsEvents) {
+
+                if (!(building.uniqueId in Castle.buildingBubblesDoms)) {
+                    Castle.buildingBubblesDoms[building.uniqueId] = DOM({style: ['castle_building_bubble', 'crystal-container-anim']}, DOM({tag: 'img', src: `content/icons/buildings/${buildingName}.png`}));
+                    Castle.buildingBubbles.appendChild(Castle.buildingBubblesDoms[building.uniqueId]);
+                }
+                const doShowBubble = buildingName in Castle.buildingBubbleStatuses && Castle.buildingBubbleStatuses[buildingName];
+                Castle.buildingBubblesDoms[building.uniqueId].style.display = doShowBubble ? 'block' : 'none';
+                if (doShowBubble) {
+                    const buildingSize = Castle.sceneBuildings[buildingName].size[0];
+                    const buldingViewPos = Castle.convertBuildingPosToViewCoord(building.posX + buildingSize / 2, building.posY + buildingSize / 2);
+                    Castle.buildingBubblesDoms[building.uniqueId].style.left = buldingViewPos[0] + 'px';
+                    Castle.buildingBubblesDoms[building.uniqueId].style.top = buldingViewPos[1] + 'px';
+                }
+            }
+        }
     }
 
 }
