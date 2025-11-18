@@ -1,4 +1,5 @@
 import { App } from './app.js';
+import { View } from './view.js';
 
 export class Shop {
     static categories = {
@@ -7,7 +8,6 @@ export class Shop {
         3: 'skin',
     }
     static timeBeforeUpdate = 0;
-    static requireAnimation = true;
 
     static getCurrentDateMsk() {
 
@@ -24,8 +24,24 @@ export class Shop {
     static async retrieveLastUpdate(){
 
         Shop.timeBeforeUpdate = await App.api.request('shop','getTimeBeforeUpdateForUser');
+        if (Shop.timeoutEvent) {
+            clearTimeout(Shop.timeoutEvent);
+        }
 
-        this.requireAnimation = Shop.timeBeforeUpdate <= 0;
+        if (Shop.timeBeforeUpdate > 0) {
+            Shop.timeoutEvent = setTimeout(_ => {
+                if (View.castleCrystalContainer) {
+                    View.castleCrystalContainer.classList.add('crystal-container-anim');
+                }
+            }, Shop.timeBeforeUpdate);
+        } else {
+            Shop.requireAnimation = true;
+            setTimeout(_ => {
+                if (View.castleCrystalContainer) {
+                    View.castleCrystalContainer.classList.add('crystal-container-anim');
+                }
+            }, 1000);
+        }
         
     }
 
