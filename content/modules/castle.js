@@ -1925,7 +1925,7 @@ export class Castle {
             if (buildingName in CastleBuildingsEvents) {
 
                 if (!(building.uniqueId in Castle.buildingBubblesDoms)) {
-                    Castle.buildingBubblesDoms[building.uniqueId] = DOM({style: ['castle_building_bubble', 'crystal-container-anim']}, DOM({tag: 'img', src: `content/icons/buildings/${buildingName}.png`}));
+                    Castle.buildingBubblesDoms[building.uniqueId] = DOM({style: ['castle_building_bubble'], event: ['click', () => CastleBuildingsEvents[buildingName]()]}, DOM({tag: 'img', src: `content/icons/buildings/${buildingName}.png`}));
                     Castle.buildingBubbles.appendChild(Castle.buildingBubblesDoms[building.uniqueId]);
                 }
                 const doShowBubble = buildingName in Castle.buildingBubbleStatuses && Castle.buildingBubbleStatuses[buildingName];

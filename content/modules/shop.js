@@ -36,6 +36,7 @@ export class Shop {
         }
 
         if (Shop.timeBeforeUpdate > 0) {
+            Castle.SetBuildingNotification('fair', false);
             Shop.timeoutEvent = setTimeout(_ => {
                 Shop.notifyShopIsUpdated();
             }, Shop.timeBeforeUpdate);
