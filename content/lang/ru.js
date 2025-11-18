@@ -461,7 +461,7 @@ export const ru = {
 		flag_chile: "Чили",
 		flag_mozambique: "Мозамбик",
 		
-		flag_tester: "Тестер",
+		flag_tester: "Тестер PWC",
 
 		// Переводы
 		select_faction: "Выбор Фракции",
