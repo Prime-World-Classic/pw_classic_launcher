@@ -16,6 +16,7 @@ import { Timer } from './timer.js';
 
 
 export class Window {
+	static currentTranslatedName = null;
 	static windows = {}
 	static windowOrder = []
 	static async show(category, method, value, value2, value3) {
@@ -110,9 +111,23 @@ export class Window {
 		let topHeroVictoryCount =  { heroId: 1, skinId: 1, frameId: 0 }; 
 		try {
 			topHeroVictoryCount = await App.api.request(App.CURRENT_MM, 'getHeroWithFrameId');
+			if (Window.currentTranslatedName === null || Window.currentTranslatedName === undefined) {
+				Window.currentTranslatedName = Lang.text('frame_0');
+			}
+			for (const item of request) {
+				if (item.categoryId === 2 && !item.enabled) {
+					const frameKey = `frame_${item.externalId}`;
+					Window.currentTranslatedName = Lang.text(frameKey);
+					break;
+				}
+			}
 		} 
+		
 		catch (e) {
 			App.error(e);
+			 if (Window.currentTranslatedName === null || Window.currentTranslatedName === undefined) {
+				Window.currentTranslatedName = Lang.text('frame_0');
+			}
 		}
 		let category = {
 			skin: DOM({ style: 'shop_items' }),
@@ -238,8 +253,9 @@ export class Window {
 							} else {
 								Splash.show(DOM({}, 
 									DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode() ), 
-									Lang.text('windowShopEquipItem'), 
-									DOM({style: 'splash-shop-item-name'}, `${translatedName}`), 
+									(isFrame && !showQuadFrame) ? Lang.text('windowShopUnequipItem') : Lang.text('windowShopEquipItem'), 
+									DOM({style: 'splash-shop-item-name'}, 
+									(isFrame && !showQuadFrame) ? `${Window.currentTranslatedName}` : `${translatedName}`), 
 									"?",
 									DOM({}, additionalMessage),
 									DOM({
@@ -254,8 +270,10 @@ export class Window {
 												} else {
 													if (isDefault) {
 														await App.api.request('shop','applyDefault', {categoryId:rItem.categoryId});
+														Window.currentTranslatedName = Lang.text('frame_0');
 													} else {
 														await App.api.request('shop','apply', {id:rItem.id});
+														Window.currentTranslatedName = translatedName;
 													}
 												}
 											}
@@ -274,7 +292,7 @@ export class Window {
 												}
 											}
 										}]
-									}, Lang.text('windowShopEquip')),
+									}, (isFrame && !showQuadFrame) ? Lang.text('windowShopUnequip') : Lang.text('windowShopEquip')),
 									DOM({
 										style: 'splash-content-button-red', event: ['click', async () => {
 											Splash.hide();

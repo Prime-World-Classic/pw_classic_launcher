@@ -58,6 +58,8 @@ export const ru = {
 		windowShopCancel: "Отмена",
 		windowShopEquip: "Экипировать",
 		windowShopEquipItem: "Экипировать ",
+		windowShopUnequip: "Снять",
+		windowShopUnequipItem: "Снять ",
 		
 		//Settings
 		settingsFileAccessError: 'Ошибка доступа к файлу настроек: ',
