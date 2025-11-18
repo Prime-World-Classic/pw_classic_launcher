@@ -1774,7 +1774,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	border:0.1cqh solid rgba(10,255,200,0.5);
+	border:0.1cqh solid rgba(0, 255, 255, 0.4);
 	border-left: 0;
 	border-right: 0;
 }
