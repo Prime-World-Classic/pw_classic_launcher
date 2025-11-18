@@ -16,7 +16,7 @@ import { MM } from './mm.js';
 import { PreloadImages } from './preloadImages.js';
 import { Game } from './game.js';
 import { Splash } from './splash.js';
-import { DomAudio } from './domAudio.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class View {
     static mmQueueMap = {};
@@ -68,7 +68,6 @@ export class View {
         try {
 
             var template = await View[method](value, value2, value3);
-
         }
         catch (error) {
 
@@ -136,10 +135,11 @@ export class View {
             }
         }];
 
-        let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
+        let login = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
         // Создаем выпадающий список языков
         const languageSelect = DOM({
             tag: 'select',
+            domaudio: domAudioPresets.defaultSelect,
             id: 'lang_select',
             style: 'language-select',
             event: ['change', async (e) => {
@@ -163,20 +163,21 @@ export class View {
                 })
             );
         });
+        
         let authorizationForm = DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' }, DOM({ tag: 'div' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' })),
 
-            DOM({ style: 'language-select-container' },
+            DOM({style: 'language-select-container' },
                 languageSelect
             ),
             DOM({ style: 'login-box-forma-inputs' },
                 login,
                 password,
                 DOM({ style: 'login-box-forma-buttons' },
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, Lang.text('login')),
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('registration')] }, Lang.text('registration'))
+                    DOM({ domaudio: domAudioPresets.defaultButton, style: 'login-box-forma-button', event: ['click', () => App.authorization(login, password)] }, Lang.text('login')),
+                    DOM({ domaudio: domAudioPresets.defaultButton, style: 'login-box-forma-button', event: ['click', () => View.show('registration')] }, Lang.text('registration'))
                 ),
                 DOM({ style: 'login-box-forma-buttons' },
-                    DOM({ style: ['login-box-forma-button', 'steamauth'], event: ['click', () => Window.show('main', 'steamauth')] }, Lang.text('authorizationSteam'))
+                    DOM({ domaudio: domAudioPresets.bigButton, style: ['login-box-forma-button', 'steamauth'], event: ['click', () => Window.show('main', 'steamauth')] }, Lang.text('authorizationSteam'))
                 ),
             )), DOM({ style: 'author' }, `Prime World: Classic v.${App.PW_VERSION}.${App.APP_VERSION}`));
 
@@ -190,7 +191,7 @@ export class View {
             }
         }];
 
-        let fraction = DOM({ tag: 'select' },
+        let fraction = DOM({ domaudio: domAudioPresets.defaultSelect, tag: 'select' },
             DOM({ tag: 'option', value: 0, disabled: true, selected: true }, Lang.text('fraction')),
             DOM({ tag: 'option', value: 1 }, Lang.text('adornia')),
             DOM({ tag: 'option', value: 2 }, Lang.text('docts'))
@@ -200,15 +201,15 @@ export class View {
 
         let telegramBotLink = DOM({ style: 'telegram-bot', tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)] });
 
-        let invite = DOM({ tag: 'input', placeholder: Lang.text('code'), event: numEnterEvent });
+        let invite = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('code'), event: numEnterEvent });
 
         let inviteContainer = DOM({ style: 'invite-input' }, invite, telegramBotLink)
 
-        let login = DOM({ tag: 'input', placeholder: Lang.text('nickname'), event: numEnterEvent });
+        let login = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('nickname'), event: numEnterEvent });
 
-        let password = DOM({ tag: 'input', placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
+        let password = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
 
-        let password2 = DOM({ tag: 'input', placeholder: Lang.text('passwordAgain'), type: 'password', event: numEnterEvent });
+        let password2 = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('passwordAgain'), type: 'password', event: numEnterEvent });
 
         return DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' },
 
@@ -219,8 +220,8 @@ export class View {
                 password,
                 password2,
                 DOM({ style: 'login-box-forma-buttons' },
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => App.registration(fraction, invite, login, password, password2)] }, Lang.text('registration1')),
-                    DOM({ style: 'login-box-forma-button', event: ['click', () => View.show('authorization')] }, Lang.text('back'))
+                    DOM({  domaudio: domAudioPresets.defaultButton, style: 'login-box-forma-button', event: ['click', () => App.registration(fraction, invite, login, password, password2)] }, Lang.text('registration1')),
+                    DOM({ domaudio: domAudioPresets.defaultButton, style: 'login-box-forma-button', event: ['click', () => View.show('authorization')] }, Lang.text('back'))
                 )
             ),
             DOM({ style: 'login-box-forma-right' }, DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/logo_classic.webp' }), DOM({ style: 'login-box-form-invite-text' }, `Получить инвайт-код через QR-код`), DOM({ tag: 'img', style: 'login-box-forma-logo', src: 'content/img/pwclassicbot.png' }))
