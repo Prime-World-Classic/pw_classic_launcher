@@ -58,6 +58,8 @@ export const en = {
 		windowShopCancel: "Cancel",
 		windowShopEquip: "Equip",
 		windowShopEquipItem: "Equip ",
+		windowShopUnequip: "Unequip",
+		windowShopUnequipItem: "Unequip ",
 		
 		//Settings
 		settingsFileAccessError: 'Settings file access error: ',
