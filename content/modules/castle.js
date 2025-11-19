@@ -740,7 +740,7 @@ export class Castle {
                         Castle.findAndRotateBuilding(Castle.outlinedBuilding.position[0], Castle.outlinedBuilding.position[1]);
                     } else {
                         if (Castle.outlinedBuilding.name in CastleBuildingsEvents) {
-                            CastleBuildingsEvents[Castle.outlinedBuilding.name]();
+                            CastleBuildingsEvents[Castle.outlinedBuilding.name](Castle.GetVolume(Castle.AUDIO_SOUNDS));
                         }
                     }
                 }
