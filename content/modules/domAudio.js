@@ -1,53 +1,52 @@
-    import { App } from "./app.js";
+import { App } from "./app.js";
 
-    export class DomAudio {
-    static eventMouseOver() {
-        App.error("MouseOver");
-        // TODO: Audio
-    }
-    static eventMouseDown() {
-        App.error("MouseDown");
-        // TODO: Audio
-    }
-    static eventMouseUp() {
-        App.error("MouseUp");
-        // TODO: Audio
-    }
+export class DomAudio {
+  static eventMouseOver() {
+    App.error("MouseOver");
+    // TODO: Audio
+  }
+  static eventMouseDown() {
+    App.error("MouseDown");
+    // TODO: Audio
+  }
+  static eventMouseUp() {
+    App.error("MouseUp");
+    // TODO: Audio
+  }
 
-    static eventInput() {
-        App.errАor("Input");
-    }
+  static eventInput() {
+    App.errАor("Input");
+  }
 
-    static eventChange() {
-        App.error("Change");
-    }
+  static eventChange() {
+    App.error("Change");
+  }
 
-    
-    eventMouseOverCallback = null;
+  eventMouseOverCallback = null;
 
-    eventMouseDownCallback = null;
+  eventMouseDownCallback = null;
 
-    eventMouseUpCallback = null;
+  eventMouseUpCallback = null;
 
-    eventInputCallback = null;
+  eventInputCallback = null;
 
-    eventChangeCallback = null;
+  eventChangeCallback = null;
 
-    constructor(
-        mouseover = DomAudio.eventMouseOver,
-        mousedown = DomAudio.eventMouseDown,
-        mouseup = DomAudio.eventMouseUp,
-        input = DomAudio.eventInput,
-        change = DomAudio.eventChange
-    ) {
-        this.eventMouseOverCallback = mouseover;
+  constructor(
+    mouseover = DomAudio.eventMouseOver,
+    mousedown = DomAudio.eventMouseDown,
+    mouseup = DomAudio.eventMouseUp,
+    input = DomAudio.eventInput,
+    change = DomAudio.eventChange
+  ) {
+    this.eventMouseOverCallback = mouseover;
 
-        this.eventMouseDownCallback = mousedown;
+    this.eventMouseDownCallback = mousedown;
 
-        this.eventMouseUpCallback = mouseup;
+    this.eventMouseUpCallback = mouseup;
 
-        this.eventInputCallback = input;
-        
-        this.eventChangeCallback = change;
-    }
-    }
+    this.eventInputCallback = input;
+
+    this.eventChangeCallback = change;
+  }
+}
