@@ -380,7 +380,7 @@ export class Window {
                             "click",
                             async () => {
                               Splash.hide();
-                              let crystalLeft;
+                              let crystalLeft = null;
                               try {
                                 crystalLeft = await App.api.request(
                                   "shop",
@@ -398,8 +398,11 @@ export class Window {
                                 App.error(e);
                                 return;
                               }
-                              View.castleTotalCrystal.firstChild.innerText =
-                                crystalLeft;
+                              if (Number.isInteger(crystalLeft)) {
+                                View.castleTotalCrystal.firstChild.innerText = crystalLeft;
+                              } else {
+                                App.error(`Неизвестное число кристаллов: ${crystalLeft}`);
+                              }
                               shopItem.classList.add(
                                 "shop_item_container_disabled"
                               );
