@@ -2,24 +2,24 @@ import { App } from "./app.js";
 
 export class DomAudio {
   static eventMouseOver() {
-    App.error("MouseOver");
+    //App.error("MouseOver");
     // TODO: Audio
   }
   static eventMouseDown() {
-    App.error("MouseDown");
+    //App.error("MouseDown");
     // TODO: Audio
   }
   static eventMouseUp() {
-    App.error("MouseUp");
+    //App.error("MouseUp");
     // TODO: Audio
   }
 
   static eventInput() {
-    App.errАor("Input");
+    //App.error("Input");
   }
 
   static eventChange() {
-    App.error("Change");
+    //App.error("Change");
   }
 
   eventMouseOverCallback = null;
