@@ -3,6 +3,7 @@ import { Lang } from './lang.js';
 import { App } from './app.js';
 import { NativeAPI } from './nativeApi.js';
 import { Splash } from './splash.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class Chat {
 
