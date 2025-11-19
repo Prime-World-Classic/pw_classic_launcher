@@ -14,6 +14,7 @@ import { MM } from './mm.js';
 import { Build } from './build.js';
 import { Timer } from './timer.js';
 
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class Window {
 	static currentTranslatedName = null;
@@ -25,6 +26,7 @@ export class Window {
 		}
 		let template = await Window[method](value, value2, value3);
 		let closeButton = DOM({
+      domaudio: domAudioPresets.closeButton,
 			style: 'close-button',
 			title: Lang.text('titleClose'),
 			event: ['click', () => {
@@ -76,6 +78,7 @@ export class Window {
 			DOM({ style: 'castle-menu-items' },
 				DOM({ style: 'castle-menu-text' }, Lang.text('steamauth')),
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					style: 'castle-menu-item-button', event: ['click', () => {
 
 						ParentEvent.children = window.open('https://api2.26rus-game.ru:2087', 'SteamAuth', 'width=1280, height=720, top=' + ((screen.height - 720) / 2) + ', left=' + ((screen.width - 1280) / 2) + ', toolbar=no, menubar=no, location=no, scrollbars=no, resizable=no, status=no');
