@@ -27,6 +27,10 @@ export function DOM(properties) {
 
                             parent.addEventListener("mouseup", () => properties.domaudio?.eventMouseUpCallback());
 
+                            parent.addEventListener("input", () => properties.domaudio?.eventInputCallback());
+
+                            parent.addEventListener("change", () => properties.domaudio?.eventChangeCallback());
+
                     } else {
 
                         App.error("Передан некорректный объект. Ожидается DomAudio")
