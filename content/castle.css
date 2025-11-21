@@ -1972,8 +1972,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 .shop_item_img_frame {
 	position: absolute;
-	top: -8cqw;
-	left: -18cqw;
+	top: -10cqw;
+	left: -20cqw;
 	width: 140cqw;
 	height: 140cqw;
 	background-size: contain;
