@@ -901,6 +901,7 @@ root.appendChild(content);
         const statCircle = DOM({ style: ['banner-stat-circle'] });
 
         const statsBtn = DOM({
+            domaudio: domAudioPresets.defaultButton,
             style: ['banner-icon', 'banner-icon--stat', 'button-outline'],
             title: Lang.text('titlestatistic'),
             event: ['click', () => {
@@ -926,7 +927,7 @@ root.appendChild(content);
                 Splash.show(
                     DOM(
                         { style: 'iframe-stats', event: ['click', (e) => { if (e.target === e.currentTarget) Splash.hide(); }] },
-                        DOM({ style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
+                        DOM({domaudio: domAudioPresets.closeButton, style: 'iframe-stats-navbar', event: ['click', () => Splash.hide()] }),
                         DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' })
                     ),
                     false
