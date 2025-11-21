@@ -2480,7 +2480,7 @@ export class Build {
 											await App.api.request('build', 'setZero', { buildId: Build.id, index: elemBelow.dataset.position });
 										}
 										Build.setStat(data, true);
-                     Sound.play(SOUNDS_LIBRARY.BUY, { volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+                     Sound.play(SOUNDS_LIBRARY.BUY, {id: "ui-buy", volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
 									}
 
 									await App.api.request('build', 'set', { buildId: Build.id, talentId: data.id, index: elemBelow.dataset.position });
@@ -2563,7 +2563,7 @@ export class Build {
 							Build.installedTalents[parseInt(oldParentNode.dataset.position)] = null;
 
 							Build.setStat(data, true);
-              Sound.play(SOUNDS_LIBRARY.BUY, { volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+              Sound.play(SOUNDS_LIBRARY.BUY, {id: "ui-buy", volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
 
 
 							if (data.id < 0) {

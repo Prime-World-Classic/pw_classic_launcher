@@ -614,8 +614,8 @@ export class Castle {
             Castle.isStaticSMCached = false;
             Castle.WriteBuildings();
             Sound.play(SOUNDS_LIBRARY.BUY, {
-                id: "ui-big-click",
-                volume: Castle.GetVolume(),
+                id: "ui-buy",
+                volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
             });
         }
     }
@@ -629,7 +629,7 @@ export class Castle {
                 Castle.WriteBuildings();
                 Sound.play(SOUNDS_LIBRARY.CLICK, {
                 id: "ui-click",
-                volume: Castle.GetVolume(),
+                volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
             });
                 return;
             }
@@ -645,7 +645,7 @@ export class Castle {
                 Castle.isStaticSMCached = false;
                 Castle.WriteBuildings();
                 Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, {
-                id: "ui-click",
+                id: "ui-close",
                 volume: Castle.GetVolume(),
             });
                 return;
