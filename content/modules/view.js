@@ -502,7 +502,7 @@ root.appendChild(content);
         for (let p in players) {
             let player = players[p];
 
-            let item = DOM({ style: 'castle-play-lobby-player', data: { id: player.id } });
+            let item = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-play-lobby-player', data: { id: player.id } });
 
             const rankIcon = DOM({ style: 'rank-icon' });
             rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
@@ -659,7 +659,7 @@ root.appendChild(content);
 
                     request.push({ id: 0 });
 
-                    let bodyHero = DOM({ style: 'party-hero' });
+                    let bodyHero = DOM({domaudio: domAudioPresets.defaultButton, style: 'party-hero' });
 
                     let preload = new PreloadImages(bodyHero);
 
@@ -870,6 +870,7 @@ root.appendChild(content);
             const disabled = (type === 'silver');
 
             const medal = DOM({
+              domaudio: domAudioPresets.defaultButton,
                 tag: 'span',
                 style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean)
             });
@@ -2011,7 +2012,7 @@ root.appendChild(content);
 
                     request.push({ id: 0 });
 
-                    let bodyHero = DOM({ style: 'party-hero' });
+                    let bodyHero = DOM({domaudio: domAudioPresets.defaultButton, style: 'party-hero' });
 
                     let preload = new PreloadImages(bodyHero);
 
@@ -2174,7 +2175,7 @@ root.appendChild(content);
 
                     request.push({ id: 0 });
 
-                    let bodyHero = DOM({ style: 'party-hero' });
+                    let bodyHero = DOM({domaudio: domAudioPresets.defaultButton, style: 'party-hero' });
 
                     let preload = new PreloadImages(bodyHero);
 
