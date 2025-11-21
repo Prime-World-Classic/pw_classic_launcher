@@ -588,20 +588,12 @@ export class MM {
         rankIcon
       );
 
-      hero.append(rank);
+      hero.append(rank,DOM({style:'mm-frame'}));
 
       if ("commander" in data.users[key]) {
-        hero.append(
-          DOM({
-            style: `mm-status-commander-${Winrate.icon(
-              data.users[key].winrate
-            )}`,
-          })
-        );
-
-        name.setAttribute("style", "color:rgba(255,215,0,0.9)");
+		name.setAttribute("style", "color:rgba(255,215,0,0.9)");
       }
-
+	  
       let banhero = DOM({ style: "mm-player-ban" });
 
       if (data.users[key].banhero) {
@@ -916,6 +908,12 @@ export class MM {
         skinId = data.skin;
 
       }
+	  
+	  if('frameId' in data){
+		  
+		  findOldPlayer.firstChild.children[1].style.backgroundImage = `url(content/frames/${data.frameId}.png)`;
+		  
+	  }
 
       findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/${skinId}.webp)`;
 
@@ -1026,6 +1024,13 @@ export class MM {
     let url = `url(content/hero/${data.heroId}/${skinId}.webp)`;
 
     if (findPlayer) {
+		
+		if('frameId' in data){
+		  
+		  findPlayer.firstChild.children[1].style.backgroundImage = `url(content/frames/${data.frameId}.png)`;
+			
+		}
+		
       findPlayer.dataset.hero = data.heroId;
 
       findPlayer.firstChild.style.backgroundImage = url;
