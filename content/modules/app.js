@@ -12,7 +12,8 @@ import { Splash } from './splash.js';
 import { Window } from './window.js';
 import { Castle } from './castle.js';
 import { domAudioPresets } from './domAudioPresets.js';
-
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { Sound } from './sound.js';
 export class App {
     static APP_VERSION = '0';
 
@@ -68,13 +69,28 @@ export class App {
             }
         }, 30000);
     }
+    
+  /**
+   * Preloads all sounds in SOUNDS_LIBRARY
+   * @returns {Promise<void>} A promise that resolves when all sounds are preloaded
+   */
+    static async initSounds() {
+      const tasks = [];
 
+      for (const name in SOUNDS_LIBRARY) {
+        const src = SOUNDS_LIBRARY[name];
+        tasks.push(Sound.preload(name, src));
+      }
+
+      await Promise.all(tasks);
+    }
+    
     static async init() {
         // wss://api2.26rus-game.ru:8443 - Москва (основа)
         // wss://relay.26rus-game.ru:8443 - Рига (Прокси)
         // wss://api.26rus-game.ru:8443 - США (прокси)
         App.api = new Api(this.hostList, this.bestHost, Events);
-
+        await App.initSounds();
         await News.init();
 
         await Store.init();
