@@ -24,6 +24,7 @@ export class Chat {
 
         let input = DOM({
             tag: 'input',
+            domaudio: domAudioPresets.deafultInput,
             style: 'chat-input',
             placeholder: Lang.text('enterTextAndPressEnter')
         });

@@ -14,6 +14,37 @@ import { SOUNDS_LIBRARY } from "./soundsLibrary.js";
  * @property {DomAudio} defaultButton - Default preset for buttons
  */
 export const domAudioPresets = {
+  defaultButton: new DomAudio(
+    /**
+     * @memberof domAudioPresets.defaultButton
+     * @description Mouse over event
+     * @function over
+     */
+    function over() {},
+    /**
+     * @memberof domAudioPresets.defaultButton
+     * @description Mouse down event
+     * @function down
+     */
+    function down() {
+      Sound.play(SOUNDS_LIBRARY.CLICK, {
+        id: "ui-click",
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    /**
+     * @memberof domAudioPresets.defaultButton
+     * @description Mouse up event
+     * @function up
+     */
+    function up() {},
+    /**
+     * @memberof domAudioPresets.defaultButton
+     * @description Input event
+     * @function input
+     */
+    function input() {}
+  ),
   /**
    * @memberof domAudioPresets
    * @description Preset for close button
