@@ -1,6 +1,7 @@
 import { DOM } from './dom.js';
 import { Lang } from './lang.js';
 import { Division } from './division.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class CastleNAVBAR {
 
@@ -39,7 +40,7 @@ export class CastleNAVBAR {
 
         for (let item of items) {
 
-            CastleNAVBAR.body.append(DOM({ style: item }));
+            CastleNAVBAR.body.append(DOM({domaudio:domAudioPresets.defaultButton, style: item }));
 
         }
 

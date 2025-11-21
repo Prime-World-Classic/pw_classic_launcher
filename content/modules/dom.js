@@ -18,7 +18,6 @@ export function DOM(properties) {
             switch (property) {
 
                 case 'domaudio':
-
                     if (properties.domaudio.constructor.name == "DomAudio") {
 
                             parent.addEventListener("mouseover", () => properties.domaudio?.eventMouseOverCallback());

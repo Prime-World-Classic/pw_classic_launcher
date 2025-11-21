@@ -14,6 +14,7 @@ import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Timer } from './timer.js';
 import { Splash } from './splash.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class MM {
 
@@ -250,6 +251,7 @@ export class MM {
 
             // Создаем кнопку закрытия
             const closeButton = DOM({
+                domaudio: domAudioPresets.closeButton,
                 tag: 'div',
                 style: 'close-button',
                 event: ['click', () => Splash.hide()]
