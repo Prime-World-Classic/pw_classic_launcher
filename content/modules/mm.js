@@ -906,12 +906,18 @@ export class MM {
       MM.searchActive(true);
     });
 
-    let findOldPlayer = document.getElementById(`PLAYER${data.userId}`);
+    let findOldPlayer = document.getElementById(`PLAYER${data.userId}`), skinId = 1;
 
     if (findOldPlayer) {
       findOldPlayer.dataset.hero = data.heroId;
 
-      findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/1.webp)`;
+      if("skin" in data){
+
+        skinId = data.skin;
+
+      }
+
+      findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/${skinId}.webp)`;
 
       findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
 
@@ -1009,9 +1015,15 @@ export class MM {
   }
 
   static eventChangeHero(data) {
-    let findPlayer = document.getElementById(`PLAYER${data.id}`);
+    let findPlayer = document.getElementById(`PLAYER${data.id}`), skinId = 1;
 
-    let url = `url(content/hero/${data.heroId}/1.webp)`;
+    if("skin" in data){
+
+      skinId = data.skin;
+
+    }
+
+    let url = `url(content/hero/${data.heroId}/${skinId}.webp)`;
 
     if (findPlayer) {
       findPlayer.dataset.hero = data.heroId;
