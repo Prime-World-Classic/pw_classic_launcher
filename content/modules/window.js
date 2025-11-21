@@ -110,21 +110,23 @@ export class Window {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
 			DOM({ style: 'castle-menu-items' },
-				App.isAdmin() ? DOM({ style: 'castle-menu-item-button' },
-					DOM({ event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
+				App.isAdmin() ? DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-menu-item-button' },
+					DOM({domaudio: domAudioPresets.defaultButton, event: ['click', () => Window.show('main', 'adminPanel')] }, 'Админ')) : DOM(),
 				DOM({ style: 'castle-menu-item-button' },
-					DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account'))),
+					DOM({domaudio: domAudioPresets.defaultButton, event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account'))),
 				DOM({ style: 'castle-menu-item-button' },
-					DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
+					DOM({domaudio: domAudioPresets.defaultButton, event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences'))),
 				DOM({ style: 'castle-menu-item-button' },
-					DOM({ event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
+					DOM({domaudio: domAudioPresets.defaultButton, event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					style: 'castle-menu-item-button', event: ['click', async () => {
 						App.exit();
 						Splash.hide();
 					}]
 				}, Lang.text('accountSwitch')),
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					style: 'castle-menu-item-button', event: ['click', () => {
 						if (NativeAPI.status) {
 							NativeAPI.exit();
@@ -158,6 +160,7 @@ export class Window {
 			DOM({ style: 'castle-menu-items' },
 				DOM({ style: 'castle-menu-item-checkbox' },
 					DOM({
+            domaudio: domAudioPresets.smallButton,
 						tag: 'input', type: 'checkbox', id: 'fullscreen-toggle', checked: !Settings.settings.fullscreen, event: ['change', (e) => {
 							Settings.settings.fullscreen = !e.target.checked;
 							Settings.ApplySettings({ render: false, audio: false });
@@ -168,6 +171,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-item-checkbox' },
 					DOM({
+            domaudio: domAudioPresets.smallButton,
 						tag: 'input',
 						type: 'checkbox',
 						id: 'render-toggle',
@@ -181,6 +185,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-item-checkbox' },
 					DOM({
+            domaudio: domAudioPresets.smallButton,
 						tag: 'input', type: 'checkbox', id: 'radmin-priority', checked: Settings.settings.radminPriority, event: ['change', (e) => {
 							Settings.settings.radminPriority = e.target.checked;
 						}]
@@ -190,6 +195,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-item-checkbox' },
 					DOM({
+            domaudio: domAudioPresets.smallButton,
 						tag: 'input', type: 'checkbox', id: 'novoice', checked: Settings.settings.novoice, event: ['change', (e) => {
 							Settings.settings.novoice = e.target.checked;
 						}]
@@ -199,6 +205,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-label' }, Lang.text('volume'),
 					DOM({
+            domaudio: domAudioPresets.defaultButton,
 						tag: 'input',
 						type: 'range',
 						value: Settings.settings.globalVolume * 100,
@@ -223,6 +230,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-label' }, Lang.text('volumeMusic'),
 					DOM({
+            domaudio: domAudioPresets.defaultButton,
 						tag: 'input',
 						type: 'range',
 						value: Settings.settings.musicVolume * 100,
@@ -246,6 +254,7 @@ export class Window {
 				),
 				DOM({ style: 'castle-menu-label' }, Lang.text('volumeSound'),
 					DOM({
+            domaudio: domAudioPresets.defaultButton,
 						tag: 'input',
 						type: 'range',
 						value: Settings.settings.soundsVolume * 100,
@@ -278,6 +287,7 @@ export class Window {
 					}, `${Math.round(Settings.settings.soundsVolume * 100)}%`)
 				),
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					style: 'castle-menu-item-button',
 					event: ['click', async (e) => {
 						const oldLanguage = Lang.target;
@@ -300,6 +310,7 @@ export class Window {
 				*/
 				// Кнопка "Назад"
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					style: 'castle-menu-item-button',
 					event: ['click', () => {
 						Window.show('main', 'menu');
@@ -341,6 +352,7 @@ export class Window {
 					Lang.text('keybindings_error', 'Не удалось найти файл конфигурации клавиш')
 				),
 				DOM({
+          domaudio: domAudioPresets.defaultButton,
 					class: 'castle-menu-item-button',
 					event: ['click', () => Window.show('settings', 'menu')]
 				}, Lang.text('back', 'Назад'))
@@ -420,6 +432,7 @@ export class Window {
 					}),
 
 					DOM({
+            domaudio: domAudioPresets.defaultButton,
 						class: 'castle-menu-item-button reset-btn',
 						event: ['click', () => {
 							document.querySelectorAll('.castle-keybinding-input').forEach((input, i) => {
@@ -438,6 +451,7 @@ export class Window {
 					}, Lang.text('reset_defaults', 'Сбросить на 1-0')),
 
 					DOM({
+            domaudio: domAudioPresets.defaultButton,
 						class: 'castle-menu-item-button save-btn',
 						event: ['click', async () => {
 							try {
@@ -502,26 +516,30 @@ export class Window {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, 'Админ Панель'),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents'); // Логика для отображения обычных талантов
 				}]
 			}, 'Таланты (обычные)'),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('talents2'); // Логика для отображения классовых талантов
 				}]
 			}, 'Таланты (классовые)'),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					View.show('users'); // Логика для управления пользователями
 				}]
 			}, 'Пользователи'),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					Window.show('main', 'castleDebug'); // Логика для управления пользователями
 				}]
 			}, 'Замок дебаг'),
-			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
 	static async castleDebug() {
@@ -539,6 +557,7 @@ export class Window {
 		return DOM({ id: 'wcastle-menu' },
 			DOM({ style: 'castle-menu-title' }, Lang.text('account')),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					ParentEvent.children = window.open(
 						`https://api2.26rus-game.ru:2087/connect/${App.storage.data.token}`,
@@ -548,16 +567,18 @@ export class Window {
 				}]
 			}, Lang.text('steamConnect')),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					App.setNickname();
 				}]
 			}, Lang.text('nicknameChange')),
 			DOM({
+        domaudio: domAudioPresets.defaultButton,
 				style: 'castle-menu-item-button', event: ['click', () => {
 					App.setFraction();
 				}]
 			}, Lang.text('sideChange')),
-			DOM({ style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
+			DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-menu-item-button', event: ['click', () => Window.show('main', 'menu')] }, Lang.text('back'))
 		);
 	}
 

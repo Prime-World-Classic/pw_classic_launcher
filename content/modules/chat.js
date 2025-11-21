@@ -174,6 +174,7 @@ export class Chat {
         }
 
         let item = DOM({
+            domaudio: domAudioPresets.defaultButton,
             style: 'chat-body-item', event: ['click', () => {
 
                 Chat.to = data.id;
@@ -192,6 +193,7 @@ export class Chat {
                 let body = document.createDocumentFragment();
 
                 body.append(DOM(`Выдать мут чата ${data.nickname}?`), DOM({
+                    domAudioPresets: domAudioPresets.bigButton,
                     style: 'splash-content-button', event: ['click', async () => {
 
                         await App.api.request('user', 'mute', { id: data.id });

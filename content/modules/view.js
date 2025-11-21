@@ -1045,6 +1045,7 @@ root.appendChild(content);
 
         let nicknameValue = String(App?.storage?.data?.login || '').trim();
         let nicknameMenuItem = DOM({
+          domaudio: domAudioPresets.defaultButton,
             style: 'nickname-menu-item',
             event: ['click', () => {
                 App.setNickname();
@@ -1055,7 +1056,7 @@ root.appendChild(content);
         }
 
         let flagMenuItem = DOM({
-            domaudio: new DomAudio(() => {App.error("Кастомный звук при наведении курсора")}), // своя реализация функции при наведении курсора
+            domaudio: domAudioPresets.defaultButton,
             style: 'flag-menu-item',
             event: ['click', () => {
                 App.setFraction();
@@ -1063,20 +1064,21 @@ root.appendChild(content);
             title: Lang.text('titleflag')
         });
         let settingsMenuItem = DOM({
-            domaudio: new DomAudio(null, undefined, undefined), // нет звука при наведении курсора
+            domaudio: domAudioPresets.defaultButton,
             style: 'settings-menu-item',
             event: ['click', () => {
                 Window.show('main', 'menu');
             }], title: Lang.text('titlesettings')
         });
         let chatMenuItem = DOM({
-            domaudio: new DomAudio(), // все звуки по умолчанию
+            domaudio: domAudioPresets.defaultButton,
             style: 'chat-menu-item',
             event: ['click', () => {
                 Chat.changeChatVisibility();
             }], title: Lang.text('titlechat')
         });
         let heroesMenuItem = DOM({
+          domaudio: domAudioPresets.defaultButton,
             style: 'heroes-menu-item',
             event: ['click', () => {
 
@@ -1086,6 +1088,7 @@ root.appendChild(content);
             }], title: Lang.text('titleheroes')
         });
         let friendsMenuItem = DOM({
+          domaudio: domAudioPresets.defaultButton,
             style: 'friends-menu-item',
             event: ['click', () => {
 
@@ -1095,6 +1098,7 @@ root.appendChild(content);
             }], title: Lang.text('titlefriends')
         });
         let buildingsMenuItem = DOM({
+          domaudio: domAudioPresets.defaultButton,
             style: 'buildings-menu-item',
             event: ['click', () => {
 
@@ -1107,10 +1111,10 @@ root.appendChild(content);
         flagMenuItem.style.backgroundImage = Castle.currentSceneName == 'doct' ? `url(content/icons/Human_logo_over.webp)` : `url(content/icons/Elf_logo_over.webp)`;
 
         View.arrows = new Object();
-        View.arrows.ls = DOM({ style: 'castle-bottom-left-scroll-single', event: ['click', () => View.scrollHero(-1)] });
-        View.arrows.ld = DOM({ style: 'castle-bottom-left-scroll-double', event: ['click', () => View.scrollHeroLine(-1)] });
-        View.arrows.rs = DOM({ style: 'castle-bottom-right-scroll-single', event: ['click', () => View.scrollHero(1)] });
-        View.arrows.rd = DOM({ style: 'castle-bottom-right-scroll-double', event: ['click', () => View.scrollHeroLine(1)] });
+        View.arrows.ls = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-bottom-left-scroll-single', event: ['click', () => View.scrollHero(-1)] });
+        View.arrows.ld = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-bottom-left-scroll-double', event: ['click', () => View.scrollHeroLine(-1)] });
+        View.arrows.rs = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-bottom-right-scroll-single', event: ['click', () => View.scrollHero(1)] });
+        View.arrows.rd = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-bottom-right-scroll-double', event: ['click', () => View.scrollHeroLine(1)] });
         body.append(DOM({ style: 'castle-bottom-menu' }, nicknameMenuItem, flagMenuItem, settingsMenuItem, heroesMenuItem, friendsMenuItem, buildingsMenuItem, chatMenuItem),
             DOM({ style: 'castle-bottom-content-container' },
                 View.castleBottom,
@@ -1348,7 +1352,7 @@ root.appendChild(content);
 
             let buildingNameBase = DOM({ style: 'castle-item-hero-name' }, buildingName);
 
-            let building = DOM({ style: 'castle-building-item' }, buildingNameBase);
+            let building = DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-building-item' }, buildingNameBase);
 
             building.dataset.url = `content/img/buildings/${Castle.currentSceneName}/${item}.png`;
 
@@ -1390,7 +1394,7 @@ root.appendChild(content);
 
                 let rank = DOM({ style: 'castle-hero-rank' }, DOM({ style: 'castle-hero-rank-lvl' }, item.rating), rankIcon);
 
-                let hero = DOM({ id: `id${item.id}`, style: ['castle-hero-item', 'hover-brightness'] },
+                let hero = DOM({domaudio: domAudioPresets.defaultButton, id: `id${item.id}`, style: ['castle-hero-item', 'hover-brightness'] },
                     DOM({ style: ['castle-hero-item-bg', 'hover-brightness'] }),
                     DOM({ style: ['castle-hero-item-img', 'no-hover-brightness'] }),
                     DOM({ style: ['castle-item-background', 'hover-brightness'] }),
@@ -1424,11 +1428,12 @@ root.appendChild(content);
             let buttonAdd = DOM({
                 style: 'castle-friend-item',
                 onclick: () => {
-                    let input = DOM({ tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+                    let input = DOM({domaudio: domAudioPresets.deafultInput, tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
                     let body = DOM({ style: 'search-body' });
 
                     // Создаём крестик для закрытия (как в buildSelectName)
                     let closeButton = DOM({
+                      domaudio: domAudioPresets.closeButton,
                         tag: 'div',
                         style: 'close-button',
                         event: ['click', () => Splash.hide()]
@@ -1469,6 +1474,7 @@ root.appendChild(content);
 
                                     // Создаём крестик для закрытия
                                     const closeButton = DOM({
+                                        domaudio: domAudioPresets.closeButton,
                                         tag: 'div',
                                         style: 'close-button',
                                         event: ['click', () => Splash.hide()]
@@ -1531,7 +1537,7 @@ root.appendChild(content);
                     input.focus();
 
                 }
-            }, DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-add' }, '+')));
+            }, DOM({domaudio: domAudioPresets.defaultButton, style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-add' }, '+')));
 
             preload.add(buttonAdd);
 
@@ -2233,7 +2239,7 @@ root.appendChild(content);
 
             hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
 
-            let item = DOM({ style: 'top-item', event: ['click', () => Build.view(player.id, player.hero, player.nickname)] }, hero, DOM({ style: 'top-item-player' }, DOM(`#${number}. ${player.nickname}`), DOM(`${player.rating}`)));
+            let item = DOM({domaudio: domAudioPresets.defaultButton, style: 'top-item', event: ['click', () => Build.view(player.id, player.hero, player.nickname)] }, hero, DOM({ style: 'top-item-player' }, DOM(`#${number}. ${player.nickname}`), DOM(`${player.rating}`)));
 
             top.append(item);
 
@@ -2397,6 +2403,7 @@ root.appendChild(content);
         let body = DOM({ style: 'game' });
 
         let button = DOM({
+              domaudio: domAudioPresets.defaultButton,
             style: 'game-button', event: ['click', async () => {
 
                 let request = await App.api.request('gamev2', 'start');
@@ -2487,6 +2494,7 @@ root.appendChild(content);
 
         if (!isWindow) {
             body.append(DOM({
+                domaudio: domAudioPresets.closeButton,
                 style: ['build-list-close', 'close-button'],
                 title: Lang.text('titleClose'),
                 event: ['click', () => {

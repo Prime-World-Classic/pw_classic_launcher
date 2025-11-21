@@ -15,6 +15,7 @@ import { CastleBuildingsEvents } from './castleBuildingEvents.js';
 import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { PreloadImages } from './preloadImages.js';
+import { SOUNDS_LIBRARY } from "./soundsLibrary.js";
 
 export class Castle {
 
@@ -612,6 +613,10 @@ export class Castle {
             Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
             Castle.isStaticSMCached = false;
             Castle.WriteBuildings();
+            Sound.play(SOUNDS_LIBRARY.BUY, {
+                id: "ui-big-click",
+                volume: Castle.GetVolume(),
+            });
         }
     }
 
@@ -622,8 +627,13 @@ export class Castle {
                 building.rot = (building.rot + 1) % 4;
                 Castle.isStaticSMCached = false;
                 Castle.WriteBuildings();
+                Sound.play(SOUNDS_LIBRARY.CLICK, {
+                id: "ui-click",
+                volume: Castle.GetVolume(),
+            });
                 return;
             }
+            
         }
     }
 
@@ -634,6 +644,10 @@ export class Castle {
                 Castle.placedBuildings.splice(b, 1);
                 Castle.isStaticSMCached = false;
                 Castle.WriteBuildings();
+                Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, {
+                id: "ui-click",
+                volume: Castle.GetVolume(),
+            });
                 return;
             }
         }

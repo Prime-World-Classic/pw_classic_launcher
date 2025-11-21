@@ -119,6 +119,41 @@ export const domAudioPresets = {
   ),
   /**
    * @memberof domAudioPresets
+   * @description Preset for small button
+   * @property {DomAudio} smallButton - Preset for small button
+   */
+  smallButton: new DomAudio(
+    /**
+     * @memberof domAudioPresets.smallButton
+     * @description Mouse over event
+     * @function over
+     */
+    function over() {},
+    /**
+     * @memberof domAudioPresets.smallButton
+     * @description Mouse down event
+     * @function down
+     */
+    function down() {
+      Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
+        id: "ui-small-click",
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    /**
+     * @memberof domAudioPresets.smallButton
+     * @description Mouse up event
+     * @function up
+     */
+    function up() {},
+    /**
+     * @memberof domAudioPresets.smallButton
+     * @description Input event
+     * @function input
+     */
+    function input() {}),
+  /**
+   * @memberof domAudioPresets
    * @description Preset for default input
    * @property {DomAudio} deafultInput - Preset for default input
    */
@@ -152,7 +187,6 @@ export const domAudioPresets = {
      * @function input
      */
     function input() {
-      console.log("input");
       Sound.play(SOUNDS_LIBRARY.CHAT, {
         id: "ui-chat",
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),

@@ -11,6 +11,7 @@ import { MM } from './mm.js';
 import { Splash } from './splash.js';
 import { Window } from './window.js';
 import { Castle } from './castle.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class App {
     static APP_VERSION = '0';
@@ -290,7 +291,7 @@ export class App {
 
     static setNickname() {
 
-        const close = DOM({ tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
+        const close = DOM({domaudio: domAudioPresets.closeButton, tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
 
         close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
@@ -298,9 +299,10 @@ export class App {
 
         let title = DOM({ tag: 'div', style: 'castle-menu-text' }, 'Сменить никнейм можно один раз в две недели');
 
-        let name = DOM({ tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
+        let name = DOM({domaudio: domAudioPresets.deafultInput, tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
 
         let button = DOM({
+            domaudio: domAudioPresets.bigButton,
             style: 'splash-content-button', event: ['click', async () => {
 
                 if (!name.value) {
@@ -348,7 +350,7 @@ export class App {
     }
 
     static setFraction() {
-        const close = DOM({ tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
+        const close = DOM({domaudio: domAudioPresets.closeButton, tag: 'div', style: 'close-button', event: ['click', () => Splash.hide()] });
         close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
         let template = document.createDocumentFragment();
@@ -396,6 +398,7 @@ export class App {
 
         factions.forEach(faction => {
             const factionElement = DOM({
+                domaudio: domAudioPresets.defaultButton,
                 tag: 'div',
                 style: 'faction-item',
                 event: ['click', () => {
@@ -455,6 +458,7 @@ export class App {
         });
 
         const button = DOM({
+            domaudio: domAudioPresets.bigButton,
             style: 'splash-content-button',
             event: ['click', async () => {
                 if (!selectedFaction) {
