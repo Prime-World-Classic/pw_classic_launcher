@@ -525,7 +525,7 @@ export class Build {
 
 		let template = document.createDocumentFragment();
 
-		let name = DOM({ tag: 'input', placeholder: 'Наименование билда' });
+		let name = DOM({domaudio: domAudioPresets.defaultInput, tag: 'input', placeholder: 'Наименование билда' });
 
 		let button = DOM({
       domaudio: domAudioPresets.bigButton,
@@ -1551,7 +1551,7 @@ export class Build {
 			item.id = `bl${i}`
 
 			item.addEventListener('click', e => {
-
+        Sound.play(SOUNDS_LIBRARY.CLICK_OPEN_BIG, {id: "ui-big-click", volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
 				if (item.dataset.active == 1) {
 
 					Build.removeSortInventory('level', item.dataset.id);

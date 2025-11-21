@@ -157,7 +157,7 @@ export const domAudioPresets = {
    * @description Preset for default input
    * @property {DomAudio} deafultInput - Preset for default input
    */
-  deafultInput: new DomAudio(
+  defaultInput: new DomAudio(
     /**
      * @memberof domAudioPresets.deafaultInput
      * @description Mouse over event

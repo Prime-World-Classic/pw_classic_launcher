@@ -315,7 +315,7 @@ export class App {
 
         let title = DOM({ tag: 'div', style: 'castle-menu-text' }, 'Сменить никнейм можно один раз в две недели');
 
-        let name = DOM({domaudio: domAudioPresets.deafultInput, tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
+        let name = DOM({domaudio: domAudioPresets.defaultInput, tag: 'input', placeholder: 'Никнейм', value: App.storage.data.login });
 
         let button = DOM({
             domaudio: domAudioPresets.bigButton,

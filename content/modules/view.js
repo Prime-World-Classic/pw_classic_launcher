@@ -135,7 +135,7 @@ export class View {
             }
         }];
 
-        let login = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
+        let login = DOM({ tag: 'input', domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('nickname'), event: numEnterEvent }), password = DOM({ tag: 'input', domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
         // Создаем выпадающий список языков
         const languageSelect = DOM({
             tag: 'select',
@@ -201,15 +201,15 @@ export class View {
 
         let telegramBotLink = DOM({ style: 'telegram-bot', tag: 'a', target: '_blank', href: tgBotUrl, event: ['click', (e) => NativeAPI.linkHandler(e)] });
 
-        let invite = DOM({ tag: 'input', domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('code'), event: numEnterEvent });
+        let invite = DOM({ tag: 'input', domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('code'), event: numEnterEvent });
 
         let inviteContainer = DOM({ style: 'invite-input' }, invite, telegramBotLink)
 
-        let login = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('nickname'), event: numEnterEvent });
+        let login = DOM({ tag: 'input',  domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('nickname'), event: numEnterEvent });
 
-        let password = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
+        let password = DOM({ tag: 'input',  domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('password'), type: 'password', event: numEnterEvent });
 
-        let password2 = DOM({ tag: 'input',  domaudio: domAudioPresets.deafultInput, placeholder: Lang.text('passwordAgain'), type: 'password', event: numEnterEvent });
+        let password2 = DOM({ tag: 'input',  domaudio: domAudioPresets.defaultInput, placeholder: Lang.text('passwordAgain'), type: 'password', event: numEnterEvent });
 
         return DOM({ style: 'login_box' }, DOM({ style: 'login-box-forma' },
 
@@ -1428,7 +1428,7 @@ root.appendChild(content);
             let buttonAdd = DOM({
                 style: 'castle-friend-item',
                 onclick: () => {
-                    let input = DOM({domaudio: domAudioPresets.deafultInput, tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
+                    let input = DOM({domaudio: domAudioPresets.defaultInput, tag: 'input', style: 'search-input', placeholder: 'Ник игрока' });
                     let body = DOM({ style: 'search-body' });
 
                     // Создаём крестик для закрытия (как в buildSelectName)
