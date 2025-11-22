@@ -2411,7 +2411,7 @@ root.appendChild(content);
       ],
     });
 
-		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Frame.open('clan')] });
+		let clan = DOM({ style: ['castle-clans', 'button-outline'], title: 'Кланы', event: ['click', () => Window.show('main', 'farm')] });
 
 		
 
@@ -4695,1424 +4695,330 @@ class Window {
     return DOM({ id: "winventory" }, view);
   }
 
-  static async clan() {
+
+static async clan() {
+  const clanRolesList = {
+    Lider: {
+      icon: "content/clanImages/main1234567899123.png",
+      label: Lang.text("ClanLeader")
+    },
+    Colider: {
+      icon: "content/clanImages/main12345678991234.png",
+      label: Lang.text("ClanDeputy")
+    },
+    Member: {
+      icon: "content/clanImages/main123456789912.png",
+      label: Lang.text("ClanMember")
+    }
+  };
+
+  const SETTINGS_ICON = "content/clanImages/main123.png";
+  const clanStatistics = {
+    clanLvl: "47",
+    placeInWorld: "15",
+    playersInClan: "78",
+    clanRating: "21133"
+  }
+  const clanRows = [
+    {
+      name: "Игрок1",
+      role: "Lider",
+      state: "В замке",
+      dailyPoints: "125",
+      totalPoints: "4210"
+    },
+    {
+      name: "Игрок2",
+      role: "Colider",
+      state: "В замке",
+      dailyPoints: "125",
+      totalPoints: "4210"
+    },
+    {
+      name: "Игрок3",
+      role: "Member",
+      state: "В замке",
+      dailyPoints: "125",
+      totalPoints: "4210"
+    },
+  ];
+
+  const memberRows = clanRows.map(row => {
+    const roleData = clanRolesList[row.role] || clanRolesList.Member;
     return DOM(
-      { className: "clanWindow", id: "clanWindow" },
+      { className: "row__main__case__clan" },
       DOM(
-        { className: "clan-wrapper" },
+        { id: "icon__clan_row" },
+        DOM({
+          id: "first__clan__row",
+          src: roleData.icon,
+          alt: "",
+          tag: "img"
+        })
+      ),
+      DOM(
+        { id: "member__clan_row" },
+        DOM({ tag: "p" }, row.name)
+      ),
+      DOM(
+        { id: "state__clan_row" },
+        DOM({ tag: "p" }, roleData.label)
+      ),
+      DOM(
+        { id: "den__o4ki__clan_row" },
+        DOM({ tag: "p" }, row.dailyPoints)
+      ),
+      DOM(
+        { id: "vsevremya__o4ki__clan_row" },
+        DOM({ tag: "p" }, row.totalPoints)
+      ),
+      DOM(
+        {
+          id: "toppers__clan_row",
+          className: "dropdown-clan"
+        },
+        DOM({
+          src: SETTINGS_ICON,
+          tag: "img"
+        })
+      )
+    );
+  });
+
+  const tab1 = DOM(
+    { style: "tab-content", id: "tab1" },
+    DOM(
+      { style: "stats__main_wrapper" },
+      DOM(
+        { style: "top-side-main" },
         DOM(
-          { className: "main__clan__wrapper" },
-          DOM({
-            id: "clan-information",
-            src: "content/clanImages/clan-info.png",
-            tag: "img",
-            event: [
-              "click",
-              () => {
-                document.getElementById("clanManagement").style.display =
-                  "block";
-              },
-            ],
-          }),
-          DOM({
-            id: "closeClanWindow",
-            src: "content/clanImages/close-win.png",
-            tag: "img",
-            event: [
-              "click",
-              () => {
-                Window.close("main");
-              },
-            ],
-          }),
+          { style: "left-top-side" },
           DOM(
-            {
-              className: "clanManagement",
-              id: "clanManagement",
-            },
-            DOM({
-              id: "close-mini-window",
-              src: "content/clanImages/close-win.png",
-              alt: "",
-              tag: "img",
-              event: [
-                "click",
-                () => {
-                  document.getElementById("clanManagement").style.display =
-                    "none";
-                },
-              ],
-            }),
+            { style: "clan-lvl-wrapper" },
             DOM(
-              { tag: "h2" },
-              "Руководство по клановой системе игры Prime World. ",
-            ),
-            DOM({ tag: "br" }),
-            DOM(
-              { tag: "p" },
-              "Клан – это объединение игроков под одним гербом, выполняя задания и участвуя в совместных боях участники повышают уровень и продвигают свой клан на вершину пьедестала.",
-            ),
-            DOM({ tag: "br" }),
-            DOM({ tag: "br" }),
-            DOM({ tag: "h4" }, DOM({ tag: "b" }, "Задачи клана:")),
-            DOM(
-              { tag: "p" },
-              "- объединение в группы для совместной игры в режимах;",
-            ),
-            DOM(
-              { tag: "p" },
-              "- выполнение клановых заданий для повышения уровня клана;",
-            ),
-            DOM(
-              { tag: "p" },
-              "- накопление очков для повышения уровня клана. ",
-            ),
-            DOM({ tag: "br" }),
-            DOM({ tag: "br" }),
-            DOM(
-              { tag: "p" },
-              "По мере достижения последующих уровней клана, каждый участник в будущем сможет учувствовать в клановых войнах, а также получать бонусы на свой аккаунт.",
-            ),
-            DOM({ tag: "p" }, DOM({ tag: "b" }, "Подробнее по очкам клана:")),
-            DOM(
-              { tag: "p" },
-              "– очки клана – это заработанный рейтинг каждого участника клана через бои;",
-            ),
-            DOM(
-              { tag: "p" },
-              "– очки определяют уровень клана и сколько игроков, может быть, в клане;",
-            ),
-            DOM(
-              { tag: "p" },
-              "– чем выше рейтинг клана (очки), тем больше игроков можно будет пригласить;",
-            ),
-            DOM({ tag: "p" }, "– количество игроков в клане не ограничено;"),
-            DOM(
-              { tag: "p" },
-              "– за каждые 24 часа надо будет платить очками клана, за одного игрока в клане 15 очков (каждые 24 часа от рейтинга клана будут отниматься очки: количество игроков в клане * 15);",
-            ),
-            DOM(
-              { tag: "p" },
-              "– глава клана и 4 вассала не могут быть исключены из клана, даже если уровень клана придет к нулю (если игроки прокачали клан до 5 игроков и если один из них глава, а четыре вассала, то они останутся);",
-            ),
-            DOM(
-              { tag: "p" },
-              "– если количество игроков в клане больше лимита игроков по уровню клана, то игроки будут автоматически удаляться (сортировка игроков по бездействию).",
-            ),
-            DOM({ tag: "br" }),
-            DOM(
-              { tag: "p" },
+              { style: "lvl-clan" },
               DOM(
-                { tag: "b" },
-                "Ранговое распределение возможностей внутри клана:",
+                { style: "top-lane" },
+                DOM({
+                  src: "content/clanImages/headsmall.png",
+                  alt: "",
+                  tag: "img"
+                }),
+                Lang.text("Clan statistics")
               ),
-            ),
+              DOM(
+                { style: "lvl-box-top" },
+                DOM(
+                  { style: "wrapper__clan__Stats_qwe" },
+                  DOM(
+                    { style: "wrap-left-stats-qwe" },
+                    DOM(
+                      {},
+                      Lang.text("Clan level: "),
+                      DOM({ id: "gold_clan_font", tag: "span" }, clanStatistics.clanLvl)
+                    ),
+                    DOM(
+                      {},
+                      Lang.text("Place in the world: "),
+                      DOM({ id: "gold_clan_font", tag: "span" }, clanStatistics.placeInWorld)
+                    ),
+                    DOM(
+                      {},
+                      Lang.text("Players in the clan: "),
+                      DOM({ id: "gold_clan_font", tag: "span" }, `${clanStatistics.playersInClan}/80`)
+                    )
+                  ),
+                  DOM(
+                    { style: "wrap-right-stats-qwe" },
+                    DOM(
+                      {},
+                      Lang.text("Clan rating: "),
+                      DOM({ id: "gold_clan_font", tag: "span" }, clanStatistics.clanRating)
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        DOM(
+          { style: "right-top-side" },
+          DOM(
+            { style: "message-day-wrapper" },
             DOM(
-              { tag: "p" },
-              "– глава клана имеет все возможности: смена имени и герба, приглашение/принятие/удаление игроков, просмотр аудита, повышение/понижение участников клана в ранге, брать квесты, добывать очки клану, роспуск клана;",
-            ),
+              { style: "message-day" },
+              DOM(
+                { style: "top-lane" },
+                DOM({
+                  src: "content/clanImages/main12345.png",
+                  alt: "",
+                  id: "day-message-logo",
+                  tag: "img"
+                }),
+                Lang.text("Message of the day")
+              ),
+              DOM({
+                style: "message-box-top",
+                id: "outputMassageDay"
+              })
+            )
+          )
+        )
+      ),
+      DOM(
+        { className: "bottom-side-main-right" },
+        DOM(
+          { className: "stats-wrapperq" },
+          DOM(
+            { className: "stats__first" },
             DOM(
-              { tag: "p" },
-              "– заместитель клана: приглашение/принятие/удаление игроков, просмотр аудита, брать квесты, добывать очки клану;",
+              { className: "row__main__case__clan first__clan__row" },
+              DOM(
+                { id: "icon__clan_row" },
+                DOM({
+                  id: "first__clan__row",
+                  src: "content/clanImages/stats-head.png",
+                  alt: "",
+                  tag: "img"
+                })
+              ),
+              DOM({ id: "member__clan_row" }, DOM({ tag: "p" }, Lang.text("Player name"))),
+              DOM({ id: "state__clan_row" }, DOM({ tag: "p" }, Lang.text("Status"))),
+              DOM({ id: "den__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("Points per day"))),
+              DOM({ id: "vsevremya__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("Total points"))),
+              DOM({ id: "toppers__clan_row1" }, DOM({ tag: "p" }, Lang.text("Settings")))
             ),
+            ...memberRows
+          )
+        )
+      )
+    )
+  );
+
+  const tab2 = DOM({}, "tab2");
+  const tab3 = DOM({}, "tab3");
+  const tab4 = DOM({}, "tab4");
+  const tab5 = DOM({}, "tab5");
+
+  let rightSideTab = 0;
+  const rightSideContainer = DOM({ style: "right-side-clan" });
+  let contentElement = tab1;
+  rightSideContainer.appendChild(contentElement);
+
+  function updateRightSideContent() {
+    rightSideContainer.innerHTML = '';
+    switch (rightSideTab) {
+      case 0: contentElement = tab1; break;
+      case 1: contentElement = tab2; break;
+      case 2: contentElement = tab3; break;
+      case 3: contentElement = tab4; break;
+      case 4: contentElement = tab5; break;
+      default: contentElement = tab1; break;
+    }
+    rightSideContainer.appendChild(contentElement);
+  }
+
+  function setActiveButton(targetButton, tabIndex) {
+    document.querySelectorAll('.btn__clan').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    rightSideTab = tabIndex;
+    targetButton.classList.add('active');
+    updateRightSideContent();
+  }
+
+  return DOM(
+    { style: 'clan-wapper', id: 'clan-wapper' },
+    DOM(
+      { style: 'main__clan__wrapper' },
+      DOM(
+        { style: "left-side-clan" },
+        DOM(
+          { style: "top__side__wrapper" },
+          DOM(
+            { style: "clan-info-top-left-wrapper" },
             DOM(
-              { tag: "p" },
-              "– участник клана: брать квесты, добывать очки клану.",
+              { style: "wrapper__clan__icon_icons" },
+              DOM(
+                { style: "clan__icon__wrapper" },
+                DOM({ id: "beautifull-1", src: "content/clanImages/в-1.png", tag: "img" }),
+                DOM({ id: "icon__clan__mainGZ", src: "content/clanImages/GuildB.png", tag: "img" }),
+                DOM({ id: "beautifull-2", src: "content/clanImages/в-1.png", tag: "img" })
+              )
             ),
-            DOM({ tag: "br" }),
-            DOM(
-              { tag: "h2" },
-              "В будущем планируется расширение возможностей клана, а также новые механики.",
-            ),
+            DOM({ style: "clan-name" }, DOM({ tag: "span" }, "ClanName"))
           ),
-
           DOM(
-            { className: "left-side-clan" },
+            { style: "lvl-box" },
             DOM(
-              { className: "top__side__wrapper" },
-              DOM(
-                { className: "clan-info-top-left-wrapper" },
-                DOM(
-                  { className: "wrapper__clan__icon_icons" },
-                  DOM(
-                    { className: "clan__icon__wrapper" },
-                    DOM({
-                      id: "beautifull-1",
-                      src: "content/clanImages/в-1.png",
-                      tag: "img",
-                    }),
-                    DOM({
-                      id: "icon__clan__mainGZ",
-                      src: "content/clanImages/GuildB.png",
-                      tag: "img",
-                    }),
-                    DOM({
-                      id: "beautifull-2",
-                      src: "content/clanImages/в-1.png",
-                      tag: "img",
-                    }),
-                  ),
-                ),
-                DOM(
-                  { className: "clan-name" },
-                  DOM({ tag: "span" }, "ClanName"),
-                ),
-              ),
-              DOM(
-                { className: "lvl-box" },
-                DOM(
-                  { className: "progrs-lvl-wrapper" },
-                  DOM({ tag: "p" }, "Прогресс клана"),
-                  DOM({
-                    id: "lvl-progress-clan",
-                    src: "content/clanImages/main1234567899123456789.png",
-                    tag: "img",
-                  }),
-                ),
-              ),
-            ),
-
-            DOM(
-              { className: "bottom__side__wrapper" },
-              DOM(
-                { className: "btns-list-clan" },
-                DOM(
-                  {
-                    id: "tab-btn-1",
-                    className: "btn__clan tab-btn active",
-                    tag: "button",
-                    event: [
-                      "click",
-                      () => {
-                        // Показываем первую вкладку, скрываем остальные
-                        document.getElementById("tab1").style.display = "flex";
-                        document.getElementById("tab2").style.display = "none";
-                        document.getElementById("tab3").style.display = "none";
-                        document.getElementById("tab4").style.display = "none";
-                        document.getElementById("tab5").style.display = "none";
-
-                        // Убираем active со всех кнопок
-                        document
-                          .getElementById("tab-btn-1")
-                          .classList.add("active");
-                        document
-                          .getElementById("tab-btn-2")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-3")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-4")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-5")
-                          .classList.remove("active");
-                      },
-                    ],
-                  },
-                  "Главная",
-                ),
-                DOM(
-                  {
-                    id: "tab-btn-2",
-                    className: "btn__clan tab-btn",
-                    tag: "button",
-                    event: [
-                      "click",
-                      () => {
-                        document.getElementById("tab1").style.display = "none";
-                        document.getElementById("tab2").style.display = "flex";
-                        document.getElementById("tab3").style.display = "none";
-                        document.getElementById("tab4").style.display = "none";
-                        document.getElementById("tab5").style.display = "none";
-
-                        document
-                          .getElementById("tab-btn-1")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-2")
-                          .classList.add("active");
-                        document
-                          .getElementById("tab-btn-3")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-4")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-5")
-                          .classList.remove("active");
-                      },
-                    ],
-                  },
-                  "Квесты",
-                ),
-                DOM(
-                  {
-                    id: "tab-btn-3",
-                    className: "btn__clan tab-btn",
-                    tag: "button",
-                    event: [
-                      "click",
-                      () => {
-                        document.getElementById("tab1").style.display = "none";
-                        document.getElementById("tab2").style.display = "none";
-                        document.getElementById("tab3").style.display = "flex";
-                        document.getElementById("tab4").style.display = "none";
-                        document.getElementById("tab5").style.display = "none";
-
-                        document
-                          .getElementById("tab-btn-1")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-2")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-3")
-                          .classList.add("active");
-                        document
-                          .getElementById("tab-btn-4")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-5")
-                          .classList.remove("active");
-                      },
-                    ],
-                  },
-                  "Заявки",
-                ),
-                DOM(
-                  {
-                    id: "tab-btn-4",
-                    className: "btn__clan tab-btn",
-                    tag: "button",
-                    event: [
-                      "click",
-                      () => {
-                        document.getElementById("tab1").style.display = "none";
-                        document.getElementById("tab2").style.display = "none";
-                        document.getElementById("tab3").style.display = "none";
-                        document.getElementById("tab4").style.display = "flex";
-                        document.getElementById("tab5").style.display = "none";
-
-                        document
-                          .getElementById("tab-btn-1")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-2")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-3")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-4")
-                          .classList.add("active");
-                        document
-                          .getElementById("tab-btn-5")
-                          .classList.remove("active");
-                      },
-                    ],
-                  },
-                  "Рейтинг кланов",
-                ),
-                DOM(
-                  {
-                    id: "tab-btn-5",
-                    className: "btn__clan tab-btn",
-                    tag: "button",
-                    event: [
-                      "click",
-                      () => {
-                        document.getElementById("tab1").style.display = "none";
-                        document.getElementById("tab2").style.display = "none";
-                        document.getElementById("tab3").style.display = "none";
-                        document.getElementById("tab4").style.display = "none";
-                        document.getElementById("tab5").style.display = "flex";
-
-                        document
-                          .getElementById("tab-btn-1")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-2")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-3")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-4")
-                          .classList.remove("active");
-                        document
-                          .getElementById("tab-btn-5")
-                          .classList.add("active");
-                      },
-                    ],
-                  },
-                  "Настройки",
-                ),
-              ),
-            ),
-          ),
-
+              { style: "progrs-lvl-wrapper" },
+              DOM({ style: "progrs-lvl-wrapper-text", tag: "span" }, Lang.text("ClanProgress")),
+              DOM({
+                id: "lvl-progress-clan",
+                src: "content/clanImages/main1234567899123456789.png",
+                tag: "img"
+              })
+            )
+          )
+        ),
+        DOM(
+          { style: "bottom__side__wrapper" },
           DOM(
-            { className: "right-side-clan" },
+            { style: "btns-list-clan" },
             DOM(
-              { className: "tab-content", id: "tab1" },
-              DOM(
-                { className: "stats__main_wrapper" },
-                DOM(
-                  { className: "membersettings-wrapper", id: "memberSetting" },
-                  DOM(
-                    { className: "member-settings" },
-                    DOM({
-                      id: "close-mini-windows",
-                      src: "content/clanImages/close.png",
-                      alt: "",
-                      tag: "img",
-                    }),
-                    DOM({ className: "btn", tag: "button" }, "Повысить"),
-                    DOM(
-                      { className: "disbanButton", tag: "button" },
-                      "Уволить",
-                    ),
-                  ),
-                ),
-                DOM(
-                  { className: "top-side-main" },
-                  DOM(
-                    { className: "left-top-side" },
-                    DOM(
-                      { className: "clan-lvl-wrapper" },
-                      DOM(
-                        { className: "lvl-clan" },
-                        DOM(
-                          { className: "top-lane" },
-                          DOM({
-                            src: "content/clanImages/headsmall.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                          "Статистика клана",
-                        ),
-                        DOM(
-                          { className: "lvl-box-top" },
-                          DOM(
-                            { className: "wrapper__clan__Stats_qwe" },
-                            DOM(
-                              { className: "wrap-left-stats-qwe" },
-                              DOM(
-                                {},
-                                "Уровень клана: ",
-                                DOM(
-                                  { id: "gold_clan_font", tag: "span" },
-                                  "47",
-                                ),
-                              ),
-                              DOM(
-                                {},
-                                "Место в мире: ",
-                                DOM(
-                                  { id: "gold_clan_font", tag: "span" },
-                                  "15",
-                                ),
-                              ),
-                              DOM(
-                                {},
-                                "Игроков в клане: ",
-                                DOM(
-                                  { id: "gold_clan_font", tag: "span" },
-                                  "78/80",
-                                ),
-                              ),
-                            ),
-                            DOM(
-                              { className: "wrap-right-stats-qwe" },
-                              DOM(
-                                {},
-                                "Рейтинг клана: ",
-                                DOM(
-                                  { id: "gold_clan_font", tag: "span" },
-                                  "21133",
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  DOM(
-                    { className: "right-top-side" },
-                    DOM(
-                      { className: "message-day-wrapper" },
-                      DOM(
-                        { className: "message-day" },
-                        DOM(
-                          { className: "top-lane" },
-                          DOM({
-                            src: "content/clanImages/main12345.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                          "Сообщение дня",
-                        ),
-                        DOM({
-                          className: "message-box-top",
-                          id: "outputMassageDay",
-                        }),
-                      ),
-                    ),
-                  ),
-                ),
-                DOM(
-                  { className: "bottom-side-main-right" },
-                  DOM(
-                    { className: "stats-wrapperq" },
-                    DOM(
-                      { className: "stats__first" },
-                      DOM(
-                        { className: "row__main__case__clan first__clan__row" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/stats-head.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Имя игрока"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "Статус"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "Очки за день"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "Очки за все время"),
-                        ),
-                        DOM(
-                          { id: "toppers__clan_row1" },
-                          DOM({ tag: "p" }, "Настройки"),
-                        ),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main1234567899123.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Глава"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM({
-                          id: "toppers__clan_row",
-                          className: "dropdown-clan",
-                        }),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main12345678991234.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Зам"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM(
-                          {
-                            id: "toppers__clan_row",
-                            className: "dropdown-clan",
-                          },
-                          DOM({
-                            src: "content/clanImages/main123.png",
-                            tag: "img",
-                          }),
-                        ),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main123456789912.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Участник"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM(
-                          {
-                            id: "toppers__clan_row",
-                            className: "dropdown-clan",
-                          },
-                          DOM({
-                            src: "content/clanImages/main123.png",
-                            tag: "img",
-                          }),
-                        ),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main123456789912.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Участник"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM(
-                          {
-                            id: "toppers__clan_row",
-                            className: "dropdown-clan",
-                          },
-                          DOM({
-                            src: "content/clanImages/main123.png",
-                            tag: "img",
-                          }),
-                        ),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main123456789912.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Участник"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM(
-                          {
-                            id: "toppers__clan_row",
-                            className: "dropdown-clan",
-                          },
-                          DOM({
-                            src: "content/clanImages/main123.png",
-                            tag: "img",
-                          }),
-                        ),
-                      ),
-                      DOM(
-                        { className: "row__main__case__clan" },
-                        DOM(
-                          { id: "icon__clan_row" },
-                          DOM({
-                            id: "first__clan__row",
-                            src: "content/clanImages/main123456789912.png",
-                            alt: "",
-                            tag: "img",
-                          }),
-                        ),
-                        DOM(
-                          { id: "member__clan_row" },
-                          DOM({ tag: "p" }, "Участник"),
-                        ),
-                        DOM(
-                          { id: "state__clan_row" },
-                          DOM({ tag: "p" }, "В замке"),
-                        ),
-                        DOM(
-                          { id: "den__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "125"),
-                        ),
-                        DOM(
-                          { id: "vsevremya__o4ki__clan_row" },
-                          DOM({ tag: "p" }, "4210"),
-                        ),
-                        DOM(
-                          {
-                            id: "toppers__clan_row",
-                            className: "dropdown-clan",
-                          },
-                          DOM({
-                            src: "content/clanImages/main123.png",
-                            tag: "img",
-                          }),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            DOM(
-              { className: "tab-content", id: "tab2" },
-              DOM(
-                { className: "quests-wrapper" },
-                DOM(
-                  { className: "progress-quests-bar" },
-                  DOM({
-                    src: "content/clanImages/main1234567899123456789.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM(
-                    { className: "lvl-clan-reward-wrapper" },
-                    DOM(
-                      { className: "quests-awards1" },
-                      DOM({
-                        src: "content/clanImages/award.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                      DOM({ tag: "span" }, "+25"),
-                    ),
-                  ),
-                  DOM({
-                    src: "content/clanImages/main1234567899123456789.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM(
-                    { className: "quests-awards1" },
-                    DOM({
-                      src: "content/clanImages/award.png",
-                      alt: "",
-                      tag: "img",
-                    }),
-                    DOM({ tag: "span" }, "+50"),
-                  ),
-                  DOM({
-                    src: "content/clanImages/main1234567899123456789.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM(
-                    { className: "quests-awards1" },
-                    DOM({
-                      src: "content/clanImages/award.png",
-                      alt: "",
-                      tag: "img",
-                    }),
-                    DOM({ tag: "span" }, "+100"),
-                  ),
-                ),
-                DOM(
-                  { className: "quests-display-wrapper" },
-                  DOM(
-                    { className: "card-quests" },
-                    DOM(
-                      { className: "quest-task-wrapper" },
-                      DOM(
-                        { className: "quest-task-name", tag: "p" },
-                        "Охотник",
-                      ),
-                      DOM({
-                        id: "razd",
-                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                    ),
-                    DOM(
-                      { className: "back-wrapper-quests" },
-                      DOM(
-                        { className: "quest-task", tag: "span" },
-                        "Убить 100 чуди в режиме пограничье",
-                      ),
-                      DOM(
-                        { className: "img-list-back-quest" },
-                        DOM({
-                          src: "content/clanImages/докт.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          src: "content/clanImages/адор.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                    DOM(
-                      { className: "send-wrapper" },
-                      DOM({ id: "award", tag: "div" }, "Награда"),
-                      DOM(
-                        { className: "quests-awards" },
-                        DOM({
-                          src: "content/clanImages/award.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({ tag: "span" }, "+10"),
-                      ),
-                      DOM(
-                        { className: "button-wrapper" },
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/left-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          type: "button",
-                          value: "Занять квест",
-                          className: "quests-accept-button",
-                          tag: "input",
-                        }),
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/right-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                  ),
-                  DOM(
-                    { className: "card-quests" },
-                    DOM(
-                      { className: "quest-task-wrapper" },
-                      DOM(
-                        { className: "quest-task-name", tag: "p" },
-                        "Ритуал смерти",
-                      ),
-                      DOM({
-                        id: "razd",
-                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                    ),
-                    DOM(
-                      { className: "back-wrapper-quests" },
-                      DOM(
-                        { className: "quest-task", tag: "span" },
-                        "Совершить 5 ритуальных убийств в пограничье",
-                      ),
-                      DOM(
-                        { className: "img-list-back-quest" },
-                        DOM({
-                          src: "content/clanImages/докт.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          src: "content/clanImages/адор.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                    DOM(
-                      { className: "send-wrapper" },
-                      DOM({ id: "award", tag: "div" }, "Награда"),
-                      DOM(
-                        { className: "quests-awards" },
-                        DOM({
-                          src: "content/clanImages/award.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({ tag: "span" }, "+10"),
-                      ),
-                      DOM(
-                        { className: "button-wrapper" },
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/left-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          type: "button",
-                          value: "Занять квест",
-                          className: "quests-accept-button",
-                          tag: "input",
-                        }),
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/right-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                  ),
-                  DOM(
-                    { className: "card-quests" },
-                    DOM(
-                      { className: "quest-task-wrapper" },
-                      DOM(
-                        { className: "quest-task-name", tag: "p" },
-                        "Завоеватель",
-                      ),
-                      DOM({
-                        id: "razd",
-                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                    ),
-                    DOM(
-                      { className: "back-wrapper-quests" },
-                      DOM(
-                        { className: "quest-task", tag: "span" },
-                        "Поднять 10 флагов в режиме пограничье",
-                      ),
-                      DOM(
-                        { className: "img-list-back-quest" },
-                        DOM({
-                          src: "content/clanImages/докт.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          src: "content/clanImages/адор.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                    DOM(
-                      { className: "send-wrapper" },
-                      DOM({ id: "award", tag: "div" }, "Награда"),
-                      DOM(
-                        { className: "quests-awards" },
-                        DOM({
-                          src: "content/clanImages/award.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({ tag: "span" }, "+10"),
-                      ),
-                      DOM(
-                        { className: "button-wrapper" },
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/left-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                        DOM({
-                          type: "button",
-                          value: "Занять квест",
-                          className: "quests-accept-button",
-                          tag: "input",
-                        }),
-                        DOM({
-                          id: "corner-button",
-                          src: "content/clanImages/right-under.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                  ),
-                ),
-                DOM(
-                  { className: "quests-alert-wrapper" },
-                  DOM({ tag: "p" }, "Новые квесты появляются каждые 2 часа"),
-                ),
-              ),
-            ),
-            DOM(
-              { className: "tab-content", id: "tab3" },
-              DOM(
-                { className: "applications-main-wrapper" },
-                DOM(
-                  { className: "wrap-add-witch-nickname" },
-                  DOM(
-                    { className: "add_with_nickname", tag: "button" },
-                    "Добавить игрока по имени",
-                  ),
-                ),
-                DOM(
-                  { className: "applications-list" },
-                  DOM(
-                    { className: "application" },
-                    DOM(
-                      { className: "image-wrapper-application" },
-                      DOM({
-                        id: "head",
-                        src: "content/clanImages/head.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                    ),
-                    DOM(
-                      { className: "application-stats" },
-                      DOM(
-                        { tag: "p" },
-                        "Имя: ",
-                        DOM({ id: "gold_clan_font", tag: "span" }, "XenozPon"),
-                      ),
-                      DOM(
-                        { tag: "p" },
-                        "Очков: ",
-                        DOM({ id: "gold_clan_font", tag: "span" }, "12302"),
-                      ),
-                      DOM(
-                        { tag: "p" },
-                        "Всего игр: ",
-                        DOM({ id: "gold_clan_font", tag: "span" }, "221"),
-                      ),
-                      DOM(
-                        { tag: "p" },
-                        "Выигранных игр: ",
-                        DOM({ id: "gold_clan_font", tag: "span" }, "155"),
-                      ),
-                      DOM(
-                        { tag: "p" },
-                        "Максимальный ранг героя: ",
-                        DOM({ id: "gold_clan_font", tag: "span" }, "Капрал"),
-                      ),
-                    ),
-                    DOM(
-                      { className: "applications-aprove" },
-                      DOM({
-                        id: "aprove",
-                        src: "content/clanImages/accept.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                      DOM({
-                        id: "aprove",
-                        src: "content/clanImages/kick.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                    ),
-                  ),
-                ),
-                DOM(
-                  { className: "addWithNickname", id: "addWithNickname" },
-                  DOM({
-                    id: "close-mini-windows",
-                    src: "content/clanImages/close.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM({
-                    className: "clan-create-input",
-                    type: "text",
-                    placeholder: "Введите имя игрока",
-                    id: "nameInvite",
-                    maxlength: "15",
-                    tag: "input",
-                  }),
-                  DOM(
-                    {
-                      id: "smallAlertRed",
-                      className: "text-red",
-                      tag: "small",
-                    },
-                    "Игрок не найден",
-                  ),
-                  DOM(
-                    {
-                      id: "smallAlertGreen",
-                      className: "text-green",
-                      tag: "small",
-                    },
-                    "Запрос отправлен",
-                  ),
-                  DOM({
-                    type: "submit",
-                    className: "gerbAcceptButton",
-                    value: "Подтвердить",
-                    tag: "input",
-                  }),
-                ),
-              ),
-            ),
-            DOM(
-              { className: "tab-content", id: "tab4" },
-              DOM(
-                { className: "clan-rating-wrapper" },
-                DOM(
-                  { className: "row__main__case__clan first__clan__row" },
-                  DOM({ id: "icon__clan_row" }, "#"),
-                  DOM(
-                    { id: "clan-name-row" },
-                    DOM({ tag: "p" }, "Название клана"),
-                  ),
-                  DOM(
-                    { id: "vsevremya__o4ki__clana-row" },
-                    DOM({ tag: "p" }, "Очки за все время"),
-                  ),
-                ),
-                DOM(
-                  { className: "row__main__case__clan" },
-                  DOM({ id: "icon__clan_row" }, "1"),
-                  DOM(
-                    { id: "Name__clan_row" },
-                    DOM(
-                      { tag: "p" },
-                      DOM({
-                        src: "content/clanImages/UnknowClanFlag.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                      "Clan-Name",
-                    ),
-                  ),
-                  DOM(
-                    { id: "vsevremya__o4ki__clan_row" },
-                    DOM({ tag: "p" }, "4210"),
-                  ),
-                ),
-                DOM(
-                  { className: "row__main__case__clan" },
-                  DOM({ id: "icon__clan_row" }, "1"),
-                  DOM(
-                    { id: "Name__clan_row" },
-                    DOM(
-                      { tag: "p" },
-                      DOM({
-                        src: "content/clanImages/UnknowClanFlag.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                      "Clan-Name",
-                    ),
-                  ),
-                  DOM(
-                    { id: "vsevremya__o4ki__clan_row" },
-                    DOM({ tag: "p" }, "4210"),
-                  ),
-                ),
-                DOM(
-                  { className: "row__main__case__clan" },
-                  DOM({ id: "icon__clan_row" }, "1"),
-                  DOM(
-                    { id: "Name__clan_row" },
-                    DOM(
-                      { tag: "p" },
-                      DOM({
-                        src: "content/clanImages/UnknowClanFlag.png",
-                        alt: "",
-                        tag: "img",
-                      }),
-                      "Clan-Name",
-                    ),
-                  ),
-                  DOM(
-                    { id: "vsevremya__o4ki__clan_row" },
-                    DOM({ tag: "p" }, "4210"),
-                  ),
-                ),
-              ),
+              {
+                id: "tab-btn-1",
+                style: ["btn__clan", "active"],
+                tag: "button",
+                event: ["click", (e) => setActiveButton(e.target, 0)]
+              },
+              Lang.text("Main")
             ),
             DOM(
               {
-                className: "tab-content",
-                id: "tab5",
+                id: "tab-btn-2",
+                style: "btn__clan",
+                tag: "button",
+                event: ["click", (e) => setActiveButton(e.target, 1)]
               },
-              DOM(
-                {
-                  className: "settings-main-wrapper",
-                },
-                DOM(
-                  {
-                    className: "setting-top-section",
-                  },
-                  DOM(
-                    {
-                      className: "setting-first-section",
-                    },
-                    DOM(
-                      {
-                        className: "change-clan-icon-board",
-                      },
-                      DOM(
-                        {
-                          id: "gerb-clan-settings",
-                        },
-                        DOM({
-                          id: "gerb-settings",
-                          src: "content/clanImages/GuildB.png",
-                          alt: "",
-                          tag: "img",
-                        }),
-                      ),
-                    ),
-                    DOM(
-                      {
-                        className: "change-tag-name-board",
-                      },
-
-                      DOM(
-                        { tag: "p" },
-                        "ClanName",
-                        DOM({ id: "clan-tag", tag: "span" }, "Tag"),
-                      ),
-                    ),
-                  ),
-                ),
-                DOM(
-                  {
-                    className: "setting-bottom-section",
-                  },
-                  DOM(
-                    {
-                      className: "settings-third-section",
-                    },
-                    DOM(
-                      {
-                        className: "history-wrapper",
-                      },
-                      DOM(
-                        {
-                          className: "settings-history-top-lane",
-                        },
-                        "Журнал",
-                      ),
-                      DOM({
-                        className: "history-board",
-                      }),
-                    ),
-                  ),
-                  DOM(
-                    {
-                      className: "settings-fourth-section",
-                    },
-                    DOM(
-                      {
-                        className: "rename-clan-button",
-                        tag: "button",
-                      },
-                      "Сменить название клана",
-                    ),
-                    DOM(
-                      {
-                        className: "rename-clan-button",
-                        tag: "button",
-                      },
-                      "Сменить Герб клана",
-                    ),
-                    DOM(
-                      {
-                        className: "disban-clan-button",
-                        tag: "button",
-                      },
-                      "Распустить клан",
-                    ),
-                  ),
-                ),
-                DOM(
-                  {
-                    className: "create-clan",
-                    id: "create-clan",
-                  },
-                  DOM({
-                    id: "close-mini-windows",
-                    src: "content/clanImages/close.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM({
-                    id: "clan-create-input",
-                    type: "text",
-                    placeholder: "Короткое название",
-                    maxLength: "10",
-                    tag: "input",
-                  }),
-                  DOM({
-                    id: "clan-create-input",
-                    type: "text",
-                    placeholder: "Полное название",
-                    maxLength: "5",
-                    tag: "input",
-                  }),
-                  DOM(
-                    {
-                      className: "buttons-clan-create-wrapper",
-                    },
-                    DOM({
-                      id: "create-clan-button",
-                      type: "button",
-                      value: "Переименовать",
-                      tag: "input",
-                    }),
-                  ),
-                ),
-                DOM(
-                  {
-                    className: "switch_clan_gerb",
-                    id: "switch_clan_gerb",
-                  },
-                  DOM({
-                    id: "close-mini-windows",
-                    src: "content/clanImages/close.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM({
-                    id: "previewGerb",
-                    src: "",
-                    alt: "Превью изображения",
-                    tag: "img",
-                  }),
-                  DOM({
-                    type: "file",
-                    accept: "image",
-                    id: "gerbSwitchInput",
-                    tag: "input",
-                  }),
-                  DOM(
-                    {
-                      className: "gerbAcceptButton",
-                      tag: "button",
-                    },
-                    "📎 Выбрать изображение",
-                  ),
-                  DOM({
-                    type: "submit",
-                    className: "gerbAcceptButton",
-                    id: "gerbAcceptButton",
-                    disabled: true,
-                    value: "Подтвердить",
-                    tag: "input",
-                  }),
-                ),
-                DOM(
-                  {
-                    className: "disbanClanAccept",
-                    id: "disbanClanAccept",
-                  },
-                  DOM({
-                    id: "close-mini-windows",
-                    src: "content/clanImages/close.png",
-                    alt: "",
-                    tag: "img",
-                  }),
-                  DOM(
-                    { tag: "p" },
-                    "Вы уверены,что хотите распустить клан?",
-                    DOM({ tag: "br" }),
-                    "Все игровые достижения ",
-                    DOM({ tag: "br" }),
-                    DOM({ tag: "span" }, "будут утеряны."),
-                  ),
-                  DOM(
-                    {
-                      className: "accept__disban__wrapper",
-                    },
-                    DOM({ tag: "span" }, "Я уверен"),
-                    DOM({
-                      type: "checkbox",
-                      id: "disbanCheckBox",
-                      tag: "input",
-                    }),
-                  ),
-                  DOM(
-                    {
-                      className: "disbanButton",
-                      id: "disbanButton",
-                      disabled: true,
-                      tag: "button",
-                    },
-                    "Распустить",
-                  ),
-                ),
-              ),
+              Lang.text("Quests")
             ),
-          ),
-        ),
+            DOM(
+              {
+                id: "tab-btn-3",
+                style: "btn__clan",
+                tag: "button",
+                event: ["click", (e) => setActiveButton(e.target, 2)]
+              },
+              Lang.text("Applications")
+            ),
+            DOM(
+              {
+                id: "tab-btn-4",
+                style: "btn__clan",
+                tag: "button",
+                event: ["click", (e) => setActiveButton(e.target, 3)]
+              },
+              Lang.text("Сlans rating")
+            ),
+            DOM(
+              {
+                id: "tab-btn-5",
+                style: "btn__clan",
+                tag: "button",
+                event: ["click", (e) => setActiveButton(e.target, 4)]
+              },
+              Lang.text("Settings")
+            )
+          )
+        )
       ),
-    );
-  }
+      rightSideContainer
+    )
+  );
+}
 
-  /*
-	static async quest(questId,cloneNode,test) {
-		let view = await View.quest(questId,cloneNode,test);
-
-	}
-	*/
-
+  
   static async menu() {
     return DOM(
       { id: "wcastle-menu" },
@@ -12344,7 +11250,11 @@ class CastleBuildingsEvents {
 	}
 	static talent_farm() {
 		Window.show('main', 'farm');
-	}
+  }
+	static clan_house() {
+    Window.show('main', 'clan');
+  }
+  
 }
 
 class Castle {
