@@ -71,11 +71,11 @@ export class CastleNAVBAR {
       DOM({
         style: "castle-button-play-queue",
         title: "Очередь игроков матчмейкинга на данный режим игры",
-      })
+      }),
     );
 
     CastleNAVBAR.body.children[11].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[11].onclick = () => {
@@ -83,7 +83,7 @@ export class CastleNAVBAR {
     };
 
     CastleNAVBAR.body.children[12].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[12].onclick = () => {
@@ -91,7 +91,7 @@ export class CastleNAVBAR {
     };
 
     CastleNAVBAR.body.children[13].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[13].onclick = () => {
@@ -99,7 +99,7 @@ export class CastleNAVBAR {
     };
 
     CastleNAVBAR.body.children[14].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[14].onclick = () => {
@@ -107,7 +107,7 @@ export class CastleNAVBAR {
     };
 
     CastleNAVBAR.body.children[15].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[15].onclick = () => {
@@ -115,7 +115,7 @@ export class CastleNAVBAR {
     };
 
     CastleNAVBAR.body.children[16].append(
-      DOM({ style: "castle-button-play-queue-mode" })
+      DOM({ style: "castle-button-play-queue-mode" }),
     );
 
     CastleNAVBAR.body.children[16].onclick = () => {
