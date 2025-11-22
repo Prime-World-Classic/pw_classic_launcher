@@ -22,3 +22,7 @@ vk_swiftshader_icd.json
 vk_swiftshader.dll
 vulkan-1.dll
 unhandledrejection.txt
+
+node_modules
+package-lock.json
+package.json

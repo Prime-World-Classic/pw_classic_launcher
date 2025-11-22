@@ -1,80 +1,63 @@
-import { DOM } from './dom.js';
-import { App } from './app.js';
+import { DOM } from "./dom.js";
+import { App } from "./app.js";
 
 export class Timer {
+  static intervalId = false;
 
-	static intervalId = false;
+  static init() {
+    Timer.sb = DOM(`${name} 00:00`);
 
-	static init() {
+    Timer.body = DOM({ style: "mm-timer" }, Timer.sb);
+  }
 
-		Timer.sb = DOM(`${name} 00:00`);
+  static async start(id, name, callback) {
+    Timer.stop();
 
-		Timer.body = DOM({ style: 'mm-timer' }, Timer.sb);
+    Timer.callback = callback;
 
-	}
+    Timer.message = name;
 
-	static async start(id, name, callback) {
+    Timer.timeFinish = await App.api.request(App.CURRENT_MM, "getTimer", {
+      id: id,
+      time: Date.now(),
+    });
 
-		Timer.stop();
+    if (Timer.end()) {
+      return;
+    }
 
-		Timer.callback = callback;
+    Timer.intervalId = setInterval(() => Timer.update(), 250);
 
-		Timer.message = name;
+    Timer.update();
+  }
 
-		Timer.timeFinish = await App.api.request(App.CURRENT_MM, 'getTimer', { id: id, time: Date.now() });
+  static update() {
+    if (Timer.end()) {
+      return;
+    }
 
-		if (Timer.end()) {
+    let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
 
-			return;
+    Timer.sb.innerText = `${Timer.message} 00:${seconds < 10 ? "0" : ""}${seconds}`;
+  }
 
-		}
+  static end() {
+    if (Date.now() - Timer.timeFinish >= 0) {
+      Timer.stop();
 
-		Timer.intervalId = setInterval(() => Timer.update(), 250);
+      Timer.callback();
 
-		Timer.update();
+      return true;
+    }
 
-	}
+    return false;
+  }
 
-	static update() {
+  static stop() {
+    if (Timer.intervalId) {
+      clearInterval(Timer.intervalId);
 
-		if (Timer.end()) {
-
-			return;
-
-		}
-
-		let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
-
-		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0' : '')}${seconds}`;
-
-	}
-
-	static end() {
-
-		if ((Date.now() - Timer.timeFinish) >= 0) {
-
-			Timer.stop();
-
-			Timer.callback();
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	static stop() {
-
-		if (Timer.intervalId) {
-
-			clearInterval(Timer.intervalId);
-
-			Timer.intervalId = false;
-
-		}
-
-	}
-
+      Timer.intervalId = false;
+    }
+  }
 }

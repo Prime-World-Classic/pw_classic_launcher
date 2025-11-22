@@ -43,7 +43,7 @@ export const domAudioPresets = {
      * @description Input event
      * @function input
      */
-    function input() {}
+    function input() {},
   ),
   /**
    * @memberof domAudioPresets
@@ -79,7 +79,7 @@ export const domAudioPresets = {
      * @description Input event
      * @function input
      */
-    function input() {}
+    function input() {},
   ),
   /**
    * @memberof domAudioPresets
@@ -115,7 +115,7 @@ export const domAudioPresets = {
      * @description Input event
      * @function input
      */
-    function input() {}
+    function input() {},
   ),
   /**
    * @memberof domAudioPresets
@@ -151,7 +151,8 @@ export const domAudioPresets = {
      * @description Input event
      * @function input
      */
-    function input() {}),
+    function input() {},
+  ),
   /**
    * @memberof domAudioPresets
    * @description Preset for default input
@@ -198,7 +199,7 @@ export const domAudioPresets = {
      * @description Change event
      * @function change
      */
-    function change() {}
+    function change() {},
   ),
   /**
    * @memberof domAudioPresets
@@ -246,6 +247,6 @@ export const domAudioPresets = {
         id: "ui-select",
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
       });
-    }
+    },
   ),
 };
