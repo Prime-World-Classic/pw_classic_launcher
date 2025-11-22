@@ -1203,10 +1203,8 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-image: url('img/menu.png');
 	background-size: contain;
 	background-repeat: no-repeat;
-	width: 22vh;
-	max-width: 10vw;
-	height: calc(22vh * 1.10);
-	max-height: calc(10vw * 1.10);
+	width: calc(max(11vw, 16vh));
+	height: calc(max(11vw, 16vh) * 1.10);
 	container-type: size;
 }
 
@@ -1290,11 +1288,11 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 }
 
 .castle-bottom-content-left-scroll {
-	left: -2cqh;
+	left: -1.85cqh;
 }
 
 .castle-bottom-content-right-scroll {
-	right: -1.8cqh;
+	right: -1.85cqh;
 }
 
 .castle-bottom-content-left-scroll div:not(.castle-bottom-content-btn-disable):hover, 
@@ -1338,9 +1336,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 
 .castle-bottom-content-container {
 	position: absolute;
-	left: 12vw;
+	left: calc(max(12vw, 17vh));
 	bottom: 0;
-	width: calc(round(down, 86vw, 9.9vh + 0.2vh) - 0.2vh * 2); /* castle-hero-item width: 9.9vh + 0.2vh*2 */
+	width: calc(round(down, min(100vw - 1.85vh - 12vw, 100vw - 1.85vh - 17vh), 9.9vh + 0.2vh) - 0.2vh * 2); /* castle-hero-item width: 9.9vh + 0.2vh*2 */
+	container-type: inline-size;
 }
 
 .castle-bottom-content{
