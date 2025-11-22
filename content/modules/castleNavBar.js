@@ -237,23 +237,45 @@ export class CastleNAVBAR {
     CastleNAVBAR.body.children[18].style.display = "none";
   }
 
-  static viewMode() {
-    CastleNAVBAR.body.children[5].style.display = "none";
+	static viewMode() {
 
-    CastleNAVBAR.body.children[10].style.display = "block";
+		if (CastleNAVBAR.body.children[10].style.display === "block") {
 
-    CastleNAVBAR.body.children[11].style.display = "block";
+			CastleNAVBAR.body.children[5].style.display = "flex";
+			
+			CastleNAVBAR.body.children[10].style.display = "none";
+			
+			CastleNAVBAR.body.children[11].style.display = "none";
+			
+			CastleNAVBAR.body.children[12].style.display = "none";
+			
+			CastleNAVBAR.body.children[13].style.display = "none";
+			
+			CastleNAVBAR.body.children[14].style.display = "none";
+			
+			CastleNAVBAR.body.children[15].style.display = "none";
+			
+			CastleNAVBAR.body.children[16].style.display = "none";
+			
+		} else {
 
-    CastleNAVBAR.body.children[12].style.display = "block";
-
-    CastleNAVBAR.body.children[13].style.display = "block";
-
-    CastleNAVBAR.body.children[14].style.display = "block";
-
-    CastleNAVBAR.body.children[15].style.display = "block";
-
-    CastleNAVBAR.body.children[16].style.display = "block";
-  }
+			CastleNAVBAR.body.children[5].style.display = "none";
+			
+			CastleNAVBAR.body.children[10].style.display = "block";
+			
+			CastleNAVBAR.body.children[11].style.display = "block";
+			
+			CastleNAVBAR.body.children[12].style.display = "block";
+			
+			CastleNAVBAR.body.children[13].style.display = "block";
+			
+			CastleNAVBAR.body.children[14].style.display = "block";
+			
+			CastleNAVBAR.body.children[15].style.display = "block";
+			
+			CastleNAVBAR.body.children[16].style.display = "block";
+		}
+	}
 
   static setMode(type) {
     let modeSelect = type - 1;
