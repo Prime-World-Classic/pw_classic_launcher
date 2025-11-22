@@ -1338,8 +1338,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	position: absolute;
 	left: calc(max(12vw, 17vh));
 	bottom: 0;
-	width: calc(round(down, min(100vw - 1.85vh - 12vw, 100vw - 1.85vh - 17vh), 9.9vh + 0.2vh) - 0.2vh * 2); /* castle-hero-item width: 9.9vh + 0.2vh*2 */
-	container-type: inline-size;
+	width: calc(round(down, 100vw - 1.85vh - max(12vw, 17vh), 9.9vh)); /* castle-hero-item width: 9.9vh + 0.2vh*2 */
 }
 
 .castle-bottom-content{
@@ -1347,15 +1346,14 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	align-items:center;
 	flex-flow:row nowrap;
 	overflow-x:scroll;
-	border-left: 0.2vh solid rgba(142, 150, 96);
-	border-right: 0.2vh solid rgba(142, 150, 96);
-	border-top: 0.2vh solid rgb(142, 150, 96);
+	border: 0.1vh solid rgba(142, 150, 96, 1);
+	border-bottom: 0;
 	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
 }
 
 .castle-hero-item, .castle-friend-item, .castle-building-item{
-	width: 9.9vh;
 	min-width: 9.9vh;
+	max-width: 9.9vh;
 	height:13.5cqh;
 	position: relative;
 	bottom: 0cqh;
@@ -1364,7 +1362,6 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	background-repeat:no-repeat;
 	container-type: size;
 	margin-top: -0.2vh;
-	border-right: 0.2vh solid rgb(142, 150, 96);
 	border-top: 0.2vh solid rgb(142, 150, 96);
 	border-bottom: 0.2vh solid rgba(142, 150, 96);
 	display: flex;
@@ -1380,7 +1377,6 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	height: 100%;
 	background-image:linear-gradient(0deg, rgba(12, 92, 107, 1),rgba(6,41,56,1));
 	background-size: 100%;
-	z-index: -1;
 }
 
 .castle-hero-item:has(.hover-brightness):not(.no-hover-brightness):hover .hover-brightness {
@@ -1411,9 +1407,10 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
 	top: 0;
 	background-image: url('img/item-ornament.svg');
 	background-repeat:no-repeat;
-	background-size: 100cqw;
-	width: 200cqw;
+	background-size: cover;
+	width: calc(100cqw - max(0.1vw, 0.2vh));
 	height: 100cqh;
+	border-right: max(0.1vw, 0.2vh) solid rgb(142, 150, 96);
 }
 
 .castle-hero-item-img {
