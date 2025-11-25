@@ -2411,7 +2411,7 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
     display: flex;
     justify-content: center;
     align-items: center;
-    border-left: 5px groove rgba(45, 75, 73, 0.84);
+    border-left: .5cqh groove rgba(45, 75, 73, 0.84);
     height: 100%;
     font-size: 1.8cqh;
 
