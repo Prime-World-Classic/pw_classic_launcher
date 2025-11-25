@@ -654,11 +654,11 @@ export class Window {
           : DOM(),
         DOM(
           { style: 'castle-menu-item-button' },
-          DOM({ event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account')),
+          DOM({ domaudio: domAudioPresets.bigButton, event: ['click', () => Window.show('main', 'accountPanel')] }, Lang.text('account')),
         ),
         DOM(
           { style: 'castle-menu-item-button' },
-          DOM({ event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences')),
+          DOM({ domaudio: domAudioPresets.bigButton, event: ['click', () => Window.show('main', 'settings')] }, Lang.text('preferences')),
         ),
         DOM({ style: 'castle-menu-item-button' }, DOM({domaudio: domAudioPresets.bigButton, event: ['click', () => Window.show('main', 'support')] }, Lang.text('support'))),
         DOM(

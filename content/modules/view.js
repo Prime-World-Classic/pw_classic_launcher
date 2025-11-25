@@ -468,6 +468,7 @@ export class View {
       let player = players[p];
 
       let item = DOM({
+        domaudio: domAudioPresets.bigButton,
         style: 'castle-play-lobby-player',
         data: { id: player.id },
       });
@@ -627,7 +628,7 @@ export class View {
           let preload = new PreloadImages(bodyHero);
 
           for (let item2 of request) {
-            let hero = DOM();
+            let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
             hero.addEventListener('click', async () => {
               try {
@@ -820,6 +821,7 @@ export class View {
       const disabled = type === 'silver';
 
       const medal = DOM({
+        domaudio: domAudioPresets.bigButton,
         tag: 'span',
         style: ['banner-medal', `banner-medal--${type}`, disabled ? 'is-disabled' : null].filter(Boolean),
       });
@@ -887,7 +889,7 @@ export class View {
           Splash.show(
             DOM(
               {
-                domaudio: domAudioPresets.defaultClose,
+                domaudio: domAudioPresets.closeButton,
                 style: 'iframe-stats',
                 event: [
                   'click',
@@ -897,7 +899,7 @@ export class View {
                 ],
               },
               DOM({
-                domaudio: domAudioPresets.defaultClose,
+                domaudio: domAudioPresets.closeButton,
                 style: 'iframe-stats-navbar',
                 event: ['click', () => Splash.hide()],
               }),
@@ -1406,6 +1408,7 @@ export class View {
 
           let hero = DOM(
             {
+              domaudio: domAudioPresets.defaultButton,
               id: `id${item.id}`,
               style: ['castle-hero-item', 'hover-brightness'],
             },
@@ -1446,6 +1449,7 @@ export class View {
             onclick: () => {
               let input = DOM({
                 tag: 'input',
+                domaudio: domAudioPresets.defaultInput,
                 style: 'search-input',
                 placeholder: Lang.text('friendNicknamePlaceholder'),
               });
@@ -1454,7 +1458,7 @@ export class View {
               // Создаём крестик для закрытия (как в buildSelectName)
               let closeButton = DOM({
                 tag: 'div',
-                domaudio: domAudioPresets.defaultClose,
+                domaudio: domAudioPresets.closeButton,
                 style: 'close-button',
                 event: ['click', () => Splash.hide()],
               });
@@ -2171,7 +2175,7 @@ export class View {
           let preload = new PreloadImages(bodyHero);
 
           for (let item of request) {
-            let hero = DOM();
+            let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
             hero.addEventListener('click', async () => {
               try {
@@ -2338,7 +2342,7 @@ export class View {
               let preload = new PreloadImages(bodyHero);
 
               for (let item of request) {
-                let hero = DOM();
+                let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
                 if (item.id) {
                   hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;

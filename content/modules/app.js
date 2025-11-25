@@ -13,6 +13,8 @@ import { Window } from './window.js';
 import { Castle } from './castle.js';
 import { Lang } from './lang.js';
 import { domAudioPresets } from './domAudioPresets.js';
+import { Sound } from './sound.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 export class App {
   static APP_VERSION = '0';
@@ -271,6 +273,7 @@ export class App {
     let title = DOM({ tag: 'div', style: 'castle-menu-text' }, Lang.text('nicknameChangeCooldown'));
 
     let name = DOM({
+      domaudio: domAudioPresets.defaultInput,
       tag: 'input',
       placeholder: Lang.text('nicknamePlaceholder'),
       value: App.storage.data.login,
@@ -571,7 +574,10 @@ export class App {
     }
 
     let msg = DOM({ tag: 'div' }, `${message}`);
-
+    Sound.play( SOUNDS_LIBRARY.ERROR, {
+      id: 'error-sound',
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+    });
     setTimeout(() => {
       msg.remove();
     }, timeout);

@@ -10,6 +10,9 @@ import { PreloadImages } from './preloadImages.js';
 import { Game } from './game.js';
 import { Splash } from './splash.js';
 import { domAudioPresets } from './domAudioPresets.js';
+import { Sound } from './sound.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { Castle } from './castle.js';
 
 export class Build {
   static loading = false;
@@ -484,7 +487,7 @@ export class Build {
     let preload = new PreloadImages(bodyHero);
 
     for (const i of Build.dataRequest.hero.skin.list) {
-      let hero = DOM();
+      let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
       hero.dataset.url = `content/hero/${Build.heroId}/${i}.webp`;
 
@@ -517,6 +520,7 @@ export class Build {
     let template = document.createDocumentFragment();
 
     let name = DOM({
+      domaudio: domAudioPresets.defaultInput,
       tag: 'input',
       placeholder: Lang.text('buildNamePlaceholder'),
     });
@@ -638,6 +642,7 @@ export class Build {
 
                     let template = document.createDocumentFragment();
                     let name = DOM({
+                      domaudio: domAudioPresets.defaultInput,
                       tag: 'input',
                       placeholder: Lang.text('buildNamePlaceholder'),
                     });
@@ -1632,6 +1637,10 @@ export class Build {
       item.id = `bl${i}`;
 
       item.addEventListener('click', (e) => {
+        Sound.play(SOUNDS_LIBRARY.CLICK, {
+          id: 'ui-click',
+          volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+        });
         if (item.dataset.active == 1) {
           Build.removeSortInventory('level', item.dataset.id);
 
@@ -1653,6 +1662,11 @@ export class Build {
 
       item.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+
+        Sound.play(SOUNDS_LIBRARY.CLICK, {
+          id: 'ui-click',
+          volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+        });
 
         for (const level of ['1', '2', '3', '4', '5', '6']) {
           Build.removeSortInventory('level', level);
@@ -1749,7 +1763,7 @@ export class Build {
   }
 
   static templateViewTalent(data) {
-    const talent = DOM({ style: 'build-talent-item' });
+    const talent = DOM({ domaudio: domAudioPresets.talent, style: 'build-talent-item' });
 
     if (data.txtNum) {
       let params = data.txtNum.split(';');
@@ -1843,6 +1857,10 @@ export class Build {
     a.dataset.active = 0;
 
     a.addEventListener('click', (e) => {
+      Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
+        id: 'ui-small-click',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
       if (a.dataset.active == 1) {
         a.style.background = 'rgba(255,255,255,0.1)';
 
@@ -1864,6 +1882,10 @@ export class Build {
 
     a.addEventListener('contextmenu', (e) => {
       e.preventDefault();
+      Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
+        id: 'ui-small-click',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
 
       for (let itemEl of element) {
         Build.removeSortInventory('rarity', itemEl.id);
@@ -1894,6 +1916,10 @@ export class Build {
       button.style.boxSizing = 'border-box';
 
       button.addEventListener('click', (e) => {
+        Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
+          id: 'ui-small-click',
+          volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+        });
         if (button.dataset.active == 1) {
           button.style.border = 'none';
 

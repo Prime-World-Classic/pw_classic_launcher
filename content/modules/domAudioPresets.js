@@ -47,6 +47,22 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
   ),
+  talent: new DomAudio(
+    function over() {},
+    function down() {
+      Sound.play('content/sounds/ui/ClickOpenSmall.wav', {
+        id: 'ui-small-click',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    function up() {
+      Sound.play('content/sounds/ui/buy.wav', {
+        id: 'ui-buy',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    function input() {},
+  ),
   defaultInput: new DomAudio(
     function over() {},
     function down() {
