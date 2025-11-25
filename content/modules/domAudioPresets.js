@@ -36,7 +36,18 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
   ),
-  deafultInput: new DomAudio(
+  smallButton: new DomAudio(
+    function over() {},
+    function down() {
+      Sound.play('content/sounds/ui/ClickOpenSmall.wav', {
+        id: 'ui-small-click',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    function up() {},
+    function input() {},
+  ),
+  defaultInput: new DomAudio(
     function over() {},
     function down() {
       Sound.play('content/sounds/ui/Click.wav', {
@@ -46,7 +57,6 @@ export const domAudioPresets = {
     },
     function up() {},
     function input() {
-      console.log('input');
       Sound.play('content/sounds/ui/chat.wav', {
         id: 'ui-chat',
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
@@ -66,7 +76,6 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
     function change() {
-      console.log('change');
       Sound.play('content/sounds/ui/ClickButtonPressSmall.wav', {
         id: 'ui-select',
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),

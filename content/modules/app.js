@@ -12,6 +12,7 @@ import { Splash } from './splash.js';
 import { Window } from './window.js';
 import { Castle } from './castle.js';
 import { Lang } from './lang.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class App {
   static APP_VERSION = '0';
@@ -258,6 +259,7 @@ export class App {
   static setNickname() {
     const close = DOM({
       tag: 'div',
+      domaudio: domAudioPresets.closeButton,
       style: 'close-button',
       event: ['click', () => Splash.hide()],
     });
@@ -276,6 +278,7 @@ export class App {
 
     let button = DOM(
       {
+        domaudio: domAudioPresets.bigButton,
         style: 'splash-content-button',
         event: [
           'click',
@@ -317,6 +320,7 @@ export class App {
   static setFraction() {
     const close = DOM({
       tag: 'div',
+      domaudio: domAudioPresets.closeButton,
       style: 'close-button',
       event: ['click', () => Splash.hide()],
     });
@@ -362,6 +366,7 @@ export class App {
     factions.forEach((faction) => {
       const factionElement = DOM({
         tag: 'div',
+        domaudio: domAudioPresets.defaultButton,
         style: 'faction-item',
         event: [
           'click',
@@ -425,6 +430,7 @@ export class App {
     const button = DOM(
       {
         style: 'splash-content-button',
+        domaudio: domAudioPresets.bigButton,
         event: [
           'click',
           async () => {

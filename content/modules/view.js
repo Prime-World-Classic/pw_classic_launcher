@@ -130,13 +130,13 @@ export class View {
 
     let login = DOM({
         tag: 'input',
-        domaudio: domAudioPresets.deafultInput,
+        domaudio: domAudioPresets.defaultInput,
         placeholder: Lang.text('nickname'),
         event: numEnterEvent,
       }),
       password = DOM({
         tag: 'input',
-        domaudio: domAudioPresets.deafultInput,
+        domaudio: domAudioPresets.defaultInput,
         placeholder: Lang.text('password'),
         type: 'password',
         event: numEnterEvent,
@@ -257,7 +257,7 @@ export class View {
 
     let invite = DOM({
       tag: 'input',
-      domaudio: domAudioPresets.deafultInput,
+      domaudio: domAudioPresets.defaultInput,
       placeholder: Lang.text('code'),
       event: numEnterEvent,
     });
@@ -266,14 +266,14 @@ export class View {
 
     let login = DOM({
       tag: 'input',
-      domaudio: domAudioPresets.deafultInput,
+      domaudio: domAudioPresets.defaultInput,
       placeholder: Lang.text('nickname'),
       event: numEnterEvent,
     });
 
     let password = DOM({
       tag: 'input',
-      domaudio: domAudioPresets.deafultInput,
+      domaudio: domAudioPresets.defaultInput,
       placeholder: Lang.text('password'),
       type: 'password',
       event: numEnterEvent,
@@ -281,7 +281,7 @@ export class View {
 
     let password2 = DOM({
       tag: 'input',
-      domaudio: domAudioPresets.deafultInput,
+      domaudio: domAudioPresets.defaultInput,
       placeholder: Lang.text('passwordAgain'),
       type: 'password',
       event: numEnterEvent,
