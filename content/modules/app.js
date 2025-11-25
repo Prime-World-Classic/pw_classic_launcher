@@ -72,6 +72,20 @@ export class App {
     }, 30000);
   }
 
+  /**
+   * Preloads all sounds in SOUNDS_LIBRARY
+   * @returns {Promise<void>} A promise that resolves when all sounds are preloaded
+   */
+  static async initSounds() {
+    const tasks = [];
+    for (const name in SOUNDS_LIBRARY) {
+      const src = SOUNDS_LIBRARY[name];
+      tasks.push(Sound.preload(name, src));
+    }
+
+    await Promise.all(tasks);
+  }
+
   static async init() {
     // wss://api2.26rus-game.ru:8443 - Москва (основа)
     // wss://relay.26rus-game.ru:8443 - Рига (Прокси)
@@ -81,6 +95,8 @@ export class App {
     await News.init();
 
     await Store.init();
+
+    await App.initSounds();
 
     App.storage = new Store('u3');
 
@@ -574,7 +590,7 @@ export class App {
     }
 
     let msg = DOM({ tag: 'div' }, `${message}`);
-    Sound.play( SOUNDS_LIBRARY.ERROR, {
+    Sound.play(SOUNDS_LIBRARY.ERROR, {
       id: 'error-sound',
       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
     });
