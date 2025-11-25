@@ -37,16 +37,19 @@ export class Game {
 
     Game.info = DOM({
       style: 'game-info',
+      domaudio: domAudioPresets.smallButton,
       event: ['click', (e) => Game.click(e)],
     });
 
     Game.scoring = DOM({
       style: 'game-scoring',
+      domaudio: domAudioPresets.smallButton,
       event: ['click', (e) => Game.click(e)],
     });
 
     Game.field = DOM({
       style: 'game-field',
+      domaudio: domAudioPresets.smallButton,
       event: ['click', (e) => Game.click(e)],
     });
 
