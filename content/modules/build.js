@@ -1537,8 +1537,16 @@ export class Build {
         registerStat(Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']), key);
       } else if (key == 'hpmp') {
         registerStat(Build.getMaxStat(['hp', 'mp']), key);
-      } else if (key == 'svn') {
+      } else if (key == 'srMin') {
+        registerStat(Build.getMinStat(['sila', 'razum']), key);
+      } else if (key == 'phMin') {
+        registerStat(Build.getMinStat(['provorstvo', 'hitrost']), key);
+      } else if (key == 'svMin') {
         registerStat(Build.getMinStat(['volia', 'stoikost']), key);
+      } else if (key == 'srsvMin') {
+        registerStat(Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']), key);
+      } else if (key == 'hpmpMin') {
+        registerStat(Build.getMinStat(['hp', 'mp']), key);
       } else {
         registerStat(key, key);
       }
