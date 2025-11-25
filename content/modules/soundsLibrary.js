@@ -5,4 +5,5 @@ export const SOUNDS_LIBRARY = {
   CHAT: 'content/sounds/ui/chat.wav',
   CLICK_BUTTON_PRESS_SMALL: 'content/sounds/ui/ClickButtonPressSmall.wav',
   BUY: 'content/sounds/ui/buy.wav',
+  ERROR: 'content/sounds/ui/error.wav',
 };
