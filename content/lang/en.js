@@ -3676,7 +3676,7 @@ export const en = {
       '<num>Protective</num><br><br>When activated, all damage received by the hero is reduced by <num>90%</num> for <num>2</num> seconds.',
     talent_173_name: 'Influx of Prime',
     talent_173_description:
-      '<prime>+4</prime> every <num>6</num> seconds<br>After receiving an additional <prime>1000</prime>, this talent reduces the influx to <prime>1</prime>. Cannot be equipped together with talents from the <br><br><font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font>',
+      '<prime>+4</prime> every <num>6</num> seconds<br><br>After receiving an additional <prime>1000</prime>, this talent reduces the influx to <prime>1</prime>.<br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be installed together with talents from the <font color=#ff8c00>"Spinners of Heroes"</font> set.',
     talent_174_name: 'Breath of Life<font color=#FFFFFF> ⌛️70</font>',
     talent_174_description:
       '<num>Protective</num><br><br>When activated, it restores <num>%s</num> Health and additional <num>%s</num> Health for each level of the Hero.',
@@ -4335,24 +4335,24 @@ export const en = {
     talent_428_name: 'Taste of Life<font color=#FFFFFF> ⌛️70</font>',
     talent_428_description:
       '<num>Protective</num><br><br>When activated, it restores <num>%s</num> Health and additional <num>%s</num> Health for each level of the Hero.',
-    talent_429_name: 'Strength Spinner',
+    talent_429_name: 'Spinner of Strenght',
     talent_429_description:
-      'The Hero\'s strength increases by <font color=#dcca64>0.75</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font>. Cannot be equipped together with Prime Influx.',
-    talent_430_name: 'Intellect Spinner',
+      'The Hero\'s strength increases by <font color=#dcca64>0.75</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
+    talent_430_name: 'Spinner of Intellect',
     talent_430_description:
-      'The Hero\'s Intellect increases by <font color=#dcca64>0.75</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font> Cannot be equipped together with Prime Influx.',
+      'The Hero\'s Intellect increases by <font color=#dcca64>0.75</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_431_name: 'Spinner Agility',
     talent_431_description:
-      'The Hero\'s agility increases by <font color=#dcca64>0.55</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font> Cannot be equipped together with Prime Influx.',
+      'The Hero\'s strength increases by <font color=#dcca64>0.75</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br><br><font color=#a5a5a5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font><br><br><font color=#FF9966>2 talents</font><br><font color=#a5a5a5>Each <num>4</num> sec. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_432_name: 'Spinner Cunnings',
     talent_432_description:
-      'The Hero\'s cunning increases by <font color=#dcca64>0.55</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font> Cannot be equipped together with Prime Influx.',
+      'The Hero\'s cunning increases by <font color=#dcca64>0.55</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_433_name: 'Spinner of Stamina',
     talent_433_description:
-      'The Hero\'s stamina increases by <font color=#dcca64>0.37</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font> Cannot be equipped together with Prime Influx.',
+      'The Hero\'s stamina increases by <font color=#dcca64>0.37</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_434_name: 'Spinner of Will',
     talent_434_description:
-      'The Hero\'s will increases by <font color=#dcca64>0.37</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font> Cannot be equipped together with Prime Influx.',
+      'The Hero\'s will increases by <font color=#dcca64>0.37</font> every minute. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_435_name: 'Terrible Strength',
     talent_435_description:
       '<font color=#A5A5A5>Set</font> <font color=#ff8c00>"Creepy time"</font> <br><br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5><num>+6</num> to the greatest of Strength and Intellect</font> <br> <font color=#FF9966>3 talents</font> <br> <font color=#A5A5A5><num>+6</num> to the greatest of Agility and Cunning</font>',
@@ -4871,7 +4871,7 @@ export const en = {
       '<font color=#A5A5A5>Set</font> <font color=#ff8c00>"Martial art"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <num>+5</num> <font color=#A5A5A5>stealing Health</font> <br> <font color=#FF9966>3 talents</font> <br> <font color=#A5A5A5>A hero\'s attack with a <num>13%</num> chance will stun the opponent for <num>0.4</num> sec.</font>',
     talent_608_name: 'Speed Spinner',
     talent_608_description:
-      'The Hero\'s speed increases by <font color=#dcca64>%s</font> and additionally by <font color=#dcca64>0.3</font> every minute. The maximum total increase is <font color=#dcca64>6</font><br><br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font>',
+      'The Hero\'s speed increases by <font color=#dcca64>%s</font> and additionally by <font color=#dcca64>0.3</font> every minute. The maximum total increase is <font color=#dcca64>6</font><br><br> <font color=#A5A5A5>Set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>Every <num>4</num> seconds. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
     talent_609_name: 'The Time of the first',
     talent_609_description:
       '<font color=#A5A5A5>Set</font> <font color=#ff8c00>"Hot time"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <num>+6</num> <font color=#A5A5A5>to the greatest of Strength and Intellect</font> <br> <font color=#FF9966>4 talents</font> <br> <font color=#A5A5A5>Ultimate ability recovery time is <num>30%</num> less</font>',
@@ -5339,11 +5339,11 @@ export const en = {
       '<font color=#A5A5A5>Set</font> <font color=#ff8c00>"Ancient runes"</font> <br> <br> <font color=#FF9966>1 talent</font> <br> <font color=#A5A5A5>Glyphs are valid for <num>10</num> seconds longer</font> <br> <font color=#FF9966>2 talents</font> <br> <font color=#A5A5A5>When the enemy siege soldiers die next to the hero, they leave a random small glyph</font> <br> <font color=#FF9966>3 talents</font><br> <num>+7</num> <font color=#A5A5A5>to the greatest of Strength and Intellect</font>',
     talent_765_name: 'Protective barrier',
     talent_765_description: '<num>defensive</num><br><br>When activated, the hero becomes invulnerable to physical damage for 2 seconds.',
-    talent_766_name: 'Health spinner',
+    talent_766_name: 'Health Spinner',
     talent_766_description:
-      'the Hero\'s health increases every minute by <font color=#dcca64>11.1</font>. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font>',
-    talent_767_name: 'Energy spinner',
+      'the Hero\'s health increases every minute by <font color=#dcca64>11.1</font>. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
+    talent_767_name: 'Energy Spinner',
     talent_767_description:
-      'the Hero\'s energy increases every minute by <font color=#dcca64>11.1</font>. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font>',
+      'the Hero\'s energy increases every minute by <font color=#dcca64>11.1</font>. The maximum total increase is <font color=#dcca64>%s</font><br> <br> <font color=#a5a5a5>set</font> <font color=#ff8c00>"Spinners of Heroes"</font> <br> <br> <font color=#FF9966>2 talents</font> <br> <font color=#a5a5a5>each <num>4</num> sec. gives <prime>+1</prime></font><br><br><hr align="center" width="70%" size="2" color="#A7A062" /><font color=#A5A5A5>Compatibility</font><br>Cannot be equipped together with <font color=#9966CC>"Prime Influx"</font>.',
   },
 };
