@@ -4714,6 +4714,7 @@ static async clan() {
 
   const SETTINGS_ICON = "content/clanImages/main123.png";
   const clanStatistics = {
+    clanName: "ClanName",
     clanLvl: "47",
     placeInWorld: "15",
     playersInClan: "78",
@@ -4746,7 +4747,7 @@ static async clan() {
   const memberRows = clanRows.map(row => {
     const roleData = clanRolesList[row.role] || clanRolesList.Member;
     return DOM(
-      { className: "row__main__case__clan" },
+      { style: "row__main__case__clan" },
       DOM(
         { id: "icon__clan_row" },
         DOM({
@@ -4775,7 +4776,7 @@ static async clan() {
       DOM(
         {
           id: "toppers__clan_row",
-          className: "dropdown-clan"
+          style: "dropdown-clan"
         },
         DOM({
           src: SETTINGS_ICON,
@@ -4866,13 +4867,13 @@ static async clan() {
         )
       ),
       DOM(
-        { className: "bottom-side-main-right" },
+        { style: "bottom-side-main-right" },
         DOM(
-          { className: "stats-wrapperq" },
+          { style: "stats-wrapperq" },
           DOM(
-            { className: "stats__first" },
+            { style: "stats__first" },
             DOM(
-              { className: "row__main__case__clan first__clan__row" },
+              { style: ["row__main__case__clan", "first__clan__row"] },
               DOM(
                 { id: "icon__clan_row" },
                 DOM({
@@ -4895,7 +4896,284 @@ static async clan() {
     )
   );
 
-  const tab2 = DOM({}, "tab2");
+  const tab2 = DOM({style: "tab-content", id: "tab2"}, 
+    DOM({ style: "quests-wrapper" },
+                DOM(
+                  { style: "progress-quests-bar" },
+                  DOM({
+                    src: "content/clanImages/main1234567899123456789.png",
+                    alt: "",
+                    tag: "img",
+                    style: "quests-progress-bar-icon"
+                  }),
+                  DOM(
+                    { style: "lvl-clan-reward-wrapper" },
+                    DOM(
+                      { style: "quests-awards1" },
+                      DOM({
+                        src: "content/clanImages/award.png",
+                        alt: "",
+                        tag: "img",
+                      }),
+                      DOM({ tag: "span" }, "+25"),
+                    ),
+                  ),
+                  DOM({
+                    src: "content/clanImages/main1234567899123456789.png",
+                    alt: "",
+                    tag: "img",
+                    style: "quests-progress-bar-icon"
+                  }),
+                  DOM(
+                    { style: "quests-awards1" },
+                    DOM({
+                      src: "content/clanImages/award.png",
+                      alt: "",
+                      tag: "img",
+                    }),
+                    DOM({ tag: "span" }, "+50"),
+                  ),
+                  DOM({
+                    src: "content/clanImages/main1234567899123456789.png",
+                    alt: "",
+                    tag: "img",
+                    style: "quests-progress-bar-icon"
+                  }),
+                  DOM(
+                    { style: "quests-awards1" },
+                    DOM({
+                      src: "content/clanImages/award.png",
+                      alt: "",
+                      tag: "img",
+                    }),
+                    DOM({ tag: "span" }, "+100"),
+                  ),
+                ),
+                DOM(
+                  { style: "quests-display-wrapper" },
+                  DOM(
+                    { style: "card-quests" },
+                    DOM(
+                      { style: "quest-task-wrapper" },
+                      DOM(
+                        { style: "quest-task-name", tag: "p" },
+                        "Охотник",
+                      ),
+                      DOM({
+                        id: "razd",
+                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
+                        alt: "",
+                        tag: "img",
+                      }),
+                    ),
+                    DOM(
+                      { style: "back-wrapper-quests" },
+                      DOM(
+                        { style: "quest-task", tag: "span" },
+                        "Убить 100 чуди в режиме пограничье",
+                      ),
+                      DOM(
+                        { style: "img-list-back-quest" },
+                        DOM({
+                          id: "backIcons",
+                          src: "content/clanImages/докт.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                          id: "backIcons",
+                          src: "content/clanImages/адор.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                    DOM(
+                      { style: "send-wrapper" },
+                      DOM({ id: "award", tag: "div" }, "Награда"),
+                      DOM(
+                        { style: "quests-awards" },
+                        DOM({
+                          src: "content/clanImages/award.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({ tag: "span" }, "+10"),
+                      ),
+                      DOM(
+                        { style: "button-wrapper" },
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/left-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                          type: "button",
+                          value: "Занять квест",
+                          style: "quests-accept-button",
+                          tag: "input",
+                        }),
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/right-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                  ),
+                  DOM(
+                    { style: "card-quests" },
+                    DOM(
+                      { style: "quest-task-wrapper" },
+                      DOM(
+                        { style: "quest-task-name", tag: "p" },
+                        "Ритуал смерти",
+                      ),
+                      DOM({
+                        id: "razd",
+                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
+                        alt: "",
+                        tag: "img",
+                      }),
+                    ),
+                    DOM(
+                      { style: "back-wrapper-quests" },
+                      DOM(
+                        { style: "quest-task", tag: "span" },
+                        "Совершить 5 ритуальных убийств в пограничье",
+                      ),
+                      DOM(
+                        { style: "img-list-back-quest" },
+                        DOM({
+                          id: "backIcons",
+                          src: "content/clanImages/докт.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                          id: "backIcons",
+                          src: "content/clanImages/адор.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                    DOM(
+                      { style: "send-wrapper" },
+                      DOM({ id: "award", tag: "div" }, "Награда"),
+                      DOM(
+                        { style: "quests-awards" },
+                        DOM({
+                          src: "content/clanImages/award.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({ tag: "span" }, "+10"),
+                      ),
+                      DOM(
+                        { style: "button-wrapper" },
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/left-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                          type: "button",
+                          value: "Занять квест",
+                          style: "quests-accept-button",
+                          tag: "input",
+                        }),
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/right-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                  ),
+                  DOM(
+                    { style: "card-quests" },
+                    DOM(
+                      { style: "quest-task-wrapper" },
+                      DOM(
+                        { style: "quest-task-name", tag: "p" },
+                        "Завоеватель",
+                      ),
+                      DOM({
+                        id: "razd",
+                        src: "content/clanImages/Remove-bg.ai_1729794563453.png",
+                        alt: "",
+                        tag: "img",
+                      }),
+                    ),
+                    DOM(
+                      { style: "back-wrapper-quests" },
+                      DOM(
+                        { style: "quest-task", tag: "span" },
+                        "Поднять 10 флагов в режиме пограничье",
+                      ),
+                      DOM(
+                        { style: "img-list-back-quest" },
+                        DOM({
+                          id: "backIcons",
+                          src: "content/clanImages/докт.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                           id: "backIcons", 
+                          src: "content/clanImages/адор.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                    DOM(
+                      { style: "send-wrapper" },
+                      DOM({ id: "award", tag: "div" }, "Награда"),
+                      DOM(
+                        { style: "quests-awards" },
+                        DOM({
+                          src: "content/clanImages/award.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({ tag: "span" }, "+10"),
+                      ),
+                      DOM(
+                        { style: "button-wrapper" },
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/left-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                        DOM({
+                          type: "button",
+                          value: "Занять квест",
+                          style: "quests-accept-button",
+                          tag: "input",
+                        }),
+                        DOM({
+                          id: "corner-button",
+                          src: "content/clanImages/right-under.png",
+                          alt: "",
+                          tag: "img",
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+                DOM(
+                  { style: "quests-alert-wrapper" },
+                  DOM({ tag: "p" }, "Новые квесты появляются каждые 2 часа"),
+                ),
+              ),
+  );
   const tab3 = DOM({}, "tab3");
   const tab4 = DOM({}, "tab4");
   const tab5 = DOM({}, "tab5");
@@ -4946,7 +5224,7 @@ static async clan() {
                 DOM({ id: "beautifull-2", src: "content/clanImages/в-1.png", tag: "img" })
               )
             ),
-            DOM({ style: "clan-name" }, DOM({ tag: "span" }, "ClanName"))
+            DOM({ style: "clan-name" }, DOM({ tag: "span" }, clanStatistics.clanName))
           ),
           DOM(
             { style: "lvl-box" },

@@ -2366,11 +2366,7 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
 
 
 
-.tabs {
-    width: 700px;
-    margin: 20px auto;
-    transition: 0.3s;
-}
+
 
 .tab-content {
     display: flex;
@@ -2719,47 +2715,50 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
 #mejline{
     transform: rotate(90deg);
 }
+.quests-progress-bar-icon{
+    width: 7cqw;
+    height: 4cqh;
+}
 .quests-display-wrapper{
     width: 100%;
-    height: 70%;
+    height: 60cqh;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 }
 .card-quests{
    background: linear-gradient(400deg, #0f2425, #0f2526, #063c3d, #005556, #007d7d);
-    border: 4px groove #13b7cd;
+    border: .4cqh groove #13b7cd;
     display: flex;
     justify-content: space-around;
     align-items: center;
     flex-direction: column;
-    width: 250px;
-    overflow: hidden;
-    min-height: 400px;
-    border-radius: 1rem;
+    width: 15cqw;
+    
     filter: drop-shadow(0px 2px 10px rgba(0, 0, 0, 0.76));
+    overflow: hidden;
+    height: 10cqh;
 }
 .send-wrapper{
     width: 100%;
-    height: 25%;
+    
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 .quests-accept-button{
-    width: 75%;
-    height: 45px;
-    background: url("./images/accept-quest.png") no-repeat center center ;
+    width: 80%;
+    
+    background: url("./clanImages/accept-quest.png") no-repeat center center ;
     background-size: cover;
-    border: none;
     text-align: center;
-    color: #fcfbd4;
+    color: #fcfcf1;
     transition: .2s;
     border-radius: .6rem;
-
-    font-size: 1.005rem;
-    z-index: 1;
+    height: 5cqh;
+    font-size: 2cqh;
+    z-index: 2;
     transition: .2s;
 }
 .quests-accept-button:hover{
@@ -2770,7 +2769,6 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
 }
 .button-wrapper{
     width: 100%;
-
     display: flex;
     justify-content: center;
     align-items: end;
@@ -2782,18 +2780,18 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
     justify-content: center;
     align-items: center;
     color: white;
-    margin-bottom: 15px;
+    margin-bottom: 1.5cqh;
 }
 .quests-awards1{
-height: 100px;
-    width: 100px;
+height: 10cqh;
+    width: 10cqw;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    background: url("./images/clan-lvl-reward.png") no-repeat center center ;
+    background: url("./clanImages/clan-lvl-reward.png") no-repeat center center ;
     background-size: contain;
-    translate: -5px 0;
+    translate: -0.5cqh 0;
     animation: pulse 2s linear infinite;
 }
 @keyframes pulse {
@@ -2808,13 +2806,13 @@ height: 100px;
     }
 }
 .quests-awards img{
-    width:20px;
-    height: 20px;
+    width:1cqw;
+    height: 2cqh;
 }
 .quests-awards1 img{
-    width:20px;
-    height: 20px;
-    translate: -2px 0;
+    width:1cqw;
+    height: 2cqh;
+    translate: -0.2cqh 0;
 }
 .quest-task-name{
     color: #ffffff;
@@ -2822,15 +2820,19 @@ height: 100px;
 }
 #razd{
     opacity:0.5;
-    transform: scale(0.7);
+    width: 25cqh;
+}
+#backIcons{
+    width: 5cqw;
+    height: 5cqh;
 }
 #underlined{
     transform: scale(1.2);
 }
 .quest-task-wrapper{
     width: 100%;
-    height: 45px;
-    margin-top: 20px;
+    height: 4.5cqh;
+    margin-top: 2cqh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2850,7 +2852,7 @@ height: 100px;
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    height:140px;
+    height:14cqh;
     flex-direction: column;
 
 }
@@ -2858,13 +2860,13 @@ height: 100px;
     text-align: center;
     color: white;
     position: absolute;
-    margin: 0 10px;
+    margin: 0 1cqh;
     opacity: 1;
     font-weight: bold;
  background: rgba(30, 52, 50, 0.73);
     border-radius: 1rem;
-    border: 3px groove rgba(75, 137, 129, 0.91);
-    padding: 10px 0;
+    border: 0.4cqh groove rgba(75, 137, 129, 0.91);
+    padding: 1cqh 0;
     filter: drop-shadow(0px 2px 10px rgba(0, 0, 0, 0.76));
 
 
@@ -2881,7 +2883,7 @@ height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10rem;
+    gap: 25cqh;
 }
 .applications-main-wrapper{
     width: 100%;
@@ -2907,12 +2909,12 @@ height: 100px;
     justify-content: start;
     align-items: center;
     flex-direction: column;
-    gap: 5px;
+    gap: 0.5cqh;
 
 }
 .application{
     width: 95%;
-    height: 75px;
+    height: 7.5cqh;
     background: #103838;
     border:4px groove rgb(205, 191, 98);
     border-radius: 1rem;
@@ -2963,19 +2965,18 @@ height: 100px;
 #award{
     background: url(./images/main123456789.png) no-repeat center center ;
     background-size:cover;
-    padding: 2px 35px;
-    font-size: 0.8em;
+    padding: 0.2cqh 3.5cqh;
+    font-size: 1.5cqh;
     color: white;
-    margin-bottom: 10px;
+    margin-bottom: 1cqh;
 
     font-weight: bolder;
 
 }
 #corner-button{
-    transform: scale(1.4);
+    width: 2cqh;
     filter: drop-shadow(0px 0px 20px rgb(0, 0, 0));
     z-index: 3;
-
 }
 .wrap-add-witch-nickname{
     height: 15%;
