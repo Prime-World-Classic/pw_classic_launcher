@@ -2726,18 +2726,18 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
     justify-content: space-evenly;
     align-items: center;
 }
-.card-quests{
-   background: linear-gradient(400deg, #0f2425, #0f2526, #063c3d, #005556, #007d7d);
+.card-quests-clan{
+    background: linear-gradient(400deg, #0f2425, #0f2526, #063c3d, #005556, #007d7d);
     border: .4cqh groove #13b7cd;
     display: flex;
     justify-content: space-around;
     align-items: center;
     flex-direction: column;
-    width: 15cqw;
-    
     filter: drop-shadow(0px 2px 10px rgba(0, 0, 0, 0.76));
     overflow: hidden;
-    height: 10cqh;
+    width: 25cqh;
+    height: 45cqh;
+    border-radius: 1rem;
 }
 .send-wrapper{
     width: 100%;

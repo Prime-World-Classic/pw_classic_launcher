@@ -4952,7 +4952,7 @@ static async clan() {
                 DOM(
                   { style: "quests-display-wrapper" },
                   DOM(
-                    { style: "card-quests" },
+                    { style: "card-quests-clan" },
                     DOM(
                       { style: "quest-task-wrapper" },
                       DOM(
@@ -5024,7 +5024,7 @@ static async clan() {
                     ),
                   ),
                   DOM(
-                    { style: "card-quests" },
+                    { style: "card-quests-clan" },
                     DOM(
                       { style: "quest-task-wrapper" },
                       DOM(
@@ -5096,7 +5096,7 @@ static async clan() {
                     ),
                   ),
                   DOM(
-                    { style: "card-quests" },
+                    { style: "card-quests-clan" },
                     DOM(
                       { style: "quest-task-wrapper" },
                       DOM(
