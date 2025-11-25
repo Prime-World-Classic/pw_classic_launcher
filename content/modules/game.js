@@ -1,5 +1,6 @@
 import { DOM } from './dom.js';
 import { App } from './app.js';
+import { domAudioPresets } from './domAudioPresets.js';
 
 export class Game {
   static sizeX = 10;
@@ -55,6 +56,7 @@ export class Game {
 
     Game.fieldScoringContainer = DOM(
       {
+        domaudio: domAudioPresets.smallButton,
         style: 'game-field-scoring-container',
         event: ['click', (e) => Game.click(e)],
       },
@@ -95,14 +97,14 @@ export class Game {
     Game.viewTotalScore.innerText = `Оcколки: ${Game.totalScore} | `;
 
     if (!isSplah) {
-      Game.viewInfo.append(DOM({ event: ['click', () => Game.eventBack()] }, 'Вернуться назад'), DOM({}, ` | `));
+      Game.viewInfo.append(DOM({domaudio: domAudioPresets.smallButton, event: ['click', () => Game.eventBack()] }, 'Вернуться назад'), DOM({}, ` | `));
     }
 
     Game.viewInfo.append(
       Game.viewTotalScore,
       Game.viewMoves,
       DOM({}, ` | `),
-      DOM({ event: ['click', () => Game.eventFinish()] }, 'Завершить игру'),
+      DOM({domaudio: domAudioPresets.bigButton, event: ['click', () => Game.eventFinish()] }, 'Завершить игру'),
     );
 
     Game.scoring.append(Game.viewScore);
@@ -179,7 +181,7 @@ export class Game {
 
     unit.style.left = `${Game.position(y)}`;
 
-    Game.field.append(DOM({ style: 'unit-container', event: ['click', (e) => Game.click(e)] }, unit));
+    Game.field.append(DOM({domaudio: domAudioPresets.smallButton, style: 'unit-container', event: ['click', (e) => Game.click(e)] }, unit));
 
     return unit;
   }
@@ -195,7 +197,7 @@ export class Game {
 
     unit.style.left = `${Game.position(y)}`;
 
-    Game.field.append(DOM({ style: 'unit-container', event: ['click', (e) => Game.click(e)] }, unit));
+    Game.field.append(DOM({domaudio: domAudioPresets.smallButton, style: 'unit-container', event: ['click', (e) => Game.click(e)] }, unit));
 
     return unit;
   }
