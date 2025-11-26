@@ -2893,6 +2893,10 @@ height: 10cqh;
     align-items: center;
     flex-direction: column;
 }
+.applications-main-wrapper span{
+    color: #f6e1e19b;
+    font-size: 2cqh;
+}
 .applications-banner{
     display: flex;
     width: 100%;
@@ -3017,14 +3021,14 @@ height: 10cqh;
 .setting-top-section{
     display: flex;
     width: 100%;
-    height: 35%;
+    height: 25%;
     align-items: center;
     justify-content: center;
 }
 .setting-bottom-section{
     display: flex;
     width: 100%;
-    height:65%;
+    height:75%;
     align-items: center;
     justify-content: space-evenly;
 
@@ -3033,19 +3037,21 @@ height: 10cqh;
     width: 95%;
     height: 15%;
     background: url(./clanImages/rename-clan.png) no-repeat center center;
-    background-size: 250px 50px;
-    color: #faf8d8;
+    color: #ffffff;
     border: 0;
     transition: .3s;
+    font-size: 1.5cqh;
+    background-size: 13cqw 4.5cqh;
 }
 .disban-clan-button{
     width: 95%;
     height: 15%;
     background: url(./clanImages/disban-clan.png) no-repeat center center;
-    background-size: 250px 50px;
-    color: #faf8d8;
+    color: #ffffff;
     border: 0;
     transition: .3s;
+    font-size: 1.5cqh;
+    background-size: 13cqw 4.5cqh;
 }
 .disban-clan-button:hover, .rename-clan-button:hover{
     filter: brightness(0.8);
@@ -3055,10 +3061,8 @@ height: 10cqh;
     width: 90%;
     display: flex;
     justify-content: start;
-    align-items: start;
-    gap: 50px;
-
-
+    align-items: center;
+    gap: 30cqh;
 }
 .setting-second-section{
     width: 50%;
@@ -3075,8 +3079,8 @@ height: 10cqh;
     display: flex;
     justify-content: start;
     align-items: start;
-    margin-top: 50px;
-    margin-left: 50px;
+    margin-top: 5cqh;
+    margin-left: 5cqh;
 
 
 
@@ -3085,26 +3089,29 @@ height: 10cqh;
     background: url("./clanImages/main12345678991234567.png") center center no-repeat;
     background-size: cover;
     display: flex;
-    justify-content: start;
-    align-items: start;
-    border-radius: 50%;transform: scale(1.2);
-
-
-
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+#gerb-settings{
+    width: 9cqh;
+    width: 9cqw;
+    background: url("./clanImages/main12345678991234567.png") center center no-repeat;
+    background-size: cover;
+    
 }
 .wrap-change-icon{
-    background: url("./clanImages/main1234567899123456.png") center center no-repeat;
     background-size: cover;
     padding: 5px;
     translate: -15px;
-    transform: scale(1);
 }
 .change-tag-name-board{
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    height: 100%;
-    flex-direction: column;
+    height: 50%;
+    width: 60%;
+    flex-direction: row;
 
 }
 .change-tag-name-board h1, .change-tag-name-board p, .setting-second-section h2{
@@ -3113,13 +3120,22 @@ height: 10cqh;
 
 
 }
-.change-tag-name-board span{
-    opacity: 0.6;
 
-}
-.change-tag-name-board p, .setting-second-section h3{
+.change-tag-name-board span, .setting-second-section h3{
     font-size: 1.4em;
-    color: #fffcf3;
+    opacity: 1;
+    color: #ffffff;
+}
+.clanNameTagWrapper{
+    width: 70%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1cqh;
+}
+#clan-tag{
+    opacity: .5;
 }
 .settings-fourth-section{
     height: 100%;
@@ -3149,20 +3165,21 @@ height: 10cqh;
     background-size: cover;
     background: rgba(13, 31, 27, 0.42);
 
-    border-radius: 15px;
-    border: 4px groove rgb(205, 191, 98);
+    border-radius: .5cqh;
+    border: .2cqh groove #124242;
     backdrop-filter: blur(20px) opacity(0.5);
     z-index: 0;
+    filter: drop-shadow(0 0 5cqh rgba(0, 0, 0, 0.151));
 }
 .settings-history-top-lane{
     width: 100%;
-    height: 10%;
+    height: 5%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.3em;
-    color: rgba(255, 238, 204, 0.95);
-    border-bottom: 4px groove rgba(205, 191, 98, 0.31);
+    font-size: 1.5cqh;
+    color: rgba(255, 255, 255, 0.95);
+    border-bottom: .2cqh groove #0c2b2b7c;
 }
 .clan-rating-wrapper{
     width: 100%;
@@ -3175,7 +3192,7 @@ height: 10cqh;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-left: 5px groove rgba(45, 75, 73, 0.84);
+    border-left: .5cqh groove rgba(45, 75, 73, 0.84);
     height: 100%;
 
 }
@@ -3184,25 +3201,28 @@ height: 10cqh;
 
     justify-content: start;
 }
-#clan-name-row p{
-    margin-left: 20px;
+#Name__clan_row span{
+    margin-left: 1cqh;
 }
 #Name__clan_row{
     width: 74%;
    justify-content: start;
 
 }
-#Name__clan_row p{
+#Name__clan_row span{
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1.8cqh;
     
 }
-#clanTopIcon{
-    height: 3.5cqh;
-    width: 9.5cqw;
-    background: "./clanImages/award.png" center center no-repeat;
+#Name__clan_row span img{
+    height: 2.5cqh;
+    width: 1.5cqw;
+    padding: 0.2cqh;
+    background-color: #113f41;
+    border: 0.2cqh groove #012021a7;
+    border-radius: 50%;
     margin-right: 1cqh;
 }
 

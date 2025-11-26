@@ -4697,6 +4697,13 @@ class Window {
 
 
 static async clan() {
+
+
+const userRole = "lider";
+// const userRole = "coLider";
+// const userRole = "member";
+// const userRole = "noClan";
+
   const clanRolesList = {
     Lider: {
       icon: "content/clanImages/main1234567899123.png",
@@ -4766,14 +4773,14 @@ static async clan() {
       {
         name: "PlayerName1",
         totalPoints: "12302",
-        totaGlames: "302",
+        totaGames: "302",
         wonGames: "202",
         maxRank: "Капрал",
       },
       {
         name: "PlayerName2",
         totalPoints: "12302",
-        totaGlames: "302",
+        totaGames: "302",
         wonGames: "202",
         maxRank: "Капрал",
       },
@@ -4781,7 +4788,7 @@ static async clan() {
       {
         name: "PlayerName3",
         totalPoints: "12302",
-        totaGlames: "302",
+        totaGames: "302",
         wonGames: "202",
         maxRank: "Капрал",
       },
@@ -4947,7 +4954,7 @@ const applicationsList = clanData.clanApplication.map(aplctn => {
           DOM(
             { tag: "span" },
             "Всего игр: ",
-            DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totaGlames),
+            DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totaGames),
           ),
           DOM(
             { tag: "span" },
@@ -4985,7 +4992,7 @@ const clanTopList = clanData.clanTop.map((top, index) => {
     DOM(
       { id: "Name__clan_row" },
       DOM(
-        { tag: "p" },
+        { tag: "span" },
         DOM({
           id: "clanTopIcon",
           src: top.icon,
@@ -5180,7 +5187,9 @@ const clanTopList = clanData.clanTop.map((top, index) => {
               ),
   );
   const tab3 = DOM({ style: "tab-content", id: "tab3" },
-     DOM({ style: "applications-main-wrapper" },
+     
+    userRole == "lider" || userRole == "coLider"
+    ?DOM({ style: "applications-main-wrapper" },
         DOM({ style: "wrap-add-witch-nickname" },
            DOM({ style: "add_with_nickname", tag: "button" },
             "Добавить игрока по имени",
@@ -5189,7 +5198,13 @@ const clanTopList = clanData.clanTop.map((top, index) => {
         DOM({ style: "applications-list" },
           ...applicationsList
         ),
-     ),
+     )
+     :DOM({ style: "applications-main-wrapper"},
+        DOM({tag: "span"},
+          "У вас нет должных полномочий"
+        ),
+
+     )
   );
   const tab4 = DOM( { style: "tab-content", id: "tab4" },
      DOM({ style: "clan-rating-wrapper" },
@@ -5200,20 +5215,26 @@ const clanTopList = clanData.clanTop.map((top, index) => {
      DOM({style: "settings-main-wrapper"},
       DOM({style: "setting-top-section"},
         DOM({style: "setting-first-section"},
-          DOM({style: "change-clan-icon-board"},
-            DOM({id: "gerb-clan-settings"},
-              DOM({
+          // DOM({style: "change-clan-icon-board"},
+          //   DOM({id: "gerb-clan-settings"},
+              
+          //   ),
+          // ),
+          DOM({style: "change-tag-name-board"},
+            DOM({
                 id: "gerb-settings",
                 src: "content/clanImages/GuildB.png",
                 alt: "",
                 tag: "img",
               }),
-            ),
-          ),
-          DOM({style: "change-tag-name-board"},
-            DOM({ tag: "p" }, clanData.clanStatistics.clanName,
-              DOM({ id: "clan-tag", tag: "span" }, "Tag"),
-            ),
+            DOM({style:"clanNameTagWrapper"},
+              DOM({ tag: "span" },
+                clanData.clanStatistics.clanName,
+              ),
+              DOM({ id: "clan-tag", tag: "span" },
+                clanData.clanStatistics.clanTag
+              ),
+            )
           ),
         ),
       ),
@@ -5240,7 +5261,9 @@ const clanTopList = clanData.clanTop.map((top, index) => {
                       }),
                     ),
                   ),
-                  DOM(
+                  
+                  userRole == "lider"
+                    ?DOM(
                     {
                       style: "settings-fourth-section",
                     },
@@ -5264,7 +5287,19 @@ const clanTopList = clanData.clanTop.map((top, index) => {
                         tag: "button",
                       },
                       "Распустить клан",
-                    ),
+                    )
+                    
+
+                    )
+                    :DOM(
+                    {style: "settings-fourth-section",},
+                      DOM(
+                      {
+                        style: "disban-clan-button",
+                        tag: "button",
+                      },
+                      "Выйти из клана",
+                    )
                   ),
                 ),
      )
@@ -5299,7 +5334,8 @@ const clanTopList = clanData.clanTop.map((top, index) => {
 
   return DOM(
     { style: 'clan-wapper', id: 'clan-wapper' },
-    DOM(
+    userRole != "noClan"
+    ?DOM(
       { style: 'main__clan__wrapper' },
       DOM(
         { style: "left-side-clan" },
@@ -5384,7 +5420,9 @@ const clanTopList = clanData.clanTop.map((top, index) => {
         )
       ),
       rightSideContainer
+      
     )
+    :DOM({main__clan__wrapper},)
   );
 }
 
