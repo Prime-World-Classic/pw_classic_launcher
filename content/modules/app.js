@@ -591,7 +591,7 @@ export class App {
 
     let msg = DOM({ tag: 'div' }, `${message}`);
     Sound.play(SOUNDS_LIBRARY.ERROR, {
-      id: 'error-sound',
+      id: 'ui-error',
       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
     });
     setTimeout(() => {
