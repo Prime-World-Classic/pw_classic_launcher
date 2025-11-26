@@ -2102,7 +2102,7 @@ html,body{cursor:url('img/cursor.png') 0 0,default}
     /*background: url("./images/main123456789912345678.png") no-repeat center  top fixed;*/
     /*background-size: cover;*/
     background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.37), rgba(18, 69, 73, 0.38), rgba(21, 51, 59, 0.34), rgba(18, 69, 73, 0.37), rgba(4, 32, 42, 0.9));
-    backdrop-filter: blur(0.5cqh);
+    backdrop-filter: blur(0.25cqh);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2356,7 +2356,7 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
     border: .5cqh groove #B18D01FF;
     border-radius: 0.8rem 0 0 0.8rem;
     transition: 0.25s;
-    background: linear-gradient(to top, rgba(11, 35, 40, 0.73), rgba(15, 35, 44, 0.78), rgba(15, 74, 72, 0.79), rgba(44, 99, 93, 0.83));
+    background: linear-gradient(to top, rgba(11, 35, 40, 0.316), rgba(15, 35, 44, 0.268), rgba(15, 74, 72, 0.79), rgba(44, 99, 93, 0.83));
     z-index: 1;
   
     font-size: 2cqh;
@@ -2728,7 +2728,7 @@ background: linear-gradient(to bottom, rgba(5, 41, 54, 0.7), rgba(27, 101, 108, 
 }
 .card-quests-clan{
     background: linear-gradient(400deg, #0f2425, #0f2526, #063c3d, #005556, #007d7d);
-    border: .4cqh groove #13b7cd;
+    border: .4cqh groove #13b7cdc8;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -2910,38 +2910,44 @@ height: 10cqh;
     align-items: center;
     flex-direction: column;
     gap: 0.5cqh;
+    overflow: scroll;
 
+    
 }
 .application{
     width: 95%;
     height: 7.5cqh;
     background: #103838;
-    border:4px groove rgb(205, 191, 98);
+    border:.5cqh groove rgb(10, 44, 38);
     border-radius: 1rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-
+    transition: .3s;
+}
+.application:hover{
+    filter: drop-shadow(0px 0px 2cqh rgba(0, 0, 0, 0.46))
 }
 .image-wrapper-application{
-    width:15%;
+    width: 10%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-right: 4px groove rgb(205, 191, 98);
+    border-right: 0.5cqh groove rgb(10, 44, 38);
 }
 #head{
-    transform: scale(0.4);
+    height: 17cqh;
 }
 .application-stats{
-    width: 50%;
-    font-size: 1.1em;
+    width: 75%;
+    height: 100%;
+    font-size:1.7cqh;
     color: white;
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items: start;
+    align-items: center;
     flex-direction: column;
     flex-wrap: wrap;
 
@@ -2953,17 +2959,17 @@ height: 10cqh;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    border-left: 4px groove rgb(205, 191, 98);
+    border-left: 0.5cqh groove rgb(10, 44, 38);
 }
 #aprove{
-    transform: scale(1);
+    height: 4cqh;
     transition: 0.3s;
 }
 #aprove:hover{
     filter: brightness(0.5);
 }
 #award{
-    background: url(./images/main123456789.png) no-repeat center center ;
+    background: url(./clanImages/main123456789.png) no-repeat center center ;
     background-size:cover;
     padding: 0.2cqh 3.5cqh;
     font-size: 1.5cqh;
@@ -2986,17 +2992,18 @@ height: 10cqh;
     align-items: center;
 }
 .add_with_nickname{
-    padding:15px 10px;
-    background: linear-gradient( #0f5052, #1c2b24);
+    padding:1.5cqh 1cqh;
+    background:  #103838;
     border-radius: 1rem;
-    border: 4px groove rgb(140, 146, 95);
-    color: #eee6b6;
-
-
+    border: 0.5cqh groove rgb(10, 44, 38);;
+    color: #f7f3e0;
+    font-size: 1.4cqh;
     transition: .3s;
+
+
 }
 .add_with_nickname:hover{
-    filter: brightness(0.8);
+    filter: drop-shadow(0px 0px 1cqh rgba(0, 0, 0, 0.306));
 }
 
 .settings-main-wrapper{
@@ -3025,7 +3032,7 @@ height: 10cqh;
 .rename-clan-button{
     width: 95%;
     height: 15%;
-    background: url(./images/rename-clan.png) no-repeat center center;
+    background: url(./clanImages/rename-clan.png) no-repeat center center;
     background-size: 250px 50px;
     color: #faf8d8;
     border: 0;
@@ -3034,7 +3041,7 @@ height: 10cqh;
 .disban-clan-button{
     width: 95%;
     height: 15%;
-    background: url(./images/disban-clan.png) no-repeat center center;
+    background: url(./clanImages/disban-clan.png) no-repeat center center;
     background-size: 250px 50px;
     color: #faf8d8;
     border: 0;
@@ -3075,7 +3082,7 @@ height: 10cqh;
 
 }
 #gerb-clan-settings, .wrap-change-icon{
-    background: url("./images/main12345678991234567.png") center center no-repeat;
+    background: url("./clanImages/main12345678991234567.png") center center no-repeat;
     background-size: cover;
     display: flex;
     justify-content: start;
@@ -3086,7 +3093,7 @@ height: 10cqh;
 
 }
 .wrap-change-icon{
-    background: url("./images/main1234567899123456.png") center center no-repeat;
+    background: url("./clanImages/main1234567899123456.png") center center no-repeat;
     background-size: cover;
     padding: 5px;
     translate: -15px;
@@ -3189,12 +3196,14 @@ height: 10cqh;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 1.8cqh;
+    
 }
-#Name__clan_row p img{
-    width: 25px;
-    height: 25px;
-    padding: 5px ;
-    background: url("./images/main1234567899123456.png") center center no-repeat;
+#clanTopIcon{
+    height: 3.5cqh;
+    width: 9.5cqw;
+    background: "./clanImages/award.png" center center no-repeat;
+    margin-right: 1cqh;
 }
 
 .create-clan{
@@ -3205,7 +3214,7 @@ height: 10cqh;
     position: absolute;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     gap: 15px;
     padding-top: 10px;
@@ -3280,7 +3289,7 @@ height: 10cqh;
   display: none;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     padding-top: 10px;
     animation: fade .2s;
@@ -3325,7 +3334,7 @@ height: 10cqh;
     display: none;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     padding-top: 10px;
     animation: fade .2s;
@@ -3344,7 +3353,7 @@ height: 10cqh;
     display: none;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     padding-top: 10px;
     animation: fade .2s;
@@ -3361,7 +3370,7 @@ height: 10cqh;
 .disbanButton{
     width: 95%;
     height: 15%;
-    background: url(./images/disban-clan.png) no-repeat center center;
+    background: url(./clanImages/disban-clan.png) no-repeat center center;
     background-size: 150px 30px;
     color: #faf8d8;
     border: 0;
@@ -3371,7 +3380,7 @@ height: 10cqh;
 .btn{
     width: 95%;
     height: 15%;
-    background: url(./images/rename-clan.png) no-repeat center center;
+    background: url(./clanImages/rename-clan.png) no-repeat center center;
     background-size: 150px 30px;
     color: #faf8d8;
     border: 0;
@@ -3390,7 +3399,7 @@ height: 10cqh;
     display: none;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     padding-top: 10px;
     animation: fade .2s;
@@ -3412,7 +3421,7 @@ height: 10cqh;
     display: flex;
     width: 300px;
     height:225px;
-    background: url(./images/window.png) no-repeat center center;
+    background: url(./clanImages/window.png) no-repeat center center;
     background-size: contain;
     padding-top: 10px;
     animation: fade .2s;
