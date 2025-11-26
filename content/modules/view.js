@@ -1214,13 +1214,25 @@ export class View {
   }
 
   static async castleQuestUpdate() {
-    let request = await App.api.request('quest', 'list');
-
-    if (Number.isInteger(request.crystal)) {
-      View.castleTotalCrystal.firstChild.innerText = request.crystal;
-    } else {
-      App.error(`Неизвестное число кристаллов: ${JSON.stringify(request)}`);
-    }
+	  
+	let request;
+	
+	try{
+		
+		request = await App.api.request('quest', 'list');
+		
+		if( !('crystal' in request) ){
+			alert(request);
+			return App.error(`Неизвестное число кристаллов: ${JSON.stringify(request)}`);
+		}
+		
+	}
+	catch(error){
+		
+		return App.error(error);
+		
+	}
+	
     while (View.castleQuestBody.firstChild) {
       View.castleQuestBody.firstChild.remove();
     }
