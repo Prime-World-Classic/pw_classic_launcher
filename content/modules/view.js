@@ -1226,6 +1226,8 @@ export class View {
 			return App.error(`Неизвестное число кристаллов: ${JSON.stringify(request)}`);
 		}
 		
+		View.castleTotalCrystal.firstChild.innerText = request.crystal;
+		
 	}
 	catch(error){
 		
