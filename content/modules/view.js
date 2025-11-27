@@ -1379,7 +1379,9 @@ export class View {
 
       let buildingNameBase = DOM({ style: 'castle-item-hero-name' }, buildingName);
 
-      let building = DOM({ style: 'castle-building-item' }, buildingNameBase);
+      let building = DOM({ style: 'castle-building-item' },
+            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+        buildingNameBase);
 
       building.dataset.url = `content/img/buildings/${Castle.currentSceneName}/${item}.png`;
 
@@ -1600,7 +1602,9 @@ export class View {
               input.focus();
             },
           },
-          DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-add' }, '+')),
+          DOM({ style: 'castle-friend-item-middle' },
+            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+            DOM({ style: 'castle-friend-add' }, '+')),
         );
 
         preload.add(buttonAdd);
@@ -1618,7 +1622,9 @@ export class View {
 
           let bottom = DOM({ style: 'castle-friend-item-bottom' });
 
-          let friend = DOM({ style: 'castle-friend-item' }, heroNameBase, bottom);
+          let friend = DOM({ style: 'castle-friend-item' },
+            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+             heroNameBase, bottom);
 
           if (item.status == 1) {
             let group = DOM({ style: 'castle-friend-add-group' }, item.online ? Lang.text('inviteToAGroup') : Lang.text('friendIsOffline'));
