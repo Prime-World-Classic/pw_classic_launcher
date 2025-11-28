@@ -756,7 +756,7 @@ export class Castle {
               })
               CastleBuildingsEvents[Castle.outlinedBuilding.name]();
             }
-          }А
+          }
         }
       }
     });
@@ -1045,11 +1045,21 @@ export class Castle {
 
     Castle.globalCanvas.classList.add('castle-fade-in');
 
-    if (NativeAPI.fileSystem && !('castle' in Sound.all)) {
-      var soundFiles = NativeAPI.fileSystem.readdirSync('content/sounds/' + sceneName);
+    if (!('castle' in Sound.all)) {
+      switch (sceneName) {
+        case 'ad':
+          var soundFiles = Object.values(SOUNDS_LIBRARY.AD);
+          break;
+        case 'doct':
+          var soundFiles = Object.values(SOUNDS_LIBRARY.DOCT);
+          break;
+        default:
+          App.error('Unknown scene name for castle music: ' + sceneName);
+          break;
+      }
 
       let playCastleMusic = function () {
-        let musicName = 'content/sounds/' + sceneName + '/' + soundFiles[Math.floor(Math.random() * soundFiles.length)];
+        let musicName = soundFiles[Math.floor(Math.random() * soundFiles.length)];
         Sound.stop('castle');
         Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic);
       };

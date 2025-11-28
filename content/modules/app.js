@@ -77,14 +77,24 @@ export class App {
    * @returns {Promise<void>} A promise that resolves when all sounds are preloaded
    */
   static async initSounds() {
-    const tasks = [];
-    for (const name in SOUNDS_LIBRARY) {
-      const src = SOUNDS_LIBRARY[name];
-      tasks.push(Sound.preload(name, src));
-    }
+  const tasks = [];
 
-    await Promise.all(tasks);
-  }
+  const walk = (obj) => {
+    for (const key in obj) {
+      const value = obj[key];
+
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+        walk(value);                    // вложенный объект → углубляемся
+      } else {
+        tasks.push(Sound.preload(key, value)); // строка → грузим
+      }
+    }
+  };
+
+  walk(SOUNDS_LIBRARY);
+
+  await Promise.all(tasks);
+}А
 
   static async init() {
     // wss://api2.26rus-game.ru:8443 - Москва (основа)
