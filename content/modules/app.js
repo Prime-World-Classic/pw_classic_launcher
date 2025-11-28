@@ -84,9 +84,9 @@ export class App {
       const value = obj[key];
 
       if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-        walk(value);                    // вложенный объект → углубляемся
+        walk(value);                    
       } else {
-        tasks.push(Sound.preload(key, value)); // строка → грузим
+        tasks.push(Sound.preload(key, value)); 
       }
     }
   };
@@ -167,17 +167,21 @@ export class App {
         // 1. Сначала закрываем Splash если открыт
         if (typeof Splash !== 'undefined' && Splash.body && Splash.body.style.display === 'flex') {
           Splash.hide();
+          Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, { id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
           return;
         }
 
         // 2. Затем закрываем окна по одному в обратном порядке
         if (typeof Window !== 'undefined' && Window.anyOpen && Window.anyOpen()) {
           Window.closeLast(); // Закрываем только последнее окно
+          Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, { id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+          return;
         }
         // 3. Если окон нет - открываем настройки
         else {
           if (typeof Window !== 'undefined' && Window.show) {
             Window.show('main', 'menu');
+            Sound.play(SOUNDS_LIBRARY.CLICK_OPEN_BIG, { id: 'ui-big-click', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
           }
         }
       }

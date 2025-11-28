@@ -20,6 +20,7 @@ import { Timer } from './timer.js';
 import { Shop } from './shop.js';
 import { DomAudio } from './domAudio.js';
 import { domAudioPresets } from './domAudioPresets.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 export class View {
   static mmQueueMap = {};
@@ -866,6 +867,7 @@ export class View {
         () => {
           const onEsc = (e) => {
             if (e.key === 'Escape') {
+              Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, {id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
               Splash.hide();
               document.removeEventListener('keydown', onEsc);
             }
