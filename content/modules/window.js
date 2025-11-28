@@ -15,6 +15,7 @@ import { Build } from './build.js';
 import { Timer } from './timer.js';
 
 import { domAudioPresets } from './domAudioPresets.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 export class Window {
   static windows = {};
@@ -926,7 +927,7 @@ export class Window {
                 if (!Castle.testSoundIsPlaying) {
                   Castle.testSoundIsPlaying = true;
                   Sound.play(
-                    'content/sounds/found.ogg',
+                    SOUNDS_LIBRARY.GONG,
                     {
                       id: soundTestId,
                       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
