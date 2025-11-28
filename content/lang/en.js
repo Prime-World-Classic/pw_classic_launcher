@@ -1603,10 +1603,10 @@
     htalent_220_name: 'Jump!',
     htalent_220_description:
       'Increases the amount of <orange-d>Jumps</orange-d> to <num>1</num>.<br> Slows down touched enemies by <num>40%</num> for <num>2</num> seconds.',
-    htalent_221_name: 'The Roots of Evil <mana>50</mana> <CD>3</CD> /<blue-l> <CD>8</CD></blue-l>',
+    htalent_221_name: 'The Roots of Evil <mana>50</mana> <CD>3</CD> /<blue-l> 8<CD></CD></blue-l>',
     htalent_221_description:
       'After <num>0.3</num> seconds, it deals <mag>%s</mag> damage to enemies in the area under the cursor and can steal Health, but not more than <num>3</num> targets.<br><rz>When used from native land, it reduces the target\'s Health recovery by <num>75%</num> for <num>2</num> seconds.</rz><br> <hr> <blue-l>In the form of <orange-d>Bear</orange-d> the hero is transported to the specified location and deals enemies around <mag>%s</mag> damage (from the greatest of Strength and Intellect).</blue-l>',
-    htalent_222_name: 'Living skin <mana>60</mana> <CD>30</CD> /<blue-l> <CD>5</CD></blue-l>',
+    htalent_222_name: 'Living skin <mana>60</mana> <CD>30</CD> /<blue-l> 5<CD></CD></blue-l>',
     htalent_222_description:
       'Attracts the selected enemy hero, dealing him <mag>%s</mag> damage and stunning him for <num>1.5</num> sec.<br> The range of talent increases by <num>0.2</num> for every <num>10</num> of the greatest of Strength and Intellect.<br> <hr> <blue-l>Applying talent to yourself turns the hero into <orange-d>Bear</orange-d> until the Energy drops below <num>5%</num>, which gets <num>%s</num> Health (from the highest of Strength and Intellect) and deals <num>15%</num> more attack damage, but loses <num>0.4%</num> max. Energy per second.</blue-l>',
     htalent_223_name: 'Woe to the weak',
@@ -1615,7 +1615,7 @@
     htalent_224_name: 'Hunger of the dead beast',
     htalent_224_description:
       'When the talent is restored, the hero\'s speed increases by <num>20%</num>, and near trees and mushrooms by <num>30%</num>.<br>When the Live Skin is triggered, the talents of the Villain and Fly Agaric are restored.<br> <hr> <blue-l>In the form of <orange-d>Bear</orange-d> the hero\'s attacks slow down the enemy by <num>25%</num> for <num>2</num> seconds, and the hero receives an additional <num>%s</num> of health theft (from the greatest of Strength and Intellect).</blue-l>',
-    htalent_225_name: "Crow's Evil Eye <mana>120</mana> <CD>25</CD> /<blue-l> <CD>5</CD></blue-l>",
+    htalent_225_name: "Crow's Evil Eye <mana>120</mana> <CD>25</CD> /<blue-l> 5<CD></CD></blue-l>",
     htalent_225_description:
       'The crow attacks the enemy, dealing him <fiz>%s</fiz> damage for <num>10</num> seconds and showing where he is.<br>If the effect ends prematurely, the talent\'s recovery time decreases proportionally.<br> <hr> <blue-l>Applying talent to yourself turns the hero into <orange-d>The crow</orange-d>, until the Energy drops below <num>5%</num>, which accelerates by <num>30%</num>, receives the effect of flight and an unobstructed view within a radius of <num>%s</num> (from the Intellect), but loses <num>1.5%</num> max. Energy per second, and cannot use talents or attack.</blue-l>',
     htalent_226_name: 'The villain <mana>380</mana> <CD>25</CD>',
