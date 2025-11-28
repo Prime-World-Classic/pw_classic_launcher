@@ -30,7 +30,7 @@ export class Chat {
 
     let input = DOM({
       tag: 'input',
-      domaudio: domAudioPresets.defaultInput,
+      domaudio: domAudioPresets.chatButton,
       style: 'chat-input',
       placeholder: Lang.text('enterTextAndPressEnter'),
     });

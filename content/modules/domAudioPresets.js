@@ -48,6 +48,18 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
   ),
+  chatButton: new DomAudio(
+    function over() {},
+    function down() {
+      Sound.play(SOUNDS_LIBRARY.CHAT, {
+        id: 'ui-chat',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+        loop: false,
+      });
+    },
+    function up() {},
+    function input() {},
+  ),
   talent: new DomAudio(
     function over() {},
     function down() {

@@ -1060,6 +1060,7 @@ export class Castle {
 
       let playCastleMusic = function () {
         let musicName = soundFiles[Math.floor(Math.random() * soundFiles.length)];
+        console.log('Playing castle music: ' + musicName);
         Sound.stop('castle');
         Sound.play(musicName, { id: 'castle', volume: Castle.GetVolume(Castle.AUDIO_MUSIC) }, playCastleMusic);
       };
