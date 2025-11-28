@@ -68,12 +68,7 @@ export const domAudioPresets = {
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
       });
     },
-    function up() {
-      Sound.play(SOUNDS_LIBRARY.BUY, {
-        id: 'ui-buy',
-        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
-      });
-    },
+    function up() {},
     function input() {},
   ),
   defaultInput: new DomAudio(
