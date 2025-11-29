@@ -2906,4 +2906,10 @@ export class Build {
       descEventEnd();
     };
   }
+  static cleanup() {
+    if (Build.descriptionView && Build.descriptionView.parentNode) {
+      Build.descriptionView.remove();
+      Build.descriptionView = null;
+    }
+  }
 }
