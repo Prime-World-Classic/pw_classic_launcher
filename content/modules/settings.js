@@ -10,7 +10,7 @@ export class Settings {
     render: true,
     globalVolume: 0.5,
     musicVolume: 0.7,
-    soundsVolume: 0.7,
+    soundsVolume: 0.2,
     radminPriority: false,
     language: 'ru',
     novoice: false,
