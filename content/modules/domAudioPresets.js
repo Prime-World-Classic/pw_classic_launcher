@@ -60,6 +60,17 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
   ),
+  buyButton: new DomAudio(
+    function over() {},
+    function down() {
+      Sound.play(SOUNDS_LIBRARY.BUY, {
+        id: 'ui-buy',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    function up() {},
+    function input() {},
+  ),
   finishQuestButton: new DomAudio(
     function over() {},
     function down() {

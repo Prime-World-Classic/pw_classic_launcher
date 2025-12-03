@@ -309,6 +309,10 @@ export class Window {
                                   let skinId = heroId_skinId[1];
                                   await Build.changeSkinForHero(heroId, skinId);
                                 }
+                                Sound.play(SOUNDS_LIBRARY.BUY, {
+                                  id: 'ui-buy',
+                                  volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+                                });
                               } catch (e) {
                                 App.error(e);
                                 return;
