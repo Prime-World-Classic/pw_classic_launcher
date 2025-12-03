@@ -77,24 +77,25 @@ export class App {
    * @returns {Promise<void>} A promise that resolves when all sounds are preloaded
    */
   static async initSounds() {
-  const tasks = [];
+    const tasks = [];
 
-  const walk = (obj) => {
-    for (const key in obj) {
-      const value = obj[key];
+    const walk = (obj) => {
+      for (const key in obj) {
+        const value = obj[key];
 
-      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-        walk(value);                    
-      } else {
-        tasks.push(Sound.preload(key, value)); 
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          walk(value);
+        } else {
+          tasks.push(Sound.preload(key, value));
+        }
       }
-    }
-  };
+    };
 
-  walk(SOUNDS_LIBRARY);
+    walk(SOUNDS_LIBRARY);
 
-  await Promise.all(tasks);
-}А
+    await Promise.all(tasks);
+  }
+  А;
 
   static async init() {
     // wss://api2.26rus-game.ru:8443 - Москва (основа)
@@ -627,6 +628,10 @@ export class App {
 
       document.body.append(body);
     }, delay);
+    Sound.play(SOUNDS_LIBRARY.ERROR, {
+      id: 'ui-error',
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+    });
   }
 
   static isAdmin(id = 0) {

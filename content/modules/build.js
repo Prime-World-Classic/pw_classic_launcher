@@ -2286,6 +2286,7 @@ export class Build {
             for (let t = (data.level - 1) * 6; t < data.level * 6; t++) {
               if (!Build.installedTalents[35 - t]) {
                 hasEmptySpace = true;
+
                 break;
               }
             }

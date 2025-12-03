@@ -309,6 +309,7 @@ export class Window {
                                   let skinId = heroId_skinId[1];
                                   await Build.changeSkinForHero(heroId, skinId);
                                 }
+                                // to refactor sound
                                 Sound.play(SOUNDS_LIBRARY.BUY, {
                                   id: 'ui-buy',
                                   volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
