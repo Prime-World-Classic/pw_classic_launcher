@@ -620,7 +620,7 @@ export class Window {
         content.appendChild(
           DOM(
             {
-              domaudio: domAudioPresets.bigButton,
+              domaudio: domAudioPresets.finishQuestButton,
               style: 'quest-accept-button',
               event: [
                 'click',

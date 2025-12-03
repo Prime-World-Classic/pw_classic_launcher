@@ -60,15 +60,33 @@ export const domAudioPresets = {
     function up() {},
     function input() {},
   ),
-  talent: new DomAudio(
+  finishQuestButton: new DomAudio(
     function over() {},
     function down() {
-      Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
-        id: 'ui-small-click',
+      Sound.play(SOUNDS_LIBRARY.GOLD_COINS, {
+        id: 'ui-finish-quest',
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
       });
     },
     function up() {},
+    function input() {},
+  ),
+  talent: new DomAudio(
+    function over() {},
+    function down() {
+      Sound.play(SOUNDS_LIBRARY.CLICK, {
+        id: 'ui-small-click',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
+    },
+    function up(e) {
+      if (e.button === 0) {
+        Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
+          id: 'ui-small-click',
+          volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+        });
+      }
+    },
     function input() {},
   ),
   defaultInput: new DomAudio(
