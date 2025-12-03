@@ -8,7 +8,7 @@ export const SOUNDS_LIBRARY = {
   CLICK_BUTTON_PRESS_SMALL: 'content/sounds/ui/ClickButtonPressSmall.wav',
   BUY: 'content/sounds/ui/buy.wav',
   ERROR: 'content/sounds/ui/error.wav',
-  GONG: 'content/sounds/ui/gong.wav',
+  MM_FOUND: 'content/sounds/found.ogg',
 
   // Music
   AD: {
@@ -26,5 +26,10 @@ export const SOUNDS_LIBRARY = {
     DOCT_3: 'content/sounds/doct/3.ogg',
     DOCT_4: 'content/sounds/doct/4.ogg',
     DOCT_5: 'content/sounds/doct/5.ogg',
-  }
+  },
+
+  VC_ENABALED: 'content/sounds/voice/enabled.mp3',
+  VC_DISABLED: 'content/sounds/voice/disabled.mp3',
+
+  TAMBUR: 'content/sounds/tambur.ogg',
 };

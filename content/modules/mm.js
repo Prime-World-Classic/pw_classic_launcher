@@ -15,6 +15,7 @@ import { Sound } from './sound.js';
 import { Timer } from './timer.js';
 import { Splash } from './splash.js';
 import { domAudioPresets } from './domAudioPresets.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 export class MM {
   static id = '';
@@ -97,7 +98,7 @@ export class MM {
   }
 
   static soundEvent() {
-    Sound.play('content/sounds/found.ogg', {
+    Sound.play(SOUNDS_LIBRARY.MM_FOUND, {
       id: 'MM_found',
       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
     });
@@ -736,7 +737,7 @@ export class MM {
       ),
     );
 
-    Sound.play('content/sounds/tambur.ogg', {
+    Sound.play(SOUNDS_LIBRARY.TAMBUR, {
       id: 'tambur',
       volume: Castle.GetVolume(Castle.AUDIO_MUSIC),
       loop: true,
@@ -817,6 +818,8 @@ export class MM {
   }
 
   static async select(data) {
+    // to refactor sound
+    await Sound.preload(`content/hero/${data.heroId}/revive/${data.sound}.ogg`);
     Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, {
       id: `heroSound_${data.heroId}_${data.sound}`,
       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),

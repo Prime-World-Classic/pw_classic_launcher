@@ -930,7 +930,7 @@ export class Window {
                 if (!Castle.testSoundIsPlaying) {
                   Castle.testSoundIsPlaying = true;
                   Sound.play(
-                    SOUNDS_LIBRARY.GONG,
+                    SOUNDS_LIBRARY.MM_FOUND,
                     {
                       id: soundTestId,
                       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
