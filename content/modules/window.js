@@ -60,7 +60,7 @@ export class Window {
   }
 
   static close(category) {
-	if (category === 'main' && typeof Build !== 'undefined' && Build.cleanup) {
+    if (category === 'main' && typeof Build !== 'undefined' && Build.cleanup) {
       Build.cleanup();
     }
     if (category in Window.windows) {
@@ -469,45 +469,56 @@ export class Window {
       DOM({ style: 'shop_category_header' }, Lang.text('shop_frames')),
       category.frame,
     );
+    let helpBtn = DOM({
+      id: 'wshop_help',
+      style: 'help-button',
+      event: [
+        'click',
+        () => {
+          // Тут любое действие: показать подсказку, открыть окно помощи и т.д.
+          console.log('help clicked');
+        },
+      ],
+    });
+    let wnd = DOM(
+      { id: 'wshop' },
+      helpBtn,
+      shopHeader,
+      DOM(
+        {
+          style: ['shop_with_scroll', isShop ? 'shop_with_scroll_shop' : '_dummy_'],
+        },
+        skins,
+        flags,
+        frames,
+      ),
+      isShop ? shopBottom : DOM(),
+    );
 
-      let wnd = DOM(
-        { id: 'wshop' },
-        shopHeader,
-        DOM(
-          {
-            style: ['shop_with_scroll', isShop ? 'shop_with_scroll_shop' : '_dummy_'],
-          },
-          skins,
-          flags,
-          frames,
-        ),
-        isShop ? shopBottom : DOM(),
-      );
+    await Shop.retrieveLastUpdate();
 
-      await Shop.retrieveLastUpdate();
+    wnd.timeLeft = Shop.timeBeforeUpdate;
 
-      wnd.timeLeft = Shop.timeBeforeUpdate;
+    function checkUpdate() {
+      setTimeout((_) => {
+        if (!('main' in Window.windows) || !(Window.windows['main'].id == 'wshop')) {
+          return;
+        }
 
-      function checkUpdate() {
-        setTimeout((_) => {
-          if (!('main' in Window.windows) || !(Window.windows['main'].id == 'wshop')) {
-            return;
-          }
+        if (wnd.timeLeft <= 0) {
+          Window.show('main', 'shop');
+          return;
+        }
 
-          if (wnd.timeLeft <= 0) {
-            Window.show('main', 'shop');
-            return;
-          }
+        shopTimeLeft.innerText = Timer.getFormattedTimer(wnd.timeLeft);
+        wnd.timeLeft -= 1000;
+        checkUpdate();
+      }, 1000);
+    }
 
-          shopTimeLeft.innerText = Timer.getFormattedTimer(wnd.timeLeft);
-          wnd.timeLeft -= 1000;
-          checkUpdate();
-        }, 1000);
-      }
+    checkUpdate();
 
-      checkUpdate();
-
-      return wnd;
+    return wnd;
   }
 
   static async shop() {

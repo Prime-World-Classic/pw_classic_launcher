@@ -808,6 +808,50 @@ input::placeholder {
   transform: translate(50%, -40%) scale(1.1);
 }
 
+/* help button */
+.help-button {
+  position: absolute;
+  container: help / size;
+  top: 0;
+  right: 4.4vh;
+  width: 3vh;
+  height: 3vh;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: #FFDB32; /* fallback */
+  background: linear-gradient(180deg,rgba(255, 219, 50, 1) 0%, rgba(212, 139, 0, 1) 100%);
+  border: 0.5cqh solid rgb(208, 180, 96);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.25cqh rgba(0, 0, 0, 0.6) inset,
+    0 0 0 0.25cqh rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+  transform: translate(50%, -40%);
+  transition: all 0.2s ease;
+  z-index: 9999;
+}
+
+.help-button:hover {
+  transform: translate(50%, -40%) scale(1.1);
+}
+
+.help-button::before {
+  position: absolute;
+  inset: 10cqh;
+  content: '';
+  background-image: url('icons/help.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Модификаторы ДОЛЖНЫ содержать только отличия от базового стиля */
 .build-list-close {
   /* Если нужны специфичные стили, иначе можно удалить этот класс */
