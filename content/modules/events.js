@@ -9,6 +9,8 @@ import { Chat } from './chat.js';
 import { NativeAPI } from './nativeApi.js';
 import { MM } from './mm.js';
 import { Splash } from './splash.js';
+import { Sound } from './sound.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { domAudioPresets } from './domAudioPresets.js';
 
 export class Events {
@@ -253,6 +255,10 @@ export class Events {
 
   static async VCall(data) {
     if (data.isCaller) {
+      Sound.play(SOUNDS_LIBRARY.CALL, {
+        id: 'ui-call',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      });
       let body = document.createDocumentFragment();
 
       body.append(
