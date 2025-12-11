@@ -618,7 +618,7 @@ export class Castle {
     else{
       Sound.play(SOUNDS_LIBRARY.ERROR, {
         id: 'ui-error',
-        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)});
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25});
     }
   }
 

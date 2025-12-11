@@ -607,7 +607,7 @@ export class App {
     let msg = DOM({ tag: 'div' }, `${message}`);
     Sound.play(SOUNDS_LIBRARY.ERROR, {
       id: 'ui-error',
-      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25,
     });
     setTimeout(() => {
       msg.remove();
@@ -630,7 +630,7 @@ export class App {
     }, delay);
     Sound.play(SOUNDS_LIBRARY.ERROR, {
       id: 'ui-error',
-      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25,
     });
   }
 
