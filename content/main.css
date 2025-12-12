@@ -852,10 +852,65 @@ input::placeholder {
   pointer-events: none;
 }
 
+.splash-content:has(.splash-help) {
+  aspect-ratio: 16 / 9;
+  width: calc(min(50cqw, 1000px));
+}
+
+.splash-help{
+  display: flex;
+  flex-direction: column;
+  font-size: 2cqh;
+  height: 100%;
+  padding: 5cqmin 5cqmin 0cqmin 5cqmin;
+}
+
+.splash-help-container {
+  flex: 1;
+  text-align: left;
+  scrollbar-width: auto;
+  padding-right: 1cqh;
+  overflow-y: auto;
+  max-height: 45cqh;
+}
+
+.splash-help-container::-webkit-scrollbar {
+  width: 1cqh;
+}
+
+.splash-help-container::-webkit-scrollbar-track {
+  background: rgba(20, 35, 42, 0.6);
+  border-radius: 1cqh;
+}
+
+.splash-help-container::-webkit-scrollbar-thumb {
+  background: rgba(90, 160, 200, 0.9);
+  border-radius: 1cqh;
+  border: 0.25cqh solid rgba(20, 35, 42, 0.6); 
+}
+
+.splash-help-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 185, 230, 1);
+}
+
+.splash-help-paragraph {
+  margin: 2cqh 0;
+}
+
+
+.splash-help-img{
+  display: block;
+  width: 100%;
+  height: auto;
+  
+}
+
 /* Модификаторы ДОЛЖНЫ содержать только отличия от базового стиля */
 .build-list-close {
   /* Если нужны специфичные стили, иначе можно удалить этот класс */
 }
+
+
 
 .close-image-style {
   width: 5vh !important;

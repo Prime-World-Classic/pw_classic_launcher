@@ -13,7 +13,7 @@ import { Voice } from './voice.js';
 import { MM } from './mm.js';
 import { Build } from './build.js';
 import { Timer } from './timer.js';
-
+import { HelpSplash } from './helpSpalsh.js';
 import { domAudioPresets } from './domAudioPresets.js';
 
 export class Window {
@@ -469,14 +469,17 @@ export class Window {
       DOM({ style: 'shop_category_header' }, Lang.text('shop_frames')),
       category.frame,
     );
+
     let helpBtn = DOM({
       id: 'wshop_help',
+      domaudio: domAudioPresets.defaultButton,
       style: 'help-button',
       event: [
         'click',
         () => {
-          // Тут любое действие: показать подсказку, открыть окно помощи и т.д.
-          console.log('help clicked');
+          HelpSplash(
+            Lang.text('shop_help_content')
+          );
         },
       ],
     });
