@@ -160,11 +160,11 @@ prime {
 }
 
 gray {
-  color: #A5A5A5;
+  color: #a5a5a5;
 }
 
 orange-l {
-  color: #FF9966;
+  color: #ff9966;
 }
 
 yellow {
@@ -176,23 +176,23 @@ orange-d {
 }
 
 amethyst {
-  color: #9966CC;
+  color: #9966cc;
 }
 
 white {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 red-d {
-  color: #B00000;
+  color: #b00000;
 }
 
 coral-l {
-  color: #F08080;
+  color: #f08080;
 }
 
 blue-b {
-  color: #4169E1;
+  color: #4169e1;
 }
 
 blood-d {
@@ -200,46 +200,46 @@ blood-d {
 }
 
 cyan-d {
-  color: #00A0A0;
+  color: #00a0a0;
 }
 
 frost {
-  color: #64CDF0;
+  color: #64cdf0;
 }
 
 bronze {
-  color: #B87333;
+  color: #b87333;
 }
 
-blue-l{
-  color: #8CD5FF;
+blue-l {
+  color: #8cd5ff;
 }
 
 electric-blue {
-  color: #3BA7FF;
+  color: #3ba7ff;
 }
 
 magenta {
-  color: #CA4FFF;
+  color: #ca4fff;
 }
 
 lime {
-  color: #37D337;
+  color: #37d337;
 }
 
 cinnabar {
-  color: #F41200;
+  color: #f41200;
 }
 
 carrot {
-  color: #FF9124;
+  color: #ff9124;
 }
 
 hr {
   display: block;
   width: 70%;
   height: 2px;
-  background-color: #A7A062;
+  background-color: #a7a062;
   margin: 15px auto 10px;
   border: none;
 }
@@ -820,13 +820,13 @@ input::placeholder {
   border: none;
   padding: 0;
   margin: 0;
-  background: #FFDB32; /* fallback */
-  background: linear-gradient(180deg,rgba(255, 219, 50, 1) 0%, rgba(212, 139, 0, 1) 100%);
+  background: #ffdb32; /* fallback */
+  background: linear-gradient(180deg, rgba(255, 219, 50, 1) 0%, rgba(212, 139, 0, 1) 100%);
   border: 0.5cqh solid rgb(208, 180, 96);
   border-radius: 50%;
   box-shadow:
-    0 0 0 0.25cqh rgba(0, 0, 0, 0.6) inset,
-    0 0 0 0.25cqh rgba(0, 0, 0, 0.7);
+    0 0 0 0.25cqh rgba(0, 0, 0, 0.2) inset,
+    0 0 0 0.25cqh rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
