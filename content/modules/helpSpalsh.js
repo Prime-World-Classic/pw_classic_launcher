@@ -1,6 +1,5 @@
 import { DOM } from './dom.js';
 import { Splash } from './splash.js';
-import { Lang } from './lang.js';
 import { domAudioPresets } from './domAudioPresets.js';
 
 /**

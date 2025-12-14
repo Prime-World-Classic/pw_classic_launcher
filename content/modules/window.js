@@ -538,9 +538,21 @@ export class Window {
 
   static async quest(item) {
     let quest = await App.api.request('quest', 'get', { id: item.id });
-
-    let root = DOM({ id: 'wquest' });
-
+    let helpBtn = DOM({
+      id: 'wshop_help',
+      domaudio: domAudioPresets.defaultButton,
+      style: 'help-button',
+      event: [
+        'click',
+        () => {
+          HelpSplash(
+            Lang.text('quest_help_content')
+          );
+        },
+      ],
+    }); 
+    let root = DOM({ id: 'wquest' }, helpBtn);
+    
     const content = DOM({ style: 'wquest__content' });
 
     const titlebar = DOM({ style: 'wquest__titlebar' });
