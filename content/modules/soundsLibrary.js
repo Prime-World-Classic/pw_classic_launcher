@@ -1,5 +1,6 @@
 import { NativeAPI } from './nativeApi.js';
 
+
 export const SOUNDS_LIBRARY = {
   // UI Sounds
   CLICK: 'content/sounds/ui/Click.wav',
@@ -44,7 +45,7 @@ export const SOUNDS_LIBRARY = {
 
 const HERO_SOUND_TYPES = ['revive'];
 
-function generateHeroSoundsNative() {
+export function generateHeroSoundsNative() {
   const fs = NativeAPI.fileSystem;
   const path = NativeAPI.path;
 
@@ -73,7 +74,7 @@ function generateHeroSoundsNative() {
   }
 }
 
-function generateHeroSoundsFallback() {
+export function generateHeroSoundsFallback() {
   const HERO_IDS = Array.from({ length: 65 }, (_, i) => i + 1);
   const FALLBACK_SOUNDS = ['1', '2', '3', '4'];
 
@@ -87,9 +88,4 @@ function generateHeroSoundsFallback() {
   }
 }
 
-if (NativeAPI.status) {
-  generateHeroSoundsNative();
-} else {
-  generateHeroSoundsFallback();
-}
-console.log('SOUNDS_LIBRARY', SOUNDS_LIBRARY);
+

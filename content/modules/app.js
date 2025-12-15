@@ -13,9 +13,8 @@ import { Window } from './window.js';
 import { Castle } from './castle.js';
 import { Lang } from './lang.js';
 import { Sound } from './sound.js';
-import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { domAudioPresets } from './domAudioPresets.js';
-
+import { SOUNDS_LIBRARY, generateHeroSoundsNative, generateHeroSoundsFallback } from './soundsLibrary.js';
 
 export class App {
   static APP_VERSION = '0';
@@ -71,6 +70,36 @@ export class App {
         App.error(Lang.text('apiConnectionError'));
       }
     }, 30000);
+  }
+
+  /**
+   * Preloads all sounds in SOUNDS_LIBRARY
+   * @returns {Promise<void>} A promise that resolves when all sounds are preloaded
+   */
+  static async initSounds() {
+    if (NativeAPI.status) {
+      generateHeroSoundsNative();
+    } else {
+      generateHeroSoundsFallback();
+    }
+    console.log('SOUNDS_LIBRARY', SOUNDS_LIBRARY);
+    const tasks = [];
+
+    const walk = (obj) => {
+      for (const key in obj) {
+        const value = obj[key];
+
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          walk(value);
+        } else {
+          tasks.push(Sound.preload(key, value));
+        }
+      }
+    };
+
+    walk(SOUNDS_LIBRARY);
+
+    await Promise.all(tasks);
   }
 
   static async init() {
