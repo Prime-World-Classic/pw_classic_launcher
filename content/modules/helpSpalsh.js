@@ -1,12 +1,13 @@
 import { DOM } from './dom.js';
 import { Splash } from './splash.js';
+import { Lang } from './lang.js';
 import { domAudioPresets } from './domAudioPresets.js';
 
 /**
  * Shows a splash with a given content.
  * @param {string} title - The title of the splash.
  * @param {string} contentInnerHTML - The HTML content to be displayed in the splash.
- * @returns {HTMLElement} - The splash element.
+ * @returns {void} - Nothing.
  */
 export function HelpSplash(contentInnerHTML) {
   /**
@@ -68,7 +69,7 @@ export function HelpSplash(contentInnerHTML) {
             },
           ],
         },
-        'ОК',
+        Lang.text('help_btn_close'),
       ),
     ),
   );
