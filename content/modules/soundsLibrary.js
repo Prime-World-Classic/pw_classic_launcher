@@ -1,5 +1,4 @@
 export const SOUNDS_LIBRARY = {
-
   // UI Sounds
   CLICK: 'content/sounds/ui/Click.wav',
   CLICK_CLOSE: 'content/sounds/ui/ClickClose.wav',
@@ -37,5 +36,4 @@ export const SOUNDS_LIBRARY = {
   VC_DISABLED: 'content/sounds/voice/disabled.mp3',
 
   TAMBUR: 'content/sounds/tambur.ogg',
-  
 };
