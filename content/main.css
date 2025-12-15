@@ -159,6 +159,20 @@ prime {
   color: cyan;
 }
 
+crystal {
+  color: inherit;
+}
+
+crystal:after {
+  content: '';
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  background-image: url('img/queue/DiamondBlue.png');
+  background-size: cover;
+  vertical-align: sub;
+}
+
 gray {
   color: #a5a5a5;
 }
@@ -860,7 +874,7 @@ input::placeholder {
 .splash-help{
   display: flex;
   flex-direction: column;
-  font-size: 2cqh;
+  font-size: 2.25cqmax;
   height: 100%;
   padding: 5cqmin 5cqmin 0cqmin 5cqmin;
 }
@@ -3937,6 +3951,16 @@ button.build-action-item:hover {
   width: 90cqw;
   position: absolute;
   top: 45cqw;
+}
+/* success icon */
+i-success {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0cqw 0.5cqw;
+  background-image: url('ranks/99.png');
+  background-size: cover;
+  vertical-align: sub;
 }
 
 .support-icons img {

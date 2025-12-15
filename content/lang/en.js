@@ -254,11 +254,12 @@
 
     shop_bottom: 'The shop will be updated in',
 
+    // so, the sturcture here is different bc of how help is render content in helpSplash.js
     shop_help_content: [
       {
         type: 'p',
         content:
-          'The <amethyst>“Market”</amethyst> offers a variety of items, divided into categories: <yellow>skins, flags, frames</yellow>.',
+          'The <magenta>“Shop”</magenta> offers a selection of items divided into categories: <yellow>skins, flags, frames</yellow>.',
       },
       {
         type: 'img',
@@ -267,48 +268,53 @@
       {
         type: 'p',
         content:
-          'Items are updated every <num>24</num> hours (<num>00:00</num> MSK). Prices are set automatically. Previously purchased items may reappear after the assortment updates.',
+          'Items refresh every <num>24</num> hours (<num>00:00</num> MSK). Prices are set automatically. An item you previously purchased may appear again after the assortment refresh.',
       },
       {
         type: 'p',
         content:
-          'To purchase an item, click <carrot>LMB</carrot> on its icon and confirm the purchase. Purchased items cannot be returned. Items cannot be purchased again.',
+          'To purchase an item, <carrot>LMB-click</carrot> the icon and confirm the purchase. Purchased items cannot be refunded. An item cannot be purchased again.',
       },
-      { type: 'p', content: 'All purchased items will appear in the <amethyst>“Collections”</amethyst> tab.' },
-      { type: 'img', content: 'content/img/shop/help-2.png' },
+      {
+        type: 'p',
+        content: 'All purchased items will be added to the <magenta>“Collections”</magenta> tab.',
+      },
+      {
+        type: 'img',
+        content: 'content/img/shop/help-2.png',
+      },
       {
         type: 'p',
         content:
-          'Future updates to the store are planned, both in terms of item variety and the <amethyst>“Market”</amethyst> functionality.',
+          'Future updates to the shop are planned, both in terms of item variety and the operation of the <magenta>“Shop”</magenta>.',
       },
       {
         type: 'ul',
         content: [
           '<b>Skins</b> — always available for purchase.',
-          '<b>Flags</b> — assortment updates according to the timer.',
-          '<b>Frames</b> — regular and seasonal. Seasons last 3 months.',
+          '<b>Flags</b> — the assortment refreshes according to the timer.',
+          '<b>Frames</b> — regular and seasonal. A season lasts 3 months.',
         ],
       },
       {
         type: 'p',
         content:
-          'Seasons last <num>3</num> months. This item will be available for purchase only during this time, then will be replaced by another item in the next season.',
+          'A season lasts 3 months. This item will only be available for purchase during this period, after which it will be replaced by another item in the next season.',
       },
       { type: 'hr' },
       {
         type: 'p',
         content:
-          'The <amethyst>“Collections”</amethyst> tab will display all in-game items purchased in the <amethyst>“Market”</amethyst>, as well as those earned through personal achievements.',
+          'The <magenta>“Collections”</magenta> tab displays all in-game items purchased from the <magenta>“Shop”</magenta>, as well as items obtained through personal achievements.',
       },
       {
         type: 'p',
         content:
-          'To change the display of a flag or frame on your account, click on the desired item and select “Choose”. The item will apply to your account and be displayed.',
+          'To change the displayed flag or frame on your account, click the desired item and select “Choose”. The item will be applied to your account and displayed.',
       },
       {
         type: 'p',
-        content:
-          'Purchased skins will automatically be added to the hero’s appearance selection via the <yellow>“Skins” button in the hero build</yellow>.',
+        content: 'A purchased skin is automatically added to the hero appearance selection via the “Skins” button in the hero build.',
       },
     ],
 
@@ -316,7 +322,7 @@
       {
         type: 'p',
         content:
-          'Quests are tasks that players can complete. To accept a quest, click <carrot>“Accept”</carrot> in the quest window. If you do not accept the quest, it will remain indefinitely and will not update.',
+          'Quests are tasks that a player can complete. To accept a quest, click <carrot>“Accept”</carrot> in the quest window. If you do not accept a quest, it will remain indefinitely, which means it will not refresh.',
       },
       {
         type: 'img',
@@ -325,30 +331,30 @@
       {
         type: 'p',
         content:
-          'Quests are divided into types: long-term (<num>30</num> days) and daily (<num>24</num> hours) from the moment of acceptance.',
+          'Quests are divided into types: long-term (<num>30</num> days) and daily (<num>24</num> hours), starting from the moment the quest is accepted.',
       },
       {
         type: 'p',
         content:
-          'When you complete a quest, a <rz>green checkmark</rz> will appear on the icon. By clicking the <carrot>“Complete”</carrot> button, you will receive a certain amount of <prime>Prime Crystals</prime>.',
+          'When a quest is completed, an <i-success></i-success> icon will appear on the quest. By clicking the “Complete” button, you will receive a certain amount of <crystal>Prime Crystals</crystal>.',
       },
       {
         type: 'p',
         content:
-          'Quests such as <amethyst>“Heir to the Throne”</amethyst>, <amethyst>“Right of the Strongest”</amethyst>, and <amethyst>“The Sacrifice”</amethyst> are completed in the <tn>“Frontier”</tn> and <tn>“Aram”</tn> modes. Long-term quests <amethyst>“Power of Unity”</amethyst> and <amethyst>“Path of Excellence”</amethyst> can be completed in all modes (except <tn>“Duel”</tn>).',
+          'Quests such as <magenta>“Heir to the Throne”</magenta>, <magenta>“Right of the Strongest”</magenta>, and <magenta>“Sacrifice”</magenta> are completed in the <tn>“Borderlands”</tn> and <tn>“ARAM”</tn> modes. Long-term quests <yst>“Power of Unity”</yst> and <yst>“Path of Supremacy”</yst> can be completed in all modes (except <tn>“Duel”</tn>).',
       },
       {
         type: 'p',
         content:
-          'When completing the <amethyst>“The Sacrifice”</amethyst> quest, pay attention to the chat window in the lobby. Instructions on which hero to <red-d>“eliminate”</red-d> will be provided in the lobby chat. If the quest fails, the player who accepted the quest will not receive a reward, while the <prime>“sacrifice”</prime> will receive <num>1</num> crystal.',
+          'When completing the <magenta>“Sacrifice”</magenta> quest, pay attention to the lobby chat window. Details about which hero must be “eliminated” will be written in the lobby chat. If the quest fails, the player who accepted it will not receive a reward, while the “victim” will receive <crystal>1</crystal>.',
       },
       {
         type: 'p',
-        content: 'Plans include creating and adding new quests.',
+        content: 'New quests are planned to be created and added.',
       },
     ],
 
-    help_btn_close: "Marked as read",
+    help_btn_close: 'Mark as read',
 
     frame_hint: 'The frame will be active when the hero has 25+ wins',
 
