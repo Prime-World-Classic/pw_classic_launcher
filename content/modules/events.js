@@ -9,6 +9,10 @@ import { Chat } from './chat.js';
 import { NativeAPI } from './nativeApi.js';
 import { MM } from './mm.js';
 import { Splash } from './splash.js';
+import { Sound } from './sound.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { domAudioPresets } from './domAudioPresets.js';
+import { Castle } from './castle.js';
 
 export class Events {
   static Message(data) {
@@ -246,6 +250,18 @@ export class Events {
 
   static async VCall(data) {
     if (data.isCaller) {
+      let playCallSoundLoop = () => {
+        Sound.stop('ui-call');
+        Sound.play(
+          SOUNDS_LIBRARY.CALL,
+          {
+            id: 'ui-call',
+            volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+          },
+          playCallSoundLoop,
+        );
+      };
+      playCallSoundLoop();
       let body = document.createDocumentFragment();
 
       body.append(
@@ -256,9 +272,9 @@ export class Events {
             event: [
               'click',
               async () => {
+                Sound.stop('ui-call');
                 try {
                   let voice = new Voice(data.id, '', data.name, true);
-
                   await voice.accept(data.offer);
 
                   Splash.hide();
@@ -273,7 +289,13 @@ export class Events {
         DOM(
           {
             style: 'splash-content-button',
-            event: ['click', async () => Splash.hide()],
+            event: [
+              'click',
+              async () => {
+                Sound.stop('ui-call');
+                Splash.hide();
+              },
+            ],
           },
           Lang.text('friendDropCall'),
         ),

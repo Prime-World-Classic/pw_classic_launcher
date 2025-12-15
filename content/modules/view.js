@@ -1291,6 +1291,7 @@ export class View {
       let quest = DOM(
         {
           style: 'quest-item',
+          domaudio: domAudioPresets.defaultButton,
           event: [
             'click',
             () => {

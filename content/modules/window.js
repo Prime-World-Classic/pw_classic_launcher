@@ -616,6 +616,7 @@ export class Window {
           DOM(
             {
               style: 'quest-accept-button',
+              domaudio: domAudioPresets.defaultButton,
               event: [
                 'click',
                 async () => {
@@ -638,6 +639,7 @@ export class Window {
           DOM(
             {
               style: 'quest-accept-button',
+              domaudio: domAudioPresets.defaultButton,
               event: [
                 'click',
                 async () => {

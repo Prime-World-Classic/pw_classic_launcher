@@ -12,11 +12,15 @@ import { Splash } from './splash.js';
 import { Window } from './window.js';
 import { Castle } from './castle.js';
 import { Lang } from './lang.js';
+import { Sound } from './sound.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { domAudioPresets } from './domAudioPresets.js';
+
 
 export class App {
   static APP_VERSION = '0';
 
-  static PW_VERSION = '2.12.2';
+  static PW_VERSION = '2.12.3';
 
   static CURRENT_MM = 'mmtest';
 
@@ -565,7 +569,10 @@ export class App {
     }
 
     let msg = DOM({ tag: 'div' }, `${message}`);
-
+    Sound.play(SOUNDS_LIBRARY.ERROR, {
+      id: 'ui-error',
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25,
+    });
     setTimeout(() => {
       msg.remove();
     }, timeout);
@@ -585,6 +592,10 @@ export class App {
 
       document.body.append(body);
     }, delay);
+    Sound.play(SOUNDS_LIBRARY.ERROR, {
+      id: 'ui-error',
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25,
+    });
   }
 
   static isAdmin(id = 0) {

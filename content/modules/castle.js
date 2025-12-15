@@ -609,6 +609,14 @@ export class Castle {
       Castle.placedBuildings.push(Object.assign({}, Castle.phantomBuilding));
       Castle.isStaticSMCached = false;
       Castle.WriteBuildings();
+      Sound.play(SOUNDS_LIBRARY.BUY, {
+        id: 'ui-buy',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS)});
+    }
+    else{
+      Sound.play(SOUNDS_LIBRARY.ERROR, {
+        id: 'ui-error',
+        volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 0.25});
     }
   }
 
