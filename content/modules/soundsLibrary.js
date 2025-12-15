@@ -49,7 +49,7 @@ export function generateHeroSoundsNative() {
   const fs = NativeAPI.fileSystem;
   const path = NativeAPI.path;
 
-  const heroRoot = path.join(process.cwd(), 'public/content/hero');
+  const heroRoot = path.join(process.cwd(), 'content/hero');
 
   const heroIds = fs
     .readdirSync(heroRoot, { withFileTypes: true })
