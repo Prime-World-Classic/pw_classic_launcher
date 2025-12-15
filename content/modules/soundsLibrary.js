@@ -1,3 +1,5 @@
+import { NativeAPI } from './nativeApi.js';
+
 export const SOUNDS_LIBRARY = {
   // UI Sounds
   CLICK: 'content/sounds/ui/Click.wav',
@@ -37,3 +39,57 @@ export const SOUNDS_LIBRARY = {
 
   TAMBUR: 'content/sounds/tambur.ogg',
 };
+
+/*  HERO SOUNDS GENERATION */
+
+const HERO_SOUND_TYPES = ['revive'];
+
+function generateHeroSoundsNative() {
+  const fs = NativeAPI.fileSystem;
+  const path = NativeAPI.path;
+
+  const heroRoot = path.join(process.cwd(), 'public/content/hero');
+
+  const heroIds = fs
+    .readdirSync(heroRoot, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name);
+
+  for (const heroId of heroIds) {
+    for (const type of HERO_SOUND_TYPES) {
+      const typeDir = path.join(heroRoot, heroId, type);
+      if (!fs.existsSync(typeDir)) continue;
+
+      const sounds = fs
+        .readdirSync(typeDir)
+        .filter(f => f.endsWith('.ogg'))
+        .map(f => f.replace('.ogg', ''));
+
+      for (const sound of sounds) {
+        SOUNDS_LIBRARY[`HERO_${heroId}_${type}_${sound}`] =
+          `content/hero/${heroId}/${type}/${sound}.ogg`;
+      }
+    }
+  }
+}
+
+function generateHeroSoundsFallback() {
+  const HERO_IDS = Array.from({ length: 65 }, (_, i) => i + 1);
+  const FALLBACK_SOUNDS = ['1', '2', '3', '4'];
+
+  for (const heroId of HERO_IDS) {
+    for (const type of HERO_SOUND_TYPES) {
+      for (const sound of FALLBACK_SOUNDS) {
+        SOUNDS_LIBRARY[`HERO_${heroId}_${type}_${sound}`] =
+          `content/hero/${heroId}/${type}/${sound}.ogg`;
+      }
+    }
+  }
+}
+
+if (NativeAPI.status) {
+  generateHeroSoundsNative();
+} else {
+  generateHeroSoundsFallback();
+}
+console.log('SOUNDS_LIBRARY', SOUNDS_LIBRARY);

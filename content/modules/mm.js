@@ -14,6 +14,7 @@ import { Settings } from './settings.js';
 import { Sound } from './sound.js';
 import { Timer } from './timer.js';
 import { Splash } from './splash.js';
+import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 export class MM {
   static id = '';
@@ -810,12 +811,10 @@ export class MM {
   }
 
   static async select(data) {
-    // to refactor sound
-    // await Sound.preload(`content/hero/${data.heroId}/revive/${data.sound}.ogg`);
-    // Sound.play(`content/hero/${data.heroId}/revive/${data.sound}.ogg`, {
-    //   id: `heroSound_${data.heroId}_${data.sound}`,
-    //   volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
-    // });
+    Sound.play(SOUNDS_LIBRARY[`HERO_${data.heroId}_revive_${data.sound}`], {
+      id: `heroSound_${data.heroId}_${data.sound}`,
+      volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
+    });
 
     MM.lobbyPlayerAnimate.cancel();
 
