@@ -860,7 +860,7 @@ input::placeholder {
 .splash-help{
   display: flex;
   flex-direction: column;
-  font-size: 1.8cqh;
+  font-size: 2cqh;
   height: 100%;
   padding: 5cqmin 5cqmin 0cqmin 5cqmin;
 }
