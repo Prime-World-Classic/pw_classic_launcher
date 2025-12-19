@@ -596,7 +596,7 @@
     flag_oak: 'Tree',
 	flag_Agaric: 'Baba Yaga\'s Gift',
 	flag_Moon: 'Crescent Night',
-	flag_Rose: 'Aram\'s Rose',
+	flag_Rose: 'ARAM Rose',
 	flag_Space: 'Your Universe',
 	flag_The_brown_cutie: 'Brown Cutie',
 

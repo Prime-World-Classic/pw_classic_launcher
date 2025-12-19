@@ -589,11 +589,10 @@
     flag_oak: 'Дерево',
 	flag_Agaric: 'Подарок Бабы - Яги',
 	flag_Moon: 'Месяц в ночи',
-	flag_Rose: 'Роза Арам',
+	flag_Rose: 'Роза ARAM',
 	flag_Space: 'Твоя Вселенная',
 	flag_The_brown_cutie: 'Коричневая милашка',
 	
-
     // Переводы
     select_faction: 'Выбор Фракции',
 
