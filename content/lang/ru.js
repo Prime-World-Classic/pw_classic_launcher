@@ -587,6 +587,12 @@
     flag_Mimimi: 'Мимими',
     flag_New_Years_skull: 'Новогодний Череп',
     flag_oak: 'Дерево',
+	flag_Agaric: 'Подарок Бабы - Яги',
+	flag_Moon: 'Месяц в ночи',
+	flag_Rose: 'Роза Арам',
+	flag_Space: 'Твоя Вселенная',
+	flag_The_brown_cutie: 'Коричневая милашка',
+	
 
     // Переводы
     select_faction: 'Выбор Фракции',
