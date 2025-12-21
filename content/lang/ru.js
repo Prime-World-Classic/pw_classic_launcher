@@ -807,7 +807,7 @@
     hero_65_name: 'Подрывница',
 
     //Скины героев
-    hero_1_skin_2_name: 'Мушкитёр',
+    hero_1_skin_2_name: 'Мушкетёр',
     hero_1_skin_3_name: 'Закалённый',
     hero_1_skin_4_name: 'Плутовка',
     hero_1_skin_5_name: 'Корсар',
