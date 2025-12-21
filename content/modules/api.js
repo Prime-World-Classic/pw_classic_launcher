@@ -147,7 +147,7 @@ export class Api {
       }
 
       if (error) {
-        this.awaiting[request].reject(error);
+        this.awaiting[request].reject(Lang.text(error));
       } else {
         this.awaiting[request].resolve(data);
       }
