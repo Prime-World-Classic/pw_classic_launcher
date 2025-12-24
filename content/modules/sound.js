@@ -1,90 +1,90 @@
+
+
 export class Sound {
-  static all = new Object();
-  static cache = new Object();
 
-  /**
-   * Preload a sound with the given name and src.
-   * @param {string} name - The name of the sound to preload.
-   * @param {string} src - The src of the sound to preload.
-   * @returns {Promise} A promise that resolves when the sound is preloaded.
-   */
-  static preload(name, src) {
-    return new Promise((resolve) => {
-      const audio = new Audio();
-      audio.src = src;
-      audio.preload = "auto";
+    static all = new Object();
 
-      audio.addEventListener("canplaythrough", () => {
-        Sound.cache[name] = audio;
-        resolve();
-      });
+    static play(source, object = new Object(), callback) {
 
-      audio.load();
-    });
-  }
+        if (('id' in object) && (object.id)) {
 
-  static play(source, object = {}, callback) {
-    let baseAudio = null;
+            if (object.id in Sound.all) {
 
-    for (const name in Sound.cache) {
-      if (Sound.cache[name].src.includes(source)) {
-        baseAudio = Sound.cache[name];
-        break;
-      }
+                Sound.stop(object.id);
+
+            }
+
+        }
+
+        let audio = new Audio();
+
+        if ('loop' in object) {
+
+            audio.loop = object.loop ? true : false;
+
+        }
+
+        audio.preload = 'auto';
+
+        audio.src = source;
+
+        audio.play();
+
+        if (callback) {
+
+
+            audio.addEventListener("ended", (event) => {
+                callback();
+            });
+
+        }
+
+        if (('id' in object) && (object.id)) {
+
+            if (!(object.id in Sound.all)) {
+
+                Sound.all[object.id] = audio;
+
+            }
+
+            if ('volume' in object) {
+                Sound.setVolume(object.id, object.volume);
+            }
+
+        }
+
     }
 
-    if (!baseAudio) {
-      console.error("Sound not preloaded:", source);
-      return;
+    static stop(id) {
+
+        if (id in Sound.all) {
+
+            Sound.all[id].pause();
+
+            delete Sound.all[id];
+
+        }
+
     }
 
-    const audio = baseAudio.cloneNode(true);
+    static setVolume(id, volume) {
 
-    if ("loop" in object) {
-      audio.loop = object.loop ? true : false;
+        if (id in Sound.all) {
+
+            Sound.all[id].volume = volume;
+
+        }
     }
 
-    if ("id" in object && object.id) {
-      if (object.id in Sound.all) {
-        Sound.stop(object.id);
-      }
-
-      Sound.all[object.id] = audio;
-
-      if ("volume" in object) {
-        Sound.all[object.id].volume = object.volume;
-      }
+    static pause(id) {
+        if (id in Sound.all) {
+            Sound.all[id].pause();
+        }
+    }
+    static unpause(id) {
+        if (id in Sound.all) {
+            Sound.all[id].play();
+        }
     }
 
-    if (callback) {
-      audio.addEventListener("ended", callback);
-    }
-
-    audio.play();
-  }
-
-  static stop(id) {
-    if (id in Sound.all) {
-      Sound.all[id].pause();
-
-      delete Sound.all[id];
-    }
-  }
-
-  static setVolume(id, volume) {
-    if (id in Sound.all) {
-      Sound.all[id].volume = volume;
-    }
-  }
-
-  static pause(id) {
-    if (id in Sound.all) {
-      Sound.all[id].pause();
-    }
-  }
-  static unpause(id) {
-    if (id in Sound.all) {
-      Sound.all[id].play();
-    }
-  }
 }

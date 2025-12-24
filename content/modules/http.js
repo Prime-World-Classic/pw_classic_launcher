@@ -1,19 +1,21 @@
+
+
 export class HTTP {
-  static async request(url, type = '') {
-    let response = await fetch(url);
 
-    switch (type) {
-      case 'text':
-        return await response.text();
-        break;
+	static async request(url, type = '') {
 
-      case 'arrayBuffer':
-        return await response.arrayBuffer();
-        break;
+		let response = await fetch(url);
 
-      default:
-        return await response.json();
-        break;
-    }
-  }
+		switch (type) {
+
+			case 'text': return await response.text(); break;
+
+			case 'arrayBuffer': return await response.arrayBuffer(); break;
+
+			default: return await response.json(); break;
+
+		}
+
+	}
+
 }

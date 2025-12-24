@@ -7,59 +7,74 @@ import { NativeAPI } from './nativeApi.js';
 import { Settings } from './settings.js';
 import { Splash } from './splash.js';
 
+
+
 window.addEventListener('message', (event) => {
-  if (event.data == '') {
-    return;
-  }
 
-  if (!('action' in event.data)) {
-    return;
-  }
+	if (event.data == '') {
+		return;
+	}
 
-  if (event.data.action in ParentEvent) {
-    ParentEvent[event.data.action](event.data.body);
-  }
+	if (!('action' in event.data)) {
 
-  console.log('event.data', event.data);
+		return;
+
+	}
+
+	if (event.data.action in ParentEvent) {
+
+		ParentEvent[event.data.action](event.data.body);
+
+	}
+
+	console.log('event.data', event.data);
+
 });
 
 Lang.init().then(() => {
-  Splash.init();
+	Splash.init();
 
-  NativeAPI.init();
+	NativeAPI.init();
 
-  NativeAPI.update((data) => {
-    if (View.updateProgress) {
-      Splash.hide();
-    }
+	NativeAPI.update((data) => {
 
-    if (data.update) {
-      View.updateProgress = View.progress();
+		if (View.updateProgress) {
 
-      View.updateProgress.firstChild.style.width = data.total + '%';
+			Splash.hide();
 
-      View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
-    }
-  });
+		}
 
-  let testRadminConnection = async () => {
-    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
-    if (hasConnection) {
-      PWGame.radminHasConnection = true;
-    }
-  };
-  let testMainConnection = async () => {
-    let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
-    if (hasConnection) {
-      PWGame.mainServerHasConnection = true;
-    }
-  };
-  setTimeout((_) => {
-    testRadminConnection();
-    testMainConnection();
-  }, 3000);
+		if (data.update) {
 
-  Settings.init().then(() => {
-    App.findBestHostAndInit();
-  });
+			View.updateProgress = View.progress();
+
+			View.updateProgress.firstChild.style.width = data.total + '%';
+
+			View.updateProgress.lastChild.innerText = `${data.title} ${data.total}%...`;
+
+		}
+
+	});
+
+	let testRadminConnection = async () => {
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.RADMIN_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.radminHasConnection = true;
+		}
+	}
+	let testMainConnection = async () => {
+		let hasConnection = await PWGame.testServerConnection(PWGame.gameServerIps[PWGame.MAIN_GAME_SERVER_IP]);
+		if (hasConnection) {
+			PWGame.mainServerHasConnection = true;
+		}
+	}
+	setTimeout(_ => {
+		testRadminConnection();
+		testMainConnection();
+	}, 3000);
+
+	Settings.init().then(() => {	
+        App.findBestHostAndInit();
+    });
+
 });

@@ -1,37 +1,56 @@
+
+
 export class Splash {
-  static init() {
-    Splash.body = document.createElement('div');
 
-    Splash.body.style.display = 'none';
+	static init() {
 
-    Splash.body.classList.add('splash');
+		Splash.body = document.createElement('div');
 
-    document.body.append(Splash.body);
-  }
+		Splash.body.style.display = 'none';
 
-  static show(element, content = true) {
-    if (Splash.body.firstChild) {
-      while (Splash.body.firstChild) {
-        Splash.body.firstChild.remove();
-      }
-    }
+		Splash.body.classList.add('splash');
 
-    if (content) {
-      let body = document.createElement('div');
+		document.body.append(Splash.body);
 
-      body.classList.add('splash-content');
+	}
 
-      body.append(element);
+	static show(element, content = true) {
 
-      Splash.body.append(body);
-    } else {
-      Splash.body.append(element);
-    }
+		if (Splash.body.firstChild) {
 
-    Splash.body.style.display = 'flex';
-  }
+			while (Splash.body.firstChild) {
 
-  static hide() {
-    Splash.body.style.display = 'none';
-  }
+				Splash.body.firstChild.remove();
+
+			}
+
+		}
+
+		if (content) {
+
+			let body = document.createElement('div');
+
+			body.classList.add('splash-content');
+
+			body.append(element);
+
+			Splash.body.append(body);
+
+		}
+		else {
+
+			Splash.body.append(element);
+
+		}
+
+		Splash.body.style.display = 'flex';
+
+	}
+
+	static hide() {
+
+		Splash.body.style.display = 'none';
+
+	}
+
 }

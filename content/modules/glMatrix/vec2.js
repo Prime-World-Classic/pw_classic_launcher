@@ -1,4 +1,4 @@
-import * as glMatrix from './common.js';
+import * as glMatrix from "./common.js";
 
 /**
  * 2 Dimensional Vector
@@ -476,27 +476,24 @@ export function rotate(out, a, b, rad) {
  * @returns {Number} The angle in radians
  */
 export function angle(a, b) {
-  let ax = a[0],
-    ay = a[1],
-    bx = b[0],
-    by = b[1];
+  let ax = a[0], ay = a[1],
+    bx = b[0], by = b[1];
   return Math.abs(Math.atan2(ay * bx - ax * by, ax * bx + ay * by));
 }
 
 /**
  * Get the signed angle in the interval [-pi,pi] between two 2D vectors (positive if `a` is to the right of `b`)
- *
+ * 
  * @param {ReadonlyVec2} a The first vector
  * @param {ReadonlyVec2} b The second vector
  * @returns {number} The signed angle in radians
  */
 export function signedAngle(a, b) {
-  let ax = a[0],
-    ay = a[1],
-    bx = b[0],
-    by = b[1];
+  let ax = a[0], ay = a[1],
+    bx = b[0], by = b[1];
   return Math.atan2(ax * by - ay * bx, ax * bx + ay * by);
 }
+
 
 /**
  * Set the components of a vec2 to zero
@@ -517,7 +514,7 @@ export function zero(out) {
  * @returns {String} string representation of the vector
  */
 export function str(a) {
-  return 'vec2(' + a[0] + ', ' + a[1] + ')';
+  return "vec2(" + a[0] + ", " + a[1] + ")";
 }
 
 /**
@@ -544,8 +541,10 @@ export function equals(a, b) {
   let b0 = b[0],
     b1 = b[1];
   return (
-    Math.abs(a0 - b0) <= glMatrix.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
-    Math.abs(a1 - b1) <= glMatrix.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1))
+    Math.abs(a0 - b0) <=
+      glMatrix.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
+    Math.abs(a1 - b1) <=
+      glMatrix.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1))
   );
 }
 
@@ -603,10 +602,10 @@ export const sqrLen = squaredLength;
  * @returns {Array} a
  * @function
  */
-export const forEach = (function () {
+export const forEach = (function() {
   let vec = create();
 
-  return function (a, stride, offset, count, fn, arg) {
+  return function(a, stride, offset, count, fn, arg) {
     let i, l;
     if (!stride) {
       stride = 2;

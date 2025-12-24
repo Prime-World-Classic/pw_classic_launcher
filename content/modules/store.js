@@ -1,106 +1,132 @@
 import { DataBase } from './database.js';
 
 export class Store {
-  static async init() {
-    Store.db = new DataBase(
-      'Storage',
-      [
-        {
-          name: 'keys',
-          options: { keyPath: 'identify' },
-          indexes: [{ name: 'objects', path: 'object' }],
-        },
-      ],
-      5,
-    );
 
-    return await Store.db.init();
-  }
+    static async init() {
 
-  static async get(object, key) {
-    let result = await Store.db.get('keys', `${object}.${key}`);
+        Store.db = new DataBase('Storage', [{ name: 'keys', options: { keyPath: 'identify' }, indexes: [{ name: 'objects', path: 'object' }] }], 5);
 
-    return result ? result.value : false;
-  }
+        return await Store.db.init();
 
-  static async getAll(object) {
-    let keys = await Store.db.getIndexAll('keys', 'objects', object);
-
-    if (!keys.length) {
-      return keys;
     }
 
-    let result = new Object();
+    static async get(object, key) {
 
-    for (let item of keys) {
-      result[item.key] = item.value;
+        let result = await Store.db.get('keys', `${object}.${key}`);
+
+        return (result) ? result.value : false;
+
     }
 
-    return result;
-  }
+    static async getAll(object) {
 
-  constructor(object) {
-    this.object = object;
+        let keys = await Store.db.getIndexAll('keys', 'objects', object);
 
-    this.local = new Object();
-  }
+        if (!keys.length) {
 
-  async init(defaultObject) {
-    let result, object;
+            return keys;
 
-    result = await Store.db.getIndexAll('keys', 'objects', this.object);
+        }
 
-    if (result.length) {
-      for (object of result) {
-        this.local[object.key] = object.value;
-      }
-    } else {
-      await this.set(defaultObject);
-    }
-  }
+        let result = new Object();
 
-  get data() {
-    return this.local;
-  }
+        for (let item of keys) {
 
-  async set(object) {
-    for (let key in object) {
-      await Store.db.add('keys', {
-        identify: `${this.object}.${key}`,
-        object: this.object,
-        key: key,
-        value: object[key],
-      });
+            result[item.key] = item.value;
 
-      this.local[key] = object[key];
-    }
-  }
+        }
 
-  async getAll(object) {
-    let keys = await Store.db.getIndexAll('keys', 'objects', object);
+        return result;
 
-    if (!keys.length) {
-      return false;
     }
 
-    let result = new Object();
+    constructor(object) {
 
-    for (let item of keys) {
-      result[item.key] = item.value;
+        this.object = object;
+
+        this.local = new Object();
+
     }
 
-    return result;
-  }
+    async init(defaultObject) {
 
-  static async delete(object) {
-    let keys = await Store.db.getIndexAll('keys', 'objects', object);
+        let result, object;
 
-    if (!keys) {
-      return;
+        result = await Store.db.getIndexAll('keys', 'objects', this.object);
+
+        if (result.length) {
+
+            for (object of result) {
+
+                this.local[object.key] = object.value;
+
+            }
+
+        }
+        else {
+
+            await this.set(defaultObject);
+
+        }
+
     }
 
-    for (let item of keys) {
-      await Store.db.delete('keys', item.identify);
+    get data() {
+
+        return this.local;
+
     }
-  }
+
+    async set(object) {
+
+        for (let key in object) {
+
+            await Store.db.add('keys', { identify: `${this.object}.${key}`, object: this.object, key: key, value: object[key] });
+
+            this.local[key] = object[key];
+
+        }
+
+    }
+
+    async getAll(object) {
+
+        let keys = await Store.db.getIndexAll('keys', 'objects', object);
+
+        if (!keys.length) {
+
+            return false;
+
+        }
+
+        let result = new Object();
+
+        for (let item of keys) {
+
+            result[item.key] = item.value;
+
+        }
+
+        return result;
+
+    }
+
+    static async delete(object) {
+
+        let keys = await Store.db.getIndexAll('keys', 'objects', object);
+
+        if (!keys) {
+
+            return;
+
+        }
+
+        for (let item of keys) {
+
+            await Store.db.delete('keys', item.identify);
+
+        }
+
+    }
+
 }
