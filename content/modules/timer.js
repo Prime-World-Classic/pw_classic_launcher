@@ -2,79 +2,104 @@ import { DOM } from './dom.js';
 import { App } from './app.js';
 
 export class Timer {
+  static intervalId = false;
 
-	static intervalId = false;
+  static init() {
+    Timer.sb = DOM(`${name} 00:00`);
 
-	static init() {
+    Timer.body = DOM({ style: 'mm-timer' }, Timer.sb);
+  }
 
-		Timer.sb = DOM(`${name} 00:00`);
+  static async start(id, name, callback) {
+    Timer.stop();
 
-		Timer.body = DOM({ style: 'mm-timer' }, Timer.sb);
+    Timer.callback = callback;
 
-	}
+    Timer.message = name;
 
-	static async start(id, name, callback) {
+    Timer.timeFinish = await App.api.request(App.CURRENT_MM, 'getTimer', {
+      id: id,
+      time: Date.now(),
+    });
 
-		Timer.stop();
+    if (Timer.end()) {
+      return;
+    }
 
-		Timer.callback = callback;
+    Timer.intervalId = setInterval(() => Timer.update(), 250);
 
-		Timer.message = name;
+    Timer.update();
+  }
 
-		Timer.timeFinish = await App.api.request(App.CURRENT_MM, 'getTimer', { id: id, time: Date.now() });
+  static update() {
+    if (Timer.end()) {
+      return;
+    }
 
-		if (Timer.end()) {
+    let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
 
-			return;
+    Timer.sb.innerText = `${Timer.message} 00:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
 
-		}
+  static end() {
+    if (Date.now() - Timer.timeFinish >= 0) {
+      Timer.stop();
 
-		Timer.intervalId = setInterval(() => Timer.update(), 250);
+      Timer.callback();
 
-		Timer.update();
+      return true;
+    }
 
-	}
+    return false;
+  }
 
-	static update() {
+  static stop() {
+    if (Timer.intervalId) {
+      clearInterval(Timer.intervalId);
 
-		if (Timer.end()) {
+      Timer.intervalId = false;
+    }
+  }
 
-			return;
+  static oneSecond = 1000;
+  static oneMinute = this.oneSecond * 60;
+  static oneHour = this.oneMinute * 60;
+  static oneDay = this.oneHour * 24;
 
-		}
+  static getFormattedTimeDays(timer) {
+    return Math.floor(timer / this.oneDay);
+  }
 
-		let seconds = Math.round(Math.abs(Date.now() - Timer.timeFinish) / 1000);
+  static getFormattedTimeHours(timer) {
+    return Math.floor((timer / this.oneHour) % 24);
+  }
 
-		Timer.sb.innerText = `${Timer.message} 00:${(seconds < 10 ? '0' : '')}${seconds}`;
+  static getFormattedTimeMinutes(timer) {
+    return Math.floor((timer / this.oneMinute) % 60);
+  }
 
-	}
+  static getFormattedTimeSeconds(timer) {
+    return Math.floor((timer / this.oneSecond) % 60);
+  }
 
-	static end() {
-
-		if ((Date.now() - Timer.timeFinish) >= 0) {
-
-			Timer.stop();
-
-			Timer.callback();
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	static stop() {
-
-		if (Timer.intervalId) {
-
-			clearInterval(Timer.intervalId);
-
-			Timer.intervalId = false;
-
-		}
-
-	}
-
+  static getFormattedTimer(timer) {
+    const days = this.getFormattedTimeDays(timer);
+    const hours = this.getFormattedTimeHours(timer);
+    const minutes = this.getFormattedTimeMinutes(timer);
+    const seconds = this.getFormattedTimeSeconds(timer);
+    let formattedDate = '';
+    if (days) {
+      formattedDate += `${String(days).padStart(2, '0')}:`;
+    }
+    if (days || hours) {
+      formattedDate += `${String(hours).padStart(2, '0')}:`;
+    }
+    if (days || hours || minutes) {
+      formattedDate += `${String(minutes).padStart(2, '0')}:`;
+    }
+    if (days || hours || minutes || seconds) {
+      formattedDate += `${String(seconds).padStart(2, '0')}`;
+    }
+    return formattedDate;
+  }
 }

@@ -1,4 +1,7 @@
 {
   "name": "Prime World Classic #1 Dev",
-  "main": "index.html"
+  "main": "index.html",
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
 }
