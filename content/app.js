@@ -4707,15 +4707,15 @@ class Window {
     const clanRolesList = {
       Lider: {
         icon: "content/clanImages/main1234567899123.png",
-        label: Lang.text("ClanLeader")
+        label: Lang.text("clanLeader")
       },
       Colider: {
         icon: "content/clanImages/main12345678991234.png",
-        label: Lang.text("ClanDeputy")
+        label: Lang.text("clanDeputy")
       },
       Member: {
         icon: "content/clanImages/main123456789912.png",
-        label: Lang.text("ClanMember")
+        label: Lang.text("clanMember")
       }
     };
   
@@ -4726,7 +4726,8 @@ class Window {
           clanLvl: "47",
           placeInWorld: "15",
           playersInClan: "78",
-          clanRating: "21133"
+          clanRating: "21133",
+          clanGerb: 'content/clanImages/GuildB.png',
       },
       clanMembers: [
         { name: "Игрок1", role: "Lider", state: "В замке", dailyPoints: "125", totalPoints: "4210" },
@@ -4784,23 +4785,22 @@ class Window {
         splashContent.append(
           DOM({ style: "splash-title" }, 
             DOM({style: "splashClanMemberMenu"},
-              DOM({}, 'Выберите действие с игроком ' + row.name),
+              DOM({}, Lang.text("settingsSplashLabel") + row.name),
               (userRole == 'lider')
               ? DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Добавить в друзья"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Пригласить в группу"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Дать повышение"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Выгнать из клана"),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('appClanStatusButton')),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('kickFromClanButton')),
               )
               : (userRole == 'coLider')
               ?DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Добавить в друзья"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Пригласить в группу"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Выгнать из клана"),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
               )
               : DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Добавить в друзья"),
-                  DOM({ style: "clanMembersButton", tag: "button" }, "Пригласить в группу"),
+                  DOM({ style: "clanMembersButton", tag: "button" },  Lang.text('addInFriendsButton')),
+                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
               )
             )
           ),
@@ -4848,7 +4848,7 @@ class Window {
         ),
         DOM(
           { style: "send-wrapper" },
-          DOM({ id: "award", tag: "div" }, "Награда"),
+          DOM({ id: "award", tag: "div" }, Lang.text('clanAward')),
           DOM(
             { style: "quests-awards" },
             DOM({ src: "content/clanImages/award.png", alt: "", tag: "img" }),
@@ -4857,7 +4857,7 @@ class Window {
           DOM(
             { style: "button-wrapper" },
             DOM({ id: "corner-button", src: "content/clanImages/left-under.png", alt: "", tag: "img" }),
-            DOM({ type: "button", value: "Занять квест", style: "quests-accept-button", tag: "input" }),
+            DOM({ type: "button", value: Lang.text("clanQuestTake"), style: "quests-accept-button", tag: "input" }),
             DOM({ id: "corner-button", src: "content/clanImages/right-under.png", alt: "", tag: "img" })
           )
         )
@@ -4870,10 +4870,10 @@ class Window {
           DOM({ id: "head", src: "content/clanImages/head.png", alt: "", tag: "img" })
         ),
         DOM({ style: "application-stats" },
-          DOM({ tag: "span" }, "Имя: ", DOM({ id: "gold_clan_font", tag: "span" }, aplctn.name)),
-          DOM({ tag: "span" }, "Очков: ", DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totalPoints)),
-          DOM({ tag: "span" }, "Всего игр: ", DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totaGames)),
-          DOM({ tag: "span" }, "Выигранных игр: ", DOM({ id: "gold_clan_font", tag: "span" }, aplctn.wonGames)),
+          DOM({ tag: "span" }, Lang.text("clanApplicationsName"), DOM({ id: "gold_clan_font", tag: "span" }, aplctn.name)),
+          DOM({ tag: "span" }, Lang.text("clanApplicationsPoints"), DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totalPoints)),
+          DOM({ tag: "span" }, Lang.text("clanApplicationsAllGame"), DOM({ id: "gold_clan_font", tag: "span" }, aplctn.totaGames)),
+          DOM({ tag: "span" }, Lang.text("clanApplicationsWinGame"), DOM({ id: "gold_clan_font", tag: "span" }, aplctn.wonGames)),
         ),
         DOM({ style: "applications-aprove" },
           DOM({ id: "aprove", src: "content/clanImages/accept.png", alt: "", tag: "img" }),
@@ -4913,7 +4913,7 @@ class Window {
                 DOM(
                   { style: "top-lane" },
                   DOM({ src: "content/clanImages/headsmall.png", alt: "", tag: "img" }),
-                  Lang.text("Clan statistics")
+                  Lang.text("ClanStatistics")
                 ),
                 DOM(
                   { style: "lvl-box-top" },
@@ -4921,13 +4921,13 @@ class Window {
                     { style: "wrapper__clan__Stats_qwe" },
                     DOM(
                       { style: "wrap-left-stats-qwe" },
-                      DOM({}, Lang.text("Clan level: "), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.clanLvl)),
-                      DOM({}, Lang.text("Place in the world: "), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.placeInWorld)),
-                      DOM({}, Lang.text("Players in the clan: "), DOM({ id: "gold_clan_font", tag: "span" }, `${clanData.clanStatistics.playersInClan}/80`))
+                      DOM({}, Lang.text("clanLevel"), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.clanLvl)),
+                      DOM({}, Lang.text("PlaceInTheWorld"), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.placeInWorld)),
+                      DOM({}, Lang.text("PlayersInTheClan"), DOM({ id: "gold_clan_font", tag: "span" }, `${clanData.clanStatistics.playersInClan}/80`))
                     ),
                     DOM(
                       { style: "wrap-right-stats-qwe" },
-                      DOM({}, Lang.text("Clan rating: "), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.clanRating))
+                      DOM({}, Lang.text("ClanRating"), DOM({ id: "gold_clan_font", tag: "span" }, clanData.clanStatistics.clanRating))
                     )
                   )
                 )
@@ -4943,7 +4943,7 @@ class Window {
                 DOM(
                   { style: "top-lane" },
                   DOM({ src: "content/clanImages/main12345.png", alt: "", id: "day-message-logo", tag: "img" }),
-                  Lang.text("Message of the day")
+                  Lang.text("DayMessage")
                 ),
                 DOM({ style: "message-box-top", id: "outputMassageDay" })
               )
@@ -4959,11 +4959,11 @@ class Window {
               DOM(
                 { style: ["row__main__case__clan", "first__clan__row"] },
                 DOM({ id: "icon__clan_row" }, DOM({ id: "first__clan__row", src: "content/clanImages/stats-head.png", alt: "", tag: "img" })),
-                DOM({ id: "member__clan_row" }, DOM({ tag: "p" }, Lang.text("Player name"))),
-                DOM({ id: "state__clan_row" }, DOM({ tag: "p" }, Lang.text("Status"))),
-                DOM({ id: "den__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("Points per day"))),
-                DOM({ id: "vsevremya__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("Total points"))),
-                DOM({ id: "toppers__clan_row1" }, DOM({ tag: "p" }, Lang.text("Settings")))
+                DOM({ id: "member__clan_row" }, DOM({ tag: "p" }, Lang.text("PlayerNameStatsBar"))),
+                DOM({ id: "state__clan_row" }, DOM({ tag: "p" }, Lang.text("StatusStatsBar"))),
+                DOM({ id: "den__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("PointsPerDayStatsBar"))),
+                DOM({ id: "vsevremya__o4ki__clan_row" }, DOM({ tag: "p" }, Lang.text("TotalPointsStatsBar"))),
+                DOM({ id: "toppers__clan_row1" }, DOM({ tag: "p" }, Lang.text("SettingsStatsBar")))
               ),
               ...memberRows
             )
@@ -4984,14 +4984,14 @@ class Window {
           DOM({ style: "quests-awards1" }, DOM({ src: "content/clanImages/award.png", alt: "", tag: "img" }), DOM({ tag: "span" }, "+100"))
         ),
         DOM({ style: "quests-display-wrapper" }, ...questsList),
-        DOM({ style: "quests-alert-wrapper" }, DOM({ tag: "p" }, Lang.text("New quests appear every 2 hours.")))
+        DOM({ style: "quests-alert-wrapper" }, DOM({ tag: "p" }, Lang.text("questsAlert")))
       )
     );
   
     const tab3 = DOM({ style: "tab-content", id: "tab3" },
       userRole == "lider" || userRole == "coLider"
       ? DOM({ style: "applications-main-wrapper" },
-          DOM({ style: "wrap-add-witch-nickname" }, DOM({ style: "add_with_nickname", tag: "button" }, "Добавить игрока по имени")),
+          DOM({ style: "wrap-add-witch-nickname" }, DOM({ style: "add_with_nickname", tag: "button" }, Lang.text("addPlayerWithNickName"))),
           DOM({ style: "applications-list" }, ...applicationsList)
         )
       : DOM({ style: "applications-main-wrapper" }, DOM({ tag: "span" }, "У вас нет должных полномочий"))
@@ -5006,7 +5006,7 @@ class Window {
         DOM({ style: "setting-top-section" },
           DOM({ style: "setting-first-section" },
             DOM({ style: "change-tag-name-board" },
-              DOM({ id: "gerb-settings", src: "content/clanImages/GuildB.png", alt: "", tag: "img" }),
+              DOM({ id: "gerb-settings", src: clanData.clanStatistics.clanGerb, alt: "", tag: "img" }),
               DOM({ style: "clanNameTagWrapper" },
                 DOM({ tag: "span" }, clanData.clanStatistics.clanName),
                 DOM({ id: "clan-tag", tag: "span" }, clanData.clanStatistics.clanTag)
@@ -5018,15 +5018,15 @@ class Window {
           { style: "setting-bottom-section" },
           DOM(
             { style: "settings-third-section" },
-            DOM({ style: "history-wrapper" }, DOM({ style: "settings-history-top-lane" }, "Журнал"), DOM({ style: "history-board" }))
+            DOM({ style: "history-wrapper" }, DOM({ style: "settings-history-top-lane" }, Lang.text("clanJournal")), DOM({ style: "history-board" }))
           ),
           userRole == "lider"
             ? DOM({ style: "settings-fourth-section" },
-                DOM({ style: "rename-clan-button", tag: "button" }, "Сменить название клана"),
-                DOM({ style: "rename-clan-button", tag: "button" }, "Сменить Герб клана"),
-                DOM({ style: "disban-clan-button", tag: "button" }, "Распустить клан")
+                DOM({ style: "rename-clan-button", tag: "button" }, Lang.text("clanChangeName")),
+                DOM({ style: "rename-clan-button", tag: "button" }, Lang.text("clanChangeGerb")),
+                DOM({ style: "disban-clan-button", tag: "button" }, Lang.text("clanDisBan"))
               )
-            : DOM({ style: "settings-fourth-section" }, DOM({ style: "disban-clan-button", tag: "button" }, "Выйти из клана"))
+            : DOM({ style: "settings-fourth-section" }, DOM({ style: "disban-clan-button", tag: "button" }, Lang.text("Выйти из клана")))
         )
       )
     );
@@ -5152,7 +5152,7 @@ class Window {
           DOM(
             { style: "clan__icon__wrapper" },
             DOM({ id: "beautifull-1", src: "content/clanImages/в-1.png", tag: "img" }),
-            DOM({ id: "icon__clan__mainGZ", src: "content/clanImages/GuildB.png", tag: "img" }),
+            DOM({ id: "icon__clan__mainGZ", src: clanData.clanStatistics.clanGerb, tag: "img" }),
             DOM({ id: "beautifull-2", src: "content/clanImages/в-1.png", tag: "img" })
           )
         )
@@ -5162,7 +5162,7 @@ class Window {
         { style: "lvl-box" },
         DOM(
           { style: "progrs-lvl-wrapper" },
-          DOM({ style: "progrs-lvl-wrapper-text", tag: "span" }, Lang.text("ClanProgress")),
+          DOM({ style: "progrs-lvl-wrapper-text", tag: "span" }, Lang.text("clanProgress")),
           DOM({ id: "lvl-progress-clan", src: "content/clanImages/main1234567899123456789.png", tag: "img" })
         )
       )
@@ -5181,11 +5181,11 @@ class Window {
                 { style: "bottom__side__wrapper" },
                 DOM(
                   { style: "btns-list-clan" },
-                  DOM({ id: "tab-btn-1", style: ["btn__clan", "active"], tag: "button", event: ["click", (e) => setActiveButton(e.target, 0)] }, Lang.text("Main")),
-                  DOM({ id: "tab-btn-2", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 1)] }, Lang.text("Quests")),
-                  DOM({ id: "tab-btn-3", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 2)] }, Lang.text("Applications")),
-                  DOM({ id: "tab-btn-4", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 3)] }, Lang.text("Сlans rating")),
-                  DOM({ id: "tab-btn-5", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 4)] }, Lang.text("Settings"))
+                  DOM({ id: "tab-btn-1", style: ["btn__clan", "active"], tag: "button", event: ["click", (e) => setActiveButton(e.target, 0)] }, Lang.text("mainPage")),
+                  DOM({ id: "tab-btn-2", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 1)] }, Lang.text("QuestsPage")),
+                  DOM({ id: "tab-btn-3", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 2)] }, Lang.text("applicationsPage")),
+                  DOM({ id: "tab-btn-4", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 3)] }, Lang.text("clansRatingPage")),
+                  DOM({ id: "tab-btn-5", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 4)] }, Lang.text("settingsPage"))
                 )
               )
             ),
