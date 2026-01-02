@@ -2128,11 +2128,10 @@ item.style.backgroundSize = 'contain, contain';
     for (let item of players) {
       let img = DOM({ style: 'party-middle-item-middle' });
 
-      let rankIcon = DOM({ style: 'rank-icon' });
-
+      const rankIcon = DOM({ style: 'rank-icon' });
       rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIcon);
+      const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
+      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIconWrapper);
 
       img.append(rank);
 
