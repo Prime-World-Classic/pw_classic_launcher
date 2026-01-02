@@ -17,6 +17,7 @@ import { PreloadImages } from './preloadImages.js';
 import { Game } from './game.js';
 import { Splash } from './splash.js';
 import { Timer } from './timer.js';
+import { HelpSplash } from './helpSpalsh.js';
 import { Shop } from './shop.js';
 import { DomAudio } from './domAudio.js';
 import { domAudioPresets } from './domAudioPresets.js';
@@ -453,18 +454,6 @@ static async castlePlay() {
         MM.hero = [];
     }
 
-    let userData;
-    try {
-        userData = await App.api.request('user', 'info', { id: App.storage.data.id });
-    } catch (error) {
-        console.warn('Не удалось получить актуальные данные пользователя:', error);
-        userData = { rating: App.storage.data.rating || 1100 };
-    }
-
-    if (userData.rating) {
-        App.storage.data.rating = userData.rating;
-    }
-
     for (let key in data.users) {
         let userRating = data.users[key].heroRating || 1100;
         
@@ -600,7 +589,7 @@ item.style.backgroundSize = 'contain, contain';
         {
           id: `PP${player.id}`,
           style: 'castle-party-middle-item',
-          title: nickname.innerText,
+          title: Lang.text('choosingHero'),
         },
         nickname,
         item,
@@ -2408,6 +2397,19 @@ item.style.backgroundSize = 'contain, contain';
       throw 'Рейтинг отсутствует';
     }
 
+    let helpBtn = DOM({
+      id: 'wtop_help',
+      domaudio: domAudioPresets.defaultButton,
+      style: 'help-button',
+      event: [
+        'click',
+        () => {
+          HelpSplash(
+            Lang.text('top_help_content')
+          );
+        },
+      ],
+    });
     let top = DOM(
       { style: isSplah ? 'wtop-scroll' : 'top-scroll' },
       DOM(
@@ -2497,6 +2499,7 @@ item.style.backgroundSize = 'contain, contain';
       body.append(View.header());
     }
     body.append(top);
+    body.append(helpBtn);
 
     return body;
   }
