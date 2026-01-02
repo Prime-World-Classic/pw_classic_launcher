@@ -39,15 +39,15 @@ export class Chat {
 
     Chat.body = DOM({ style: 'chat' }, DOM({ style: 'chat-body' }), Chat.input);
 
-    const handleSend = async (event) => {
-      if (event.key === 'Enter' || event.keyCode === 13 || event.code === 'Enter' || event.code === 'NumpadEnter') {
-        event.preventDefault();
-        await Chat.sendMessage();
-      }
-    };
+		const handleSend = async (event) => {
+		  if (event.key === 'Enter' || event.keyCode === 13 || event.code === 'Enter' || event.code === 'NumpadEnter') {
+			event.preventDefault();
+			await Chat.sendMessage();
+		  }
+		};
 
-    input.addEventListener('keyup', handleSend);
-    input.addEventListener('keypress', handleSend);
+ // input.addEventListener('keyup', handleSend);
+ // input.addEventListener('keypress', handleSend);
     input.addEventListener('keydown', handleSend);
 
     input.addEventListener('input', () => {
@@ -118,30 +118,41 @@ export class Chat {
       message.style.color = 'rgba(51,255,0,0.9)';
     }
 
-    if (data.id == 1) {
+    if (data.id == 1) {		
       nickname.style.color = 'transparent';
 
       nickname.style.fontWeight = 600;
 
       nickname.classList.add('owner-text');
-    } else if (data.id == -2) {
+	  
+	  nickname.dataset.role = Lang.text('titleOwner');	
+	  
+    } else if (data.id == -2) {		
       nickname.style.color = 'transparent';
 
       nickname.style.fontWeight = 600;
 
       nickname.classList.add('telegrambot-text');
+	  
+	  nickname.dataset.role = Lang.text('titleTelegram');
+	  
     } else if (App.isAdmin(data.id)) {
       nickname.style.color = 'transparent';
 
       nickname.style.fontWeight = 600;
 
       nickname.classList.add('administration-text');
-    } else if (App.isHelper(data.id)) {
+	  
+	  nickname.dataset.role = Lang.text('titleAdministration');
+	  
+    } else if (App.isHelper(data.id)) {		
       nickname.style.color = '#48D1CC';
 
       nickname.style.fontWeight = 600;
 
       nickname.classList.add('helper-text');
+	  
+	  nickname.dataset.role = Lang.text('titleHelper');
     }
 
     let item = DOM(
