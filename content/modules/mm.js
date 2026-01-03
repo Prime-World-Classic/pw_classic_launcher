@@ -554,10 +554,7 @@ export class MM {
       let name = DOM({ style: 'mm-lobby-header-team-player-name' }, `${data.users[key].nickname}`);
 
       const rankIcon = DOM({ style: 'rank-icon' });
-      rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.webp), url(content/ranks/rateIconBack.png)`;
-      rankIcon.style.backgroundSize = '70%, 100%';
-      rankIcon.style.backgroundPosition = 'center, center';
-      rankIcon.style.backgroundRepeat = 'no-repeat, no-repeat';
+      rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.webp)`;
       const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
       let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, data.users[key].rating), rankIconWrapper);
 
@@ -601,9 +598,10 @@ export class MM {
       } else {
         name.innerText = 'ifst';
 
+      
         name.style.opacity = 0;
 
-        rankIcon.style.backgroundImage = 'none, url(content/ranks/rateIconBack.png)';
+        rankIcon.style.backgroundImage = 'none';
 
         rank.firstChild.innerText = 1100;
 
