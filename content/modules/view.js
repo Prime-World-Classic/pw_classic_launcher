@@ -697,10 +697,12 @@ item.style.backgroundSize = 'contain, contain';
 						rankLvl.textContent = heroRating;
 					}
 					
-					// Убеждаемся, что backgroundImage не установлен на rank-icon-wrapper
+					// Восстанавливаем правильный фон на rank-icon-wrapper (rateIconBack.png)
 					if (rankIconWrapper) {
-						rankIconWrapper.style.backgroundImage = '';
-						rankIconWrapper.style.removeProperty('background-image');
+						rankIconWrapper.style.backgroundImage = `url(content/ranks/rateIconBack.png)`;
+						rankIconWrapper.style.backgroundSize = 'contain';
+						rankIconWrapper.style.backgroundPosition = 'center center';
+						rankIconWrapper.style.backgroundRepeat = 'no-repeat';
 					}
 					
 					if (rankIcon) {
