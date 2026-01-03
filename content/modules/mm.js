@@ -860,9 +860,32 @@ export class MM {
 
       findOldPlayer.firstChild.style.backgroundImage = `url(content/hero/${data.heroId}/${skinId}.webp)`;
 
-      findOldPlayer.firstChild.firstChild.firstChild.innerText = data.rating;
-
-      findOldPlayer.firstChild.firstChild.lastChild.style.backgroundImage = `url(content/ranks/99.png)`;
+      const rankContainer = findOldPlayer.firstChild.querySelector('.rank');
+      if (rankContainer) {
+        const rankLvl = rankContainer.querySelector('.rank-lvl');
+        const rankIconWrapper = rankContainer.querySelector('.rank-icon-wrapper');
+        const rankIcon = rankIconWrapper ? rankIconWrapper.querySelector('.rank-icon') : null;
+        
+        if (rankLvl) {
+          rankLvl.innerText = data.rating;
+          // Убеждаемся, что backgroundImage удален с rank-lvl
+          rankLvl.style.backgroundImage = '';
+          rankLvl.style.removeProperty('background-image');
+        }
+        
+        // Восстанавливаем правильный фон на rank-icon-wrapper (rateIconBack.png)
+        if (rankIconWrapper) {
+          rankIconWrapper.style.backgroundImage = `url(content/ranks/rateIconBack.png)`;
+          rankIconWrapper.style.backgroundSize = 'contain';
+          rankIconWrapper.style.backgroundPosition = 'center center';
+          rankIconWrapper.style.backgroundRepeat = 'no-repeat';
+        }
+        
+        // Устанавливаем 99.png только на rank-icon (иконка "готов")
+        if (rankIcon) {
+          rankIcon.style.backgroundImage = `url(content/ranks/99.png)`;
+        }
+      }
 
       if (data.banHeroId) {
         findOldPlayer.firstChild.lastChild.style.backgroundImage = `url(content/hero/${data.banHeroId}/1.webp)`;
