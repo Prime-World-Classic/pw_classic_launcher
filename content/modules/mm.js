@@ -553,11 +553,13 @@ export class MM {
 
       let name = DOM({ style: 'mm-lobby-header-team-player-name' }, `${data.users[key].nickname}`);
 
-      let rankIcon = DOM({ style: 'rank-icon' });
-
-      rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.webp)`;
-
-      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, data.users[key].rating), rankIcon);
+      const rankIcon = DOM({ style: 'rank-icon' });
+      rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.users[key].rating)}.webp), url(content/ranks/rateIconBack.png)`;
+      rankIcon.style.backgroundSize = '70%, 100%';
+      rankIcon.style.backgroundPosition = 'center, center';
+      rankIcon.style.backgroundRepeat = 'no-repeat, no-repeat';
+      const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
+      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, data.users[key].rating), rankIconWrapper);
 
       hero.append(rank, DOM({ style: 'mm-frame' }));
 
@@ -601,7 +603,7 @@ export class MM {
 
         name.style.opacity = 0;
 
-        rankIcon.style.backgroundImage = 'none';
+        rankIcon.style.backgroundImage = 'none, url(content/ranks/rateIconBack.png)';
 
         rank.firstChild.innerText = 1100;
 
