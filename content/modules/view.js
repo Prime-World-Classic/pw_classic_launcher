@@ -2586,11 +2586,10 @@ item.style.backgroundSize = 'contain, contain';
 
         for (const item of result) {
           //item.rating = App.getRandomInt(1100,3000);
-          let rankIcon = DOM({ style: 'rank-icon' });
-
+          const rankIcon = DOM({ style: 'rank-icon' });
           rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-          let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIcon);
+          const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
+          let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIconWrapper);
 
           const hero = DOM({ style: 'hero-item' }, DOM({ tag: 'span', style: 'name' }, item.name), rank);
 
