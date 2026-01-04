@@ -680,14 +680,29 @@ item.style.backgroundSize = 'contain, contain';
 				const rankContainer = item.querySelector('.rank');
 				if (rankContainer) {
 					const rankLvl = rankContainer.querySelector('.rank-lvl');
-					const rankIcon = rankContainer.querySelector('.rank-icon');
+					const rankIconWrapper = rankContainer.querySelector('.rank-icon-wrapper');
+					const rankIcon = rankIconWrapper ? rankIconWrapper.querySelector('.rank-icon') : rankContainer.querySelector('.rank-icon');
 					
 					if (rankLvl) {
 						const heroRating = item2.rating || player.rating || 1100;
 						
+						// Убеждаемся, что backgroundImage удален с rank-lvl
 						rankLvl.style.backgroundImage = '';
+						rankLvl.style.removeProperty('background-image');
+						// Удаляем атрибут style, если он пустой
+						if (!rankLvl.style.cssText || rankLvl.style.cssText.trim() === '') {
+							rankLvl.removeAttribute('style');
+						}
 
 						rankLvl.textContent = heroRating;
+					}
+					
+					// Восстанавливаем правильный фон на rank-icon-wrapper (rateIconBack.png)
+					if (rankIconWrapper) {
+						rankIconWrapper.style.backgroundImage = `url(content/ranks/rateIconBack.png)`;
+						rankIconWrapper.style.backgroundSize = 'contain';
+						rankIconWrapper.style.backgroundPosition = 'center center';
+						rankIconWrapper.style.backgroundRepeat = 'no-repeat';
 					}
 					
 					if (rankIcon) {
@@ -2117,13 +2132,10 @@ item.style.backgroundSize = 'contain, contain';
     for (let item of players) {
       let img = DOM({ style: 'party-middle-item-middle' });
 
-      let rankIcon = DOM({ style: 'rank-icon' });
-      rankIcon.style.backgroundImage = `url("content/ranks/rateIconBack.png"), url("content/ranks/${Rank.icon(item.rating)}.webp")`;
-      rankIcon.style.backgroundSize = 'contain, contain';
-      rankIcon.style.backgroundPosition = 'center, center';
-      rankIcon.style.backgroundRepeat = 'no-repeat, no-repeat';
-
-      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIcon);
+      const rankIcon = DOM({ style: 'rank-icon' });
+      rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+      const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
+      let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIconWrapper);
 
       img.append(rank);
 
@@ -2173,9 +2185,13 @@ item.style.backgroundSize = 'contain, contain';
           status.innerText = 'Подтвердить';
         }
 
-        img.style.backgroundImage = item.hero
+        const heroImg = item.hero
           ? `url(content/hero/${item.hero}/${item.skin ? item.skin : 1}.webp)`
           : `url(content/hero/empty.webp)`;
+        img.style.backgroundImage = `${heroImg}, url(content/hero/background.png)`;
+        img.style.backgroundRepeat = 'no-repeat, no-repeat';
+        img.style.backgroundPosition = 'center, center';
+        img.style.backgroundSize = 'contain, contain';
       } else {
         img.innerText = '+';
 
@@ -2576,11 +2592,10 @@ item.style.backgroundSize = 'contain, contain';
 
         for (const item of result) {
           //item.rating = App.getRandomInt(1100,3000);
-          let rankIcon = DOM({ style: 'rank-icon' });
-
+          const rankIcon = DOM({ style: 'rank-icon' });
           rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-          let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIcon);
+          const rankIconWrapper = DOM({ style: 'rank-icon-wrapper' }, rankIcon);
+          let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, item.rating), rankIconWrapper);
 
           const hero = DOM({ style: 'hero-item' }, DOM({ tag: 'span', style: 'name' }, item.name), rank);
 

@@ -147,13 +147,43 @@ export class Events {
     let find = document.getElementById(`PP${data.id}`);
 
     if (find) {
-      find.children[1].style.backgroundImage = data.hero
+      const playerElement = find.children[1]; // castle-play-lobby-player
+      const newHeroImg = data.hero
         ? `url(content/hero/${data.hero}/${data.skin ? data.skin : 1}.webp)`
         : `url(content/hero/empty.webp)`;
+      playerElement.style.backgroundImage = `${newHeroImg}, url(content/hero/background.png)`;
+      playerElement.style.backgroundRepeat = 'no-repeat, no-repeat';
+      playerElement.style.backgroundPosition = 'center, center';
+      playerElement.style.backgroundSize = 'contain, contain';
 
-      find.children[1].firstChild.firstChild.innerText = data.rating;
-
-      find.children[1].firstChild.firstChild.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+      const rankContainer = playerElement.querySelector('.rank');
+      if (rankContainer) {
+        const rankLvl = rankContainer.querySelector('.rank-lvl');
+        const rankIconWrapper = rankContainer.querySelector('.rank-icon-wrapper');
+        const rankIcon = rankIconWrapper ? rankIconWrapper.querySelector('.rank-icon') : null;
+        
+        if (rankLvl) {
+          // Обновляем текст рейтинга
+          rankLvl.innerText = data.rating;
+          
+          // Убеждаемся, что backgroundImage удален с rank-lvl
+          rankLvl.style.backgroundImage = '';
+          rankLvl.style.removeProperty('background-image');
+        }
+        
+        // Восстанавливаем правильный фон на rank-icon-wrapper (rateIconBack.png)
+        if (rankIconWrapper) {
+          rankIconWrapper.style.backgroundImage = `url(content/ranks/rateIconBack.png)`;
+          rankIconWrapper.style.backgroundSize = 'contain';
+          rankIconWrapper.style.backgroundPosition = 'center center';
+          rankIconWrapper.style.backgroundRepeat = 'no-repeat';
+        }
+        
+        // Устанавливаем backgroundImage только на rank-icon
+        if (rankIcon) {
+          rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(data.rating)}.webp)`;
+        }
+      }
     }
   }
 
