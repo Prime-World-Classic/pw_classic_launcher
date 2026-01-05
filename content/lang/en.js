@@ -104,7 +104,7 @@
     gm3_hover: 'Dragonwald\ABattle on a special 4x4 map. A mode combining PvE and PvP. Hero leveling is possible only in battles with chud, evenly populating the entire map. The road between bases is protected by a dragon. When killed, it drops an egg. If you take the egg, a special soldier appears who will help you achieve victory.',
     gm4_hover: 'ARAM\AThe mode consists of one lane, 5x5 players. Features: reduced healing and stealing, no health and mana regeneration at the fountain, increased amount of prime per team.',
     gm5_hover: 'Challenges\AFive players must defend the starting area from chud, monsters controlled by AI on a specially created map. Monsters come in waves. Monsters spawn from four points located on the map, after each wave one of the points must be destroyed by pressing a special switch.',
-    gm6_hover: 'Duel\ABattle takes place on the Borderlands map, 1x1\AFeatures: there are tasks within the mode. Here players can compete with each other.'
+    gm6_hover: 'Duel\ABattle takes place on the Borderlands map, 1x1\AFeatures: there are tasks within the mode. Here players can compete with each other.',
     fight: 'Fight!',
     cancel: 'Cancel',
     titleСhildren17_1: 'Division - players grouped under the same rank,\ncompeting with similar matchmaking winrates.',
