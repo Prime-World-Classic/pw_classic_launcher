@@ -3051,9 +3051,10 @@ button.build-action-item:hover {
   transition: all 0.3s ease-out;
   opacity: 70%;
   border: 0.1cqh solid rgb(158, 155, 104);
-  background-image: linear-gradient(1turn, rgba(9, 25, 24, 0.8), rgba(15, 35, 48, 0.9), rgba(7, 16, 19, 0.8), rgba(8, 36, 46, 0.8));
+  background-image: linear-gradient(1turn, rgba(38, 109, 103, 0.8), rgba(18, 69, 73, 0.9), rgba(21, 51, 59, 0.8), rgba(4, 32, 42, 0.8));
   box-shadow: -2cqh 10cqh 5cqh #0c1f2220;
-  border-radius: .5cqh .5cqh .5cqh .5cqh / .5cqh .5cqh .5cqh .5cqh;
+
+  border-radius: 2cqh 2cqh 2cqh 2cqh / 2cqh 2cqh 2cqh 2cqh;
 }
 
 .chat:hover {
@@ -3086,7 +3087,7 @@ button.build-action-item:hover {
   width: 90%;
   height: 4cqh;
   background: none;
-  font: 1.7cqh / 1 Tahoma;
+  font: 2cqh / 1 Tahoma;
   color: rgba(255, 255, 255, 0.9);
   word-wrap: normal;
 }
@@ -3095,7 +3096,7 @@ button.build-action-item:hover {
   position: relative;
   width: 2.5cqh;
   height: 2.5cqh;
-  font: 2cqh / 1 Tahoma;
+  font: 2.5cqh / 1 Tahoma;
   color: rgba(255, 255, 255, 0.377);
 }
 
@@ -3104,12 +3105,12 @@ button.build-action-item:hover {
 }
 
 .chat-body-item {
-  margin-top: .5cqh;
+  margin-top: 1.2cqh;
 }
 
 .chat-body-item div {
   display: inline;
-  font: 1.8cqh / 1 Tahoma;
+  font: 2cqh / 1 Tahoma;
   text-shadow: rgba(0, 0, 0, 0.3) 0 0 0.2cqw;
   transition: all 0.3s ease-out;
 }
