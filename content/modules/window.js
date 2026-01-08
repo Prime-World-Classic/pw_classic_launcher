@@ -17,6 +17,9 @@ import { HelpSplash } from './helpSpalsh.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
+// windows
+import { keybindings } from './windows/keybindings.window.js';
+
 export class Window {
   static windows = {};
   static windowOrder = [];
@@ -1042,14 +1045,13 @@ export class Window {
           `${Lang.text('language')} (${Lang.target})`,
         ),
         // Добавленная кнопка "Клавиши"
-        /*DOM({ 
+        DOM({ 
 					style: 'castle-menu-item-button',
 					event: ['click', () => {
 						console.log("Клавиши clicked"); // Для отладки
 						Window.show('main','keybindings'); 
 					}]
 				}, Lang.text('keys') || 'Клавиши'), // Fallback на текст, если перевод отсутствует
-				*/
         // Кнопка "Назад"
         DOM(
           {
@@ -1629,3 +1631,4 @@ export class Window {
     );
   } 
 }
+Window.keybindings = keybindings;
