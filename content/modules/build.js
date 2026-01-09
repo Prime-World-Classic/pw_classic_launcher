@@ -2024,8 +2024,10 @@ export class Build {
 
     console.log('activeBar', data);
     let index = 0;
-
+for (let x = 0; x < 3; ++x)
     for (let item of data) {
+  if (index > 23)
+    break;
       const element = DOM({
         domaudio: domAudioPresets.defaultButton,
         data: { index: index },

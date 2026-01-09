@@ -941,7 +941,7 @@ input::placeholder {
   font-family: 'DejaVuSans', sans-serif;
   color: rgb(255 255 255 / 50%);
   position: absolute;
-  bottom: -4cqh;
+  bottom: -9cqh;
   left: -25cqw;
 }
 
@@ -1193,7 +1193,7 @@ button.build-action-item:hover {
   flex-flow: row wrap;
   overflow: auto;
   width: 100cqw;
-  height: 100cqh;
+  height: 90cqh;
   background: #33333352;
   justify-content: start;
   align-content: flex-start;
@@ -1207,7 +1207,7 @@ button.build-action-item:hover {
   justify-content: center;
   flex-flow: column;
   position: absolute;
-  bottom: -10cqh;
+  bottom: 0;
 }
 
 .build-active-bar {
@@ -1217,7 +1217,7 @@ button.build-action-item:hover {
   display: flex;
   justify-content: center;
   align-items: end;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
 }
 
 .build-active-bar-item {
@@ -1226,6 +1226,7 @@ button.build-action-item:hover {
   height: calc(60cqw / 10);
   margin-left: 0.5cqw;
   margin-right: 0.5cqw;
+  margin-bottom: 1cqh;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 1cqh;
   border: 0.5cqh solid transparent;
@@ -3545,7 +3546,7 @@ button.build-action-item:hover {
   right: 0;
   text-align: center;
   width: calc(min(140cqh, 95cqw));
-  height: 75cqh;
+  height: 85cqh;
   /*background-color: #8d8b8b;*/
   border-radius: .5cqh;
   border: 0.2cqh groove rgb(158, 155, 104);
@@ -4385,6 +4386,7 @@ i-success {
 
 .build-center {
   width: 50.4cqw;
+  height: 80cqh;
   container-type: inline-size;
   display: flex;
   flex-direction: column;
@@ -4404,7 +4406,7 @@ i-success {
 
 .build-hero {
   width: 100cqw;
-  height: 100cqh;
+  height: 90cqh;
   container-type: size;
   display: flex;
   flex-flow: column nowrap;
@@ -4527,7 +4529,6 @@ i-success {
 
   .build-right {
     width: 100cqw;
-    height: 15cqh;
     container-type: size;
   }
   .build-rarity {
@@ -4539,7 +4540,6 @@ i-success {
   }
   .build-talent-view {
     width: 100cqw;
-    height: 100cqh;
     align-self: center;
   }
   .build-talent-item-container {
