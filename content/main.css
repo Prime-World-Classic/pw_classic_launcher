@@ -1804,6 +1804,7 @@ button.build-action-item:hover {
   text-align: center;
   container-type: inline-size;
   /*border: 0.1cqh solid rgb(158, 155, 104);*/
+  position: relative;
 }
 
 .splash-content input {
