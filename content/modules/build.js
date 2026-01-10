@@ -431,9 +431,9 @@ export class Build {
 
     Build.rarity();
 
-//    Build.activeBar(request.active);
+    Build.activeBar(request.active);
 
-	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+//	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
     Build.ruleSortInventory = new Object();
   }
