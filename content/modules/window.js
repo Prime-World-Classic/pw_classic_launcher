@@ -18,7 +18,7 @@ import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 
 // windows
-import { keybindings } from './windows/keybindings.window.js';
+import { keybindings } from './keybindings/keybindings.window.js';
 
 export class Window {
   static windows = {};
