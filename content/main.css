@@ -3908,11 +3908,18 @@ button.build-action-item:hover {
   height: 4cqh;
   text-align: center;
   font-size: 2.5cqh;
-  background: rgba(0, 0, 0, 0.3);
-  border: 0.1cqh solid rgb(158, 155, 104);
-  border-radius: 0.5cqh;
-  color: white;
+  background: #0d3f3d;
+  border-radius: 1.5cqh;
+  box-shadow: 
+    0px 1px 1px 0.5px rgba(255, 255, 255, 0.336), /* white glow at bottom */
+    inset 0px 6px 5px -4px rgba(0, 0, 0, 0.8) /* inner black shadow at top */; 
+  color: #ffe5b7;
   transition: all 0.2s;
+  text-shadow:
+  -0.1cqh -0.1cqh 0 #612e0c,
+   0.1cqh -0.1cqh 0 #612e0c,
+  -0.1cqh  0.1cqh 0 #612e0c,
+   0.1cqh  0.1cqh 0 #612e0c;
 }
 #wcastle-keybindings {
   container-type: size;
@@ -3943,13 +3950,12 @@ button.build-action-item:hover {
   padding: 1cqh 1cqh;
   color: #ffe5b7;
   text-shadow:
-  -1px -1px 0 #333333,
-   1px -1px 0 #333333,
-  -1px  1px 0 #333333,
-   1px  1px 0 #333333;
+  -0.1cqh -0.1cqh 0 #333333,
+   0.1cqh -0.1cqh 0 #333333,
+  -0.1cqh  0.1cqh 0 #333333,
+   0.1cqh  0.1cqh 0 #333333;
 }
 
-.wcastle-keybindings
 
 /* Стили для кнопок */
 .reset-btn {
