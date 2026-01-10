@@ -697,7 +697,9 @@ input::placeholder {
 .build-hero-stats-settings {
   margin-top: 1cqh;
   display: flex;
-  flex-direction: row nowrap;
+  position: absolute;
+  top: -15cqh;
+  left: 74cqw;
 }
 
 .build-hero-stats-setting-land-type {
@@ -1184,9 +1186,9 @@ button.build-action-item:hover {
   container-type: size;
   width: 120cqw;
   border-radius: 2cqh;
-  height: 68cqh;
+  height: 85cqh;
   align-self: end;
-  margin-top: -6cqh;
+  margin-top: 16cqh;
 }
 
 .build-talents {
@@ -1208,7 +1210,8 @@ button.build-action-item:hover {
   justify-content: center;
   flex-flow: column;
   position: absolute;
-  bottom: 0;
+  bottom: 3cqh;
+  left: -28cqh;
 }
 
 .build-active-bar {
@@ -3546,8 +3549,8 @@ button.build-action-item:hover {
   left: 0;
   right: 0;
   text-align: center;
-  width: calc(min(140cqh, 95cqw)*0.9);
-  height: calc(min(85cqh, 65cqw)*0.9);
+  width: calc(min(135cqh, 95cqw) * 0.9);
+  height: calc(min(85cqh, 60cqw) * 0.9);
   /*background-color: #8d8b8b;*/
   border-radius: .5cqh;
   border: 0.2cqh groove rgb(158, 155, 104);
@@ -4407,7 +4410,7 @@ i-success {
 
 .build-hero {
   width: 100cqw;
-  height: 90cqh;
+  height: 80cqh;
   container-type: size;
   display: flex;
   flex-flow: column nowrap;
