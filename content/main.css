@@ -1152,16 +1152,16 @@ button.build-action-item:hover {
   background-position: center;
   background-repeat: no-repeat;
   position: relative; /* Изменено с static на relative */
-  transform-origin: center !important; /* Масштабирование от центра */
+  transform-origin: center; /* Масштабирование от центра */
   will-change: transform; /* Оптимизация анимации */
 }
 
 .build-talent-item.dragging {
-  transform: scale(1.1) !important;
-  transform-origin: center center !important;
-  transition: transform 0.1s ease-out !important;
-  z-index: 9999 !important;
-  position: absolute !important;
+  transform: scale(1.1);
+  transform-origin: center center;
+  transition: transform 0.1s ease-out;
+  z-index: 9999 ;
+  position: absolute;
 }
 
 .build-talent-item-container .build-talent-item[data-active='1']:after,

@@ -2217,9 +2217,10 @@ export class Build {
       element.style.willChange = 'transform';
       element.style.setProperty('transform', 'scale(1.1)', 'important');
       element.style.transition = 'transform 0.1s ease';
+	  
 	  let shiftX = 0;
       let shiftY = 0;
-	  console.log(element);
+
 	  if(element.dataset.state === '3'){
 		shiftX = event.clientX;
         shiftY = event.clientY;
@@ -2238,16 +2239,16 @@ export class Build {
 
       element.style.zIndex = '9999';
       element.style.position = 'absolute';
-      element.style.left = event.pageX - shiftX - 1 + 'px';
-      element.style.top = event.pageY - shiftY - 1 + 'px';
+      element.style.left = event.pageX - shiftX + 'px';
+      element.style.top = event.pageY - shiftY + 'px';
 
       elementSetDisplay(element, 'none');
       let startingElementBelow = elementFromPoint(event.clientX, event.clientY);
       elementSetDisplay(element, 'block');
 
       document.onmousemove = (e) => {
-        element.style.left = e.pageX - shiftX - 1 + 'px';
-        element.style.top = e.pageY - shiftY - 1 + 'px';
+        element.style.left = e.pageX - shiftX + 'px';
+        element.style.top = e.pageY - shiftY + 'px';
       };
 
       element.onmouseup = async (event) => {
