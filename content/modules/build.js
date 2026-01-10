@@ -431,9 +431,9 @@ export class Build {
 
     Build.rarity();
 
-    Build.activeBar(request.active);
+//    Build.activeBar(request.active);
 
-//	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
     Build.ruleSortInventory = new Object();
   }
@@ -2026,10 +2026,7 @@ export class Build {
 
     console.log('activeBar', data);
     let index = 0;
-for (let x = 0; x < 3; ++x)
     for (let item of data) {
-  if (index > 23)
-    break;
       const element = DOM({
         domaudio: domAudioPresets.defaultButton,
         data: { index: index },

@@ -1184,8 +1184,9 @@ button.build-action-item:hover {
   container-type: size;
   width: 120cqw;
   border-radius: 2cqh;
-  height: 71cqh;
+  height: 68cqh;
   align-self: end;
+  margin-top: -6cqh;
 }
 
 .build-talents {
@@ -1217,7 +1218,7 @@ button.build-action-item:hover {
   display: flex;
   justify-content: center;
   align-items: end;
-  flex-flow: row wrap;
+  flex-flow: row wrap-reverse;
 }
 
 .build-active-bar-item {
@@ -3518,8 +3519,8 @@ button.build-action-item:hover {
   left: 0;
   right: 0;
   text-align: center;
-  width: calc(min(150cqh, 95cqw));
-  height: 80cqh;
+  width: calc(min(150cqh, 95cqw)*0.9);
+  height: calc(80cqh*0.9);
   z-index: 9;
   /*background-color: #8d8b8b;*/
   border-radius: 2cqh;
@@ -3545,8 +3546,8 @@ button.build-action-item:hover {
   left: 0;
   right: 0;
   text-align: center;
-  width: calc(min(140cqh, 95cqw));
-  height: 85cqh;
+  width: calc(min(140cqh, 95cqw)*0.9);
+  height: calc(min(85cqh, 65cqw)*0.9);
   /*background-color: #8d8b8b;*/
   border-radius: .5cqh;
   border: 0.2cqh groove rgb(158, 155, 104);
@@ -4452,7 +4453,7 @@ i-success {
   flex-direction: row;
   justify-content: center;
   position: absolute;
-  top: -10cqh;
+  top: -8cqh;
 }
 
 @media (max-aspect-ratio: 1/1) {
