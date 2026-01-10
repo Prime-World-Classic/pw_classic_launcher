@@ -4,6 +4,7 @@ import { Lang } from '../lang.js';
 import { domAudioPresets } from '../domAudioPresets.js';
 export async function keybindings() {
   async function findConfigFile() {
+    // native 
     if (NativeAPI.status) {
       const possiblePaths = [
         `${NativeAPI.App.getDataPath('documents')}/My Games/Prime World Classic/input_new.cfg`,
@@ -19,6 +20,11 @@ export async function keybindings() {
           continue;
         }
       }
+    }
+
+    // browser fallback
+    try {
+      const response = await fetch('/content/keybindsFallback.cfg');
     }
 
     return null;
