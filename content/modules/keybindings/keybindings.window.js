@@ -23,7 +23,7 @@ export async function keybindings() {
     const input = DOM({
       tag: 'input',
       value: current,
-      class: 'castle-keybinding-input',
+      style: 'castle-keybinding-input',
       event: ['keydown', e => {
         e.preventDefault();
         const key = normalizeKey(e);
@@ -50,7 +50,7 @@ export async function keybindings() {
 
   return DOM(
     { id: 'wcastle-keybindings' },
-    DOM({}, Lang.text('keybindings_title')),
+
     ...rows,
     saveBtn
   );
