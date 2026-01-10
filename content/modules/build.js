@@ -433,6 +433,8 @@ export class Build {
 
     Build.activeBar(request.active);
 
+//	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
     Build.ruleSortInventory = new Object();
   }
 
@@ -2192,7 +2194,6 @@ for (let x = 0; x < 3; ++x)
       let elems = document.elementsFromPoint(x, y);
       return elems[0].className == 'build-level' ? elems[1] : elems[0];
     };
-
     let elementSetDisplay = (element, display) => {
       if (element.parentElement.classList == 'build-talent-item-container') {
         element.parentElement.style.display = display;
@@ -2219,17 +2220,24 @@ for (let x = 0; x < 3; ++x)
       element.style.willChange = 'transform';
       element.style.setProperty('transform', 'scale(1.1)', 'important');
       element.style.transition = 'transform 0.1s ease';
-
-      let rect = element.getBoundingClientRect();
-      let shiftX = event.pageX - rect.left - 5;
-      let shiftY = event.pageY - rect.top - 5;
-
-      let offsetParent = element;
-      do {
-        shiftX += offsetParent.offsetParent.offsetLeft;
-        shiftY += offsetParent.offsetParent.offsetTop;
-        offsetParent = offsetParent.offsetParent;
-      } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
+	  let shiftX = 0;
+      let shiftY = 0;
+	  console.log(element);
+	  if(element.dataset.state === '3'){
+		shiftX = event.clientX;
+        shiftY = event.clientY;
+	  } else {
+		let rect = element.getBoundingClientRect();
+        shiftX = event.pageX - rect.left - 5;
+        shiftY = event.pageY - rect.top - 5;
+	   
+        let offsetParent = element;
+        do {
+          shiftX += offsetParent.offsetParent.offsetLeft;
+          shiftY += offsetParent.offsetParent.offsetTop;
+          offsetParent = offsetParent.offsetParent;
+        } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
+	  }
 
       element.style.zIndex = '9999';
       element.style.position = 'absolute';
