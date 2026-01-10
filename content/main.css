@@ -1214,7 +1214,7 @@ button.build-action-item:hover {
 .build-active-bar {
   container-type: inline-size;
   width: 100cqw;
-  height: 10cqw;
+  height: 16cqw;
   display: flex;
   justify-content: center;
   align-items: end;
