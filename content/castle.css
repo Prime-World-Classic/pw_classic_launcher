@@ -1484,7 +1484,6 @@ body {
   width: 100%;
   height: 100%;
 }
-
 .castle-friend-item-bottom {
   width: 100%;
   display: flex;
@@ -1496,6 +1495,11 @@ body {
   bottom: 0;
 }
 
+.addToFriendIcon{
+  border-radius: 5cqh;
+  border: 2.25cqh groove #ffe27ab7;
+  height: 35cqh;
+}
 .castle-friend-online {
   font-weight: 600;
   font-size: 10cqh;
@@ -1514,17 +1518,21 @@ body {
   font-weight: 800;
   text-align: center;
   color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+}
+.qweadd {
+    border: 2px solid rgb(255, 0, 0);
 }
 
 .castle-friend-add-group {
   overflow: scroll;
-  height: 13cqh;
+  height: 15cqh;
   width: 85%;
-  background: radial-gradient(ellipse at center, rgb(0, 49, 57) 0%, rgb(16, 110, 89) 100%);
-  border: 0.2cqh solid rgb(96, 80, 52);
-  border-radius: 0.3vw;
-  color: white;
-  font: 12cqh / 1 Tahoma;
+  background: linear-gradient( #3b6d61 0%, #09211f 25%, #053B3F 75%, #2c554c 100%);
+  border:1cqh groove #ecd88d;
+  border-radius: 3.5cqh;
+  color: #fff7dae0;
+  font: 10cqh / 1.4 Tahoma;
   padding: 1cqh 0;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -1532,12 +1540,15 @@ body {
     background 0.3s,
     transform 0.2s;
   text-align: center;
+  transition: .2s;
 }
 
 .castle-friend-add-group:hover {
-  background: radial-gradient(ellipse at center, rgb(0, 49, 57) 30%, rgb(16, 110, 89) 100%);
+  filter: brightness(1.2);
 }
-
+.add-to-friend-button{
+  margin-bottom: 5cqh;
+}
 .castle-friend-confirm {
   overflow: scroll;
   height: 13cqh;
@@ -1580,13 +1591,15 @@ body {
 }
 
 .castle-hero-name {
-  overflow: scroll;
-  height: 13cqh;
+  height: 10cqh;
   color: #cc5;
+  overflow: scroll;
   font: 9cqh / 1 Tahoma;
   text-shadow: #000 0 0 0.5cqh;
-  padding: 5cqh 5cqh;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 4cqh 2cqh;
 }
 
 .castle-item-hero-name {
@@ -1598,7 +1611,16 @@ body {
   position: absolute;
   top: 0;
 }
-
+.castle-item-hero-name span{
+  font-size: 10cqh;
+  color: #fff;
+}
+.add-to-friend-text{
+  height: 15cqh;
+}
+.add-to-friend-text span{
+  text-align: center;
+}
 .castle-chat {
   position: absolute;
   right: 0;

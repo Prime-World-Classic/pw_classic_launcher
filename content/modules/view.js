@@ -1665,15 +1665,19 @@ item.style.backgroundSize = 'contain, contain';
           },
           DOM(
             { style: 'castle-friend-item-middle' },
-            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-            DOM({ style: 'castle-friend-add' }, '+'),
+            DOM({ style: 'castle-item-hero-name' }, DOM({ style: ['castle-hero-name', 'add-to-friend-text'] }, DOM({ tag: 'span' }, Lang.text("addFriend"))), ),
+            DOM({src: 'content/hero/addFriend.png', style: 'addToFriendIcon', tag: 'img'},),
+
+            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }, ),
+            DOM({style: 'castle-friend-item-bottom' }, DOM({style: ['castle-friend-add-group', 'add-to-friend-button']}, "Пригласить"),),
           ),
         );
 
         preload.add(buttonAdd);
 
-        buttonAdd.dataset.url = `content/hero/empty.webp`;
+        buttonAdd.dataset.url = `content/hero/qwe.png`;
 
+        
         for (let item of result) {
           const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, item.nickname));
 

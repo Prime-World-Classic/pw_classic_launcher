@@ -55,6 +55,7 @@
     fullscreenDisabled: 'Window mode enabled',
 	choosingHero: 'Choose a Hero',
 	youSearchFight: 'You are in search of a fight!',
+  addFriend: 'Invite friend',
 	
 	//BackEnd
 	structureError: 'Structure error',

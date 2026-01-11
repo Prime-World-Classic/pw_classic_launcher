@@ -56,6 +56,7 @@
     fullscreenDisabled: 'Включен оконный режим',
 	choosingHero: 'Выбрать Героя',
 	youSearchFight: 'Вы в поиске боя!',
+  addFriend: 'Пригласить друга',
 
 	//BackEnd
 	structureError: 'Ошибка структуры',
