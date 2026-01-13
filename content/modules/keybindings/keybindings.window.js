@@ -18,7 +18,7 @@ export async function keybindings() {
 
   for (let i = 1; i <= 10; i++) {
     const slot = `slot${i}`;
-    const current = KeybindStore.binds[slot] || defaultKeys[i-1];
+    const current = KeybindStore.keybinds[slot] || defaultKeys[i-1];
 
     const input = DOM({
       tag: 'input',
@@ -48,10 +48,14 @@ export async function keybindings() {
     }]
   }, 'Save');
 
+  const wrapper = DOM({ style: 'keybindings-wrapper' },
+    DOM({ tag: 'h2' }, Lang.keybindings_title),
+    ...rows
+  );
+
   return DOM(
     { id: 'wcastle-keybindings' },
-
-    ...rows,
+    wrapper,
     saveBtn
   );
 }

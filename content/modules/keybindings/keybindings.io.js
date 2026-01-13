@@ -48,11 +48,11 @@ export async function loadKeybinds() {
 }
 
 export async function saveKeybinds() {
-  const text = serializeBinds(KeybindStore.binds);
+  const text = serializeBinds(KeybindStore.keybinds);
 
   if (KeybindStore.source === 'native') {
     await NativeAPI.fs.writeFile(KeybindStore.configPath, text);
   } else {
-    localStorage.setItem('keybinds', JSON.stringify(KeybindStore.binds));
+    localStorage.setItem('keybinds', JSON.stringify(KeybindStore.keybinds));
   }
 }

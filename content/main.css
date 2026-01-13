@@ -3887,6 +3887,17 @@ button.build-action-item:hover {
   transform: scale(1.02);
 }
 
+.keybindings-wrapper {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2cqh 0;
+  overflow-y: auto;
+}
+
 .keybinding-row {
   display: flex;
   align-items: center;
@@ -3916,10 +3927,10 @@ button.build-action-item:hover {
   color: #ffe5b7;
   transition: all 0.2s;
   text-shadow:
-  -0.1cqh -0.1cqh 0 #612e0c,
-   0.1cqh -0.1cqh 0 #612e0c,
-  -0.1cqh  0.1cqh 0 #612e0c,
-   0.1cqh  0.1cqh 0 #612e0c;
+  -0.25cqh -0.25cqh 0 #612e0c,
+   0.25cqh -0.25cqh 0 #612e0c,
+  -0.25cqh  0.25cqh 0 #612e0c,
+   0.25cqh  0.25cqh 0 #612e0c;
 }
 #wcastle-keybindings {
   container-type: size;
