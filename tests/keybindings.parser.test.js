@@ -45,7 +45,6 @@ describe('parseBindLine()', () => {
 
   it('parses simple bind', () => {
     const b = parseBindLine("bind cmd_move 'Q'");
-    console.log(b);
     expect(b.command).toBe("cmd_move");
     expect(b.value).toBe(null);
     expect(b.negated).toBe(false);
@@ -76,10 +75,23 @@ describe('parseBindLine()', () => {
 
   it('parses multiple keys', () => {
     const b = parseBindLine("bind exit_game 'ALT' + 'X'");
-    console.log(b);
     expect(b.type).toBe("bind");
     expect(b.command).toBe("exit_game");
     expect(b.keys).toStrictEqual(['ALT', 'X']);
+  });
+
+  it('parses bind_command, simple key', () => {
+    const b = parseBindLine("bind_command 'F11' \"toggle_fps\"");
+    expect(b.type).toBe("bind_command");
+    expect(b.command).toBe("toggle_fps");
+    expect(b.keys).toStrictEqual(['F11']);
+  });
+
+  it('parses bind_command, combo key', () => {
+    const b = parseBindLine("bind_command 'SHIFT' + 'F10' \"screenshot .png\"");
+    expect(b.type).toBe("bind_command");
+    expect(b.command).toBe("screenshot .png");
+    expect(b.keys).toStrictEqual(['SHIFT', 'F10']);
   });
 
 });
@@ -181,6 +193,7 @@ describe('real /content/keybindsFallback.cfg', () => {
     const adv = model.sections.find(s => s.name === 'adventure_screen');
     expect(adv).toBeDefined();
     expect(adv.binds.length).toBeGreaterThan(10);
+    
   });
 
   it('contains smart chat binds', () => {
@@ -223,9 +236,34 @@ describe('real /content/keybindsFallback.cfg', () => {
     );
 
     expect(hasValue).toBe(true);
-    
-    console.log('Debug: Displaying parsed model:');
-    console.log(JSON.stringify(model, null, 2));
+  });
+
+  it('contains multi-key binds', () => {
+
+    const filePath = path.resolve(__dirname, '../content/keybindsFallback.cfg');
+    const cfgText = fs.readFileSync(filePath, 'utf8');
+
+    const model = parseKeybindCfg(cfgText);
+
+    const multiKeyExists = model.sections.some(section =>
+      section.binds.some(b => Array.isArray(b.keys) && b.keys.length > 1)
+    );
+
+    expect(multiKeyExists).toBe(true);
+  });
+
+  it('contains bind_command entries', () => {
+
+    const filePath = path.resolve(__dirname, '../content/keybindsFallback.cfg');
+    const cfgText = fs.readFileSync(filePath, 'utf8');
+
+    const model = parseKeybindCfg(cfgText);
+
+    const bindCommandExists = model.sections.some(section =>
+      section.binds.some(b => b.type === 'bind_command')
+    );
+
+    expect(bindCommandExists).toBe(true);
   });
 
 });

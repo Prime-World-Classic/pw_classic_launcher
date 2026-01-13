@@ -165,7 +165,7 @@ export const KeybindStore = {
   subscribers: [],
 
   set(slot, key) {
-    this.keybinds[slot] = key;
+    this.keybindsFileModel[slot] = key;
     this.notify();
   },
 
@@ -175,7 +175,7 @@ export const KeybindStore = {
   },
 
   notify() {
-    this.subscribers.forEach((fn) => fn(this.keybinds));
+    this.subscribers.forEach((fn) => fn(this.keybindsFileModel));
   },
 
   subscribe(fn) {

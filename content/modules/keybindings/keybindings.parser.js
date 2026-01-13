@@ -16,7 +16,7 @@ export function parseKeybindCfg(cfgText) {
     const line = rawLine.trim();
     if (!line || line === 'unbindall') continue;
 
-    // bindsection 
+    // bindsection
     if (line.startsWith('bindsection')) {
       const parts = line.split(/\s+/);
       const name = parts.length > 1 ? parts[1] : null;
@@ -26,14 +26,8 @@ export function parseKeybindCfg(cfgText) {
       continue;
     }
 
-    //  bind_command 
-    if (line.startsWith('bind_command')) {
-      // ignored or could be stored separately
-      continue;
-    }
-
-    //  bind
-    if (line.startsWith('bind ')) {
+    //  bind or bind_command
+    if (line.startsWith('bind ') || line.startsWith('bind_command ')) {
       const bind = parseBindLine(line);
       if (bind) currentSection.binds.push(bind);
     }
@@ -78,14 +72,23 @@ export function parseBindLine(line) {
       value = tokens.shift();
     }
   } else {
-    // bind_command: последняя строка — команда
-    command = tokens.pop()?.replace(/^"|"$/g, "");
+    const cmdTokens = [];
+
+    for (const t of tokens) {
+      if (t === "+") continue;
+      if (t.startsWith("'") && t.endsWith("'")) continue;
+      cmdTokens.push(t);
+    }
+
+    command = cmdTokens
+      .join(" ")
+      .replace(/^"|"$/g, "");
   }
 
-  // === парсинг клавиш ===
   const keyTokens = tokens.filter(t => t !== "+");
 
   const keys = keyTokens
+    .filter(k => k.startsWith("'"))
     .map(k => k.replace(/^'|'$/g, ""))
     .filter(k => k.length > 0);
 
