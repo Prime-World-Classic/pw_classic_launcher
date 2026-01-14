@@ -1210,8 +1210,8 @@ button.build-action-item:hover {
   justify-content: center;
   flex-flow: column;
   position: absolute;
-  bottom: 3cqh;
-  left: -28cqh;
+  top: 88cqw;
+  right: 17cqw;
 }
 
 .build-active-bar {
@@ -4448,8 +4448,64 @@ i-success {
 }
 
 @media (max-aspect-ratio: 1/1) {
+  button.build-action-item {
+      background-color: #279aac !important;
+      background-size: 30cqmin;
+      background-repeat: no-repeat;
+      box-shadow: none !important;
+      width: 23cqmin;
+      height: 23cqmin;
+      border-width: 0;
+      margin: 1cqmin;
+      padding: 1cqmin;
+      box-shadow: 0 0 2cqmin rgba(0, 0, 0, 0.3);
+      container-type: inline-size;
+      display: flex;
+      align-items: center;
+  }
+  .btn-skins {
+    width: 30cqmin;
+    height: 8cqmin;
+    font-weight: bold;
+    font-size: 4cqmin;
+    color: white;
+    margin: 1cqh;
+    border-radius: 4cqmin;
+    background-size: 300% 100%;
+    border-width: 0;
+	display: none;
+  }
+  .build-active-bar-hint {
+    width: 150cqw;
+    font-size: 1.5cqmin;
+    font-family: 'DejaVuSans', sans-serif;
+    color: rgb(255 255 255 / 50%);
+    position: absolute;
+    bottom: -6cqw;
+    left: -25cqw;
+ }
+  #wbuild {
+    container-type: size;
+    position: absolute;
+    margin-top: 12cqh;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    width: calc(min(135cqh, 95cqw) * 0.9);
+    height: calc(90cqh * 0.9);
+    /* background-color: #8d8b8b; */
+    border-radius: .5cqh;
+    border: 0.2cqh groove rgb(158, 155, 104);
+    background-image: linear-gradient(to bottom, rgba(4, 32, 42, 0.9), rgba(18, 69, 73, 0.85), rgba(21, 51, 59, 0.8), rgba(18, 69, 73, 0.85), rgba(4, 32, 42, 0.9));
+    display: flex;
+    align-items: center;
+    z-index: 100;
+	top: -6cqh;
+  }
   .button-build--wrapper {
-    height: 7.5cqh;
+    height: 4.5cqh;
   }
   .close-button {
     position: absolute;
@@ -4476,12 +4532,12 @@ i-success {
     flex-flow: column nowrap;
     font: 4cqw / 1 Tahoma;
     container-type: inline-size;
-    width: 100cqmin;
+    width: 117cqmin;
     align-items: center;
     justify-content: center;
-    position: relative;
-    top: -11cqh;
-    left: -10cqh;
+    position: absolute;
+    top: 29cqw;
+    left: -14cqw;
   }
   
   .build-hero-stats-line {
@@ -4502,17 +4558,16 @@ i-success {
     margin-top: 0.2cqh;
     font-weight: 600;
     container-type: inline-size;
-    width: 66cqw;
+    width: 68cqw;
     height: calc(min(5cqh, 10cqw));
     font-size: calc(min(3cqh, 6cqw));
   }
   
   .build-hero-stats-settings {
-    margin-top: 1cqh;
     display: flex;
     position: absolute;
-    top: -9cqh;
-    left: 64cqw;
+    top: -26cqw;
+    left: 100cqw;
   }
   
   .build-hero-stats-setting-land-type {
@@ -4586,8 +4641,8 @@ i-success {
   }
   
   .build-hero-stats-daw {
-    width: calc(min(4cqh, 8cqw));
-    height: calc(min(4cqh, 8cqw));
+    width: calc(min(4cqh, 13cqw));
+    height: calc(min(4cqh, 13cqw));
     padding: 0.1cqh;
     border-radius: 50%;
     margin-right: 0.1cqh;
@@ -4620,13 +4675,14 @@ i-success {
     border: 0;
     padding: 0 2cqh;
     width: auto;
-    height: 4cqh;
+    height: 5cqw;
     font-size: 2cqh;
     overflow: hidden;
     position: relative;
     bottom: 0cqh;
     color: #fff;
     text-align: center;
+    white-space: nowrap;
   }
   
   .build-list {
@@ -4635,11 +4691,11 @@ i-success {
     white-space: wrap;
     overflow-y: hidden;
     overflow-x: scroll;
-    width: 55cqh;
-    height: 6cqh;
+    width: 30cqw;
+    height: 7cqw;
     position: relative;
-    top: 81cqh;
-    left: 55cqh;
+    top: 67cqw;
+    left: -48cqw;
   }
   
   .build-list::-webkit-scrollbar {
@@ -4737,8 +4793,8 @@ i-success {
   
   .build-talent-item-container {
     background-size: calc(max(12cqw, 3cqh));
-    width: calc(max(22cqw, 3cqh));
-    height: calc(max(22cqw, 3cqh));
+    width: calc(max(33cqw, 3cqh));
+    height: calc(max(33cqw, 3cqh));
     container-type: size;
     margin: calc(max(0.9cqw, 0.3cqh));
   }
@@ -4780,23 +4836,24 @@ i-success {
   }
   
   .build-talent-view {
-    overflow: hidden;
+    overflow: visible;
     container-type: size;
-    width: 117cqw;
     border-radius: 2cqh;
-    height: 116cqh;
+    width: 135cqw;
     align-self: end;
-    margin-top: -8cqh;
+    height: 1445cqw;
+    margin-top: 2cqh;
     position: relative;
-    left: 4cqh;
+    left: -350cqw;
+    top: 377cqw;
   }
   
   .build-talents {
     display: flex;
     flex-flow: row wrap;
     overflow: auto;
-    width: 97cqw;
-    height: 100cqh;
+    width: 348cqw;
+    height: calc(-111cqw + (100cqh - 100cqw));
     background: #33333352;
     justify-content: start;
     align-content: flex-start;
@@ -4804,14 +4861,15 @@ i-success {
   
   .build-active-bar-container {
     container-type: inline-size;
-    width: 129cqw;
+    width: 137cqw;
     height: 10cqw;
     display: flex;
     justify-content: center;
     flex-flow: column;
-    position: absolute;
-    bottom: -4cqh;
-    left: -34cqh;
+    position: relative;
+    top: -5cqw;
+    right: -7cqw;
+    transform: scale(1.05);
   }
   
   .build-active-bar {
@@ -4858,18 +4916,18 @@ i-success {
     flex-flow: row nowrap;
     justify-content: center;
     position: absolute;
-    width: 116cqw;
-    top: 2cqh;
-    right: 10px;
+    /* width: 113cqw; */
+    top: 343cqw;
+    left: -4cqw;
   }
   
   .build-rarity div {
-    width: 11cqw;
-    height: 11cqw;
+    width: 19cqw;
+    height: 19cqw;
     border-radius: 50%;
     margin: 0 1cqw;
     container-type: size;
-    font-size: 3cqh;
+    font-size: 10cqw;
   }
   
   .build-rarity-other {
@@ -4997,7 +5055,7 @@ i-success {
   }
   
   .build-left {
-    width: 19.6cqw;
+    width: 10cqw;
     height: 100cqh;
     container-type: size;
     display: flex;
@@ -5006,7 +5064,7 @@ i-success {
   }
   
   .build-center {
-    width: 50.4cqw;
+    width: 70cqw;
     height: 78cqh;
     container-type: inline-size;
     display: flex;
@@ -5016,7 +5074,7 @@ i-success {
   }
   
   .build-right {
-    width: 29cqw;
+    width: 20cqw;
     height: 68cqh;
     container-type: inline-size;
     display: flex;
@@ -5026,8 +5084,8 @@ i-success {
   }
   
   .build-hero {
-    width: 68cqw;
-    height: 80cqh;
+    width: 246cqw;
+    height: 63cqh;
     container-type: size;
     display: flex;
     flex-flow: column nowrap;
@@ -5038,12 +5096,12 @@ i-success {
   .build-hero-avatar-and-name {
     display: flex;
     flex-direction: column;
-    width: 40cqh;
+    width: 43cqh;
     container-type: inline-size;
     align-items: center;
     position: absolute;
-    top: -8cqh;
-    left: -13cqh;
+    top: -6cqh;
+    left: -18cqh;
   }
   
   .build-hero-avatar-and-name .name {
@@ -5066,18 +5124,18 @@ i-success {
     align-items: center;
     flex-direction: column;
     position: relative;
-    top: -15cqh;
-    left: -5cqh;
+    top: -16cqw;
+    right: -27cqw;
   }
   
   .build-actions-view {
-    width: 39cqh;
+    width: 25cqw;
     container-type: inline-size;
-    display: flow;
+    display: flex;
     flex-direction: row;
     justify-content: center;
     position: absolute;
-    top: 39cqh;
-    left: -27cqh;
+    top: -13cqw;
+    left: -5cqw;
   }
 }
