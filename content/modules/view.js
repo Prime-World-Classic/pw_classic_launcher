@@ -1675,7 +1675,7 @@ item.style.backgroundSize = 'contain, contain';
 
         preload.add(buttonAdd);
 
-        buttonAdd.dataset.url = `content/hero/qwe.png`;
+        buttonAdd.dataset.url = `content/hero/empty.png`;
 
         
         for (let item of result) {
@@ -1855,7 +1855,7 @@ item.style.backgroundSize = 'contain, contain';
             );
           }
 
-          friend.dataset.url = `content/hero/empty.webp`;
+          friend.dataset.url = `content/hero/friendLogo.png`;
 
           preload.add(friend);
         }

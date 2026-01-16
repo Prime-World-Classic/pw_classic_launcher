@@ -58,6 +58,7 @@ body {
 }
 
 /* Встроенный в Splash полноэкранный слой */
+/* Встроенный в Splash полноэкранный слой */
 .iframe-stats {
   position: fixed;
   inset: 0;
@@ -1492,12 +1493,13 @@ body {
   align-items: center;
   position: absolute;
   gap: 0.2vw;
-  bottom: 0;
+  bottom: 2cqh;
+
 }
 
 .addToFriendIcon{
-  border-radius: 5cqh;
-  border: 2.25cqh groove #ffe27ab7;
+  border-radius: 2cqh;
+  border: 1.5cqh groove #ffe27ae2;
   height: 35cqh;
 }
 .castle-friend-online {
@@ -1528,12 +1530,14 @@ body {
   overflow: scroll;
   height: 15cqh;
   width: 85%;
-  background: linear-gradient( #3b6d61 0%, #09211f 25%, #053B3F 75%, #2c554c 100%);
-  border:1cqh groove #ecd88d;
+  /* background: linear-gradient( #3b6d61 0%, #09211f 25%, #053B3F 75%, #2c554c 100%); */
+  /* border:1cqh groove #ecd88d; */
+  background: url('/content/hero/button.png') center center no-repeat;
+  background-size: contain;
   border-radius: 3.5cqh;
-  color: #fff7dae0;
+ text-shadow: rgba(0, 0, 0, 1) 0.1cqh 0.1cqh 0.1cqh, rgba(0, 0, 0, 1) 0.1cqh -0.1cqh 0.1cqh, rgba(0, 0, 0, 1) -0.1cqh 0.1cqh 0.1cqh, rgba(0, 0, 0, 1) -0.1cqh -0.1cqh 0.1cqh;
+  color: rgb(251, 234, 203);
   font: 10cqh / 1.4 Tahoma;
-  padding: 1cqh 0;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition:
@@ -1541,14 +1545,19 @@ body {
     transform 0.2s;
   text-align: center;
   transition: .2s;
+  padding: 0;
 }
 
 .castle-friend-add-group:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.15);
 }
 .add-to-friend-button{
+  background: url('/content/hero/button.png') center center no-repeat;
+  background-size: contain;
   margin-bottom: 5cqh;
+  padding: 1cqh 1cqh;
 }
+
 .castle-friend-confirm {
   overflow: scroll;
   height: 13cqh;

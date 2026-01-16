@@ -3547,7 +3547,7 @@ button.build-action-item:hover {
   width: calc(min(140cqh, 95cqw));
   height: 75cqh;
   /*background-color: #8d8b8b;*/
-  border-radius: .5cqh;
+  border-radius: 1cqh;
   border: 0.2cqh groove rgb(158, 155, 104);
   background-image: linear-gradient(
     to bottom,
