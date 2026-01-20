@@ -4644,4 +4644,7 @@ i-success {
   .button-build--wrapper {
     height: 13cqh;
   }
+  .splash-content-button, .splash-content-button-red {
+    width: auto;
+  }
 }
