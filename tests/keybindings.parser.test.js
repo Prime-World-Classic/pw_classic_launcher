@@ -256,8 +256,10 @@ describe('real /content/keybindsFallback.cfg', () => {
 
     const filePath = path.resolve(__dirname, '../content/keybindsFallback.cfg');
     const cfgText = fs.readFileSync(filePath, 'utf8');
-
+    
     const model = parseKeybindCfg(cfgText);
+
+    console.log(JSON.stringify(model, null, 2));
 
     const bindCommandExists = model.sections.some(section =>
       section.binds.some(b => b.type === 'bind_command')

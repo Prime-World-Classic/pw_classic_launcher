@@ -1,5 +1,5 @@
 import { KeybindStore } from './keybindings.store.js';
-import { parseBinds, serializeBinds } from './keybindings.parser.js';
+import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
 
 export async function findConfigFile() {
@@ -38,9 +38,15 @@ export async function loadKeybinds() {
     text = await fetch(cfg.path).then(r => r.text());
   }
 
-  const binds = parseBinds(text);
+  const binds = parseKeybindCfg(text);
+  
+  KeybindStore.fileModel = binds;
+  KeybindStore.uiModel = KeybindStore.mapFileToUiModel(binds);
 
-  KeybindStore.setAll(binds);
+  console.log(KeybindStore.uiModel);
+
+
+  // KeybindStore.setAll(binds);
   KeybindStore.source = cfg.type;
   KeybindStore.configPath = cfg.path;
 
@@ -48,7 +54,8 @@ export async function loadKeybinds() {
 }
 
 export async function saveKeybinds() {
-  const text = serializeBinds(KeybindStore.keybinds);
+  const text = serializeCfg(KeybindStore.fileModel);
+  console.log('Saving keybinds:', text);
 
   if (KeybindStore.source === 'native') {
     await NativeAPI.fs.writeFile(KeybindStore.configPath, text);

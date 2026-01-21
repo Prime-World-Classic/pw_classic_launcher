@@ -1,15 +1,16 @@
 export function normalizeKey(e) {
-  const parts = [];
+  const keys = [];
 
-  if (e.ctrlKey) parts.push('CTRL');
-  if (e.altKey) parts.push('ALT');
-  if (e.shiftKey) parts.push('SHIFT');
+  if (e.ctrlKey) keys.push('CTRL');
+  if (e.altKey) keys.push('ALT');
+  if (e.shiftKey) keys.push('SHIFT');
 
   let main = e.key.toUpperCase();
-
   if (main === ' ') main = 'SPACE';
 
-  parts.push(main);
-
-  return parts.join(' + ');
+  if (!['CONTROL','SHIFT','ALT'].includes(main)) {
+    keys.push(main);
+  }
+  
+  return keys;
 }

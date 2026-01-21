@@ -5,7 +5,7 @@
  * @typedef {Object} KeybindStore
  * @property {Keybinds} fileModel - { slot1: '1', slot2: 'Q', ... }
  * @property {'native'|'browser'} source - source of keybindings
- * @property {string|null} configPath - path to keybindings config file
+ * @property {string|null} configPath - path to keybindings config this.keybindsFileModel
  * @property {function[]} subscribers - list of subscribers to notify when keybindings change
  *
  * @method set - sets keybinding for a slot
@@ -22,7 +22,7 @@
  */
 
 export const KeybindStore = {
-  keybindsFileModel: {
+  fileModel: {
     sections: [
       // GLOBAL
       {
@@ -163,37 +163,135 @@ export const KeybindStore = {
       },
     ],
   },
-  keybindsUiModel: {
+  uiModel: {
     talents: {
       ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`cmd_action_bar_slot${i + 1}`, null])),
 
-      self_cast_on: null,
+      self_cast_on: {
+        keys: null,
+        self_cast_off: null,
+      },
+
       cmd_portal: null,
-      actionbar_lock_off: null,
+      actionbar_lock_off: {
+        keys: null,
+        actionbar_lock_on: null,
+      },
     },
     additionalTalents: {
-      ...Object.fromEntries(Array.from({ length: 14 }, (_, i) => [`cmd_action_bar_slot${i + 11}`, null]))
-    }
+      ...Object.fromEntries(Array.from({ length: 14 }, (_, i) => [`cmd_action_bar_slot${i + 11}`, null])),
+    },
+    smartChat: {
+      cmd_smart_chat: null,
+      ...Object.fromEntries(Array.from({ length: 7 }, (_, i) => [`cmd_smart_chat_${i + 1}`, null])),
+    },
+    fighting: {
+      cmd_move: null,
+      cmd_attack: null,
+      cmd_hold: null,
+      cs_toggle_healthbars: null,
+    },
+    windowManagement: {
+      chat_open_close: null,
+      chat_open_global: null,
+      chat_open_team: null,
+      show_statistics: {
+        keys: null,
+        hide_statistics: null,
+      },
+      show_charstat: null,
+      show_inventory: null,
+      show_talents: null,
+    },
+    camera: {
+      camera_switch_attach_mode_down: {
+        keys: null,
+        camera_switch_attach_mode_up: null,
+      },
+      camera_forward: {
+        '+1.0': null,
+        '-1.0': null,
+      },
+      camera_strafe: {
+        '+1.0': null,
+        '-1.0': null,
+      },
+      camera_rotate: {
+        '+1.0': null,
+        '-1.0': null,
+      },
+    },
   },
   source: 'native' | 'browser',
   configPath: null,
   subscribers: [],
 
-  set(slot, key) {
-    this.keybindsFileModel[slot] = key;
-    this.notify();
+  init(fileModel) {
+    this.fileModel = fileModel;
+    this.uiModel = this.mapFileToUiModel();
   },
 
-  setAll(newBinds) {
-    this.binds = { ...newBinds };
+  getBind(command, value = null) {
+    for (const section of this.fileModel.sections) {
+      for (const bind of section.binds) {
+        if (bind.command === command && bind.value === value) {
+          return bind;
+        }
+      }
+    }
+    return null;
+  },
+
+  setBind(command, keys, value = null) {
+    const bind = this.getBind(command, value);
+    if (!bind) return false;
+
+    bind.keys = keys;
+    this.uiModel = this.mapFileToUiModel();
     this.notify();
+    return true;
   },
 
   notify() {
-    this.subscribers.forEach((fn) => fn(this.keybindsFileModel));
+    this.subscribers.forEach((fn) => fn(this.fileModel));
   },
 
   subscribe(fn) {
     this.subscribers.push(fn);
+  },
+
+  mapFileToUiModel() {
+    const ui = structuredClone(this.uiModel);
+    for (const section of this.fileModel.sections) {
+      for (const bind of section.binds) {
+        // talents
+        if (bind.command.startsWith('cmd_action_bar_slot')) {
+          const n = Number(bind.command.replace('cmd_action_bar_slot', ''));
+          if (n <= 10) ui.talents[bind.command] = bind.keys;
+          else ui.additionalTalents[bind.command] = bind.keys;
+          continue;
+        }
+
+        // camera numeric
+        if (['camera_forward', 'camera_strafe', 'camera_rotate'].includes(bind.command)) {
+          ui.camera[bind.command][bind.value] = bind.keys;
+          continue;
+        }
+
+        // fighting
+        if (ui.fighting[bind.command] !== undefined) {
+          ui.fighting[bind.command] = bind.keys;
+          continue;
+        }
+
+        // smart chat
+        if (ui.smartChat[bind.command] !== undefined) {
+          ui.smartChat[bind.command] = bind.keys;
+          continue;
+        }
+      }
+    }
+
+    return ui;
   },
 };
