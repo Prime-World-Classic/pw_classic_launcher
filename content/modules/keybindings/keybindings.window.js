@@ -47,8 +47,10 @@ function createRow(label, inputEl) {
 function createGroup(title, rows) {
   return DOM(
     { style: 'keybinding-group' },
-    DOM({ tag: 'h3' }, title),
-    ...rows
+    DOM({ tag: 'h3', style: 'keybinding-group-title' }, title),
+    DOM({ style: 'keybinding-group-rows' },
+      ...rows
+    ),
   );
 }
 
@@ -179,7 +181,6 @@ export async function keybindings() {
 
   const content = DOM(
     { style: 'keybindings-wrapper' },
-    DOM({ tag: 'h2' }, Lang.keybindings_title),
 
     buildTalents(),
     buildAdditionalTalents(),
