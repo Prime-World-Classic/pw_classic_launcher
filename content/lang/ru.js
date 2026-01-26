@@ -113,6 +113,7 @@
     titleСhildren18_1: 'Карма — поведение игрока и его "полезность" в бою.',
     titleСhildren18_2: 'Она может повышаться и понижаться, в зависимости от боёв.',
     titleСhildren18_3: 'Текущий порог: {karma}',
+    kristall: 'kristall',
 
     // Window
     windowShopBuyItem: 'Купить ',
@@ -271,6 +272,7 @@
     friendInvitesToLobby: '{nickname} приглашает вас в группу',
     friendCallFrom: 'Принять звонок от {name}?',
     friendDropCall: 'Сбросить',
+    inviteToAFriend: 'Пригласить',
 
     //Войс
     enableMic: 'Нажмите Ctrl+Z или на свой Ник, чтобы включить: {Voice.mic.label}',

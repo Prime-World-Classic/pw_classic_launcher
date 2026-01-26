@@ -1671,7 +1671,7 @@ item.style.backgroundSize = 'contain, contain';
             DOM({src: 'content/hero/addFriend.png', style: 'addToFriendIcon', tag: 'img'},),
 
             DOM({ style: ['castle-item-ornament', 'hover-brightness'] }, ),
-            DOM({style: 'castle-friend-item-bottom' }, DOM({style: ['castle-friend-add-group', 'add-to-friend-button']}, "Пригласить"),),
+            DOM({style: 'castle-friend-item-bottom' }, DOM({style: ['castle-friend-add-group', 'add-to-friend-button']}, Lang.text('inviteToAFriend')),),
           ),
         );
 

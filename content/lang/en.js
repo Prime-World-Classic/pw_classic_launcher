@@ -270,6 +270,7 @@
     friendInvitesToLobby: '{nickname} invites you to party',
     friendCallFrom: 'Accept call from {name}?',
     friendDropCall: 'Drop call',
+    inviteToAFriend: 'Пригласить',
 
     //Войс
 
