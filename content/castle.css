@@ -1497,6 +1497,27 @@ body {
 
 }
 
+
+.buildingIconBox{
+  width: 100%;
+  height: 95%;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  padding-bottom: 2cqh;
+}
+.buildingIcon{
+  z-index: 1;
+  background: url(/content/img/buildings/hammerIconBackground.png) center center no-repeat;
+  background-size: cover;
+  width: 20cqh;
+  height: 20cqh;
+  filter: drop-shadow(.2cqh .2cqh 1cqh rgba(0, 0, 0, 0.701));
+  transition: .2s;
+}
+.buildingIcon:hover{
+  filter: drop-shadow(.2cqh .2cqh 1.5cqh rgb(0, 0, 0)) brightness(1.15);
+}
 .addToFriendIcon{
   border-radius: 2cqh;
   border: 1.5cqh groove #ffe27ae2;
@@ -1544,7 +1565,6 @@ body {
     background 0.3s,
     transform 0.2s;
   text-align: center;
-  transition: .2s;
   padding: 0;
 }
 

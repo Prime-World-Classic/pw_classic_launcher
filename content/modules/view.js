@@ -1441,8 +1441,10 @@ item.style.backgroundSize = 'contain, contain';
       }
 
       let buildingNameBase = DOM({ style: 'castle-item-hero-name' }, buildingName);
+      let buildingIcon = DOM({style: 'buildingIcon', src: 'content/img/buildings/hammerIcon.png', tag: 'img'},);
+      let buildingIconBox = DOM({style: 'buildingIconBox'}, buildingIcon);
 
-      let building = DOM({ style: 'castle-building-item' }, DOM({ style: ['castle-item-ornament', 'hover-brightness'] }), buildingNameBase);
+      let building = DOM({ style: 'castle-building-item' }, DOM({ style: ['castle-item-ornament', 'hover-brightness'] }), buildingNameBase, buildingIconBox);
 
       building.dataset.url = `content/img/buildings/${Castle.currentSceneName}/${item}.png`;
 
