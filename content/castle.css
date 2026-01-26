@@ -1542,10 +1542,11 @@ body {
   z-index: 1;
   background: url(/content/img/buildings/hammerIconBackground.png) center center no-repeat;
   background-size: cover;
-  width: 20cqh;
-  height: 20cqh;
+  width: 15cqh;
+  height: 15cqh;
   filter: drop-shadow(.2cqh .2cqh 1cqh rgba(0, 0, 0, 0.701));
   transition: .2s;
+  padding: 2cqh;
 }
 .buildingIcon:hover{
   filter: drop-shadow(.2cqh .2cqh 1.5cqh rgb(0, 0, 0)) brightness(1.15);
