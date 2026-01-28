@@ -222,6 +222,14 @@ export const KeybindStore = {
       },
     },
   },
+  linkedCommands: {
+    actionbar_lock_off: 'actionbar_lock_on',
+    camera_switch_attach_mode_down: 'camera_switch_attach_mode_up',
+    self_cast_on: 'self_cast_off',
+    show_statistics: 'hide_statistics',
+    cs_mouse_wheel_down: 'cs_mouse_wheel_up',
+    minimap_signal_key_down: 'minimap_signal_key_up',
+  },
   source: 'native' | 'browser',
   configPath: null,
   subscribers: [],
@@ -241,12 +249,18 @@ export const KeybindStore = {
     }
     return null;
   },
-
   setBind(command, keys, value = null) {
     const bind = this.getBind(command, value);
     if (!bind) return false;
 
     bind.keys = keys;
+    const linked = this.linkedCommands[command];
+    if (linked) {
+      const linkedBind = this.getBind(linked, value);
+      if (linkedBind) {
+        linkedBind.keys = [...keys];
+      }
+    }
     this.uiModel = this.mapFileToUiModel();
     this.notify();
     return true;
