@@ -198,9 +198,13 @@ export async function keybindings() {
     }]
   }, 'Save');
 
+  const controls = DOM({ style: 'keybindings-controls' }, saveBtn);
+
+
+
   return DOM(
     { id: 'wcastle-keybindings' },
     content,
-    saveBtn
+    controls
   );
 }
