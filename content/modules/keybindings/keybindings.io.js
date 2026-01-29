@@ -4,11 +4,26 @@ import { NativeAPI } from '../nativeApi.js';
 
 export async function findConfigFile() {
   if (NativeAPI?.status) {
-    const paths = [
-      `${NativeAPI.App.getDataPath('documents')}/My Games/Prime World Classic/input_new.cfg`,
-      `${process.env.USERPROFILE}/Documents/My Games/Prime World Classic/input_new.cfg`,
-      `${process.env.USERPROFILE}/OneDrive/Documents/My Games/Prime World Classic/input_new.cfg`,
+    const basePaths = [
+      NativeAPI.path.join(
+        NativeAPI.os.homedir(),
+        'Documents'
+      ),
+      NativeAPI.path.join(
+        NativeAPI.os.homedir(),
+        'OneDrive',
+        'Documents'
+      )
     ];
+
+    const paths = basePaths.map(base =>
+      NativeAPI.path.join(
+        base,
+        'My Games',
+        'Prime World Classic',
+        'input_new.cfg'
+      )
+    );
 
     for (const p of paths) {
       try {
@@ -20,7 +35,9 @@ export async function findConfigFile() {
 
   try {
     const r = await fetch('/content/keybindsFallback.cfg', { cache: 'no-store' });
-    if (r.ok) return { type: 'browser', path: '/content/keybindsFallback.cfg' };
+    if (r.ok) {
+      return { type: 'browser', path: '/content/keybindsFallback.cfg' };
+    }
   } catch {}
 
   return null;
@@ -30,15 +47,15 @@ export async function loadKeybinds() {
   const cfg = await findConfigFile();
   if (!cfg) return false;
 
-  let text;
+  let data;
 
   if (cfg.type === 'native') {
-    text = await NativeAPI.fs.readFile(cfg.path, 'utf8');
+    data = await NativeAPI.fs.readFile(cfg.path, 'utf8');
   } else {
-    text = await fetch(cfg.path).then(r => r.text());
+    data = await fetch(cfg.path).then(r => r.data());
   }
 
-  const binds = parseKeybindCfg(text);
+  const binds = parseKeybindCfg(data);
   
   KeybindStore.fileModel = binds;
   KeybindStore.uiModel = KeybindStore.mapFileToUiModel(binds);
@@ -54,11 +71,11 @@ export async function loadKeybinds() {
 }
 
 export async function saveKeybinds() {
-  const text = serializeCfg(KeybindStore.fileModel);
-  console.log('Saving keybinds:', text);
+  const data = serializeCfg(KeybindStore.fileModel);
+  console.log('Saving keybinds:', data);
 
   if (KeybindStore.source === 'native') {
-    await NativeAPI.fs.writeFile(KeybindStore.configPath, text);
+    await NativeAPI.fs.writeFile(KeybindStore.configPath, data);
   } else {
     localStorage.setItem('keybinds', JSON.stringify(KeybindStore.keybinds));
   }
