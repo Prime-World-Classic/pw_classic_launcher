@@ -66,27 +66,27 @@ function buildTalents(ui) {
   for (let i = 1; i <= 10; i++) {
     const cmd = `cmd_action_bar_slot${i}`;
     rows.push(createRow(
-      `Slot ${i}`,
+      Lang.text('slot').replace('{num}', i),
       createKeyInput({ command: cmd })
     ));
   }
 
   rows.push(createRow(
-    'Self cast',
+    Lang.text('selfCast'),
     createKeyInput({ command: 'self_cast_on' })
   ));
 
   rows.push(createRow(
-    'Portal',
+    Lang.text('portal'),
     createKeyInput({ command: 'cmd_portal' })
   ));
 
   rows.push(createRow(
-    'Action bar lock',
+    Lang.text('actionBarLock'),
     createKeyInput({ command: 'actionbar_lock_off' })
   ));
 
-  return createGroup('Talents', rows);
+  return createGroup(Lang.text('talents'), rows);
 }
 
 function buildAdditionalTalents() {
@@ -95,78 +95,78 @@ function buildAdditionalTalents() {
   for (let i = 11; i <= 24; i++) {
     const cmd = `cmd_action_bar_slot${i}`;
     rows.push(createRow(
-      `Slot ${i}`,
+      Lang.text('slot').replace('{num}', i),
       createKeyInput({ command: cmd })
     ));
   }
 
-  return createGroup('Additional talents', rows);
+  return createGroup(Lang.text('additionalTalents'), rows);
 }
 
 function buildSmartChat() {
   const rows = [];
 
   rows.push(createRow(
-    'Smart chat',
+    Lang.text('smartChatMenu'),
     createKeyInput({ command: 'cmd_smart_chat' })
   ));
 
   for (let i = 1; i <= 7; i++) {
     const cmd = `cmd_smart_chat_${i}`;
     rows.push(createRow(
-      `Smart chat ${i}`,
+      Lang.text(`smartChat${i}`),
       createKeyInput({ command: cmd })
     ));
   }
 
-  return createGroup('Smart chat', rows);
+  return createGroup(Lang.text('smartChat'), rows);
 }
 
 function buildFighting() {
   const map = [
-    ['Move', 'cmd_move'],
-    ['Attack', 'cmd_attack'],
-    ['Hold', 'cmd_hold'],
-    ['Health bars', 'cs_toggle_healthbars'],
+    [Lang.text('move'), 'cmd_move'],
+    [Lang.text('attack'), 'cmd_attack'],
+    [Lang.text('hold'), 'cmd_hold'],
+    [Lang.text('healthBars'), 'cs_toggle_healthbars'],
   ];
 
   const rows = map.map(([label, cmd]) =>
     createRow(label, createKeyInput({ command: cmd }))
   );
 
-  return createGroup('Fighting', rows);
+  return createGroup(Lang.text('fighting'), rows);
 }
 
 function buildWindowManagement() {
   const map = [
-    ['Show statistics', 'show_statistics'],
-    ['Character', 'show_charstat'],
-    ['Inventory', 'show_inventory'],
-    ['Talents', 'show_talents'],
+    [Lang.text('showStatistics'), 'show_statistics'],
+    [Lang.text('character'), 'show_charstat'],
+    [Lang.text('inventory'), 'show_inventory'],
+    [Lang.text('talents'), 'show_talents'],
   ];
 
   const rows = map.map(([label, cmd]) =>
     createRow(label, createKeyInput({ command: cmd }))
   );
 
-  return createGroup('Window management', rows);
+  return createGroup(Lang.text('windowManagement'), rows);
 }
 
 function buildCamera() {
   const rows = [];
 
   rows.push(createRow(
-    'Camera mode',
+    Lang.text('cameraMode'),
     createKeyInput({ command: 'camera_switch_attach_mode_down' })
   ));
 
   const numeric = [
-    ['Forward +', 'camera_forward', '+1.0'],
-    ['Forward -', 'camera_forward', '-1.0'],
-    ['Strafe +', 'camera_strafe', '+1.0'],
-    ['Strafe -', 'camera_strafe', '-1.0'],
-    ['Rotate +', 'camera_rotate', '+1.0'],
-    ['Rotate -', 'camera_rotate', '-1.0'],
+    [Lang.text('forwardPlus'), 'camera_forward', '+1.0'],
+    [Lang.text('forwardMinus'), 'camera_forward', '-1.0'],
+    [Lang.text('strafePlus'), 'camera_strafe', '+1.0'],
+    [Lang.text('strafeMinus'), 'camera_strafe', '-1.0'],
+    [Lang.text('turnPlus'), 'camera_rotate', '+1.0'],
+    [Lang.text('turnMinus'), 'camera_rotate', '-1.0'],
   ];
 
   for (const [label, cmd, value] of numeric) {
@@ -176,13 +176,13 @@ function buildCamera() {
     ));
   }
 
-  return createGroup('Camera', rows);
+  return createGroup(Lang.text('camera'), rows);
 }
 
 
 export async function keybindings() {
   const ok = await loadKeybinds();
-  if (!ok) return DOM({}, 'Config not found');
+  if (!ok) return DOM({}, Lang.text('settingsReadError'));
 
   const content = DOM(
     { style: 'keybindings-wrapper' },
@@ -201,7 +201,7 @@ export async function keybindings() {
     event: ['click', async () => {
       await saveKeybinds();
     }]
-  }, 'Save');
+  }, Lang.text('save'));
 
   const controls = DOM({ style: 'keybindings-controls' }, saveBtn);
 

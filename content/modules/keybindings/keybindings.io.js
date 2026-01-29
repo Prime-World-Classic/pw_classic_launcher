@@ -1,3 +1,4 @@
+import { DOM } from '../dom.js';
 import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
@@ -40,6 +41,7 @@ export async function findConfigFile() {
     }
   } catch {}
 
+
   return null;
 }
 
@@ -52,7 +54,7 @@ export async function loadKeybinds() {
   if (cfg.type === 'native') {
     data = await NativeAPI.fs.readFile(cfg.path, 'utf8');
   } else {
-    data = await fetch(cfg.path).then(r => r.data());
+    data = await fetch(cfg.path).then(r => r.text());
   }
 
   const binds = parseKeybindCfg(data);
@@ -77,6 +79,13 @@ export async function saveKeybinds() {
   if (KeybindStore.source === 'native') {
     await NativeAPI.fs.writeFile(KeybindStore.configPath, data);
   } else {
-    localStorage.setItem('keybinds', JSON.stringify(KeybindStore.keybinds));
+    const blob = new Blob([data], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = DOM({tag: 'a', href: url, download: 'input_new.cfg', event: ['click', () => {
+      a.remove();
+      url.revokeObjectURL(url);
+    }]});
+    document.body.appendChild(a);
+    a.click();
   }
 }

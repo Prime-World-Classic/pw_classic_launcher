@@ -3969,6 +3969,7 @@ button.build-action-item:hover {
   justify-content: space-between;
   width: 100%;
   margin: 0 0;
+  font-size: 3cqh;
 }
 
 .keybinding-label {
@@ -3980,6 +3981,7 @@ button.build-action-item:hover {
 }
 
 .castle-keybinding-input {
+  flex-shrink: 0;
   width: 30%;
   height: 4cqh;
   text-align: center;
