@@ -32,6 +32,29 @@ export async function findConfigFile() {
         return { type: 'native', path: p };
       } catch {}
     }
+
+    const targetPath = paths[0];
+    const targetDir = NativeAPI.path.dirname(targetPath);
+
+    try {
+      await NativeAPI.fs.mkdir(targetDir, { recursive: true });
+
+      const r = await fetch('/content/keybindsFallback.cfg', { cache: 'no-store' });
+      if (!r.ok) throw new Error();
+
+      const data = await r.text();
+
+      await NativeAPI.fs.writeFile(targetPath, data, {
+        encoding: 'utf8',
+        flag: 'wx'
+      });
+
+      return { type: 'native', path: targetPath };
+    } catch (e) {
+      if (e.code === 'EEXIST') {
+        return { type: 'native', path: targetPath };
+      }
+    }
   }
 
   try {
@@ -40,7 +63,6 @@ export async function findConfigFile() {
       return { type: 'browser', path: '/content/keybindsFallback.cfg' };
     }
   } catch {}
-
 
   return null;
 }
