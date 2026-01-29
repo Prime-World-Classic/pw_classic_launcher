@@ -26,6 +26,11 @@ function createKeyInput({ command, value = null }) {
     e.preventDefault();
     e.stopPropagation();
 
+    if (e.key === 'Escape' || e.key === 'Enter') {
+      input.blur();
+      return;
+    };
+
     const keys = normalizeKey(e);
     KeybindStore.setBind(command, keys, value);
   });
