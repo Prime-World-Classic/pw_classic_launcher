@@ -1452,8 +1452,16 @@ item.style.backgroundSize = 'contain, contain';
       building.dataset.buildingId = i;
 
       building.addEventListener('click', async () => {
-        Castle.phantomBuilding.id = building.dataset.buildingId;
-      });
+  // Сначала удаляем класс selectedBuild со всех зданий
+  document.querySelectorAll('.castle-building-item').forEach(item => {
+    item.classList.remove('selectedBuild');
+  });
+  
+  // Затем устанавливаем ID выбранного здания и добавляем класс
+  Castle.phantomBuilding.id = building.dataset.buildingId;
+  building.classList.add('selectedBuild');
+});
+
 
       preload.add(building);
     }
