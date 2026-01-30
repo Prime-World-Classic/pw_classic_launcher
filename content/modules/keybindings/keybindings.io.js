@@ -1,4 +1,4 @@
-import { DOM } from '../dom.js';
+import { normalizeFileModel } from './keybindings.schema.js';
 import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
@@ -33,7 +33,6 @@ async function createDefaultConfigFile(targetPath) {
 
     console.log('Default config file created at', targetPath);
     return true;
-
   } catch (e) {
     if (e.code === 'EEXIST') {
       return true;
@@ -90,17 +89,18 @@ export async function loadKeybinds() {
     data = await fetch(cfg.path).then((r) => r.text());
   }
 
-  const binds = parseKeybindCfg(data);
+  const parsed = parseKeybindCfg(data);
+  const schema = createEmptyFileModel();
 
-  KeybindStore.fileModel = binds;
-  KeybindStore.uiModel = KeybindStore.mapFileToUiModel(binds);
+  KeybindStore.fileModel = normalizeFileModel(schema, parsed);
+  KeybindStore.uiModel = KeybindStore.mapFileToUiModel(KeybindStore.fileModel);
+  KeybindStore.source = cfg.type;
+  KeybindStore.configPath = cfg.path;
+
+  KeybindStore.notify();
 
   console.log(KeybindStore.uiModel);
-
-  // KeybindStore.setAll(binds);
-  KeybindStore.source = cfg.type;
   console.log('Keybinds loaded from', cfg.type, cfg.path);
-  KeybindStore.configPath = cfg.path;
 
   return true;
 }

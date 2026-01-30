@@ -143,3 +143,18 @@ export function serializeCfg(fileModel) {
 
   return out;
 }
+
+export function findParsedBind(parsedModel, command, value, negated) {
+  for (const section of parsedModel.sections) {
+    for (const bind of section.binds) {
+      if (
+        bind.command === command &&
+        bind.value === value &&
+        bind.negated === negated
+      ) {
+        return bind;
+      }
+    }
+  }
+  return null;
+}
