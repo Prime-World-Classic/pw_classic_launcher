@@ -1,14 +1,16 @@
+import { DOM } from '../dom.js';
 import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
-import { App } from '../app.js';
-import { Lang } from '../lang.js';
 
 export async function findConfigFile() {
   if (NativeAPI?.status) {
+    console.log('NativeAPI.fileSystem.promises:', NativeAPI.fileSystem.promises);
+    console.log('NativeAPI.path:', NativeAPI.path);
     console.log('Searching for native config file...');
     const basePaths = [
       NativeAPI.path.join(NativeAPI.os.homedir(), 'Documents'),
+      NativeAPI.path.join(NativeAPI.os.homedir(), 'OneDrive', 'Documents'),
     ];
 
     const paths = basePaths.map((base) => NativeAPI.path.join(base, 'My Games', 'Prime World Classic', 'input_new.cfg'));
@@ -17,9 +19,9 @@ export async function findConfigFile() {
       try {
         await NativeAPI.fileSystem.promises.access(p);
         return { type: 'native', path: p };
-      } catch (e) {
+      } catch {
         // File does not exist
-        console.warn('Config file not found at', p);
+        console.log('Config file not found at', p);
       }
     }
 
@@ -28,6 +30,7 @@ export async function findConfigFile() {
 
     try {
       console.log('Creating default config file at', targetPath);
+
       await NativeAPI.fileSystem.promises.mkdir(targetDir, { recursive: true });
 
       const r = await fetch('/content/keybindsFallback.cfg', { cache: 'no-store' });
@@ -88,26 +91,17 @@ export async function loadKeybinds() {
 export async function saveKeybinds() {
   const data = serializeCfg(KeybindStore.fileModel);
   console.log('Saving keybinds:', data);
-  
 
-  let saved = false;
   if (KeybindStore.source === 'native') {
-    console.log('Saving to native config file at', KeybindStore.configPath);
-    saved = await NativeAPI.fileSystem.promises.writeFile(KeybindStore.configPath, data).then(() => true).catch(() => false);
+    await NativeAPI.fileSystem.promises.writeFile(KeybindStore.configPath, data);
   } else {
     const handle = await window.showSaveFilePicker({
       suggestedName: 'input_new.cfg',
       types: [{ description: 'Config', accept: { 'text/plain': ['.cfg'] } }],
     });
-    const writable = await handle.createWritable();
-    saved = await writable.write(data).then(() => true).catch(() => false);
-    await writable.close();
-  }
 
-  if (saved) {
-    App.notify(Lang.text('savedKeybindings'));
-  }
-  else {
-    App.error(Lang.text('errorKeybindings'));
+    const writable = await handle.createWritable();
+    await writable.write(data);
+    await writable.close();
   }
 }

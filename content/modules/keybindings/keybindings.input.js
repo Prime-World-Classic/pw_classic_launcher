@@ -28,8 +28,8 @@ const CODE_MAP = {
   Insert: 'INSERT',
   Home: 'HOME',
   End: 'END',
-  PageUp: 'PAGE_UP',
-  PageDown: 'PAGE_DOWN',
+  PageUp: 'PG_UP',
+  PageDown: 'PG_DOWN',
   Backquote: '`',
 
   /* Function */
