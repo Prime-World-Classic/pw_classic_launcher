@@ -3,60 +3,77 @@ import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
 
-export async function findConfigFile() {
-  if (NativeAPI?.status) {
-    console.log('NativeAPI.fileSystem.promises:', NativeAPI.fileSystem.promises);
-    console.log('NativeAPI.path:', NativeAPI.path);
-    console.log('Searching for native config file...');
-    const basePaths = [
-      NativeAPI.path.join(NativeAPI.os.homedir(), 'Documents'),
-      NativeAPI.path.join(NativeAPI.os.homedir(), 'OneDrive', 'Documents'),
-    ];
+async function createDefaultConfigFile(targetPath) {
+  if (!NativeAPI.status) return false;
 
-    const paths = basePaths.map((base) => NativeAPI.path.join(base, 'My Games', 'Prime World Classic', 'input_new.cfg'));
+  const targetDir = NativeAPI.path.dirname(targetPath);
 
-    for (const p of paths) {
-      try {
-        await NativeAPI.fileSystem.promises.access(p);
-        return { type: 'native', path: p };
-      } catch {
-        // File does not exist
-        console.log('Config file not found at', p);
-      }
+  try {
+    console.log('Creating default config file at', targetPath);
+
+    await NativeAPI.fileSystem.promises.mkdir(targetDir, {
+      recursive: true,
+    });
+
+    const r = await fetch('/content/keybindsFallback.cfg', {
+      cache: 'no-store',
+    });
+
+    if (!r.ok) {
+      console.error('Failed to fetch fallback config');
+      return false;
     }
 
-    const targetPath = paths[0];
-    const targetDir = NativeAPI.path.dirname(targetPath);
+    const data = await r.text();
+
+    await NativeAPI.fileSystem.promises.writeFile(targetPath, data, {
+      encoding: 'utf8',
+      flag: 'wx',
+    });
+
+    console.log('Default config file created at', targetPath);
+    return true;
+
+  } catch (e) {
+    if (e.code === 'EEXIST') {
+      return true;
+    }
+
+    console.error('Failed to create default config file:', e);
+    return false;
+  }
+}
+
+export async function findConfigFile() {
+  if (NativeAPI.status) {
+    console.log('Searching for native config file...');
+    const documentsPath = NativeAPI.getDocumentsDir();
+    const configPath = NativeAPI.path.join(documentsPath, 'My Games', 'Prime World Classic', 'input_new.cfg');
 
     try {
-      console.log('Creating default config file at', targetPath);
-
-      await NativeAPI.fileSystem.promises.mkdir(targetDir, { recursive: true });
-
-      const r = await fetch('/content/keybindsFallback.cfg', { cache: 'no-store' });
-      if (r.ok) {
-        const data = await r.text();
-        await NativeAPI.fileSystem.promises.writeFile(targetPath, data, {
-          encoding: 'utf8',
-          flag: 'wx',
-        });
-        console.log('Default config file created at', targetPath);
-        return { type: 'native', path: targetPath };
-      }
+      await NativeAPI.fileSystem.promises.access(configPath);
+      console.log('Found native config file at', configPath);
+      return { type: 'native', path: configPath };
     } catch (e) {
-      if (e.code === 'EEXIST') {
-        return { type: 'native', path: targetPath };
+      if (e.code === 'ENOENT') {
+        console.log('Native config file not found at', configPath);
+        const created = await createDefaultConfigFile(configPath);
+        if (created) {
+          return { type: 'native', path: configPath };
+        }
       }
-      console.error('Failed to create default config file:', e);
+      console.error('Failed to access native config file:', e);
     }
   }
-
+  console.log('Searching for browser config file...');
   try {
     const r = await fetch('/content/keybindsFallback.cfg', { cache: 'no-store' });
     if (r.ok) {
       return { type: 'browser', path: '/content/keybindsFallback.cfg' };
     }
-  } catch {}
+  } catch (e) {
+    console.error('Failed to fetch browser config file:', e);
+  }
 
   return null;
 }

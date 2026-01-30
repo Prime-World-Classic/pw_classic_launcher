@@ -3,6 +3,7 @@ import { Voice } from './voice.js';
 import { PWGame } from './pwgame.js';
 import { Settings } from './settings.js';
 import { Lang } from './lang.js';
+import { b } from 'vitest/dist/chunks/suite.d.FvehnV49.js';
 
 export class NativeAPI {
   static status = false;
@@ -13,7 +14,7 @@ export class NativeAPI {
   static updated = false;
   static curLabel;
   static lastBranchV = null;
-  
+
   static testbridgelog = new Array();
 
   static modules = {
@@ -485,16 +486,31 @@ export class NativeAPI {
       App.OpenExternalLink(url);
     }
   }
-  
-  static async bridge(data){
-	  
-	  NativeAPI.testbridgelog.push(`${data} | ${new Date().toLocaleString()}`);
-	  
-	  await NativeAPI.fileSystem.promises.writeFile(PWGame.PATH_LUA_BRIDGE,data);
-	  
-	  
-	  await NativeAPI.fileSystem.promises.writeFile('../Game/Bin/bridgelog',NativeAPI.testbridgelog.join("\n"));
-	  
+
+  static async bridge(data) {
+    NativeAPI.testbridgelog.push(`${data} | ${new Date().toLocaleString()}`);
+
+    await NativeAPI.fileSystem.promises.writeFile(PWGame.PATH_LUA_BRIDGE, data);
+
+    await NativeAPI.fileSystem.promises.writeFile('../Game/Bin/bridgelog', NativeAPI.testbridgelog.join('\n'));
   }
-  
+
+  static getDocumentsDir() {
+    switch (NativeAPI.platform) {
+      case 'win32':
+        return NativeAPI.childProcess
+          .execSync('powershell', ['-NoProfile', '-Command', "[Environment]::GetFolderPath('MyDocuments')"], { encoding: 'utf-8' })
+          .trim();
+      case 'linux':
+        try {
+          const dir = NativeAPI.childProcess.execSync('xdg-user-dir', ['DOCUMENTS'], { encoding: 'utf-8' }).trim();
+          if (dir) {
+            return dir;
+          }
+        } catch {}
+        // No break to fallithrough to default
+      default:
+        return NativeAPI.path.join(NativeAPI.os.homedir(), 'Documents');
+    }
+  }
 }
