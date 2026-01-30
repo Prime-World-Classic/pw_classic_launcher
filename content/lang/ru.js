@@ -273,6 +273,7 @@
     friendCallFrom: 'Принять звонок от {name}?',
     friendDropCall: 'Сбросить',
     inviteToAFriend: 'Пригласить',
+    kristallik: 'qwe',
 
     //Войс
     enableMic: 'Нажмите Ctrl+Z или на свой Ник, чтобы включить: {Voice.mic.label}',

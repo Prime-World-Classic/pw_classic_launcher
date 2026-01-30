@@ -63,6 +63,7 @@ export class View {
 
   static castleTotalCrystal = DOM({ tag: 'div', style: ['question-icon'] }, DOM({ style: 'quest-counter' }, ''));
 
+
   static setCss(name = 'content/style.css') {
     let css = DOM({ tag: 'link', rel: 'stylesheet', href: name });
 
