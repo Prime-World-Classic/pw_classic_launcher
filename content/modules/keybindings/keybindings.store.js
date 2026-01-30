@@ -37,8 +37,10 @@ export const KeybindStore = {
   configPath: null,
   subscribers: [],
 
-  init(fileModel) {
+  init(fileModel, source = 'native', configPath = null) {
     this.fileModel = fileModel;
+    this.source = source;
+    this.configPath = configPath;
     this.uiModel = this.mapFileToUiModel();
     this.notify();
   },

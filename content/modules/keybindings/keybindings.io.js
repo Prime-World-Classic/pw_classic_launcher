@@ -93,11 +93,7 @@ export async function loadKeybinds() {
   const parsed = parseKeybindCfg(data);
   const schema = createEmptyFileModel();
 
-  KeybindStore.fileModel = normalizeFileModel(schema, parsed);
-  KeybindStore.uiModel = KeybindStore.mapFileToUiModel(KeybindStore.fileModel);
-  KeybindStore.source = cfg.type;
-  KeybindStore.configPath = cfg.path;
-
+  KeybindStore.init(normalizeFileModel(schema, parsed), cfg.type, cfg.path);
   KeybindStore.notify();
 
   console.log(KeybindStore.uiModel);
