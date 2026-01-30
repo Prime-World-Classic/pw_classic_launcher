@@ -59,7 +59,7 @@ export function normalizeKey(e) {
 
   let main = CODE_MAP[e.code];
 
-  if (!main || main == 'BACKSPACE') return keys; 
+  if (!main || main == 'BACKSPACE') main = ''; 
 
   keys.push(main);
   return keys;
