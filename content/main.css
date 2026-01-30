@@ -3886,10 +3886,11 @@ button.build-action-item:hover {
   align-items: center;
   width: 100%;
   border-top: 0.1cqh solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 -0.2cqh 1cqh rgba(0, 0, 0, 0.3);
 }
 
 .keybindings-wrapper {
-  width: 100%;
+  width: calc(100% - 1cqh);
   height: 100%;
   display: flex;
   flex-direction: column;
