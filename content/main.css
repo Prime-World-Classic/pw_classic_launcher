@@ -3901,7 +3901,6 @@ button.build-action-item:hover {
   margin-right: 1cqh;
 }
 
-
 .keybindings-wrapper::-webkit-scrollbar {
   height: 100%;
   width: 3.5cqh;
@@ -3922,7 +3921,7 @@ button.build-action-item:hover {
   box-shadow: 0px 0.5cqh 1cqh 0px rgba(0, 0, 0, 0.2);
 }
 
-.keybindings-wrapper::-webkit-scrollbar-button{
+.keybindings-wrapper::-webkit-scrollbar-button {
   display: none;
 }
 
@@ -3930,9 +3929,8 @@ button.build-action-item:hover {
   display: block;
   background-size: 80% 60%;
   background-repeat: no-repeat;
-  
-  height: auto;
 
+  height: auto;
 }
 
 .keybindings-wrapper::-webkit-scrollbar-button:single-button:vertical:decrement {
@@ -3994,25 +3992,25 @@ button.build-action-item:hover {
   color: #ffe5b7;
   transition: all 0.2s;
   text-shadow:
-    -0.25cqh -0.25cqh 0 #612e0c,
-    0.25cqh -0.25cqh 0 #612e0c,
-    -0.25cqh 0.25cqh 0 #612e0c,
-    0.25cqh 0.25cqh 0 #612e0c;
+    -1px -1px 0 #612e0c,
+    1px -1px 0 #612e0c,
+    -1px 1px 0 #612e0c,
+    1px 1px 0 #612e0c;
 }
 
 .keybinding-group-title {
   font: 5cqw / 1.2 Tahoma;
   color: #ffe5b7;
   text-shadow:
-    -0.25cqh -0.25cqh 0 #612e0c,
-    0.25cqh -0.25cqh 0 #612e0c,
-    -0.25cqh 0.25cqh 0 #612e0c,
-    0.25cqh 0.25cqh 0 #612e0c;
+    -1px -1px 0 #612e0c,
+    1px -1px 0 #612e0c,
+    -1px 1px 0 #612e0c,
+    1px 1px 0 #612e0c;
   margin: 0;
   text-align: left;
   position: relative;
   padding: 1.5cqh 3cqh;
-  background: linear-gradient(90deg,rgba(0, 0, 0, 0.2) 1%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1%, rgba(255, 255, 255, 0) 100%);
 }
 
 #wcastle-keybindings {
@@ -4042,10 +4040,10 @@ button.build-action-item:hover {
   justify-content: center;
   color: #ffe5b7;
   text-shadow:
-    -0.1cqh -0.1cqh 0 #333333,
-    0.1cqh -0.1cqh 0 #333333,
-    -0.1cqh 0.1cqh 0 #333333,
-    0.1cqh 0.1cqh 0 #333333;
+    -1px 1px 0 #333333,
+    1px -1px 0 #333333,
+    -1px -1px 0 #333333,
+    1px 1px 0 #333333;
   transition: background-color 0.3s ease-in-out;
 }
 
