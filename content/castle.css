@@ -1622,7 +1622,7 @@ body {
   filter: brightness(.85);
   background-size: contain;
   border-radius: 0.3vw;
-  color: white;
+  color: rgb(251, 234, 203);
   font: 10cqh / 1 Tahoma;
   padding: 1.5cqh 5cqh;
   white-space: nowrap;
@@ -1641,8 +1641,9 @@ body {
   background: url('/content/hero/button-red.png') center center no-repeat;
   background-size: contain;
   filter: brightness(.85);
-  color: white;
+  color: rgb(251, 234, 203);
   font: 10cqh / 1.2 Tahoma;
+  text-align: center;
   padding: 1cqh 5cqh;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
