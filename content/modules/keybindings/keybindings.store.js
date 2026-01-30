@@ -1,4 +1,4 @@
-import { createUiSchema, createFileSchema } from './keybindings.uiSchema.js';
+import { createUiSchema, createFileSchema } from './keybindings.schema.js';
 /**
  * KeybindStore: manages keybindings for the application,
  * observer pattern implementation
@@ -78,6 +78,10 @@ export const KeybindStore = {
 
   subscribe(fn) {
     this.subscribers.push(fn);
+    const unsubscribeFunc = () => {
+      this.subscribers = this.subscribers.filter((f) => f !== fn);
+    };
+    return unsubscribeFunc;
   },
 
   mapFileToUiModel(fileModel = this.fileModel) {

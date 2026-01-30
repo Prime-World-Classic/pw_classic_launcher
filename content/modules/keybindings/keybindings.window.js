@@ -5,6 +5,7 @@ import { KeybindStore } from './keybindings.store.js';
 import { loadKeybinds, saveKeybinds } from './keybindings.io.js';
 import { normalizeKey } from './keybindings.input.js';
 
+const unsubscribers = [];
 
 function formatKeys(keys) {
   return keys && keys.length ? keys.join(' + ') : '';
@@ -35,7 +36,7 @@ function createKeyInput({ command, value = null }) {
     KeybindStore.setBind(command, keys, value);
   });
 
-  KeybindStore.subscribe(refresh);
+  unsubscribers.push(KeybindStore.subscribe(refresh));
   refresh();
 
   return input;
@@ -205,11 +206,17 @@ export async function keybindings() {
 
   const controls = DOM({ style: 'keybindings-controls' }, saveBtn);
 
-
-
-  return DOM(
+  const root = DOM(
     { id: 'wcastle-keybindings' },
     content,
     controls
-  );
+  )
+
+  root.cleanup = () => {
+    unsubscribers.forEach(fn => fn());
+    unsubscribers.length = 0;
+  }
+
+  return root;
 }
+
