@@ -344,7 +344,7 @@ body {
   white-space: pre;
   text-wrap: balance;
   text-align: center;
-  content: var(--kristallik, 'кристалик');
+  /* content: var(--kristallik, 'кристалик'); */
   font-size: 15cqh;
   z-index: 6;
   translate: 0 100cqh;
