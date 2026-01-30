@@ -2,6 +2,7 @@ import { normalizeFileModel } from './keybindings.schema.js';
 import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
 import { NativeAPI } from '../nativeApi.js';
+import { createEmptyFileModel } from './keybindings.schema.js';
 
 async function createDefaultConfigFile(targetPath) {
   if (!NativeAPI.status) return false;

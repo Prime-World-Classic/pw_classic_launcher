@@ -1,4 +1,4 @@
-import { createUiSchema, createFileSchema } from './keybindings.schema.js';
+import { createEmptyUiModel } from './keybindings.schema.js';
 /**
  * KeybindStore: manages keybindings for the application,
  * observer pattern implementation
@@ -85,7 +85,7 @@ export const KeybindStore = {
   },
 
   mapFileToUiModel(fileModel = this.fileModel) {
-    const ui = createUiSchema();
+    const ui = createEmptyUiModel();
 
     for (const section of fileModel.sections) {
       for (const bind of section.binds) {

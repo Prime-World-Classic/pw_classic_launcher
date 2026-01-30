@@ -3,7 +3,6 @@ import { Voice } from './voice.js';
 import { PWGame } from './pwgame.js';
 import { Settings } from './settings.js';
 import { Lang } from './lang.js';
-import { b } from 'vitest/dist/chunks/suite.d.FvehnV49.js';
 
 export class NativeAPI {
   static status = false;
