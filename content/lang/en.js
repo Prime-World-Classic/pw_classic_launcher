@@ -477,6 +477,8 @@
     savedKeybindings: 'Keybindings saved',
     errorKeybindings: 'Error saving keybindings',
 
+    discardChanges: 'Cancel',
+
     frame_hint: 'The frame will be active when the hero has 25+ wins',
 
     frame_0: 'No frame',

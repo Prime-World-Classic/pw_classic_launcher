@@ -468,6 +468,7 @@
 
     savedKeybindings: 'Клавиши сохранены',
     errorKeybindings: 'Ошибка сохранения клавиш',
+    discardChanges: 'Отменить',
 
     frame_hint: 'Рамка активируется, когда у героя будет 25+ побед',
 

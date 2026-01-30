@@ -30,7 +30,7 @@ function createKeyInput({ command, value = null }) {
     if (e.key === 'Escape' || e.key === 'Enter') {
       input.blur();
       return;
-    };
+    }
 
     const keys = normalizeKey(e);
     KeybindStore.setBind(command, keys, value);
@@ -43,49 +43,30 @@ function createKeyInput({ command, value = null }) {
 }
 
 function createRow(label, inputEl) {
-  return DOM(
-    { style: 'keybinding-row' },
-    DOM({}, label),
-    inputEl
-  );
+  return DOM({ style: 'keybinding-row' }, DOM({}, label), inputEl);
 }
 
 function createGroup(title, rows) {
   return DOM(
     { style: 'keybinding-group' },
     DOM({ tag: 'h3', style: 'keybinding-group-title' }, title),
-    DOM({ style: 'keybinding-group-rows' },
-      ...rows
-    ),
+    DOM({ style: 'keybinding-group-rows' }, ...rows),
   );
 }
-
 
 function buildTalents(ui) {
   const rows = [];
 
   for (let i = 1; i <= 10; i++) {
     const cmd = `cmd_action_bar_slot${i}`;
-    rows.push(createRow(
-      Lang.text('slot').replace('{num}', i),
-      createKeyInput({ command: cmd })
-    ));
+    rows.push(createRow(Lang.text('slot').replace('{num}', i), createKeyInput({ command: cmd })));
   }
 
-  rows.push(createRow(
-    Lang.text('selfCast'),
-    createKeyInput({ command: 'self_cast_on' })
-  ));
+  rows.push(createRow(Lang.text('selfCast'), createKeyInput({ command: 'self_cast_on' })));
 
-  rows.push(createRow(
-    Lang.text('portal'),
-    createKeyInput({ command: 'cmd_portal' })
-  ));
+  rows.push(createRow(Lang.text('portal'), createKeyInput({ command: 'cmd_portal' })));
 
-  rows.push(createRow(
-    Lang.text('actionBarLock'),
-    createKeyInput({ command: 'actionbar_lock_off' })
-  ));
+  rows.push(createRow(Lang.text('actionBarLock'), createKeyInput({ command: 'actionbar_lock_off' })));
 
   return createGroup(Lang.text('talents'), rows);
 }
@@ -95,10 +76,7 @@ function buildAdditionalTalents() {
 
   for (let i = 11; i <= 24; i++) {
     const cmd = `cmd_action_bar_slot${i}`;
-    rows.push(createRow(
-      Lang.text('slot').replace('{num}', i),
-      createKeyInput({ command: cmd })
-    ));
+    rows.push(createRow(Lang.text('slot').replace('{num}', i), createKeyInput({ command: cmd })));
   }
 
   return createGroup(Lang.text('additionalTalents'), rows);
@@ -107,17 +85,11 @@ function buildAdditionalTalents() {
 function buildSmartChat() {
   const rows = [];
 
-  rows.push(createRow(
-    Lang.text('smartChatMenu'),
-    createKeyInput({ command: 'cmd_smart_chat' })
-  ));
+  rows.push(createRow(Lang.text('smartChatMenu'), createKeyInput({ command: 'cmd_smart_chat' })));
 
   for (let i = 1; i <= 7; i++) {
     const cmd = `cmd_smart_chat_${i}`;
-    rows.push(createRow(
-      Lang.text(`smartChat${i}`),
-      createKeyInput({ command: cmd })
-    ));
+    rows.push(createRow(Lang.text(`smartChat${i}`), createKeyInput({ command: cmd })));
   }
 
   return createGroup(Lang.text('smartChat'), rows);
@@ -131,9 +103,7 @@ function buildFighting() {
     [Lang.text('healthBars'), 'cs_toggle_healthbars'],
   ];
 
-  const rows = map.map(([label, cmd]) =>
-    createRow(label, createKeyInput({ command: cmd }))
-  );
+  const rows = map.map(([label, cmd]) => createRow(label, createKeyInput({ command: cmd })));
 
   return createGroup(Lang.text('fighting'), rows);
 }
@@ -146,9 +116,7 @@ function buildWindowManagement() {
     [Lang.text('talents'), 'show_talents'],
   ];
 
-  const rows = map.map(([label, cmd]) =>
-    createRow(label, createKeyInput({ command: cmd }))
-  );
+  const rows = map.map(([label, cmd]) => createRow(label, createKeyInput({ command: cmd })));
 
   return createGroup(Lang.text('windowManagement'), rows);
 }
@@ -156,10 +124,7 @@ function buildWindowManagement() {
 function buildCamera() {
   const rows = [];
 
-  rows.push(createRow(
-    Lang.text('cameraMode'),
-    createKeyInput({ command: 'camera_switch_attach_mode_down' })
-  ));
+  rows.push(createRow(Lang.text('cameraMode'), createKeyInput({ command: 'camera_switch_attach_mode_down' })));
 
   const numeric = [
     [Lang.text('forwardPlus'), 'camera_forward', '+1.0'],
@@ -171,15 +136,11 @@ function buildCamera() {
   ];
 
   for (const [label, cmd, value] of numeric) {
-    rows.push(createRow(
-      label,
-      createKeyInput({ command: cmd, value })
-    ));
+    rows.push(createRow(label, createKeyInput({ command: cmd, value })));
   }
 
   return createGroup(Lang.text('camera'), rows);
 }
-
 
 export async function keybindings() {
   const ok = await loadKeybinds();
@@ -193,30 +154,45 @@ export async function keybindings() {
     buildSmartChat(),
     buildFighting(),
     buildWindowManagement(),
-    buildCamera()
+    buildCamera(),
   );
 
-  const saveBtn = DOM({
-    domaudio: domAudioPresets.bigButton,
-    style: 'castle-menu-item-button',
-    event: ['click', async () => {
-      await saveKeybinds();
-    }]
-  }, Lang.text('save'));
+  const saveBtn = DOM(
+    {
+      domaudio: domAudioPresets.bigButton,
+      style: ['castle-menu-item-button', 'castle-menu-item-button--small'],
+      event: [
+        'click',
+        async () => {
+          await saveKeybinds();
+        },
+      ],
+    },
+    Lang.text('save'),
+  );
 
-  const controls = DOM({ style: 'keybindings-controls' }, saveBtn);
+  const discardBtn = DOM(
+    {
+      domaudio: domAudioPresets.bigButton,
+      style: ['castle-menu-item-button', 'castle-menu-item-button--small', 'castle-menu-item-button--red'],
+      event: [
+        'click',
+        () => {
+          root.requestClose?.();
+        },
+      ],
+    },
+    Lang.text('discardChanges'),
+  );
 
-  const root = DOM(
-    { id: 'wcastle-keybindings' },
-    content,
-    controls
-  )
+  const controls = DOM({ style: 'keybindings-controls' }, saveBtn, discardBtn);
+
+  const root = DOM({ id: 'wcastle-keybindings' }, content, controls);
 
   root.cleanup = () => {
-    unsubscribers.forEach(fn => fn());
+    unsubscribers.forEach((fn) => fn());
     unsubscribers.length = 0;
-  }
+  };
 
   return root;
 }
-

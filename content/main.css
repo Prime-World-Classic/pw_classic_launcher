@@ -3882,7 +3882,7 @@ button.build-action-item:hover {
 
 .keybindings-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
   border-top: 0.1cqh solid rgba(255, 255, 255, 0.2);
@@ -4393,6 +4393,24 @@ i-success {
     rgba(66, 71, 73, 0.8)
   );
   position: relative;
+}
+
+.castle-menu-item-button--small {
+  width: 30cqw;
+  height: 4cqw;
+  font: 4cqw / 1 Tahoma;
+  padding: 1.5cqw 2cqw;
+}
+
+.castle-menu-item-button--red {
+  background-image: linear-gradient(
+    to bottom,
+    #927960,
+    #3b0f02,
+    #3b0f02,
+    #381001
+  );
+  color: #f0c9b3;
 }
 
 .castle-menu-label {

@@ -28,6 +28,9 @@ export class Window {
       return;
     }
     let template = await Window[method](value, value2, value3);
+    template.requestClose = () => {
+      Window.close(category);
+    };
     let closeButton = DOM(
       {
         domaudio: domAudioPresets.closeButton,
