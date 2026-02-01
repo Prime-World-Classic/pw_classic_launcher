@@ -6,22 +6,22 @@ export function createEmptyFileModel() {
       {
         name: null,
         binds: [
-          { type: 'bind', command: 'console_prevcommand', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_nextcommand', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_scrollup', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_scrolldown', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_charleft', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_charright', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_home', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_end', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_runcommand', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_runcommand', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_autocomplete', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_clear', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'console_eraselastchar', value: null, negated: false, keys: [''] },
-          { type: 'bind_command', command: 'toggle_fps', value: null, negated: false, keys: [''] },
-          { type: 'bind_command', command: 'screenshot .jpg', value: null, negated: false, keys: [''] },
-          { type: 'bind_command', command: 'screenshot .png', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'console_prevcommand', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_nextcommand', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_scrollup', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_scrolldown', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_charleft', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_charright', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_home', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_end', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_runcommand', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_runcommand', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_autocomplete', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_clear', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'console_eraselastchar', value: null, negated: false, keys: null },
+          { type: 'bind_command', command: 'toggle_fps', value: null, negated: false, keys: null },
+          { type: 'bind_command', command: 'screenshot .jpg', value: null, negated: false, keys: null },
+          { type: 'bind_command', command: 'screenshot .png', value: null, negated: false, keys: null },
         ],
       },
 
@@ -29,9 +29,9 @@ export function createEmptyFileModel() {
       {
         name: 'adventure_screen',
         binds: [
-          { type: 'bind', command: 'cmd_move', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_attack', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_hold', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'cmd_move', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_attack', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_hold', value: null, negated: false, keys: null },
 
           // slots 1–24
           ...Array.from({ length: 24 }, (_, i) => ({
@@ -39,29 +39,29 @@ export function createEmptyFileModel() {
             command: `cmd_action_bar_slot${i + 1}`,
             value: null,
             negated: false,
-            keys: [''],
+            keys: null,
           })),
-          { type: 'bind', command: 'self_cast_on', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'self_cast_off', value: null, negated: true, keys: [''] },
+          { type: 'bind', command: 'self_cast_on', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'self_cast_off', value: null, negated: true, keys: null },
 
-          { type: 'bind', command: 'cmd_portal', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'cmd_portal', value: null, negated: false, keys: null },
 
-          { type: 'bind', command: 'cs_toggle_healthbars', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'cs_toggle_healthbars', value: null, negated: false, keys: null },
 
-          { type: 'bind', command: 'exit_game', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'exit_game', value: null, negated: false, keys: null },
 
-          { type: 'bind', command: 'camera_switch_attach_mode_down', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_switch_attach_mode_up', value: null, negated: true, keys: [''] },
+          { type: 'bind', command: 'camera_switch_attach_mode_down', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'camera_switch_attach_mode_up', value: null, negated: true, keys: null },
 
-          { type: 'bind', command: 'show_statistics', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'hide_statistics', value: null, negated: true, keys: [''] },
+          { type: 'bind', command: 'show_statistics', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'hide_statistics', value: null, negated: true, keys: null },
 
-          { type: 'bind', command: 'show_charstat', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'show_inventory', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'show_talents', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'show_charstat', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'show_inventory', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'show_talents', value: null, negated: false, keys: null },
 
-          { type: 'bind', command: 'actionbar_lock_off', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'actionbar_lock_on', value: null, negated: true, keys: [''] },
+          { type: 'bind', command: 'actionbar_lock_off', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'actionbar_lock_on', value: null, negated: true, keys: null },
         ],
       },
 
@@ -69,10 +69,10 @@ export function createEmptyFileModel() {
       {
         name: null,
         binds: [
-          { type: 'bind', command: 'cmd_cancel', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cs_mouse_wheel_down', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cs_mouse_wheel_up', value: null, negated: true, keys: [''] },
-          { type: 'bind', command: 'exit_bind', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'cmd_cancel', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cs_mouse_wheel_down', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cs_mouse_wheel_up', value: null, negated: true, keys: null },
+          { type: 'bind', command: 'exit_bind', value: null, negated: false, keys: null },
         ],
       },
 
@@ -80,17 +80,17 @@ export function createEmptyFileModel() {
       {
         name: 'adventure_screen',
         binds: [
-          { type: 'bind', command: 'camera_zoom', value: '+1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_zoom', value: '-1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_forward', value: '+1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_forward', value: '-1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_strafe', value: '+1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_strafe', value: '-1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_pitch', value: '-1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_pitch', value: '+1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_rotate', value: '+1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_rotate', value: '-1.0', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_zoom_mouse', value: '-0.003', negated: false, keys: [''] },
+          { type: 'bind', command: 'camera_zoom', value: '+1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_zoom', value: '-1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_forward', value: '+1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_forward', value: '-1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_strafe', value: '+1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_strafe', value: '-1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_pitch', value: '-1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_pitch', value: '+1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_rotate', value: '+1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_rotate', value: '-1.0', negated: false, keys: null },
+          { type: 'bind', command: 'camera_zoom_mouse', value: '-0.003', negated: false, keys: null },
         ],
       },
 
@@ -98,17 +98,17 @@ export function createEmptyFileModel() {
       {
         name: null,
         binds: [
-          { type: 'bind', command: '+camera_roll', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: '-camera_roll', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: '+camera_upward', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: '-camera_upward', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: '+camera_roll', value: null, negated: false, keys: null },
+          { type: 'bind', command: '-camera_roll', value: null, negated: false, keys: null },
+          { type: 'bind', command: '+camera_upward', value: null, negated: false, keys: null },
+          { type: 'bind', command: '-camera_upward', value: null, negated: false, keys: null },
 
-          { type: 'bind', command: 'camera_rotate_mouse', value: '0.03', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_pitch_mouse', value: '0.03', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_strafe_mouse', value: '-0.03', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_strafe_mouse', value: '0.03', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_forward_mouse', value: '0.03', negated: false, keys: [''] },
-          { type: 'bind', command: 'camera_forward_mouse', value: '0.03', negated: false, keys: [''] },
+          { type: 'bind', command: 'camera_rotate_mouse', value: '0.03', negated: false, keys: null },
+          { type: 'bind', command: 'camera_pitch_mouse', value: '0.03', negated: false, keys: null },
+          { type: 'bind', command: 'camera_strafe_mouse', value: '-0.03', negated: false, keys: null },
+          { type: 'bind', command: 'camera_strafe_mouse', value: '0.03', negated: false, keys: null },
+          { type: 'bind', command: 'camera_forward_mouse', value: '0.03', negated: false, keys: null },
+          { type: 'bind', command: 'camera_forward_mouse', value: '0.03', negated: false, keys: null },
         ],
       },
 
@@ -116,11 +116,11 @@ export function createEmptyFileModel() {
       {
         name: 'minigame',
         binds: [
-          { type: 'bind', command: 'minigame_escape', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'easel_mg_boost1', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'easel_mg_boost2', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'easel_mg_boost3', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'easel_mg_heroic_boost', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'minigame_escape', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'easel_mg_boost1', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'easel_mg_boost2', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'easel_mg_boost3', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'easel_mg_heroic_boost', value: null, negated: false, keys: null },
         ],
       },
 
@@ -128,15 +128,15 @@ export function createEmptyFileModel() {
       {
         name: null,
         binds: [
-          { type: 'bind', command: 'cmd_smart_chat', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_cancel', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_1', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_2', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_3', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_4', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_5', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_6', value: null, negated: false, keys: [''] },
-          { type: 'bind', command: 'cmd_smart_chat_7', value: null, negated: false, keys: [''] },
+          { type: 'bind', command: 'cmd_smart_chat', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_cancel', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_1', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_2', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_3', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_4', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_5', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_6', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'cmd_smart_chat_7', value: null, negated: false, keys: null },
         ],
       },
     ]
@@ -149,13 +149,13 @@ export function createEmptyUiModel() {
       ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`cmd_action_bar_slot${i + 1}`, null])),
 
       self_cast_on: {
-        keys: [''],
+        keys: null,
         self_cast_off: null,
       },
 
       cmd_portal: null,
       actionbar_lock_off: {
-        keys: [''],
+        keys: null,
         actionbar_lock_on: null,
       },
     },
@@ -177,7 +177,7 @@ export function createEmptyUiModel() {
       chat_open_global: null,
       chat_open_team: null,
       show_statistics: {
-        keys: [''],
+        keys: null,
         hide_statistics: null,
       },
       show_charstat: null,
@@ -186,7 +186,7 @@ export function createEmptyUiModel() {
     },
     camera: {
       camera_switch_attach_mode_down: {
-        keys: [''],
+        keys: null,
         camera_switch_attach_mode_up: null,
       },
       camera_forward: {
