@@ -14,17 +14,17 @@ import {
 // =======================
 
 describe('tokenize()', () => {
-  it('parses simple tokens', () => {
+  it('tokenizes simple tokens', () => {
     const t = tokenize("cmd_move 'Q'");
     expect(t).toEqual(["cmd_move", "'Q'"]);
   });
 
-  it('parses multi key combo', () => {
+  it('tokenizes multi key combo', () => {
     const t = tokenize("cs_toggle_healthbars 'CTRL' + 'L'");
     expect(t).toEqual(["cs_toggle_healthbars", "'CTRL'", "+", "'L'"]);
   });
 
-  it('parses numeric values', () => {
+  it('tokenizes numeric values', () => {
     const t = tokenize("camera_zoom -1.0 'PG_UP'");
     expect(t).toEqual(["camera_zoom", "-", "1.0", "'PG_UP'"]);
   });
@@ -45,6 +45,7 @@ describe('parseBindLine()', () => {
 
   it('parses simple bind', () => {
     const b = parseBindLine("bind cmd_move 'Q'");
+    console.log(b);
     expect(b.command).toBe("cmd_move");
     expect(b.value).toBe(null);
     expect(b.negated).toBe(false);
@@ -96,7 +97,6 @@ describe('parseBindLine()', () => {
 
   it('parses +camera_roll', () => {
     const b = parseBindLine("bind +camera_roll 'PG_UP'");
-    console.log(b);
     expect(b.type).toBe("bind");
     expect(b.command).toBe("+camera_roll");
     expect(b.keys).toStrictEqual(['PG_UP']);
@@ -104,7 +104,6 @@ describe('parseBindLine()', () => {
 
   it('parses -camera_roll', () => {
     const b = parseBindLine("bind -camera_roll 'PG_DOWN'");
-    console.log(b);
     expect(b.type).toBe("bind");
     expect(b.command).toBe("-camera_roll");
     expect(b.keys).toStrictEqual(['PG_DOWN']);

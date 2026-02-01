@@ -6,23 +6,31 @@ export class BindParseError extends Error {
   }
 }
 
-export function validateBind(bind, line) {
+export function validate(bind, line) {
+  switch (bind.type) {
+    case 'bind':
+      validateBind(bind, line);
+      break;
+    case 'bind_command':
+      validateBindCommand(bind, line);
+      break;
+    default:
+      throw new BindParseError(`Unknown bind type: ${bind.type}`, line);
+  }
+}
+
+function validateBind(bind, line) {
   if (!bind.command || typeof bind.command !== 'string') {
-    console.log(bind);
     throw new BindParseError('Missing or invalid command', line);
   }
 
-  if (bind.type === 'bind_command') {
-    if (bind.value !== null) {
-      throw new BindParseError('bind_command must not have value', line);
-    }
-    if (!bind.keys || bind.keys.length === 0) {
-      throw new BindParseError('bind_command requires keys', line);
-    }
+  if (typeof bind.negated !== 'boolean') {
+    throw new BindParseError('Invalid negated flag', line);
   }
 
-  if (bind.type === 'bind') {
-    if (bind.value !== null && !/^[-+]?\d+(\.\d+)?$/.test(bind.value)) {
+  if (bind.value !== null) {
+    if (typeof bind.value !== 'string' ||
+        !/^[-+]?\d+(\.\d+)?$/.test(bind.value)) {
       throw new BindParseError('Invalid numeric value', line);
     }
   }
@@ -32,9 +40,27 @@ export function validateBind(bind, line) {
       throw new BindParseError('Keys must be array or null', line);
     }
     for (const k of bind.keys) {
-      if (typeof k !== 'string' || !k.length) {
+      if (typeof k !== 'string') {
         throw new BindParseError(`Invalid key "${k}"`, line);
       }
     }
+  }
+
+  if (bind.value !== null && (!bind.keys || bind.keys.length === 0)) {
+    throw new BindParseError('Bind with value requires keys', line);
+  }
+}
+
+function validateBindCommand(bind, line) {
+  if (bind.value !== null) {
+    throw new BindParseError('bind_command must not have value', line);
+  }
+
+  if (!bind.command || typeof bind.command !== 'string') {
+    throw new BindParseError('bind_command requires command', line);
+  }
+
+  if (!Array.isArray(bind.keys) || bind.keys.length === 0) {
+    throw new BindParseError('bind_command requires keys', line);
   }
 }

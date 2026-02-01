@@ -41,8 +41,6 @@ describe('KeybindStore paired binds', () => {
 
     const result = KeybindStore.setBind('actionbar_lock_off', keys);
     
-    console.log('Set result:', KeybindStore.getBind('actionbar_lock_off'), KeybindStore.getBind('actionbar_lock_on'));
-
     expect(result).toBe(true);
 
     const down = KeybindStore.getBind('actionbar_lock_off');

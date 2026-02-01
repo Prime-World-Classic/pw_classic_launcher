@@ -1,4 +1,4 @@
-import { BindParseError } from './keybindings.validator';
+import { validate } from './keybindings.validator.js';
 
 /**
  * Parse Prime World keybind cfg into file model
@@ -44,6 +44,7 @@ export function parseKeybindCfg(cfgText) {
  */
 export function parseBindLine(line) {
   let type = null;
+  let bind = null;
 
   if (line.startsWith('bind ')) {
     type = 'bind';
@@ -55,17 +56,16 @@ export function parseBindLine(line) {
 
   switch (type) {
     case 'bind':
-      return parseBind(line);
+      bind = parseBind(line);
+      break;
     case 'bind_command':
-      return parseBindCommand(line);
+      bind = parseBindCommand(line);
+      break;
   }
-}
 
-function getKeysFromTokens(tokens) {
-  return tokens
-    .filter(t => t !== '+')
-    .filter(t => t.startsWith("'") && t.endsWith("'"))
-    .map(t => t.slice(1, -1));
+  validate(bind, line);
+
+  return bind;
 }
 
 function parseBind(line) {
@@ -148,6 +148,13 @@ function parseBindCommand(line) {
   };
 
   return bind;
+}
+
+function getKeysFromTokens(tokens) {
+  return tokens
+    .filter(t => t !== '+')
+    .filter(t => t.startsWith("'") && t.endsWith("'"))
+    .map(t => t.slice(1, -1));
 }
 
 /**
