@@ -173,7 +173,7 @@ export async function keybindings() {
 
   const discardBtn = DOM(
     {
-      domaudio: domAudioPresets.bigButton,
+      domaudio: domAudioPresets.closeButton,
       style: ['castle-menu-item-button', 'castle-menu-item-button--small', 'castle-menu-item-button--red'],
       event: [
         'click',

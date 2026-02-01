@@ -26,7 +26,7 @@ describe('tokenize()', () => {
 
   it('parses numeric values', () => {
     const t = tokenize("camera_zoom -1.0 'PG_UP'");
-    expect(t).toEqual(["camera_zoom", "-1.0", "'PG_UP'"]);
+    expect(t).toEqual(["camera_zoom", "-", "1.0", "'PG_UP'"]);
   });
 
   it('handles empty key', () => {
@@ -64,7 +64,7 @@ describe('parseBindLine()', () => {
 
   it('parses empty key', () => {
     const b = parseBindLine("bind cmd_action_bar_slot11 ''");
-    expect(b.keys).toBe(null);
+    expect(b.keys).toStrictEqual(['']);
   });
 
   it('parses mouse axis', () => {
@@ -92,6 +92,22 @@ describe('parseBindLine()', () => {
     expect(b.type).toBe("bind_command");
     expect(b.command).toBe("screenshot .png");
     expect(b.keys).toStrictEqual(['SHIFT', 'F10']);
+  });
+
+  it('parses +camera_roll', () => {
+    const b = parseBindLine("bind +camera_roll 'PG_UP'");
+    console.log(b);
+    expect(b.type).toBe("bind");
+    expect(b.command).toBe("+camera_roll");
+    expect(b.keys).toStrictEqual(['PG_UP']);
+  })
+
+  it('parses -camera_roll', () => {
+    const b = parseBindLine("bind -camera_roll 'PG_DOWN'");
+    console.log(b);
+    expect(b.type).toBe("bind");
+    expect(b.command).toBe("-camera_roll");
+    expect(b.keys).toStrictEqual(['PG_DOWN']);
   });
 
 });
@@ -259,7 +275,6 @@ describe('real /content/keybindsFallback.cfg', () => {
     
     const model = parseKeybindCfg(cfgText);
 
-    console.log(JSON.stringify(model, null, 2));
 
     const bindCommandExists = model.sections.some(section =>
       section.binds.some(b => b.type === 'bind_command')

@@ -1,3 +1,5 @@
+import { BindParseError } from './keybindings.validator';
+
 /**
  * Parse Prime World keybind cfg into file model
  * @param {string} cfgText
@@ -41,68 +43,111 @@ export function parseKeybindCfg(cfgText) {
  * @param {string} line
  */
 export function parseBindLine(line) {
-  let rest = '';
-  let type = 'bind';
+  let type = null;
 
-  if (line.startsWith('bind_command ')) {
-    rest = line.slice(13).trim();
+  if (line.startsWith('bind ')) {
+    type = 'bind';
+  } else if (line.startsWith('bind_command ')) {
     type = 'bind_command';
-  } else if (line.startsWith('bind ')) {
-    rest = line.slice(5).trim();
   } else {
-    return null;
+    throw new BindParseError(`Unknown bind type: ${line}`);
   }
 
-  let negated = false;
-  if (rest.startsWith('!')) {
-    negated = true;
-    rest = rest.slice(1).trim();
+  switch (type) {
+    case 'bind':
+      return parseBind(line);
+    case 'bind_command':
+      return parseBindCommand(line);
   }
+}
 
-  const tokens = tokenize(rest);
-  if (tokens.length === 0) return null;
+function getKeysFromTokens(tokens) {
+  return tokens
+    .filter(t => t !== '+')
+    .filter(t => t.startsWith("'") && t.endsWith("'"))
+    .map(t => t.slice(1, -1));
+}
 
+function parseBind(line) {
   let command = null;
   let value = null;
+  let negated = false;
+  let keys = null;
 
-  if (type === 'bind') {
-    command = tokens.shift();
+  const allTokens = tokenize(line);
+  const tokens = [...allTokens];
 
-    if (tokens.length >= 1) {
-      if (/^[+-]\d/.test(tokens[0])) {
-        value = tokens.shift();
-      } else if (/^\d+(\.\d+)?$/.test(tokens[0])) {
-        value = tokens.shift();
-      } else if ((tokens[0] === '+' || tokens[0] === '-') && tokens[1] && /^\d+(\.\d+)?$/.test(tokens[1])) {
-        value = tokens.shift() + tokens.shift();
-      }
-    }
-  } else {
-    const cmdTokens = [];
+  tokens.shift(); // remove bind
 
-    for (const t of tokens) {
-      if (t === '+') continue;
-      if (t.startsWith("'") && t.endsWith("'")) continue;
-      cmdTokens.push(t);
-    }
-
-    command = cmdTokens.join(' ').replace(/^"|"$/g, '');
+  // command
+  command = tokens.shift();
+  if (command === '+' || command === '-') {
+    command += tokens.shift();
   }
 
-  const keyTokens = tokens.filter((t) => t !== '+');
+  // negated
+  if (command.startsWith('!')) {
+    negated = true;
+    command = command.slice(1);
+  }
 
-  const keys = keyTokens
-    .filter((k) => k.startsWith("'"))
-    .map((k) => k.replace(/^'|'$/g, ''))
-    .filter((k) => k.length > 0);
+  // value
+  if (
+    (tokens[0] === '+' || tokens[0] === '-') &&
+    /^\d+(\.\d+)?$/.test(tokens[1])
+  ) {
+    value = tokens.shift() + tokens.shift();
+  }
+  else if (/^\d+(\.\d+)?$/.test(tokens[0])) {
+    value = tokens.shift();
+  }
 
-  return {
-    type,
+  // keys 
+  keys = getKeysFromTokens(tokens);
+
+  const bind = {
+    type: 'bind',
     command,
     value,
     negated,
-    keys: keys.length ? keys : null,
+    keys,
   };
+
+  return bind;
+}
+
+function parseBindCommand(line) {
+  let command = null;
+  let value = null;
+  let negated = false;
+  let keys = null;
+
+  const allTokens = tokenize(line);
+  const tokens = [...allTokens];
+
+  tokens.shift(); // remove bind_command
+  
+  // keys
+  keys = getKeysFromTokens(tokens);
+  
+  // command
+  const cmdToken = tokens.find(
+    t => t.startsWith('"') && t.endsWith('"')
+  );
+
+  if (cmdToken) {
+    command = cmdToken.slice(1, -1);
+  }
+
+  const bind = {
+    type: 'bind_command',
+    command,
+    value,
+    negated,
+    keys,
+  };
+
+  return bind;
 }
 
 /**
@@ -115,7 +160,7 @@ export function parseBindLine(line) {
  * @returns {Array<string>} - An array of tokens
  */
 export function tokenize(str) {
-  const regex = /'[^']*'|\+|[^\s]+/g;
+  const regex = /'[^']*'|"[^"]*"|\+|-|[^\s+-]+/g;
   return str.match(regex) || [];
 }
 
