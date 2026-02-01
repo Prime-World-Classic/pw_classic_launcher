@@ -3,7 +3,8 @@ import { Lang } from '../lang.js';
 import { DOM } from '../dom.js';
 import { normalizeFileModel } from './keybindings.schema.js';
 import { KeybindStore } from './keybindings.store.js';
-import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
+import { parseKeybindCfg } from './keybindings.parser.js';
+import { serializeCfg } from './keybindings.serializer.js';
 import { NativeAPI } from '../nativeApi.js';
 import { createEmptyFileModel } from './keybindings.schema.js';
 
@@ -108,7 +109,8 @@ export async function loadKeybinds() {
 export async function saveKeybinds() {
   try {
     const data = serializeCfg(KeybindStore.fileModel);
-
+    console.log('Saving keybinds to', KeybindStore.source, KeybindStore.configPath);
+    console.log(data);
     if (KeybindStore.source === 'native') {
       await NativeAPI.fileSystem.promises.writeFile(KeybindStore.configPath, data, 'utf8');
     } else {
