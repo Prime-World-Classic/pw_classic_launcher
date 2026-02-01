@@ -1,3 +1,6 @@
+import { App } from '../app.js';
+import { Lang } from '../lang.js';
+import { DOM } from '../dom.js';
 import { normalizeFileModel } from './keybindings.schema.js';
 import { KeybindStore } from './keybindings.store.js';
 import { serializeCfg, parseKeybindCfg } from './keybindings.parser.js';
@@ -45,9 +48,9 @@ async function createDefaultConfigFile(targetPath) {
 }
 
 export async function findConfigFile() {
-  if (NativeAPI.status) {
+  const documentsPath = NativeAPI.getDocumentsDir();
+  if (documentsPath) {
     console.log('Searching for native config file...');
-    const documentsPath = NativeAPI.getDocumentsDir();
     const configPath = NativeAPI.path.join(documentsPath, 'My Games', 'Prime World Classic', 'input_new.cfg');
 
     try {
@@ -103,19 +106,35 @@ export async function loadKeybinds() {
 }
 
 export async function saveKeybinds() {
-  const data = serializeCfg(KeybindStore.fileModel);
-  console.log('Saving keybinds:', data);
+  try {
+    const data = serializeCfg(KeybindStore.fileModel);
 
-  if (KeybindStore.source === 'native') {
-    await NativeAPI.fileSystem.promises.writeFile(KeybindStore.configPath, data);
-  } else {
-    const handle = await window.showSaveFilePicker({
-      suggestedName: 'input_new.cfg',
-      types: [{ description: 'Config', accept: { 'text/plain': ['.cfg'] } }],
-    });
+    if (KeybindStore.source === 'native') {
+      await NativeAPI.fileSystem.promises.writeFile(KeybindStore.configPath, data, 'utf8');
+    } else {
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = DOM({
+        tag: 'a',
+        href: url,
+        download: 'input_new.cfg',
+        event: [
+          'click',
+          () => {
+            a.remove();
+            URL.revokeObjectURL(url);
+          },
+        ],
+      });
+      document.body.appendChild(a);
+      a.click();
+    }
 
-    const writable = await handle.createWritable();
-    await writable.write(data);
-    await writable.close();
+    App.notify(Lang.text('savedKeybindings'));
+    return true;
+  } catch (err) {
+    console.error('Failed to save keybinds:', err);
+    App.error(Lang.text('errorKeybindings'));
+    return false;
   }
 }

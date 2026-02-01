@@ -105,7 +105,6 @@ export function parseBindLine(line) {
   };
 }
 
-
 /**
  * Tokenize a given string into an array of tokens.
  * Tokens are defined as any of the following:
@@ -135,7 +134,7 @@ export function serializeCfg(fileModel) {
     for (const bind of section.binds) {
       const neg = bind.negated ? '!' : '';
       const val = bind.value ? ` ${bind.value}` : '';
-      const keys = bind.keys?.map(k => `'${k}'`).join(' + ') ?? '';
+      const keys = bind.keys && bind.keys.length ? bind.keys.map((k) => `'${k}'`).join(' + ') : "''";
 
       out += `${bind.type} ${neg}${bind.command}${val} ${keys}\n`;
     }
@@ -147,11 +146,7 @@ export function serializeCfg(fileModel) {
 export function findParsedBind(parsedModel, command, value, negated) {
   for (const section of parsedModel.sections) {
     for (const bind of section.binds) {
-      if (
-        bind.command === command &&
-        bind.value === value &&
-        bind.negated === negated
-      ) {
+      if (bind.command === command && bind.value === value && bind.negated === negated) {
         return bind;
       }
     }

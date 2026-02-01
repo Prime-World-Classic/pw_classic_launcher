@@ -495,6 +495,9 @@ export class NativeAPI {
   }
 
   static getDocumentsDir() {
+    if (!NativeAPI.status) {
+      return;
+    }
     switch (NativeAPI.platform) {
       case 'win32':
         return NativeAPI.childProcess
