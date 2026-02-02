@@ -1,56 +1,107 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { KeybindStore } from '../content/modules/keybindings/keybindings.store.js';
+import { createEmptyFileModel } from '../content/modules/keybindings/keybindings.schema.js';
+import { normalizeFileModel } from '../content/modules/keybindings/keybindings.schema.js';
 
-function createMockModel() {
-  return {
-    sections: [
+function makeParsed(sections) {
+  return { sections };
+}
+
+describe('KeybindStore linkedGroups', () => {
+  beforeEach(() => {
+    const schema = createEmptyFileModel();
+
+    const parsedModel = makeParsed([
       {
-        name: null,
+        name: 'adventure_screen',
         binds: [
           {
             type: 'bind',
-            command: 'actionbar_lock_off',
+            command: 'show_statistics',
             value: null,
             negated: false,
-            keys: null,
+            keys: ['TAB'],
           },
           {
             type: 'bind',
-            command: 'actionbar_lock_on',
+            command: 'hide_statistics',
             value: null,
             negated: true,
-            keys: null,
+            keys: ['TAB'],
           },
         ],
       },
-    ],
-  };
-}
+      {
+        name: 'minigame',
+        binds: [
+          {
+            type: 'bind',
+            command: 'show_statistics',
+            value: null,
+            negated: false,
+            keys: ['TAB'],
+          },
+          {
+            type: 'bind',
+            command: 'hide_statistics',
+            value: null,
+            negated: true,
+            keys: ['TAB'],
+          },
+        ],
+      },
+    ]);
 
-describe('KeybindStore paired binds', () => {
-  beforeEach(() => {
-    const model = createMockModel();
+    KeybindStore.linkedGroups = {
+      statistics: {
+        members: [
+          { command: 'show_statistics', negated: false },
+          { command: 'hide_statistics', negated: true },
+        ],
+        sections: ['adventure_screen', 'minigame'],
+      },
+    };
 
-    KeybindStore.fileModel = model;
-    KeybindStore.mapFileToUiModel();
-    KeybindStore.subscribers = [];
+    KeybindStore.init(
+      normalizeFileModel(schema, parsedModel),
+    );
   });
 
-  it('should set same keys for paired binds (actionbar_lock_off + actionbar_lock_on)', () => {
-    const keys = ['TAB'];
+  it('updates all linked binds across sections', () => {
+    KeybindStore.setBind('show_statistics', ['F1']);
 
-    const result = KeybindStore.setBind('actionbar_lock_off', keys);
-    
-    expect(result).toBe(true);
+    const advShow = KeybindStore.getBind('show_statistics');
+    const advHide = KeybindStore.getBind('hide_statistics');
 
-    const down = KeybindStore.getBind('actionbar_lock_off');
-    const up = KeybindStore.getBind('actionbar_lock_on');
+    expect(advShow.keys).toEqual(['F1']);
+    expect(advHide.keys).toEqual(['F1']);
 
-    expect(down).not.toBeNull();
-    expect(up).not.toBeNull();
+    const minigameSection = KeybindStore.fileModel.sections.find((s) => s.name === 'minigame');
 
-    expect(down.keys).toEqual(['TAB']);
-    expect(up.keys).toEqual(['TAB']);
+    const miniShow = minigameSection.binds.find((b) => b.command === 'show_statistics');
+    const miniHide = minigameSection.binds.find((b) => b.command === 'hide_statistics');
+
+    expect(miniShow.keys).toEqual(['F1']);
+    expect(miniHide.keys).toEqual(['F1']);
   });
 
+  it('does not affect unrelated binds', () => {
+    const before = KeybindStore.getBind('show_inventory');
+
+    KeybindStore.setBind('show_statistics', ['F2']);
+
+    const after = KeybindStore.getBind('show_inventory');
+
+    expect(after).toBe(before);
+  });
+
+  it('keeps keys in sync when changing negated command', () => {
+    KeybindStore.setBind('hide_statistics', ['ESC']);
+
+    const show = KeybindStore.getBind('show_statistics');
+    const hide = KeybindStore.getBind('hide_statistics');
+
+    expect(show.keys).toEqual(['ESC']);
+    expect(hide.keys).toEqual(['ESC']);
+  });
 });

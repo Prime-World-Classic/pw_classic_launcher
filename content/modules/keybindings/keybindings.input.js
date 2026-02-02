@@ -59,9 +59,13 @@ export function normalizeKey(e) {
 
   let main = CODE_MAP[e.code];
 
-  if (!main || main == 'BACKSPACE') main = ''; 
+  if (!main || ['CTRL', 'ALT', 'SHIFT', 'WIN'].includes(main)) {
+    return keys.length ? keys : '';
+  }
 
   keys.push(main);
+
   return keys;
 }
+
 

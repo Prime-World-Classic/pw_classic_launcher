@@ -25,13 +25,42 @@ import { createEmptyUiModel } from './keybindings.schema.js';
 export const KeybindStore = {
   fileModel: {},
   uiModel: {},
-  linkedCommands: {
-    actionbar_lock_off: 'actionbar_lock_on',
-    camera_switch_attach_mode_down: 'camera_switch_attach_mode_up',
-    self_cast_on: 'self_cast_off',
-    show_statistics: 'hide_statistics',
-    cs_mouse_wheel_down: 'cs_mouse_wheel_up',
-    minimap_signal_key_down: 'minimap_signal_key_up',
+  linkedGroups: {
+    charstat: {
+      members: [{ command: 'show_charstat', negated: false }],
+      sections: ['adventure_screen', 'minigame'],
+    },
+    inventory: {
+      members: [{ command: 'show_inventory', negated: false }],
+      sections: ['adventure_screen', 'minigame'],
+    },
+    talents: {
+      members: [{ command: 'show_talents', negated: false }],
+      sections: ['adventure_screen', 'minigame'],
+    },
+    statistics: {
+      members: [
+        { command: 'show_statistics', negated: false },
+        { command: 'hide_statistics', negated: true },
+      ],
+      sections: ['adventure_screen', 'minigame'],
+    },
+
+    actionbarLock: {
+      members: [
+        { command: 'actionbar_lock_off', negated: false },
+        { command: 'actionbar_lock_on', negated: true },
+      ],
+      sections: ['adventure_screen'],
+    },
+
+    selfCast: {
+      members: [
+        { command: 'self_cast_on', negated: false },
+        { command: 'self_cast_off', negated: true },
+      ],
+      sections: ['adventure_screen'],
+    },
   },
   source: 'native' | 'browser',
   configPath: null,
@@ -43,6 +72,28 @@ export const KeybindStore = {
     this.configPath = configPath;
     this.uiModel = this.mapFileToUiModel();
     this.notify();
+  },
+
+  findLinkedBinds(changedBind) {
+    const result = [];
+
+    for (const group of Object.values(this.linkedGroups)) {
+      const isMember = group.members.some((m) => m.command === changedBind.command && m.negated === changedBind.negated);
+
+      if (!isMember) continue;
+
+      for (const section of this.fileModel.sections) {
+        if (section.name === null ? group.sections.includes('__global__') : group.sections.includes(section.name)) {
+          for (const bind of section.binds) {
+            if (group.members.some((m) => m.command === bind.command && m.negated === bind.negated)) {
+              result.push(bind);
+            }
+          }
+        }
+      }
+    }
+
+    return result;
   },
 
   getBind(command, value = null) {
@@ -61,19 +112,15 @@ export const KeybindStore = {
 
     bind.keys = [...keys];
 
-    const linked = this.linkedCommands[command];
-    if (linked) {
-      const linkedBind = this.getBind(linked, value);
-      if (linkedBind) {
-        linkedBind.keys = [...keys];
-      }
+    const linked = this.findLinkedBinds(bind);
+    for (const b of linked) {
+      b.keys = [...keys];
     }
 
-    this.uiModel = this.mapFileToUiModel(this.fileModel);
+    this.uiModel = this.mapFileToUiModel();
     this.notify();
     return true;
   },
-
   notify() {
     this.subscribers.forEach((fn) => fn(this.fileModel));
   },
