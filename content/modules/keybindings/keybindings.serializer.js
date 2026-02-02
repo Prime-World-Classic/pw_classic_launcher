@@ -9,7 +9,7 @@ export function serializeCfg(fileModel) {
   let out = 'unbindall\n';
 
   for (const section of fileModel.sections) {
-    if (section.name) out += `bindsection ${section.name}\n`;
+    out += `bindsection ${section.name ?? ''}\n`;
 
     for (const bind of section.binds) {
       switch (bind.type) {

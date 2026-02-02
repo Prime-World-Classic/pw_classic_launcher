@@ -120,6 +120,11 @@ export function createEmptyFileModel() {
           { type: 'bind', command: 'easel_mg_boost2', value: null, negated: false, keys: null },
           { type: 'bind', command: 'easel_mg_boost3', value: null, negated: false, keys: null },
           { type: 'bind', command: 'easel_mg_heroic_boost', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'show_charstat', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'show_talents', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'show_statistics', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'hide_statistics', value: null, negated: true, keys: null },
+          { type: 'bind', command: 'easel_skip_movie', value: null, negated: false, keys: null },
         ],
       },
 
@@ -127,6 +132,47 @@ export function createEmptyFileModel() {
       {
         name: null,
         binds: [
+          { type: 'bind', command: 'dialog_escape', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'editline_wordleft', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_wordright', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_left', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_right', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'editline_paste', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_copy', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_cut', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'editline_up', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_down', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'editline_return', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_return', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'editline_delete', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_back', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_clear', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'editline_tab', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'draganddrop_cancel', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'dumpscreens', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'minimap_signal_key_down', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'minimap_signal_key_up', value: null, negated: true, keys: null },
+
+          { type: 'bind', command: 'chat_open_close', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'chat_open_global', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'chat_open_team', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'window_full_screen', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'login_screen_tab', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'login_screen_enter', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'login_screen_enter', value: null, negated: false, keys: null },
+
+          { type: 'bind', command: 'open_close_game_menu', value: null, negated: false, keys: null },
+          { type: 'bind', command: 'skip_phrase_cinematic', value: null, negated: false, keys: null },
+
           { type: 'bind', command: 'cmd_smart_chat', value: null, negated: false, keys: null },
           { type: 'bind', command: 'cmd_smart_chat_cancel', value: null, negated: false, keys: null },
           { type: 'bind', command: 'cmd_smart_chat_1', value: null, negated: false, keys: null },
@@ -220,16 +266,14 @@ export function normalizeFileModel(schemaModel, parsedModel) {
     }
   }
 
-  for(const section of schemaModel.sections) {
+  for (const section of schemaModel.sections) {
     const logicalSection = section.name ?? '__global__';
 
     for (const bind of section.binds) {
       const key = makeBindMapKey(logicalSection, bind);
       const override = lastBindMap.get(key);
 
-      bind.keys = override?.keys
-        ? [...override.keys]
-        : null;
+      bind.keys = override?.keys ? [...override.keys] : null;
     }
   }
 
