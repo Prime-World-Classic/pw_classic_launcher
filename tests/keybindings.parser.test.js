@@ -45,7 +45,6 @@ describe('parseBindLine()', () => {
 
   it('parses simple bind', () => {
     const b = parseBindLine("bind cmd_move 'Q'");
-    console.log(b);
     expect(b.command).toBe("cmd_move");
     expect(b.value).toBe(null);
     expect(b.negated).toBe(false);

@@ -105,37 +105,38 @@ export async function loadKeybinds() {
   const cfg = await findConfigFile();
   if (!cfg) return false;
 
-  if (cfg.type === 'native') {
-    try {
+  try {
+    if (cfg.type === 'native') {
       await loadKeybindsNative(cfg);
-    } catch (err) {
-      if (err instanceof BindParseError && cfg.type === 'native') {
-        console.warn('Invalid keybinds, restoring default');
-        const restored = await createDefaultConfigFile(cfg.path);
+    } else {
+      await loadKeybindsBrowser(cfg);
+    }
+  } catch (err) {
+    if (cfg.type === 'native' && err instanceof BindParseError) {
+      console.warn('Invalid keybinds, restoring default');
 
-        if (!restored) {
-          console.error('Failed to restore default keybinds');
-          App.error(Lang.text('errorKeybindingsLoad'));
-          return false;
-        };
+      App.notify(Lang.text('errorKeybindingsParse'));
 
-        try {
-          await loadKeybindsNative(cfg);
-          App.notify(Lang.text('errorKeybindingsParse'));
-          return true;
-        } catch (e) {
-          console.error('Failed to load restored default', e);
-          App.error(Lang.text('errorKeybindingsLoad'));
-          return false;
-        }
+      // delete config
+      await NativeAPI.fileSystem.promises.unlink(cfg.path);
+
+      const restored = await createDefaultConfigFile(cfg.path);
+      if (!restored) {
+        return false;
       }
 
-      console.error('Failed to load keybinds', err);
-      App.error(Lang.text('errorKeybindingsLoad'));
-      return false;
+      try {
+        await loadKeybindsNative(cfg);
+        App.notify(Lang.text('restoredDefaultKeybindings'));
+        return true;
+      } catch (e) {
+        App.error(Lang.text('errorKeybindingsLoad'));
+        return false;
+      }
     }
-  } else {
-    await loadKeybindsBrowser(cfg);
+
+    App.error(Lang.text('errorKeybindingsLoad'));
+    return false;
   }
 
   console.log('Keybinds loaded from', cfg.type, cfg.path);

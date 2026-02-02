@@ -1,4 +1,3 @@
-import { findParsedBind } from './keybindings.parser.js';
 export function createEmptyFileModel() {
   return {
     sections: [
@@ -139,7 +138,7 @@ export function createEmptyFileModel() {
           { type: 'bind', command: 'cmd_smart_chat_7', value: null, negated: false, keys: null },
         ],
       },
-    ]
+    ],
   };
 }
 
@@ -202,25 +201,35 @@ export function createEmptyUiModel() {
         '-1.0': null,
       },
     },
-  }
+  };
 }
 
 export function normalizeFileModel(schemaModel, parsedModel) {
-  for (const schemaSection of schemaModel.sections) {
-    for (const schemaBind of schemaSection.binds) {
+  function makeBindMapKey(sectionName, bind) {
+    return [sectionName ?? '__global__', bind.type, bind.command, bind.value ?? '', bind.negated ? '!' : ''].join('|');
+  }
 
-      const match = findParsedBind(
-        parsedModel,
-        schemaBind.command,
-        schemaBind.value,
-        schemaBind.negated
-      );
+  const lastBindMap = new Map();
 
-      if (match && Array.isArray(match.keys)) {
-        schemaBind.keys = [...match.keys];
-      } else {
-        schemaBind.keys = null;
-      }
+  for (const section of parsedModel.sections) {
+    const logicalSection = section.name ?? '__global__';
+
+    for (const bind of section.binds) {
+      const key = makeBindMapKey(logicalSection, bind);
+      lastBindMap.set(key, bind);
+    }
+  }
+
+  for(const section of schemaModel.sections) {
+    const logicalSection = section.name ?? '__global__';
+
+    for (const bind of section.binds) {
+      const key = makeBindMapKey(logicalSection, bind);
+      const override = lastBindMap.get(key);
+
+      bind.keys = override?.keys
+        ? [...override.keys]
+        : null;
     }
   }
 
