@@ -465,12 +465,13 @@
     turnPlus: 'Повернуть вправо',
     turnMinus: 'Повернуть влево',
     keys: 'Клавиши',
+    
+    discardChanges: 'Отменить',
 
     savedKeybindings: 'Клавиши сохранены',
     errorKeybindings: 'Ошибка сохранения клавиш',
-    discardChanges: 'Отменить',
-    errorKeybindingsParse: 'Невалидный конфиг клавиш. Созданы клавиши по умолчанию.',
-    errorKeybindingsLoad: 'Ошибка загрузки конфигурации клавиш. Созданы клавиши по умолчанию.',
+    errorKeybindingsLoad: 'Ошибка загрузки клавиш',
+    restoredDefaultKeybindings: 'Невалидный конфиг клавиш. Созданы клавиши по умолчанию.',
 
     frame_hint: 'Рамка активируется, когда у героя будет 25+ побед',
 

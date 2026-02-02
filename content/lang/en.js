@@ -474,10 +474,12 @@
     turnMinus: 'Turn left',
     keys: 'Keybindings',
 
+    discardChanges: 'Cancel',
+
     savedKeybindings: 'Keybindings saved',
     errorKeybindings: 'Error saving keybindings',
-
-    discardChanges: 'Cancel',
+    errorKeybindingsLoad: 'Error loading keybindings',
+    restoredDefaultKeybindings: 'Restored default keybindings',
 
     frame_hint: 'The frame will be active when the hero has 25+ wins',
 
