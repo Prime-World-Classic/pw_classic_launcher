@@ -12,13 +12,31 @@ export function serializeCfg(fileModel) {
     if (section.name) out += `bindsection ${section.name}\n`;
 
     for (const bind of section.binds) {
-      const neg = bind.negated ? '!' : '';
-      const val = bind.value ? ` ${bind.value}` : '';
-      const keys = bind.keys && bind.keys.length ? bind.keys.map((k) => `'${k}'`).join(' + ') : "''";
-
-      out += `${bind.type} ${neg}${bind.command}${val} ${keys}\n`;
+      switch (bind.type) {
+        case 'bind':
+          out += serializeBind(bind);
+          break;
+        case 'bind_command':
+          out += serializeBindCommand(bind);
+          break;
+      }
     }
   }
 
   return out;
+}
+
+function serializeBind(bind) {
+  const neg = bind.negated ? '!' : '';
+  const val = bind.value ? ` ${bind.value}` : '';
+  const keys = serializeKeys(bind);
+  return `${bind.type} ${neg}${bind.command}${val} ${keys}\n`;
+}
+
+function serializeBindCommand(bind) {
+  return `${bind.type} ${serializeKeys(bind)} "${bind.command}" \n`;
+}
+
+function serializeKeys(bind) {
+  return bind.keys && bind.keys.length ? bind.keys.map((k) => `'${k}'`).join(' + ') : "''";
 }

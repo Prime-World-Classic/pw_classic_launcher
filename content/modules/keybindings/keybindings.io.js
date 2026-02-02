@@ -89,7 +89,6 @@ export async function loadKeybindsNative(cfg) {
   const schema = createEmptyFileModel();
 
   KeybindStore.init(normalizeFileModel(schema, parsed), cfg.type, cfg.path);
-  console.log(KeybindStore.fileModel);
   KeybindStore.notify();
 }
 
@@ -114,6 +113,7 @@ export async function loadKeybinds() {
     }
   } catch (err) {
     if (cfg.type === 'native' && err instanceof BindParseError) {
+      console.error(err);
       console.warn('Invalid keybinds, restoring default...');
 
       // delete config
