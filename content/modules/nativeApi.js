@@ -495,22 +495,19 @@ export class NativeAPI {
   }
 
   static getDocumentsDir() {
-    if (!NativeAPI.status) {
-      return;
-    }
+    if (!NativeAPI.status) return;
+
     switch (NativeAPI.platform) {
       case 'win32':
         return NativeAPI.childProcess
-          .execSync('powershell', ['-NoProfile', '-Command', "[Environment]::GetFolderPath('MyDocuments')"], { encoding: 'utf-8' })
+          .execSync('powershell -NoProfile -Command "[Environment]::GetFolderPath(\'MyDocuments\')"', { encoding: 'utf-8' })
           .trim();
+
       case 'linux':
         try {
-          const dir = NativeAPI.childProcess.execSync('xdg-user-dir', ['DOCUMENTS'], { encoding: 'utf-8' }).trim();
-          if (dir) {
-            return dir;
-          }
+          return NativeAPI.childProcess.execSync('xdg-user-dir DOCUMENTS', { encoding: 'utf-8' }).trim();
         } catch {}
-        // No break to fallithrough to default
+
       default:
         return NativeAPI.path.join(NativeAPI.os.homedir(), 'Documents');
     }
