@@ -1072,7 +1072,7 @@ export class View {
     return body;
   }
 
-  static castleHeroes() {
+  static async castleHeroes() {
     let tab = 1;
 
     let body = DOM({ style: 'castle-bottom' });
@@ -1134,12 +1134,15 @@ export class View {
       title: Lang.text('titleflag'),
     });
 
+    const partyData = await App.api.request(App.CURRENT_MM, 'loadParty', {});
+    const rawPlayerRating = partyData.users[App.storage.data.id]?.playerRating || 0;
+    console.log('DEBUG: Received partyData from loadParty:', partyData);
     let accountRatingItem = DOM(
       {
         style: 'account-rating-menu-item',
-        title: 'Рейтинг игрока - это числовое значение суммы очков рейтинга, начисляемый по итогу побед и поражений в боях. По нему вас распределяет в ту или иную команду.',
+        title: Lang.text('accountRatingTitle'),
       },
-      'Рейтинг: 0000',
+      Lang.text('accountRating').replace('{rating}', Rank.getVisualRating(rawPlayerRating)),
     );
 
     let settingsMenuItem = DOM({
