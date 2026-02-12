@@ -1775,10 +1775,6 @@ export class View {
 
             bottom.append(call, group);
           } else if (item.status == 2) {
-            Sound.play(SOUNDS_LIBRARY.GROUP_INVITE, {
-              id: 'ui-groupInvite',
-              volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) * 1.2,
-            });
             bottom.append(
               DOM(
                 {
