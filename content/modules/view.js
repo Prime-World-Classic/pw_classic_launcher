@@ -1140,10 +1140,11 @@ export class View {
     let accountRatingItem = DOM(
       {
         style: 'account-rating-menu-item',
-        title: Lang.text('accountRatingTitle'),
       },
       Lang.text('accountRating').replace('{rating}', Rank.getVisualRating(rawPlayerRating)),
     );
+
+    accountRatingItem.style.setProperty('--filter-text-hover', `'${Lang.text('accountRatingTooltip')}'`);
 
     let settingsMenuItem = DOM({
       domaudio: domAudioPresets.defaultButton,
