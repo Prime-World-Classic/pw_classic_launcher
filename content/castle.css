@@ -1405,7 +1405,7 @@ body {
   position: absolute;
   left: calc(max(12vw, 17vh));
   bottom: 0;
-  width: calc(round(down, 100vw - 1.85vh - max(12vw, 17vh), max(9.9vw * 18 / 43, 9.9vh))); /* castle-hero-item width: 9.9vh + 0.2vh*2 */
+  width: calc(100vw - max(12vw, 17vh) - 1.85vh - max(3.8vw, 4vh));
 }
 
 .castle-bottom-content {
@@ -1416,6 +1416,14 @@ body {
   border: 0.1vh solid rgba(142, 150, 96, 1);
   border-bottom: 0;
   background-image: linear-gradient(0deg, rgba(12, 92, 107, 1), rgba(6, 41, 56, 1));
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.castle-bottom-content::-webkit-scrollbar {
+  display: none;
 }
 
 .castle-hero-item,
