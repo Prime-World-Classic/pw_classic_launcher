@@ -1075,7 +1075,7 @@ export class View {
 
   static async castleHeroes() {
     let tab = 1;
-
+    const SCROLL_MODIFIER = 1.5;
     let body = DOM({ style: 'castle-bottom' });
 
     View.castleBottom = DOM({ style: 'castle-bottom-content' });
@@ -1083,13 +1083,14 @@ export class View {
     View.castleBottom.addEventListener('wheel', function (event) {
       if (event.deltaY != 0) {
         if (event.deltaMode == event.DOM_DELTA_PIXEL) {
+          
           event.preventDefault();
 
-          View.scrollHero(event.deltaY / 100);
+          View.scrollHero(event.deltaY / 100 * SCROLL_MODIFIER);
         } else if (event.deltaMode == event.DOM_DELTA_LINE) {
           event.preventDefault();
 
-          View.scrollHeroLine(event.deltaY / 100);
+          View.scrollHeroLine(event.deltaY / 100 * SCROLL_MODIFIER);
         } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
           event.preventDefault();
 
