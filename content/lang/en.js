@@ -151,7 +151,7 @@
     rankMarshal: 'Marshal',
     rankGod: 'God',
 
-    accountRatingTitle: 'Player rating is a numerical value of the sum of rating points, awarded based on victories and defeats in battles. It determines your placement in one team or another.',
+    accountRatingTooltip: 'Player rating is a numerical indicator of the sum of rating points. It is awarded based on match results (victories and defeats in battles). Your rating value helps in selecting opponents in combat sessions and distributing you into one team or another.',
     accountRating: 'Rating: {rating}',
 
     //pwgame
@@ -731,6 +731,13 @@
     flag_Rose: 'ARAM Rose',
     flag_Space: 'Your Universe',
     flag_The_brown_cutie: 'Brown Cutie',
+	flag_Yarilosolnce: 'Yarilo the Sun',
+    flag_Samovar: 'Samovar and Baranki',
+    flag_Pancakes: 'Maslenitsa 2026',
+	flag_Kitty_LO: 'Meow! LO (paired flags)',
+	flag_Kitty_VE: 'Meow! VE (paired flags)',
+	flag_FY_Pair1: 'Strong friendship',
+	flag_FY_Pair2: 'Very strong friendship',
 
     // Переводы
     select_faction: 'Select faction',
