@@ -1,4 +1,5 @@
 import { createEmptyUiModel } from './keybindings.schema.js';
+import { findConflicts } from './keybindings.validator.js';
 /**
  * KeybindStore: manages keybindings for the application,
  * observer pattern implementation
@@ -119,6 +120,9 @@ export const KeybindStore = {
 
     this.uiModel = this.mapFileToUiModel();
     this.notify();
+
+    console.log('Current conflicts:', findConflicts(this.fileModel, this.linkedGroups));
+    
     return true;
   },
   notify() {
