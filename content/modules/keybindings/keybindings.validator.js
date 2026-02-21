@@ -1,9 +1,99 @@
+class Rule {
+  constructor(name, priority = 0) {
+    this.name = name;
+    this.priority = priority;
+  }
 
-const CONFLICT_RULES = {
-  allowSameCommandAcrossSections: true,
-  allowLinkedCommands: true,
-  allowSameSectionDuplicates: false,
-};
+  evaluate(context) {
+    return {
+      allowed: true,
+      priority: this.priority,
+      severity: null,
+      reason: null,
+    };
+  }
+}
+
+class EmptyKeyRule extends Rule {
+  constructor() {
+    super('EmptyKeyRule', 0);
+  }
+  evaluate({ combo }) {
+    if (!combo) {
+      return {
+        allowed: true,
+        severity: 'info',
+        reason: 'Empty combo',
+      };
+    }
+    return { allowed: true };
+  }
+}
+
+class LinkedGroupRule extends Rule {
+  constructor(linkedGroups) {
+    super('LinkedGroupRule', 100);
+    this.linkedGroups = linkedGroups;
+  }
+
+  evaluate({ entries }) {
+    for (const group of Object.values(this.linkedGroups)) {
+      const allMatch = entries.every((e) => group.members.some((m) => m.command === e.bind.command && m.negated === e.bind.negated));
+
+      if (!allMatch) continue;
+
+      const sectionsOk = entries.every((e) => group.sections.includes(e.section));
+
+      if (sectionsOk && entries.length === group.members.length) {
+        return {
+          allowed: true,
+          priority: this.priority,
+          severity: 'none',
+          reason: 'Linked group',
+        };
+      }
+    }
+
+    return { allowed: true };
+  }
+}
+
+class SameSectionDuplicateRule extends Rule {
+  constructor() {
+    super('SameSectionDuplicateRule', 50);
+  }
+
+  evaluate({ entries }) {
+    const sections = new Set(entries.map((e) => e.section));
+
+    if (sections.size === 1 && entries.length > 1) {
+      return {
+        allowed: false,
+        priority: this.priority,
+        severity: 'error',
+        reason: 'Duplicate in same section',
+      };
+    }
+
+    return { allowed: true };
+  }
+}
+
+class RuleEngine {
+  constructor(rules = []) {
+    this.rules = [...rules].sort((a, b) => b.priority - a.priority);
+  }
+
+  evaluate(context) {
+    const results = [];
+
+    for (const rule of this.rules) {
+      const result = rule.evaluate(context);
+      results.push({ rule: rule.name, ...result });
+    }
+    return results;
+  }
+}
 
 export class BindParseError extends Error {
   constructor(message, line) {
@@ -90,6 +180,7 @@ function createKeysBindMap(fileModel) {
 
     for (const bind of section.binds) {
       if (!bind.keys || bind.keys.length === 0) continue;
+      if (bind.keys.some((k) => !k)) continue;
 
       const combo = [...bind.keys].sort().join('+');
 
@@ -107,63 +198,32 @@ function createKeysBindMap(fileModel) {
   return map;
 }
 
-function isAllowed(entries, linkedGroups) {
-  function _sameCommandAcrossSections() {
-    const sections = new Set(entries.map(e => e.section));
-    return sections.size > 1;
-  }
-
-  function _linkedCommandsAllowed() {
-    for (const group of Object.values(linkedGroups)) {
-
-      if (!group.sections.includes(e.section)) return false;
-
-      const allMatch = entries.every(e =>
-        group.members.some(m =>
-          m.command === e.bind.command &&
-          m.negated === e.bind.negated
-        )
-      );
-
-      if (allMatch && entries.length === group.members.length) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function _sameSectionDuplicates() {
-    const sections = new Set(entries.map(e => e.section));
-    return sections.size === 1 && entries.length > 1;
-  }
-
-  if (!CONFLICT_RULES.allowSameCommandAcrossSections && _sameCommandAcrossSections()) {
-    return false;
-  }
-
-  if (!CONFLICT_RULES.allowLinkedCommands && _linkedCommandsAllowed()) {
-    return false;
-  }
-
-  if (!CONFLICT_RULES.allowSameSectionDuplicates && _sameSectionDuplicates()) {
-    return false;
-  }
-
-  return true;
-}
-
 export function findConflicts(fileModel, linkedGroups) {
-  const keysMap = createKeysBindMap(fileModel);
+  const engine = new RuleEngine([
+    new EmptyKeyRule(),
+    new LinkedGroupRule(linkedGroups),
+    new SameSectionDuplicateRule(),
+  ]);
+
   const conflicts = [];
 
-  for (const [combo, entries] of keysMap.entries()) {
-    if (entries.length <= 1) continue;
-    if (isAllowed(entries, linkedGroups)) continue;
+  const keysMap = createKeysBindMap(fileModel);
 
-    conflicts.push({
-      combo,
-      entries,
-    });
+  for (const [combo, entries] of keysMap.entries()) {
+    const context = { combo, entries, fileModel, linkedGroups };
+    const results = engine.evaluate(context);
+
+    // check top priority result, if not allowed, it's a conflict, if allowed with reason 'Linked group', it's not a conflict even if there are duplicates, otherwise it's a conflict
+    const final = results.sort((a, b) => b.priority - a.priority)[0].allowed;
+    console.log(combo, final)
+    if (final) {
+      conflicts.push({
+        combo,
+        entries,
+        reason: final.reason,
+        severity: final.severity,
+      });
+    }
   }
 
   return conflicts;
