@@ -1074,7 +1074,7 @@ export class View {
 
   static async castleHeroes() {
     let tab = 1;
-    const SCROLL_MODIFIER = 1.5;
+    const SCROLL_MODIFIER = 1;
     let body = DOM({ style: 'castle-bottom' });
 
     View.castleBottom = DOM({ style: 'castle-bottom-content' });
