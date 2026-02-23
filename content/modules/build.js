@@ -2093,7 +2093,7 @@ export class Build {
   }
 	
   static getKeyName(index) {  
-    const keys = ['1', '2', '3', '4', '5', '6', '7', 'SHIFT + F1', '9', '0', 'F1', 'F2', 'F3', 'F4'];
+    const keys = ['Я', 'НЕ', 'Хочу', 'Работать', '🙃', '6', '7', 'SHIFT + F1', '9', '0', 'F1', 'F2', 'F3', 'F4'];
 	
     return keys[index] || (index + 1).toString();
   }
