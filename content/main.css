@@ -1279,6 +1279,19 @@ button.build-action-item:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.active-bar-key-text {
+  position: absolute;
+  top: -0.1cqh;
+  left: -0.1cqh;
+  color: lightgray; 
+  font-size: 18cqw; 
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .build-description {
   width: auto;
   max-width: 60cqh;

@@ -2047,7 +2047,15 @@ export class Build {
           },
         ],
       });
-
+	  
+	  const keyText = document.createElement('div');
+	  
+      keyText.className = 'active-bar-key-text';
+	  
+	  keyText.textContent = 'SHIFT + F1';
+      
+      element.appendChild(keyText);
+	  
       if (item >= 0) {
         element.dataset.active = 0;
       } else {
