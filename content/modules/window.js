@@ -1517,6 +1517,9 @@ export class Window {
 
     return DOM(
       { id: 'wcastle-call' },
+      DOM({style: 'title-modal'},
+        DOM({style: 'title-modal-text'}, 'Звонок'),
+      ),
       DOM({ style: 'castle-menu-title' }, Lang.text('friendCallFrom').replace('{name}', displayName)),
       DOM(
         { style: 'castle-menu-items-modal' },
