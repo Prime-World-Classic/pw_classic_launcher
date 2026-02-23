@@ -40,7 +40,7 @@ export const SOUNDS_LIBRARY = {
 
   // Tambur
   TAMBUR: 'content/sounds/tambur.ogg',
-  SINGLE_TIMER: 'content/sounds/SingleTimer.mp3'
+  SINGLE_TIMER: 'content/sounds/ui/SingleTimer.mp3'
 };
 
 /*  HERO SOUNDS GENERATION */

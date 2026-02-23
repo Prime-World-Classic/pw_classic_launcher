@@ -150,20 +150,20 @@ export class App {
             
         // },2000);
 
-    /*
-        setTimeout(() => {
+
+        // setTimeout(() => {
             
-            ARAM.briefing(6,1,() => alert(1));
+        //     ARAM.briefing(6,1,() => alert(1));
             
-        },3000);
-        */
-    /*
-        setTimeout(() => {
+        // },3000);
+
+
+        // setTimeout(() => {
             
-            Splash.show(DOM({style:'iframe-stats'},DOM({style:'iframe-stats-navbar',event:['click',() => Splash.hide()]},'X'),DOM({tag:'iframe',src:'https://stat.26rus-game.ru'})),false);
+        //     Splash.show(DOM({style:'iframe-stats'},DOM({style:'iframe-stats-navbar',event:['click',() => Splash.hide()]},'X'),DOM({tag:'iframe',src:'https://stat.26rus-game.ru'})),false);
             
-        },3000);
-        */
+        // },3000);
+
     await loadKeybinds();
     Chat.init();
 
