@@ -422,8 +422,7 @@ export class App {
             });
 
             factionElement.style.transform = 'scale(1.05)';
-            factionElement.style.filter = 'brightness(1)';
-            factionElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.7)';
+            factionElement.style.filter = 'brightness(1) drop-shadow(0 0 5px rgba(255,215,0,0.7))';
           },
         ],
       });
@@ -443,8 +442,7 @@ export class App {
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         transform: selectedFaction === faction.id ? 'scale(1.05)' : 'scale(1)',
-        filter: selectedFaction === faction.id ? 'brightness(1)' : 'brightness(0.7)',
-        boxShadow: selectedFaction === faction.id ? '0 0 15px rgba(255,215,0,0.7)' : 'none',
+        filter: selectedFaction === faction.id ? 'brightness(1) drop-shadow(0 0 5px rgba(255,215,0,0.7))' : 'brightness(0.7)',
         borderRadius: '10px',
       });
 
