@@ -4295,12 +4295,13 @@ i-success {
   container-type: inline-size;
   position: absolute;
   margin-top: 30cqh;
+  padding: 1cqh 3cqh;
   margin-left: auto;
   margin-right: auto;
   left: 0;
   right: 0;
   text-align: center;
-  width: 35cqh;
+  width: 33cqh;
   height: 17cqh;
   border-radius: 2cqh;
   /* Фоновый рисунок как в splash без градиента */
@@ -4347,6 +4348,9 @@ i-success {
   text-shadow: rgba(0, 0, 0, .5) 0.1cqh 0.1cqh 0.1cqh, rgba(0, 0, 0, .5) 0.1cqh -0.1cqh 0.1cqh, rgba(0, 0, 0, .5) -0.1cqh 0.1cqh 0.1cqh, rgba(0, 0, 0, .5) -0.1cqh -0.1cqh 0.1cqh;
   color: rgb(252, 229, 188);
     filter: brightness(1.1);
+}
+#splash-content-button-modal-red{
+  background: url('img/button5.png') no-repeat center center/contain;
 }
 .splash-content-button-modal:hover{
   filter: brightness(.9);

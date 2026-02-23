@@ -1550,6 +1550,7 @@ export class Window {
           {
             domaudio: domAudioPresets.bigButton,
             style: 'splash-content-button-modal',
+            id: 'splash-content-button-modal-red',
             event: [
               'click',
               async () => {
@@ -1637,6 +1638,7 @@ export class Window {
           {
             domaudio: domAudioPresets.bigButton,
             style: 'splash-content-button-modal',
+            id: 'splash-content-button-modal-red',
             event: [
               'click',
               () => {
