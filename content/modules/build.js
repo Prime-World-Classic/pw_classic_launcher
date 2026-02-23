@@ -2030,8 +2030,6 @@ export class Build {
 	
     let index = 0;
 	
-	Build.activeBarKeybindingsView.innerHTML = '';
-	
     for (let item of data) {
       const element = DOM({
         domaudio: domAudioPresets.defaultButton,
