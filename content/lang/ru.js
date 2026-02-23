@@ -279,7 +279,7 @@
     friendNicknamePlaceholder: 'Ник игрока',
     friendAcceptWaiting: 'Ожидание',
     friendInvitesToLobby: 'Игрок {nickname} приглашает Вас вступить в группу.',
-    friendCallFrom: 'Принять звонок от {name}?',
+    friendCallFrom: 'Игрок {name} вызывает по голосовой связи.',
     friendDropCall: 'Сбросить',
     inviteToAFriend: 'Пригласить',
     kristallik: 'qwe',

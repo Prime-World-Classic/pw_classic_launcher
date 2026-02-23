@@ -4301,7 +4301,7 @@ i-success {
   left: 0;
   right: 0;
   text-align: center;
-  width: 33cqh;
+  width: 35cqh;
   height: 17cqh;
   border-radius: 2cqh;
   /* Фоновый рисунок как в splash без градиента */
@@ -4318,7 +4318,7 @@ i-success {
   font-family: Tahoma, sans-serif;
   color: rgba(255, 255, 255, 0.9);
   border: .1cqh groove rgba(255, 186, 57, 0.774);
-  filter: drop-shadow(10px 0px 20px black);
+  filter: drop-shadow(0 0 2cqh black);
 }
 
 
