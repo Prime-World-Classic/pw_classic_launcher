@@ -1,3 +1,4 @@
+import { DOM } from './dom.js';
 export class Splash {
   static init() {
     Splash.body = document.createElement('div');
@@ -20,8 +21,10 @@ export class Splash {
       let body = document.createElement('div');
 
       body.classList.add('splash-content');
-
-      body.append(element);
+      let topbar = DOM({style: "title-modal"},
+        DOM({style: "title-text-modal"},)
+      );
+      body.append(topbar, element);
 
       Splash.body.append(body);
     } else {

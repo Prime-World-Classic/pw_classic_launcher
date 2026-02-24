@@ -276,7 +276,7 @@
     friendNicknamePlaceholder: 'Nickname',
     friendAcceptWaiting: 'Waiting',
     friendInvitesToLobby: 'Player {nickname} invites you to join the group',
-    friendCallFrom: 'Accept call from {name}?',
+    friendCallFrom: 'Player {name} appears via voice communication.',
     friendDropCall: 'Drop call',
     inviteToAFriend: 'Invite',
 
