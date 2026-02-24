@@ -1890,12 +1890,9 @@ button.build-action-item:hover {
     filter: brightness(1.1);
 }
 
-.splash-content-button {
-
-}
 
 .splash-content-button-red {
-  background-image: url(img/button3.png);
+  background-image: url(img/button5.png);
 }
 
 /* Адаптация для маленьких экранов */
@@ -4245,10 +4242,12 @@ i-success {
     color: rgba(255, 255, 255, 0.705);
     top: 0;
     left: 0;
-    z-index: 7;
+    z-index: 0.5;
     
 }
-
+#purchase-text{
+  font-size: 2.5cqh;
+}
 .title-modal:before,.title-modal:after {
     content: "";
     position: absolute;
