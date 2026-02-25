@@ -330,7 +330,7 @@ export class Window {
                       DOM(
                         { style: 'castle-menu-title', id:'purchase-text' },
                         Lang.text('windowShopBuyItem'),
-                        DOM({ style: 'castle-menu-title' }, `${translatedName}`),
+                        DOM({ style: 'splash-shop-item-name' }, `${translatedName}`),
                         DOM({ tag: 'br' }),
                         Lang.text('windowShopItemPrice').replace('{rItem.price}', rItem.price),
                         DOM({
