@@ -4346,6 +4346,20 @@ i-success {
   color: rgba(255, 255, 255, 0.9);
   border: 0.2cqh groove rgb(158, 155, 104);
   filter: drop-shadow(0 0 2cqh black);
+  z-index: 9999;
+}
+
+body:has(#wcastle-invite)::before,
+body:has(#wcastle-call)::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(1vmax);
+  z-index: 9998;
 }
 
 
