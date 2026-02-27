@@ -162,6 +162,7 @@ export class Window {
     );
   }
   static async build(heroId, targetId = 0, isWindow = false) {
+    
     let viewBuild = await View.build(heroId, targetId, isWindow);
     requestAnimationFrame(() => Voice.updatePanelPosition());
     return DOM({ id: 'wbuild' }, viewBuild);
@@ -322,11 +323,14 @@ export class Window {
                   Splash.show(
                     DOM(
                       {},
+                      DOM({style: "title-modal"},
+                        DOM({style: "title-modal-text"}, Lang.text('purchase'))
+                      ),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       DOM(
-                        { style: 'splash-item-text' },
+                        { style: 'castle-menu-title', id:'purchase-text' },
                         Lang.text('windowShopBuyItem'),
-                        DOM({ style: 'splash-shop-item-name' }, `${translatedName}`),
+                        DOM({ style: 'castle-menu-title' }, `${translatedName}`),
                         DOM({ tag: 'br' }),
                         Lang.text('windowShopItemPrice').replace('{rItem.price}', rItem.price),
                         DOM({
@@ -337,7 +341,8 @@ export class Window {
                         `?`,
                         DOM({}, additionalMessage),
                       ),
-                      DOM(
+                      DOM({style: 'castle-menu-items-modal'},
+                        DOM(
                         {
                           domaudio: domAudioPresets.bigButton,
                           style: 'splash-content-button',
@@ -388,12 +393,16 @@ export class Window {
                         },
                         Lang.text('windowShopCancel'),
                       ),
+                      )
                     ),
                   );
                 } else {
                   Splash.show(
                     DOM(
                       {},
+                      DOM({style: "title-modal"},
+                          DOM({style: "title-modal-text"}, Lang.text('WindowShopEquipment'))
+                      ),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       isFrame && !showQuadFrame ? Lang.text('windowShopUnequipItem') : Lang.text('windowShopEquipItem'),
                       DOM(
@@ -402,7 +411,8 @@ export class Window {
                       ),
                       '?',
                       DOM({}, additionalMessage),
-                      DOM(
+                      DOM({style: 'castle-menu-items-modal'},
+                        DOM(
                         {
                           domaudio: domAudioPresets.bigButton,
                           style: 'splash-content-button',
@@ -456,6 +466,7 @@ export class Window {
                           ],
                         },
                         Lang.text('windowShopCancel'),
+                      ),
                       ),
                     ),
                   );
@@ -1517,13 +1528,16 @@ export class Window {
 
     return DOM(
       { id: 'wcastle-call' },
+      DOM({style: 'title-modal'},
+        DOM({style: 'title-modal-text'}, 'Звонок'),
+      ),
       DOM({ style: 'castle-menu-title' }, Lang.text('friendCallFrom').replace('{name}', displayName)),
       DOM(
-        { style: 'castle-menu-items' },
+        { style: 'castle-menu-items-modal' },
         DOM(
           {
             domaudio: domAudioPresets.bigButton,
-            style: 'splash-content-button',
+            style: 'splash-content-button-modal',
             event: [
               'click',
               async () => {
@@ -1546,7 +1560,8 @@ export class Window {
         DOM(
           {
             domaudio: domAudioPresets.bigButton,
-            style: 'splash-content-button',
+            style: 'splash-content-button-modal',
+            id: 'splash-content-button-modal-red',
             event: [
               'click',
               async () => {
@@ -1595,12 +1610,15 @@ export class Window {
 
     return DOM(
       { id: 'wcastle-invite' },
+      DOM({style: 'title-modal'},
+        DOM({style: 'title-modal-text'}, 'Сражение'),
+      ),
       DOM({ style: 'castle-menu-title' }, Lang.text('friendInvitesToLobby').replace('{nickname}', displayNickname)),
       DOM(
-        { style: 'castle-menu-items' },
+        { style: 'castle-menu-items-modal' },
         DOM(
           {
-            style: 'splash-content-button',
+            style: 'splash-content-button-modal',
             domaudio: domAudioPresets.bigButton,
             event: [
               'click',
@@ -1630,7 +1648,8 @@ export class Window {
         DOM(
           {
             domaudio: domAudioPresets.bigButton,
-            style: 'splash-content-button',
+            style: 'splash-content-button-modal',
+            id: 'splash-content-button-modal-red',
             event: [
               'click',
               () => {
