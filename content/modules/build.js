@@ -1360,10 +1360,14 @@ export class Build {
 
         Splash.show(body);
       };
+	  
+	  Build.heroImg.oncontextmenu = (e) => {
+	  	Window.show('main', 'top', data.id, 0);
+	  };
     } else {
-		Build.heroImg.onclick = () => {
-			Window.show('main', 'top', data.id, 0);
-		};
+	  Build.heroImg.onclick = () => {
+	  	Window.show('main', 'top', data.id, 0);
+	  };
 	}
 
     Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${
