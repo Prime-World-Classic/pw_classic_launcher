@@ -1360,7 +1360,11 @@ export class Build {
 
         Splash.show(body);
       };
-    }
+    } else {
+		Build.heroImg.onclick = () => {
+			Window.show('main', 'top', data.id, 0);
+		};
+	}
 
     Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${
       Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1
