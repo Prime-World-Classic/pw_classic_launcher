@@ -1361,6 +1361,7 @@ export class Build {
         Splash.show(body);
       };
     };
+	Build.heroImg.dataset.role = Lang.text('titleTopBuilds');
 	Build.heroImg.onclick = () => {Window.show('main', 'top', data.id, 0)};
 	
     Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${

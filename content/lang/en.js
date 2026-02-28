@@ -262,6 +262,7 @@
       'Accounting for talents that provide additional buffs based on territory type (land) - native, enemy/neutral (e.g., red quality talents "Life Talisman", "Radiance of Nature")',
     makeStatPriorityTitle: 'Make characteristic priority',
     talentQualityTitle: '{name} talent quality',
+	titleTopBuilds: 'Top builds (LMB)',
 
     //Друзья
 
