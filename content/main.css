@@ -2866,8 +2866,12 @@ button.build-action-item:hover {
   z-index: 9999;
   font: 1cqw / 1 Arial;
   padding: 0.3vw;
-  color: rgba(255, 255, 255, 0.5);
+  color: white;
   font-size: 1cqh;
+  text-shadow: 2px 2px 4px black;
+  background-color: gray;
+  border-radius: 4cqh;
+  opacity: 0.7;
 }
 
 .history {
