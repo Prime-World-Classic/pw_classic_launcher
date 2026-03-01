@@ -31,9 +31,7 @@ function createKeyInput({ command, value = null }) {
       input.blur();
       return;
     }
-
     const keys = normalizeKey(e);
-    
     KeybindStore.setBind(command, keys, value);
   });
 
@@ -144,8 +142,8 @@ function buildCamera() {
 }
 
 export async function keybindings() {
-  const ok = await loadKeybinds();
-  if (!ok) return DOM({}, Lang.text('settingsReadError'));
+  // const ok = await loadKeybinds();
+  // if (!ok) return DOM({}, Lang.text('settingsReadError'));
 
   const content = DOM(
     { style: 'keybindings-wrapper' },
