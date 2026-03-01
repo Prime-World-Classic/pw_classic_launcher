@@ -4196,7 +4196,7 @@ i-success {
 
 .voice-info-panel-body {
   background-image: linear-gradient(1turn, rgba(25, 71, 67, 0.8), rgba(18, 69, 73, 0.9), rgba(21, 51, 59, 0.8), rgba(4, 32, 42, 0.8));
-  border-radius: 4cqh 4cqh 4cqh 4cqh / 4cqh 4cqh 4cqh 4cqh;
+  border-radius: 1cqh 1cqh 1cqh 1cqh / 1cqh 1cqh 1cqh 1cqh;
   border: 0.2cqh groove rgb(158, 155, 104);
   opacity: 0.8;
   width: 7vw;
