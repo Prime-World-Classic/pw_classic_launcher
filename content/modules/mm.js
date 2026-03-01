@@ -16,6 +16,7 @@ import { Timer } from './timer.js';
 import { Splash } from './splash.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { loadKeybinds } from './keybindings/keybindings.io.js';
 
 export class MM {
   static id = '';
@@ -75,7 +76,10 @@ export class MM {
 
     let button = CastleNAVBAR.init();
 
-    button.onclick = () => MM.start();
+    button.onclick = async () => {
+      await loadKeybinds();
+      MM.start();
+    };
   }
 
   static async init() {
@@ -1056,7 +1060,7 @@ export class MM {
     let message = DOM(`${data.message}`);
 
     if (App.isAdmin(data.id)) {
-      message.style.color = 'rgba(255, 50, 0, 0.9)';
+      message.style.color = 'rgba(255, 103, 90, 0.9)';
     } else if (data.id && 'commander' in MM.lobbyUsers[data.id]) {
       message.style.color = 'rgba(255,215,0,0.9)';
     }
