@@ -185,9 +185,9 @@ export const KeybindStore = {
     this.fileModel = fileModel;
     this.source = source;
     this.configPath = configPath;
-    if (this.fixConflicts()) {
+    if (this.fixConflicts().length > 0) {
       saveKeybinds(this.fileModel, this.configPath);
-      App.error("Сброс конфликтующих привязок к пустому значению");
+      App.error(Lang.text('resetConflictedKeybindings'));
     }
     this.uiModel = this.mapFileToUiModel();
     this.notify();
