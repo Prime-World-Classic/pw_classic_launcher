@@ -4179,7 +4179,7 @@ i-success {
 
 .voice-info-panel {
   position: fixed;
-  top: 36vh;
+  top: 27vh;
   display: none;
   flex-flow: column nowrap;
   justify-content: center;
