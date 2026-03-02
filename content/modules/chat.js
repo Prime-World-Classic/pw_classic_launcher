@@ -92,13 +92,7 @@ export class Chat {
     if (data.flag && data.flag !== 0) {
         flag = DOM({ tag: 'img' });
         flag.setAttribute('src', `content/flags/${data.flag}.png`);
-        flag.setAttribute('alt', '');
-        flag.style.height = '2cqh';
-        flag.style.width = '2cqh';
-        flag.style.marginRight = '0.2cqh';
-        flag.style.marginLeft = '0.2cqh';
-        flag.style.marginBottom = '-0.2cqh';
-        flag.style.display = 'inline-block';
+		flag.classList.add('chat-flag');
     }
 	
     let message = DOM({ tag: 'div' });

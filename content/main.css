@@ -4862,6 +4862,15 @@ body:has(#wcastle-call)::before {
   top: -8cqh;
 }
 
+.chat-flag {
+    height: 2cqh;
+    width: 2cqh;
+    margin-right: 0.2cqh;
+    margin-left: 0.2cqh;
+    margin-bottom: -0.2cqh;
+    display: inline-block;
+}
+
 @media (max-aspect-ratio: 1/1) {
   .build-horizontal {
     flex-direction: column;
