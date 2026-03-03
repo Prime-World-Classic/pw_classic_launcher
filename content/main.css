@@ -1283,8 +1283,8 @@ button.build-action-item:hover {
   justify-content: flex-end;
   position: relative;
   z-index: 11;
-  top: -0.5cqw;
-  left: 0cqw;
+  top: -0.1cqw;
+  left: -0.1cqw;
   font-size: 1.07cqw;
   white-space: nowrap;
   color: lightgray;
