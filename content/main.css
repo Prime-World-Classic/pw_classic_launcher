@@ -1285,12 +1285,13 @@ button.build-action-item:hover {
   z-index: 11;
   top: -0.1cqw;
   left: -0.1cqw;
-  font-size: 1.07cqw;
+  font-size: 1.1cqw;
   white-space: nowrap;
-  color: lightgray;
+  color: #ffe9c1;
   pointer-events: none;
   text-shadow: 2px 2px 2px black;
   font-weight: bold;
+  font-family: 'DejaVuSans', sans-serif;
 }
 
 .build-rarity {
