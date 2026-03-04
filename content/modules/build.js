@@ -278,34 +278,34 @@ export class Build {
     Build.descriptionView.style.display = 'none';
 
     const bindCommandsToGet = [
-      "cmd_action_bar_slot1",
-      "cmd_action_bar_slot2",
-      "cmd_action_bar_slot3",
-      "cmd_action_bar_slot4",
-      "cmd_action_bar_slot5",
-      "cmd_action_bar_slot6",
-      "cmd_action_bar_slot7",
-      "cmd_action_bar_slot8",
-      "cmd_action_bar_slot9",
-      "cmd_action_bar_slot10",
-      "cmd_action_bar_slot11",
-      "cmd_action_bar_slot12",
-      "cmd_action_bar_slot13",
-      "cmd_action_bar_slot14",
-      "cmd_action_bar_slot15",
-      "cmd_action_bar_slot16",
-      "cmd_action_bar_slot17",
-      "cmd_action_bar_slot18",
-      "cmd_action_bar_slot19",
-      "cmd_action_bar_slot20",
-      "cmd_action_bar_slot21",
-      "cmd_action_bar_slot22",
-      "cmd_action_bar_slot23",
-      "cmd_action_bar_slot24",
-    ]
+      'cmd_action_bar_slot1',
+      'cmd_action_bar_slot2',
+      'cmd_action_bar_slot3',
+      'cmd_action_bar_slot4',
+      'cmd_action_bar_slot5',
+      'cmd_action_bar_slot6',
+      'cmd_action_bar_slot7',
+      'cmd_action_bar_slot8',
+      'cmd_action_bar_slot9',
+      'cmd_action_bar_slot10',
+      'cmd_action_bar_slot11',
+      'cmd_action_bar_slot12',
+      'cmd_action_bar_slot13',
+      'cmd_action_bar_slot14',
+      'cmd_action_bar_slot15',
+      'cmd_action_bar_slot16',
+      'cmd_action_bar_slot17',
+      'cmd_action_bar_slot18',
+      'cmd_action_bar_slot19',
+      'cmd_action_bar_slot20',
+      'cmd_action_bar_slot21',
+      'cmd_action_bar_slot22',
+      'cmd_action_bar_slot23',
+      'cmd_action_bar_slot24',
+    ];
     this.binds = bindCommandsToGet.map((bindCommand) => {
       return KeybindStore.getBind(bindCommand);
-    })
+    });
 
     Build.descriptionView.onmouseover = () => {
       Build.descriptionView.style.display = 'none';
@@ -1395,9 +1395,6 @@ export class Build {
       };
     }
 
-    // оглавление
-    Build.heroImg.dataset.role = Lang.text('titleTopBuilds');
-
     // подсказка
     const tipTitle = 'Билды из Зала славы';
     const tipBody = [
@@ -1407,13 +1404,6 @@ export class Build {
       'Для копирования билда из Зала славы оставьте окно своего билда открытым на нужной вкладке.',
       'Затем перейдите к выбранному билду из Зала славы и нажмите «Украсть билд».',
     ].join('\n');
-    Build.heroImg.onclick = () => {
-      Window.show('main', 'top', data.id, 0);
-    };
-    Build.heroImg.oncontextmenu = (e) => {
-      e.preventDefault();
-      Window.show('main', 'top', data.id, 0);
-    };
 
     Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${
       Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1
@@ -1434,7 +1424,6 @@ export class Build {
     const avatarTip = DOM({ style: 'build-avatar-tip' }, DOM({ style: 'tip-title' }, tipTitle), DOM({ style: 'tip-body' }, tipBody));
     document.body.append(avatarTip);
 
-    
     function placeAvatarTip() {
       const r = Build.heroImg.getBoundingClientRect();
       const gap = 12;
@@ -1443,7 +1432,6 @@ export class Build {
       let top = r.top + r.height / 2;
 
       const tipRect = avatarTip.getBoundingClientRect();
-
       top = top - tipRect.height / 2;
 
       const pad = 10;
@@ -1455,7 +1443,6 @@ export class Build {
       }
 
       left = Math.max(pad, Math.min(left, vw - tipRect.width - pad));
-
       top = Math.max(pad, Math.min(top, vh - tipRect.height - pad));
 
       avatarTip.style.left = `${Math.round(left)}px`;
@@ -1469,9 +1456,7 @@ export class Build {
       tipOpen = true;
 
       avatarTip.classList.add('is-open');
-      requestAnimationFrame(() => {
-        placeAvatarTip();
-      });
+      requestAnimationFrame(() => placeAvatarTip());
     }
 
     function closeTip() {
@@ -1480,9 +1465,18 @@ export class Build {
       avatarTip.classList.remove('is-open');
     }
 
+    // закрыть
+    function destroyTip() {
+      tipOpen = false;
+      if (avatarTip) avatarTip.classList.remove('is-open');
+      if (avatarTip && avatarTip.parentNode) avatarTip.remove();
+    }
+
+    // hover
     Build.heroImg.addEventListener('mouseenter', openTip);
     Build.heroImg.addEventListener('mouseleave', closeTip);
 
+    // обновление позиции
     function onViewportChange() {
       if (!tipOpen) return;
       placeAvatarTip();
@@ -1490,18 +1484,53 @@ export class Build {
     window.addEventListener('scroll', onViewportChange, true);
     window.addEventListener('resize', onViewportChange);
 
+    function onDocPointerDown(e) {
+      if (!tipOpen) return;
+      const t = e.target;
+      if (t === Build.heroImg || Build.heroImg.contains(t)) return;
+      if (t === avatarTip || avatarTip.contains(t)) return;
+      closeTip();
+    }
+    document.addEventListener('pointerdown', onDocPointerDown, true);
+
+    function onBlur() {
+      closeTip();
+    }
+    function onVisibility() {
+      if (document.hidden) closeTip();
+    }
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    function goTopBuilds() {
+      closeTip();
+      destroyTip();
+      Window.show('main', 'top', data.id, 0);
+    }
+
+    Build.heroImg.onclick = () => {
+      goTopBuilds();
+    };
+
+    Build.heroImg.oncontextmenu = (e) => {
+      e.preventDefault();
+      goTopBuilds();
+    };
+
     const oldCleanup = Build.cleanup;
     Build.cleanup = function () {
       try {
         window.removeEventListener('scroll', onViewportChange, true);
         window.removeEventListener('resize', onViewportChange);
-        if (avatarTip && avatarTip.parentNode) avatarTip.remove();
+        document.removeEventListener('pointerdown', onDocPointerDown, true);
+        window.removeEventListener('blur', onBlur);
+        document.removeEventListener('visibilitychange', onVisibility);
+        destroyTip();
       } catch (e) {}
       if (typeof oldCleanup === 'function') oldCleanup.call(Build);
     };
 
     const avatarWrap = DOM({ style: 'build-avatar-wrap' }, Build.heroImg);
-
     const wrapper = DOM({ style: 'build-hero-avatar-and-name' }, avatarWrap, Build.skinView, Build.training);
 
     Build.heroView.append(wrapper, stats);
@@ -2218,8 +2247,6 @@ export class Build {
   }
 
   static getKeyName(index) {
-    
-
     return Build.binds[index].keys.join('+');
   }
 
