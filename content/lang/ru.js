@@ -22,7 +22,7 @@
     ready2: 'Подтвердить выбор героя',
     cancel: 'Отменить',
     library: 'Библиотека',
-    menu: 'Меню',
+    menu: 'Игровое меню',
     account: 'Аккаунт',
     steamConnect: 'Подключить Steam',
     nicknameChange: 'Изменить никнейм',

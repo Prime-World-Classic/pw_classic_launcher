@@ -20,7 +20,7 @@
     ready: 'Ready!',
     ready2: "Confirm the hero's choice",
     library: 'Library',
-    menu: 'Menu',
+    menu: 'Game Menu',
     account: 'Account',
     steamConnect: 'Connect Steam',
     nicknameChange: 'Change your nickname',
