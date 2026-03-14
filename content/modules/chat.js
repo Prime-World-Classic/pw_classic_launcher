@@ -53,13 +53,7 @@ export class Chat {
 
     Chat.body = DOM({ style: 'chat' }, DOM({ style: 'chat-body' }), Chat.pinnedContainer, Chat.input);
 
-    Chat.body.addEventListener('mouseleave', () => {
-      if (!Chat.pinnedCollapsed && Chat.pinnedContainer) {
-        const listWrap = Chat.pinnedContainer.querySelector('.chat-pinned-list-wrap');
-        if (listWrap) listWrap.classList.add('chat-pinned-list-wrap-collapsed');
-        Chat.pinnedCollapsed = true;
-      }
-    });
+    Chat.body.addEventListener('mouseleave', () => Chat.collapsePinnedList());
 
 		const handleSend = async (event) => {
 		  if (event.key === 'Enter' || event.keyCode === 13 || event.code === 'Enter' || event.code === 'NumpadEnter') {
@@ -106,6 +100,55 @@ export class Chat {
   static wrapLinksInATag(message) {
     const urlRegex = /(https:\/\/[^\s]+)/g;
     return message.replace(urlRegex, '<a href="$1">$1</a>');
+  }
+
+  static get canManagePins() {
+    return App.isAdmin() || App.isHelper();
+  }
+
+  static focusReplyTo(data) {
+    Chat.to = data.id;
+    Chat.body.lastChild.firstChild.value = `@${data.nickname}, `;
+    Chat.input.firstChild.focus();
+  }
+
+  static createPinButton(data, label = '📌') {
+    return DOM(
+      {
+        tag: 'button',
+        style: 'chat-pin-button',
+        event: [
+          'click',
+          async (e) => {
+            e.stopPropagation();
+            await Chat.togglePin(data);
+          },
+        ],
+      },
+      label,
+    );
+  }
+
+  /** Syncs pinned list from one message (add/update or remove), keeps list open, re-renders. */
+  static syncPinnedMessage(data) {
+    if (!Array.isArray(Chat.pinnedMessages)) Chat.pinnedMessages = [];
+    Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
+    if (data.pinned) Chat.pinnedMessages.push(data);
+    Chat.pinnedCollapsed = false;
+    Chat.renderPinnedMessages();
+  }
+
+  static revealChatIfNeeded() {
+    if (Chat.hide) {
+      Chat.body.style.display = 'block';
+      Chat.hide = false;
+    }
+  }
+
+  static collapsePinnedList() {
+    const listWrap = Chat.pinnedContainer?.querySelector('.chat-pinned-list-wrap');
+    if (listWrap) listWrap.classList.add('chat-pinned-list-wrap-collapsed');
+    Chat.pinnedCollapsed = true;
   }
 
   /** Builds flag, nickname and message nodes with same styling as chat (for viewMessage and pinned list). */
@@ -185,42 +228,14 @@ export class Chat {
     );
     if (existingItem) {
       if (data.pinned) {
-        const pinBtn = existingItem.querySelector('.chat-pin-button');
-        if (pinBtn) pinBtn.remove();
-        if (!Array.isArray(Chat.pinnedMessages)) Chat.pinnedMessages = [];
-        Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-        Chat.pinnedMessages.push(data);
-        Chat.pinnedCollapsed = false;
-        Chat.renderPinnedMessages();
-        if (!fromHistory && Chat.hide) {
-          Chat.body.style.display = 'block';
-          Chat.hide = false;
-        }
+        existingItem.querySelector('.chat-pin-button')?.remove();
+        Chat.syncPinnedMessage(data);
+        if (!fromHistory) Chat.revealChatIfNeeded();
       } else {
-        if (Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.length) {
-          const before = Chat.pinnedMessages.length;
-          Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-          if (Chat.pinnedMessages.length !== before) {
-            Chat.pinnedCollapsed = false;
-            Chat.renderPinnedMessages();
-          }
-        }
-        if ((App.isAdmin() || App.isHelper()) && !existingItem.querySelector('.chat-pin-button')) {
-          const pinButton = DOM(
-            {
-              tag: 'button',
-              style: 'chat-pin-button',
-              event: [
-                'click',
-                async (event) => {
-                  event.stopPropagation();
-                  await Chat.togglePin(data);
-                },
-              ],
-            },
-            '📌',
-          );
-          existingItem.append(pinButton);
+        const wasInPinned = Chat.pinnedMessages.some((m) => m.messageId === data.messageId);
+        if (wasInPinned) Chat.syncPinnedMessage(data);
+        if (Chat.canManagePins && !existingItem.querySelector('.chat-pin-button')) {
+          existingItem.append(Chat.createPinButton(data));
         }
       }
       if (!fromHistory) Chat.addMessageToHistory(data);
@@ -229,25 +244,17 @@ export class Chat {
     }
 
     if (data.pinned) {
-      if (!Array.isArray(Chat.pinnedMessages)) Chat.pinnedMessages = [];
-      Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-      Chat.pinnedMessages.push(data);
-      Chat.pinnedCollapsed = false;
-      Chat.renderPinnedMessages();
-      if (!fromHistory) Chat.addMessageToHistory(data);
-      if (!fromHistory && Chat.hide) {
-        Chat.body.style.display = 'block';
-        Chat.hide = false;
+      Chat.syncPinnedMessage(data);
+      if (!fromHistory) {
+        Chat.addMessageToHistory(data);
+        Chat.revealChatIfNeeded();
       }
       return;
     }
 
-    const wasOnlyPinned =
-      Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.some((m) => m.messageId === data.messageId);
+    const wasOnlyPinned = Chat.pinnedMessages.some((m) => m.messageId === data.messageId);
     if (wasOnlyPinned) {
-      Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-      Chat.pinnedCollapsed = false;
-      Chat.renderPinnedMessages();
+      Chat.syncPinnedMessage(data);
       if (!fromHistory) Chat.addMessageToHistory(data);
       return;
     }
@@ -259,38 +266,13 @@ export class Chat {
       {
         style: 'chat-body-item',
         domaudio: domAudioPresets.bigButton,
-        event: [
-          'click',
-          () => {
-            Chat.to = data.id;
-            Chat.body.lastChild.firstChild.value = `@${data.nickname}, `;
-            Chat.input.firstChild.focus();
-          },
-        ],
+        event: ['click', () => Chat.focusReplyTo(data)],
       },
       contentWrap,
     );
 
     item.dataset.messageId = data.messageId;
-
-    const canManagePins = App.isAdmin() || App.isHelper();
-    if (canManagePins && !data.pinned) {
-      const pinButton = DOM(
-        {
-          tag: 'button',
-          style: 'chat-pin-button',
-          event: [
-            'click',
-            async (event) => {
-              event.stopPropagation();
-              await Chat.togglePin(data);
-            },
-          ],
-        },
-        '📌',
-      );
-      item.append(pinButton);
-    }
+    if (Chat.canManagePins && !data.pinned) item.append(Chat.createPinButton(data));
 
     item.addEventListener('contextmenu', () => {
       if (App.isAdmin() || App.isHelper()) {
@@ -332,30 +314,12 @@ export class Chat {
     Chat.body.firstChild.prepend(item);
 
     if (data.pinned) {
-      if (!Array.isArray(Chat.pinnedMessages)) {
-        Chat.pinnedMessages = [];
-      }
-      Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-      Chat.pinnedMessages.push(data);
-      Chat.pinnedCollapsed = false;
-      Chat.renderPinnedMessages();
-      if (!fromHistory && Chat.hide) {
-        Chat.body.style.display = 'block';
-        Chat.hide = false;
-      }
-    } else if (Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.length) {
-      const beforeLength = Chat.pinnedMessages.length;
-      Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
-      if (Chat.pinnedMessages.length !== beforeLength) {
-        Chat.pinnedCollapsed = false;
-        Chat.renderPinnedMessages();
-      }
+      Chat.syncPinnedMessage(data);
+      if (!fromHistory) Chat.revealChatIfNeeded();
+    } else if (Chat.pinnedMessages.some((m) => m.messageId === data.messageId)) {
+      Chat.syncPinnedMessage(data);
     }
-
-    if (!fromHistory) {
-      Chat.addMessageToHistory(data);
-    }
-
+    if (!fromHistory) Chat.addMessageToHistory(data);
     Chat.scroll();
   }
 
@@ -425,42 +389,19 @@ export class Chat {
   }
 
   static fillPinnedList(list) {
-    const canManagePins = App.isAdmin() || App.isHelper();
     while (list.firstChild) list.firstChild.remove();
     Chat.pinnedMessages.forEach((msg) => {
       const { flag, nickname, message } = Chat.buildMessageContent(msg);
       const contentWrap = DOM({ style: 'chat-body-item-content' }, ...(flag ? [flag, nickname, message] : [nickname, message]));
-      const row = DOM({
-        style: ['chat-body-item', 'chat-pinned-item'],
-        domaudio: domAudioPresets.bigButton,
-        event: [
-          'click',
-          () => {
-            Chat.to = msg.id;
-            Chat.body.lastChild.firstChild.value = `@${msg.nickname}, `;
-            Chat.input.firstChild.focus();
-          },
-        ],
-      }, contentWrap);
-
-      if (canManagePins) {
-        const btn = DOM(
-          {
-            tag: 'button',
-            style: 'chat-pin-button',
-            event: [
-              'click',
-              async (event) => {
-                event.stopPropagation();
-                await Chat.togglePin(msg);
-              },
-            ],
-          },
-          '❌',
-        );
-        row.append(btn);
-      }
-
+      const row = DOM(
+        {
+          style: ['chat-body-item', 'chat-pinned-item'],
+          domaudio: domAudioPresets.bigButton,
+          event: ['click', () => Chat.focusReplyTo(msg)],
+        },
+        contentWrap,
+      );
+      if (Chat.canManagePins) row.append(Chat.createPinButton(msg, '❌'));
       list.append(row);
     });
   }
@@ -471,23 +412,18 @@ export class Chat {
     }
 
     const hasPinned = Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.length > 0;
-    if (Chat.body) {
-      Chat.body.classList.toggle('chat-has-pinned', hasPinned);
-    }
+    Chat.body?.classList.toggle('chat-has-pinned', hasPinned);
 
-    const existingHeader = Chat.pinnedContainer.querySelector('.chat-pinned-header');
     const existingListWrap = Chat.pinnedContainer.querySelector('.chat-pinned-list-wrap');
     const existingList = existingListWrap?.querySelector('.chat-pinned-list');
+    const existingHeader = Chat.pinnedContainer.querySelector('.chat-pinned-header');
 
     if (hasPinned && existingHeader && existingList) {
-      const total = Chat.pinnedMessages.length;
-      const last = Chat.pinnedMessages[total - 1];
+      const last = Chat.pinnedMessages[Chat.pinnedMessages.length - 1];
       existingHeader.children[1].textContent = `${last.nickname}: ${last.message}`;
-      existingHeader.children[2].textContent = `${total}`;
+      existingHeader.children[2].textContent = Chat.pinnedMessages.length;
       Chat.fillPinnedList(existingList);
-      if (!Chat.pinnedCollapsed && existingListWrap) {
-        existingListWrap.classList.remove('chat-pinned-list-wrap-collapsed');
-      }
+      if (!Chat.pinnedCollapsed) existingListWrap.classList.remove('chat-pinned-list-wrap-collapsed');
       return;
     }
 
@@ -512,12 +448,8 @@ export class Chat {
           'click',
           () => {
             Chat.pinnedCollapsed = !Chat.pinnedCollapsed;
-            if (Chat.pinnedCollapsed) {
-              const listWrap = Chat.pinnedContainer.querySelector('.chat-pinned-list-wrap');
-              if (listWrap) listWrap.classList.add('chat-pinned-list-wrap-collapsed');
-            } else {
-              Chat.renderPinnedMessages();
-            }
+            if (Chat.pinnedCollapsed) Chat.collapsePinnedList();
+            else Chat.renderPinnedMessages();
           },
         ],
       },
