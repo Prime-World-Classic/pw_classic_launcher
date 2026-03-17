@@ -1607,7 +1607,7 @@ export class Window {
     Window.inviteTimeout = inviteTimeout;
 
     return DOM(
-      { id: 'wcastle-invite' }, DOM({style: 'title-modal'},DOM({style: 'title-modal-text'}, 'Сражение'),),
+      { id: 'wcastle-invite' }, DOM({style: 'title-modal'},DOM({style: 'title-modal-text'}, Lang.text('battleText')),),
       DOM({ style: 'castle-menu-title' }, Lang.text('friendInvitesToLobby').replace('{nickname}', displayNickname)),
       DOM(
         { style: 'castle-menu-items-modal' },

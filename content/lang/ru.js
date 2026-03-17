@@ -281,7 +281,7 @@
     friendCallFrom: 'Игрок {name} вызывает по голосовой связи.',
     friendDropCall: 'Сбросить',
     inviteToAFriend: 'Пригласить',
-    kristallik: 'qwe',
+    battleText: 'Сражение',
 
     //Войс
     enableMic: 'Нажмите <strong>Ctrl+Z</strong> или на свой Ник, чтобы включить: {Voice.mic.label}',

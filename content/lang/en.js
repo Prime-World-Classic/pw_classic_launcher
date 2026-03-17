@@ -277,7 +277,7 @@
     friendCallFrom: 'Accept call from {name}?',
     friendDropCall: 'Drop call',
     inviteToAFriend: 'Invite',
-
+    battleText: 'Battle',
     //Войс
 
     enableMic: 'Press <strong>Ctrl+Z</strong> or click your Nickname to enable: {Voice.mic.label}',
