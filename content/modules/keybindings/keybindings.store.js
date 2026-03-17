@@ -1,4 +1,9 @@
+import { App } from '../app.js';
+import { Lang } from '../lang.js';
 import { createEmptyUiModel } from './keybindings.schema.js';
+import { saveKeybinds } from './keybindings.io.js';
+import { findConflicts } from './keybindings.validator.js';
+
 /**
  * KeybindStore: manages keybindings for the application,
  * observer pattern implementation
@@ -45,7 +50,6 @@ export const KeybindStore = {
       ],
       sections: ['adventure_screen', 'minigame'],
     },
-
     actionbarLock: {
       members: [
         { command: 'actionbar_lock_off', negated: false },
@@ -53,13 +57,124 @@ export const KeybindStore = {
       ],
       sections: ['adventure_screen'],
     },
-
     selfCast: {
       members: [
         { command: 'self_cast_on', negated: false },
         { command: 'self_cast_off', negated: true },
       ],
       sections: ['adventure_screen'],
+    },
+    enter: {
+      members: [
+        {
+          command: 'console_runcommand',
+          negated: false,
+        },
+        {
+          command: 'editline_return',
+          negated: false,
+        },
+        {
+          command: 'login_screen_enter',
+          negated: false,
+        },
+      ],
+      sections: ['__global__'],
+    },
+    consoleUpKey: {
+      members: [
+        {
+          command: 'console_prevcommand',
+          negated: false,
+        },
+        {
+          command: 'editline_up',
+          negated: false,
+        },
+      ],
+      sections: ['__global__'],
+    },
+    consoleDownKey: {
+      members: [
+        {
+          command: 'console_nextcommand',
+          negated: false,
+        },
+        {
+          command: 'editline_down',
+          negated: false,
+        },
+      ],
+      sections: ['__global__'],
+    },
+    consoleLeftKey: {
+      members: [
+        {
+          command: 'console_charleft',
+          negated: false,
+        },
+        {
+          command: 'editline_left',
+          negated: false,
+        },
+      ],
+      sections: ['__global__'],
+    },
+    consoleRightKey: {
+      members: [
+        { command: 'console_charright', negated: false },
+        { command: 'editline_right', negated: false },
+      ],
+      sections: ['__global__'],
+    },
+    tabKey: {
+      members: [
+        { command: 'console_autocomplete', negated: false },
+        { command: 'editline_tab', negated: false },
+        { command: 'login_screen_tab', negated: false },
+      ],
+      sections: ['__global__'],
+    },
+    escapeKey: {
+      members: [
+        { command: 'console_clear', negated: false },
+        { command: 'cmd_cancel', negated: false },
+        { command: 'exit_bind', negated: false },
+        { command: 'dialog_escape', negated: false },
+        { command: 'editline_clear', negated: false },
+        { command: 'draganddrop_cancel', negated: false },
+        { command: 'open_close_game_menu', negated: false },
+        { command: 'cmd_smart_chat_cancel', negated: false },
+      ],
+      sections: ['__global__'],
+    },
+    backspaceKey: {
+      members: [
+        { command: 'console_eraselastchar', negated: false },
+        { command: 'editline_back', negated: false },
+      ],
+      sections: ['__global__'],
+    },
+    minimapSignal: {
+      members: [
+        { command: 'minimap_signal_key_down', negated: false },
+        { command: 'minimap_signal_key_up', negated: true },
+      ],
+      sections: ['__global__'],
+    },
+    cameraAttach: {
+      members: [
+        { command: 'camera_switch_attach_mode_down', negated: false },
+        { command: 'camera_switch_attach_mode_up', negated: true },
+      ],
+      sections: ['adventure_screen'],
+    },
+    mouseWheelPair: {
+      members: [
+        { command: 'cs_mouse_wheel_down', negated: false },
+        { command: 'cs_mouse_wheel_up', negated: true },
+      ],
+      sections: ['__global__'],
     },
   },
   source: 'native' | 'browser',
@@ -70,6 +185,10 @@ export const KeybindStore = {
     this.fileModel = fileModel;
     this.source = source;
     this.configPath = configPath;
+    if (this.fixConflicts().length > 0) {
+      saveKeybinds(this.fileModel, this.configPath);
+      App.error(Lang.text('resetConflictedKeybindings'));
+    }
     this.uiModel = this.mapFileToUiModel();
     this.notify();
   },
@@ -113,13 +232,29 @@ export const KeybindStore = {
     bind.keys = [...keys];
 
     const linked = this.findLinkedBinds(bind);
-    for (const b of linked) {
-      b.keys = [...keys];
+    for (const linkedBind of linked) {
+      linkedBind.keys = [...keys];
     }
 
+    this.fixConflicts(command);
     this.uiModel = this.mapFileToUiModel();
     this.notify();
+
     return true;
+  },
+
+  fixConflicts(command = null) {
+    const conflicts = findConflicts(this.fileModel, this.linkedGroups);
+    for (const conflict of conflicts) {
+      for (const entry of conflict.entries) {
+        if (entry.bind.command === command) continue;
+        const bind = this.getBind(entry.bind.command, entry.bind.value);
+        if (bind) {
+          this.setBind(bind.command, [''], bind.value);
+        }
+      }
+    }
+    return conflicts;
   },
   notify() {
     this.subscribers.forEach((fn) => fn(this.fileModel));
@@ -133,7 +268,7 @@ export const KeybindStore = {
     return unsubscribeFunc;
   },
 
-  mapFileToUiModel(fileModel = this.fileModel) {
+  mapFileToUiModel(fileModel = this.fileModel, conflicts) {
     const ui = createEmptyUiModel();
 
     for (const section of fileModel.sections) {

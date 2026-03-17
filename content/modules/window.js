@@ -162,7 +162,6 @@ export class Window {
     );
   }
   static async build(heroId, targetId = 0, isWindow = false) {
-    
     let viewBuild = await View.build(heroId, targetId, isWindow);
     requestAnimationFrame(() => Voice.updatePanelPosition());
     return DOM({ id: 'wbuild' }, viewBuild);
@@ -323,12 +322,9 @@ export class Window {
                   Splash.show(
                     DOM(
                       {},
-                      DOM({style: "title-modal"},
-                        DOM({style: "title-modal-text"}, Lang.text('purchase'))
-                      ),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       DOM(
-                        { style: 'castle-menu-title', id:'purchase-text' },
+                        { style: 'splash-item-text' },
                         Lang.text('windowShopBuyItem'),
                         DOM({ style: 'splash-shop-item-name' }, `${translatedName}`),
                         DOM({ tag: 'br' }),
@@ -341,8 +337,7 @@ export class Window {
                         `?`,
                         DOM({}, additionalMessage),
                       ),
-                      DOM({style: 'castle-menu-items-modal'},
-                        DOM(
+                      DOM(
                         {
                           domaudio: domAudioPresets.bigButton,
                           style: 'splash-content-button',
@@ -393,16 +388,12 @@ export class Window {
                         },
                         Lang.text('windowShopCancel'),
                       ),
-                      )
                     ),
                   );
                 } else {
                   Splash.show(
                     DOM(
                       {},
-                      DOM({style: "title-modal"},
-                          DOM({style: "title-modal-text"}, Lang.text('WindowShopEquipment'))
-                      ),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       isFrame && !showQuadFrame ? Lang.text('windowShopUnequipItem') : Lang.text('windowShopEquipItem'),
                       DOM(
@@ -411,8 +402,7 @@ export class Window {
                       ),
                       '?',
                       DOM({}, additionalMessage),
-                      DOM({style: 'castle-menu-items-modal'},
-                        DOM(
+                      DOM(
                         {
                           domaudio: domAudioPresets.bigButton,
                           style: 'splash-content-button',
@@ -466,7 +456,6 @@ export class Window {
                           ],
                         },
                         Lang.text('windowShopCancel'),
-                      ),
                       ),
                     ),
                   );
@@ -733,7 +722,7 @@ export class Window {
   static async menu() {
     return DOM(
       { id: 'wcastle-menu' },
-      DOM({ style: 'castle-menu-title' }, Lang.text('menu')),
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('menu'))),
       DOM(
         { style: 'castle-menu-items' },
         App.isAdmin()
@@ -853,10 +842,18 @@ export class Window {
 
   static async settings() {
     let soundTestId = 'sound_test';
+	
+	 setTimeout(() => {
+          const sliders = document.querySelectorAll('.castle-menu-slider');
+          sliders.forEach(slider => {
+              Window.updateSliderFill(slider);
+          });
+      }, 0);
 
+	
     return DOM(
       { id: 'wcastle-menu' },
-      DOM({ style: 'castle-menu-title' }, Lang.text('preferences')),
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('preferences'))),
       DOM(
         { style: 'castle-menu-items' },
         DOM(
@@ -957,6 +954,7 @@ export class Window {
                 Settings.ApplySettings({ render: false, window: false });
 
                 document.getElementById('global-volume-percentage').textContent = `${Math.round(Settings.settings.globalVolume * 100)}%`;
+				Window.updateSliderFill(e.target);
               },
             ],
           }),
@@ -988,6 +986,7 @@ export class Window {
                 Settings.ApplySettings({ render: false, window: false });
 
                 document.getElementById('music-volume-percentage').textContent = `${Math.round(Settings.settings.musicVolume * 100)}%`;
+				Window.updateSliderFill(e.target);
               },
             ],
           }),
@@ -1033,6 +1032,7 @@ export class Window {
                 }
 
                 document.getElementById('sounds-volume-percentage').textContent = `${Math.round(Settings.settings.soundsVolume * 100)}%`;
+				Window.updateSliderFill(e.target);
               },
             ],
           }),
@@ -1289,7 +1289,7 @@ export class Window {
   static async support() {
     return DOM(
       { id: 'wcastle-menu' },
-      DOM({ style: 'castle-menu-title' }, Lang.text('support')),
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('support'))),
       DOM(
         { style: 'castle-menu-items' },
         DOM({ style: 'castle-menu-text' }, Lang.text('supportDesk')),
@@ -1355,7 +1355,7 @@ export class Window {
   static async adminPanel() {
     return DOM(
       { id: 'wcastle-menu' },
-      DOM({ style: 'castle-menu-title' }, 'Админ Панель'),
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, 'Админ Панель')),
       DOM(
         {
           domaudio: domAudioPresets.bigButton,
@@ -1435,9 +1435,7 @@ export class Window {
     );
   }
   static async accountPanel() {
-    return DOM(
-      { id: 'wcastle-menu' },
-      DOM({ style: 'castle-menu-title' }, Lang.text('account')),
+    return DOM({ id: 'wcastle-menu' }, DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('account')),),
       DOM(
         {
           domaudio: domAudioPresets.bigButton,
@@ -1609,10 +1607,7 @@ export class Window {
     Window.inviteTimeout = inviteTimeout;
 
     return DOM(
-      { id: 'wcastle-invite' },
-      DOM({style: 'title-modal'},
-        DOM({style: 'title-modal-text'}, 'Сражение'),
-      ),
+      { id: 'wcastle-invite' }, DOM({style: 'title-modal'},DOM({style: 'title-modal-text'}, 'Сражение'),),
       DOM({ style: 'castle-menu-title' }, Lang.text('friendInvitesToLobby').replace('{nickname}', displayNickname)),
       DOM(
         { style: 'castle-menu-items-modal' },
@@ -1666,6 +1661,14 @@ export class Window {
         ),
       ),
     );
+  }
+  
+  static updateSliderFill(slider) {
+	const value = slider.value;
+	const max = slider.max;
+	const percentage = 2 + (value / max * 98);
+	console.log(value, max);
+	slider.style.setProperty('--fill-percentage', percentage + '%');
   }
 }
 Window.keybindings = keybindings;

@@ -13,6 +13,7 @@ import { domAudioPresets } from './domAudioPresets.js';
 import { Sound } from './sound.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { Castle } from './castle.js';
+import { KeybindStore } from './keybindings/keybindings.store.js';
 
 export class Build {
   static loading = false;
@@ -83,6 +84,8 @@ export class Build {
     1: 2.625,
     0: 11.28,
   };
+
+  static binds = [];
 
   static async view(user, hero, nickname = '', animate = true) {
     let request = await App.api.request('build', 'get', {
@@ -274,6 +277,36 @@ export class Build {
 
     Build.descriptionView.style.display = 'none';
 
+    const bindCommandsToGet = [
+      "cmd_action_bar_slot1",
+      "cmd_action_bar_slot2",
+      "cmd_action_bar_slot3",
+      "cmd_action_bar_slot4",
+      "cmd_action_bar_slot5",
+      "cmd_action_bar_slot6",
+      "cmd_action_bar_slot7",
+      "cmd_action_bar_slot8",
+      "cmd_action_bar_slot9",
+      "cmd_action_bar_slot10",
+      "cmd_action_bar_slot11",
+      "cmd_action_bar_slot12",
+      "cmd_action_bar_slot13",
+      "cmd_action_bar_slot14",
+      "cmd_action_bar_slot15",
+      "cmd_action_bar_slot16",
+      "cmd_action_bar_slot17",
+      "cmd_action_bar_slot18",
+      "cmd_action_bar_slot19",
+      "cmd_action_bar_slot20",
+      "cmd_action_bar_slot21",
+      "cmd_action_bar_slot22",
+      "cmd_action_bar_slot23",
+      "cmd_action_bar_slot24",
+    ]
+    this.binds = bindCommandsToGet.map((bindCommand) => {
+      return KeybindStore.getBind(bindCommand);
+    })
+
     Build.descriptionView.onmouseover = () => {
       Build.descriptionView.style.display = 'none';
     };
@@ -379,6 +412,8 @@ export class Build {
 
     Build.activeBarView = DOM({ style: 'build-active-bar' });
 
+    Build.activeBarKeybindingsView = DOM({ style: 'build-active-bar' });
+
     let request = await App.api.request('build', 'data', {
       heroId: heroId,
       target: targetId,
@@ -433,7 +468,7 @@ export class Build {
 
     Build.activeBar(request.active);
 
-//	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    //	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
     Build.ruleSortInventory = new Object();
   }
@@ -1323,7 +1358,7 @@ export class Build {
     Build.heroImg = DOM({ style: 'avatar' });
 
     if (App.isAdmin()) {
-      Build.heroImg.onclick = async () => {
+      Build.heroImg.oncontextmenu = async () => {
         let body = document.createDocumentFragment(),
           request = await App.api.request('build', 'heroData', { id: data.id });
 
@@ -1360,6 +1395,11 @@ export class Build {
       };
     }
 
+    Build.heroImg.onclick = () => {
+      Window.show('main', 'top', data.id, 0);
+	  closeTip();
+    };
+
     Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${
       Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1
     }.webp), url(content/hero/background.png)`;
@@ -1372,10 +1412,82 @@ export class Build {
     rankIcon.style.backgroundSize = '70%, 100%';
     rankIcon.style.backgroundPosition = 'center, center';
     rankIcon.style.backgroundRepeat = 'no-repeat, no-repeat';
+
     let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, data.rating), rankIcon);
     Build.heroImg.append(rank);
-    // Build.training
-    const wrapper = DOM({ style: 'build-hero-avatar-and-name' }, Build.heroImg, Build.skinView, Build.training);
+
+    const avatarTip = DOM({ style: 'build-avatar-tip' }, DOM({ style: 'tip-title' }, Lang.text('tipTitle')), DOM({ style: 'tip-body' }, Lang.text('tipBody')));
+    document.body.append(avatarTip);
+
+    
+    function placeAvatarTip() {
+      const r = Build.heroImg.getBoundingClientRect();
+      const gap = 12;
+
+      let left = r.right + gap;
+      let top = r.top + r.height / 2;
+
+      const tipRect = avatarTip.getBoundingClientRect();
+
+      top = top - tipRect.height / 2;
+
+      const pad = 10;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (left + tipRect.width > vw - pad) {
+        left = r.left - gap - tipRect.width;
+      }
+
+      left = Math.max(pad, Math.min(left, vw - tipRect.width - pad));
+
+      top = Math.max(pad, Math.min(top, vh - tipRect.height - pad));
+
+      avatarTip.style.left = `${Math.round(left)}px`;
+      avatarTip.style.top = `${Math.round(top)}px`;
+    }
+
+    let tipOpen = false;
+
+    function openTip() {
+      if (tipOpen) return;
+      tipOpen = true;
+
+      avatarTip.classList.add('is-open');
+      requestAnimationFrame(() => {
+        placeAvatarTip();
+      });
+    }
+
+    function closeTip() {
+      if (!tipOpen) return;
+      tipOpen = false;
+      avatarTip.classList.remove('is-open');
+    }
+
+    Build.heroImg.addEventListener('mouseenter', openTip);
+    Build.heroImg.addEventListener('mouseleave', closeTip);
+
+    function onViewportChange() {
+      if (!tipOpen) return;
+      placeAvatarTip();
+    }
+    window.addEventListener('scroll', onViewportChange, true);
+    window.addEventListener('resize', onViewportChange);
+
+    const oldCleanup = Build.cleanup;
+    Build.cleanup = function () {
+      try {
+        window.removeEventListener('scroll', onViewportChange, true);
+        window.removeEventListener('resize', onViewportChange);
+        if (avatarTip && avatarTip.parentNode) avatarTip.remove();
+      } catch (e) {}
+      if (typeof oldCleanup === 'function') oldCleanup.call(Build);
+    };
+
+    const avatarWrap = DOM({ style: 'build-avatar-wrap' }, Build.heroImg);
+
+    const wrapper = DOM({ style: 'build-hero-avatar-and-name' }, avatarWrap, Build.skinView, Build.training);
 
     Build.heroView.append(wrapper, stats);
   }
@@ -1816,14 +1928,21 @@ export class Build {
   }
 
   static inventory() {
-    if (Build.loading) {
-      return;
+    const container = Build.inventoryView?.querySelector('.build-talents');
+    if (container) {
+      container.replaceChildren();
     }
 
+    const requestedBuildId = Build.id;
     Build.loading = true;
 
     App.api.silent(
       (data) => {
+        if (requestedBuildId !== Build.id) {
+          Build.loading = false;
+          return;
+        }
+
         for (let item of data) {
           let talentContainer = DOM({ style: 'build-talent-item-container' });
 
@@ -2025,7 +2144,9 @@ export class Build {
     Build.activeBarItems = data;
 
     console.log('activeBar', data);
+
     let index = 0;
+
     for (let item of data) {
       const element = DOM({
         domaudio: domAudioPresets.defaultButton,
@@ -2080,8 +2201,18 @@ export class Build {
 
       Build.activeBarView.append(element);
 
+      const keyElement = DOM({ style: 'build-active-bar-key' }, Build.getKeyName(index));
+
+      Build.activeBarKeybindingsView.append(keyElement);
+
       index++;
     }
+  }
+
+  static getKeyName(index) {
+
+    return index < 10 ? Build.binds[index].keys.join('+') : 'Отключен';
+	
   }
 
   static setSortInventory(key, value) {
@@ -2217,25 +2348,25 @@ export class Build {
       element.style.willChange = 'transform';
       element.style.setProperty('transform', 'scale(1.1)', 'important');
       element.style.transition = 'transform 0.1s ease';
-	  
-	  let shiftX = 0;
+
+      let shiftX = 0;
       let shiftY = 0;
 
-	  if(element.dataset.state === '3'){
-		shiftX = event.clientX;
+      if (element.dataset.state === '3') {
+        shiftX = event.clientX;
         shiftY = event.clientY;
-	  } else {
-		let rect = element.getBoundingClientRect();
+      } else {
+        let rect = element.getBoundingClientRect();
         shiftX = event.pageX - rect.left - 5;
         shiftY = event.pageY - rect.top - 5;
-	   
+
         let offsetParent = element;
         do {
           shiftX += offsetParent.offsetParent.offsetLeft;
           shiftY += offsetParent.offsetParent.offsetTop;
           offsetParent = offsetParent.offsetParent;
         } while (!(offsetParent.id == 'wbuild' || offsetParent.id == 'viewbuild'));
-	  }
+      }
 
       element.style.zIndex = '9999';
       element.style.position = 'absolute';
@@ -2408,53 +2539,43 @@ export class Build {
           elementSetDisplay(element, 'block');
 
           if (elemBelow && elemBelow.className == 'build-hero-grid-item') {
-			  
             if (data.level && elemBelow.parentNode.dataset.level == data.level) {
-				
-				let conflictState = false;
+              let conflictState = false;
 
-				if ('conflict' in data) {
-					
-					for (let conflictId of data.conflict) {
-						
-						for (let installedTalent of Build.installedTalents) {
-							
-							if (installedTalent) {
-								
-								if (Math.abs(installedTalent.id) == conflictId) {
-									
-									let isCurrentOrdinary = data.id > 0;
-									
-									let isInstalledOrdinary = installedTalent.id > 0;
-									
-									if (isCurrentOrdinary === isInstalledOrdinary) {
-										
-										conflictState = true;
-										
-										break;
-									}
-								}
-							}
-						}
-						
-						if (conflictState) break;
-					}
-				}
+              if ('conflict' in data) {
+                for (let conflictId of data.conflict) {
+                  for (let installedTalent of Build.installedTalents) {
+                    if (installedTalent) {
+                      if (Math.abs(installedTalent.id) == conflictId) {
+                        let isCurrentOrdinary = data.id > 0;
 
-				if (conflictState) {
-					
-					if (typeof App !== 'undefined' && App.notify) {
-						
-						const message = Lang.text('talentConflict');
-						
-						App.notify(message);
-					}
-				}
+                        let isInstalledOrdinary = installedTalent.id > 0;
 
-				if (!conflictState) {
-					if ('conflict' in data) {
-						Build.fieldConflict[Math.abs(data.id)] = true;
-					}
+                        if (isCurrentOrdinary === isInstalledOrdinary) {
+                          conflictState = true;
+
+                          break;
+                        }
+                      }
+                    }
+                  }
+
+                  if (conflictState) break;
+                }
+              }
+
+              if (conflictState) {
+                if (typeof App !== 'undefined' && App.notify) {
+                  const message = Lang.text('talentConflict');
+
+                  App.notify(message);
+                }
+              }
+
+              if (!conflictState) {
+                if ('conflict' in data) {
+                  Build.fieldConflict[Math.abs(data.id)] = true;
+                }
 
                 let prevState = element.dataset.state;
                 element.dataset.state = 2;
@@ -2602,7 +2723,7 @@ export class Build {
               if (data.active && oldParentNode.dataset.position) {
                 await removeFromActive(oldParentNode.dataset.position);
               }
-			  
+
               await App.api.request('build', 'setZero', {
                 buildId: Build.id,
                 index: oldParentNode.dataset.position,
