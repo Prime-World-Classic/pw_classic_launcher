@@ -353,7 +353,7 @@ body {
 .quest-counter {
   font-size: 1.6vh;
   line-height: 3.2vh;
-  font-weight: 800;
+  font-weight: 600;
   color: #ffffffab;
   margin-left: auto;
   margin-right: auto;
@@ -486,6 +486,8 @@ body {
   display: flex;
   height: 100cqh;
   width: 100cqw;
+  overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 #castle-body canvas {
