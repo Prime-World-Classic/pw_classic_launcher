@@ -555,8 +555,9 @@ export class Build {
     close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
 
     let template = document.createDocumentFragment();
-
+    const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('assembly')));
     let name = DOM({
+      id: 'build-create-input',
       domaudio: domAudioPresets.defaultInput,
       tag: 'input',
       placeholder: Lang.text('buildNamePlaceholder'),
@@ -564,7 +565,7 @@ export class Build {
 
     let button = DOM(
       {
-        style: 'splash-content-button',
+        style: 'splash-content-button-modal',
         domaudio: domAudioPresets.bigButton,
         event: [
           'click',
@@ -586,7 +587,7 @@ export class Build {
       btnName,
     );
 
-    template.append(name, button, close);
+    template.append(modal, name, button, close);
 
     Splash.show(template);
   }
@@ -624,7 +625,7 @@ export class Build {
 
           const fragment = document.createDocumentFragment();
           const title = DOM(
-            { style: 'splash-text' },
+            { style: 'splash-text', id: 'duplicateBuildModal'},
             builds.length >= 6 ? Lang.text('buildLimitReached') : Lang.text('selectBuildToReplace'),
           );
           fragment.append(title);
@@ -676,14 +677,13 @@ export class Build {
                       event: ['click', () => Splash.hide()],
                     });
                     close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-
                     let template = document.createDocumentFragment();
                     let name = DOM({
                       domaudio: domAudioPresets.defaultInput,
                       tag: 'input',
                       placeholder: Lang.text('buildNamePlaceholder'),
                     });
-
+                    
                     let button = DOM(
                       {
                         style: 'splash-content-button',
@@ -718,7 +718,7 @@ export class Build {
                       },
                       Lang.text('createAndDuplicate'),
                     );
-
+                    
                     template.append(name, button, close);
                     Splash.show(template);
                   },
@@ -736,8 +736,10 @@ export class Build {
             style: 'close-button',
             event: ['click', () => Splash.hide()],
           });
+
+          const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('assembly')));
           closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-          fragment.append(closeButton);
+          fragment.append(modal, closeButton);
 
           Splash.show(fragment);
         },
@@ -784,7 +786,8 @@ export class Build {
           'click',
           async () => {
             const fragment = document.createDocumentFragment();
-            const title = DOM({ style: 'splash-text' }, Lang.text('resetTalentsTitle'));
+            const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('assembly')));
+            const title = DOM({ style: 'splash-text', id: 'resetBuildText' }, Lang.text('resetTalentsTitle'));
             fragment.append(title);
 
             // Красная кнопка сброса
@@ -816,7 +819,7 @@ export class Build {
               reset.style.backgroundColor = '#7b001c';
             });
 
-            fragment.append(reset);
+            fragment.append(modal, reset);
 
             let closeButton = DOM({
               tag: 'div',

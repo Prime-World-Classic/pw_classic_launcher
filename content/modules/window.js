@@ -322,6 +322,7 @@ export class Window {
                   Splash.show(
                     DOM(
                       {},
+                      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('buyModalText'))),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       DOM(
                         { style: 'splash-item-text' },
@@ -394,6 +395,7 @@ export class Window {
                   Splash.show(
                     DOM(
                       {},
+                      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('equipment'))),
                       DOM({ style: 'splash-item-container' }, isFlag ? shopItemBackground.cloneNode() : item.cloneNode()),
                       isFrame && !showQuadFrame ? Lang.text('windowShopUnequipItem') : Lang.text('windowShopEquipItem'),
                       DOM(
