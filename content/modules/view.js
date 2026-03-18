@@ -1722,7 +1722,7 @@ export class View {
 
             friend.oncontextmenu = () => {
               let body = document.createDocumentFragment();
-
+              const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('friends')));
               let b1 = DOM(
                 {
                   domaudio: domAudioPresets.smallButton,
@@ -1752,7 +1752,7 @@ export class View {
                 Lang.text('friendCancle'),
               );
 
-              body.append(DOM(Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), b1, b2);
+              body.append(modal, DOM({id: 'friendRemoveText'},Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), b1, b2);
 
               Splash.show(body);
 

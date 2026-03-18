@@ -1,4 +1,4 @@
-export const ru = {
+﻿export const ru = {
   locale: ['ru_RU'],
   name: 'Русский',
   word: {
@@ -271,6 +271,7 @@ export const ru = {
     assembly: 'Сборка',
 
     //Друзья
+    friends: 'Друзья',
     searchForFriends: 'Поиск друзей',
     callAFriend: 'Звонок',
     inviteToAGroup: 'Группа',
@@ -441,6 +442,8 @@ export const ru = {
       },
     ],
 
+
+    helpWindow: 'Справка',
     help_btn_close: 'Прочитано',
 
     // keybindings

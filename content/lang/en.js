@@ -1,4 +1,4 @@
-export const en = {
+﻿export const en = {
   locale: ['en_US'],
   name: 'English',
   word: {
@@ -265,6 +265,7 @@ export const en = {
 	tipBody: 'Builds for this hero from the Hall of Fame top-100 players.\nClick on the icon to view builds.\n\nTo copy a build from the Hall of Fame, leave your build window open on the desired tab.\nThen go to the selected build from the Hall of Fame and click "Steal build".',
 assembly: 'Assembly',
     //Друзья
+    friends: 'Friends',
     searchForFriends: 'Search for friends',
     callAFriend: 'Call',
     inviteToAGroup: 'Party',
@@ -444,6 +445,8 @@ assembly: 'Assembly',
       },
     ],
 
+
+    helpWindow: 'Help window',
     help_btn_close: 'Mark as read',
 
     // keybindings

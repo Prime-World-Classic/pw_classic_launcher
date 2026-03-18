@@ -2215,6 +2215,9 @@ button.build-action-item:hover {
 #search-friend-window-input{
   margin-top: 2cqh;
 }
+#friendRemoveText{
+  margin-top: 2cqh;
+}
 .btn-duplicate {
   position: absolute;
   top: 50%;
