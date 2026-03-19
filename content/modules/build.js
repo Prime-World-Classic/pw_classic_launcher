@@ -2154,9 +2154,12 @@ export class Build {
   static clearEmptySlotPreviews() {
     try {
       Build.fieldView
-        ?.querySelectorAll('.build-hero-grid-item.build-set-empty-slot-preview')
+        ?.querySelectorAll(
+          '.build-hero-grid-item.build-set-empty-slot-preview, .build-hero-grid-item.build-talent-empty-slot-preview',
+        )
         .forEach((el) => {
           el.classList.remove('build-set-empty-slot-preview');
+          el.classList.remove('build-talent-empty-slot-preview');
           el.style.backgroundImage = '';
         });
     } catch {}
@@ -2173,7 +2176,7 @@ export class Build {
     return null;
   }
 
-  static previewSetTalentsInEmptySlots(set, slotDirection = 'right') {
+  static previewSetTalentsInEmptySlots(set, slotDirection = 'right', { previewClass = 'build-set-empty-slot-preview' } = {}) {
     try {
       Build.clearEmptySlotPreviews();
 
@@ -2210,8 +2213,9 @@ export class Build {
 
         const cell = Build.fieldView?.querySelector(`.build-hero-grid-item[data-position="${emptyIndex}"]`);
         if (!cell) continue;
-        cell.classList.add('build-set-empty-slot-preview');
-        cell.style.backgroundImage = `url("content/talents/${id}.webp")`;
+        cell.classList.add(previewClass);
+        const src = id > 0 ? `content/talents/${id}.webp` : `content/htalents/${Math.abs(id)}.webp`;
+        cell.style.backgroundImage = `url("${src}")`;
       }
     } catch {}
   }
@@ -2986,34 +2990,30 @@ export class Build {
         Build.enableSmartCast(element);
       }
 
+      const keyName = Build.getKeyName(index);
+
       if (Math.abs(item)) {
         let position = Math.abs(item) - 1;
-
         let findTalent = Build.fieldView.querySelector(`[data-position = "${position}"]`);
 
         if (findTalent && findTalent.firstChild) {
           let clone = findTalent.firstChild.cloneNode(true);
-
           element.append(clone);
 
           clone.dataset.state = 3;
-
           clone.style.opacity = 1;
-
           clone.style.position = 'static';
-
           clone.style.backgroundImage = `url("${clone.dataset.url}")`;
-
           clone.dataset.position = position;
-
           Build.move(clone, true);
         }
       }
 
       Build.activeBarView.append(element);
 
-      const keyElement = DOM({ style: 'build-active-bar-key' }, Build.getKeyName(index));
-
+      // Keep key-label alignment: always append an element per slot.
+      // If no key is assigned, we render an empty text node.
+      const keyElement = DOM({ style: 'build-active-bar-key' }, keyName || '');
       Build.activeBarKeybindingsView.append(keyElement);
 
       index++;
@@ -3021,8 +3021,14 @@ export class Build {
   }
 
   static getKeyName(index) {
-
-    return index < 24 ? Build.binds[index].keys.join('+') : 'Отключен';
+    try {
+      const bind = Build.binds?.[index];
+      const keys = bind?.keys;
+      if (!Array.isArray(keys) || !keys.length) return '';
+      return keys.join('+');
+    } catch {
+      return '';
+    }
 	
   }
 
@@ -3783,9 +3789,13 @@ export class Build {
       });
 
       // Preview: where this library talent would land in the build.
-      if (isInventoryTalent && data.id > 0) {
+      if (isInventoryTalent) {
         // Single talent preview in library should pick the left-most empty slot.
-        Build.previewSetTalentsInEmptySlots({ _manualOrder: [data.id], key: `single_${data.id}` }, 'left');
+        Build.previewSetTalentsInEmptySlots(
+          { _manualOrder: [data.id], key: `single_${data.id}` },
+          'left',
+          { previewClass: 'build-talent-empty-slot-preview' },
+        );
       }
     };
 
