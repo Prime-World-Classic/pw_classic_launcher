@@ -15,6 +15,7 @@ import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { Castle } from './castle.js';
 import { KeybindStore } from './keybindings/keybindings.store.js';
 import { TalentSets } from './talentSets.js';
+import { Settings } from './settings.js';
 
 export class Build {
   static loading = false;
@@ -268,6 +269,17 @@ export class Build {
   }
 
   static async init(heroId, targetId, isWindow) {
+    Build.ensureBuildSettingsDefaults();
+
+    try {
+      Build.buildSettingsButton?.parentNode?.removeChild?.(Build.buildSettingsButton);
+    } catch {}
+    try {
+      Build.buildSettingsPanel?.parentNode?.removeChild?.(Build.buildSettingsPanel);
+    } catch {}
+    Build.buildSettingsButton = null;
+    Build.buildSettingsPanel = null;
+
     Build.talents = new Object();
 
     Build.descriptionView = document.createElement('div');
@@ -358,6 +370,7 @@ export class Build {
 
     Build.inventoryView = document.createElement('div');
     Build.inventoryView.classList.add('build-talent-view');
+    Build.applyTalentViewLayoutFromSettings();
 
     Build.setsListView = DOM({ style: 'build-sets' });
     Build.setsListView.addEventListener(
@@ -365,6 +378,37 @@ export class Build {
       (e) => {
         if (e.ctrlKey || e.shiftKey) return;
         if (!Build.setsListView) return;
+
+        // Prevent tooltip churn while actively scrolling sets list.
+        Build._setsScrollLockUntil = performance.now() + 180;
+        Build._setsWheelMouseX = e.clientX;
+        Build._setsWheelMouseY = e.clientY;
+        try {
+          if (Build._setsScrollStopTimer) clearTimeout(Build._setsScrollStopTimer);
+        } catch {}
+        Build._setsScrollStopTimer = setTimeout(() => {
+          Build._setsScrollStopTimer = 0;
+          Build._setsScrollLockUntil = 0;
+          try {
+            const x = Number(Build._setsWheelMouseX) || 0;
+            const y = Number(Build._setsWheelMouseY) || 0;
+            const el = document.elementFromPoint(x, y);
+            const hoveredSet = el?.closest?.('.build-set-item');
+            if (hoveredSet) {
+              hoveredSet.dispatchEvent(
+                new MouseEvent('mouseenter', {
+                  bubbles: true,
+                  clientX: x,
+                  clientY: y,
+                }),
+              );
+            }
+          } catch {}
+        }, 140);
+        if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+
+        // In row layout, keep native wheel speed (same feel as library).
+        if (Build.inventoryView?.classList?.contains('build-talent-view--row')) return;
 
         e.preventDefault();
 
@@ -456,6 +500,9 @@ export class Build {
     setsSection.append(setsHeader, Build.setsListView);
 
     Build.inventoryView.append(talentsSection, setsSection);
+    Build.buildSettingsButton = Build.createBuildSettingsButton();
+    Build.buildSettingsPanel = Build.createBuildSettingsPanel();
+    Build.attachBuildSettingsToWbuild();
 
     Build.renderTalentSetsList();
 
@@ -525,10 +572,14 @@ export class Build {
     //	Build.activeBar([35,-35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
     Build.ruleSortInventory = new Object();
+    Build.scheduleAttachBuildSettings();
   }
 
   static async refreshBuildStateFromServer({ refreshInventory = true } = {}) {
     if (!Build.heroId || Build.targetId === undefined || Build.targetId === null) return;
+
+    // Ensure the settings button/panel remain attached after rebuilds.
+    Build.scheduleAttachBuildSettings(20);
 
     let highlightedLevels = [];
     try {
@@ -604,6 +655,237 @@ export class Build {
     } finally {
       Build.endSilentBuildUiUpdate();
     }
+  }
+
+  static ensureBuildSettingsDefaults() {
+    if (!Settings.settings) return;
+    if (!Number.isFinite(Number(Settings.settings.buildSetLmbMode))) {
+      Settings.settings.buildSetLmbMode = 1;
+    }
+    if (Settings.settings.buildSetLmbMode < 1 || Settings.settings.buildSetLmbMode > 3) {
+      Settings.settings.buildSetLmbMode = 1;
+    }
+    if (typeof Settings.settings.buildRowHoverHighlight !== 'boolean') {
+      Settings.settings.buildRowHoverHighlight = true;
+    }
+    if (!Number.isFinite(Number(Settings.settings.buildTalentViewLayout))) {
+      Settings.settings.buildTalentViewLayout = 0;
+    }
+    if (Settings.settings.buildTalentViewLayout !== 0 && Settings.settings.buildTalentViewLayout !== 1) {
+      Settings.settings.buildTalentViewLayout = 0;
+    }
+  }
+
+  static getSetLmbMode() {
+    const mode = Number(Settings.settings?.buildSetLmbMode);
+    if (!Number.isFinite(mode) || mode < 1 || mode > 3) return 1;
+    return mode;
+  }
+
+  static isBuildRowHoverHighlightEnabled() {
+    return !!Settings.settings?.buildRowHoverHighlight;
+  }
+
+  static applyTalentViewLayoutFromSettings() {
+    try {
+      const v = Build.inventoryView;
+      if (!v) return;
+      const mode = Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0;
+      v.classList.toggle('build-talent-view--row', mode === 1);
+    } catch {}
+  }
+
+  static createBuildSettingsButton() {
+    const button = DOM({
+      tag: 'button',
+      style: 'build-list-settings',
+      domaudio: domAudioPresets.defaultButton,
+      event: [
+        'click',
+        (e) => {
+          e?.preventDefault?.();
+          e?.stopPropagation?.();
+          Build.toggleBuildSettingsPanel();
+        },
+      ],
+    });
+    button.type = 'button';
+    button.textContent = '';
+    button.title = Lang.text('buildSettingsTitle');
+    return button;
+  }
+
+  static createBuildSettingsPanel() {
+    const panel = DOM({ style: 'build-settings-panel' });
+    panel.style.display = 'none';
+
+    const title = DOM({ style: 'build-settings-title' }, Lang.text('buildSettingsTitle'));
+
+    const modeLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsLmbMode'));
+    const modeValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const modeSlider = DOM({
+      tag: 'input',
+      type: 'range',
+      min: '0',
+      max: '2',
+      step: '1',
+      style: 'castle-menu-slider',
+      value: String(Build.getSetLmbMode() - 1),
+      event: [
+        'input',
+        async (e) => {
+          const next = Math.min(3, Math.max(1, (Number(e.target.value) || 0) + 1));
+          Settings.settings.buildSetLmbMode = next;
+          modeValue.textContent = Build.getSetLmbModeLabel(next);
+          try {
+            await Settings.WriteSettings();
+          } catch {}
+
+          try {
+            Window.updateSliderFill(e.target);
+          } catch {}
+        },
+      ],
+    });
+
+    modeValue.textContent = Build.getSetLmbModeLabel(Build.getSetLmbMode());
+
+    const hoverLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsRowHighlight'));
+    const hoverValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const hoverSlider = DOM({
+      tag: 'input',
+      type: 'range',
+      min: '0',
+      max: '1',
+      step: '1',
+      style: 'castle-menu-slider',
+      value: Build.isBuildRowHoverHighlightEnabled() ? '1' : '0',
+      event: [
+        'input',
+        async (e) => {
+          const enabled = Number(e.target.value) === 1;
+          Settings.settings.buildRowHoverHighlight = enabled;
+          hoverValue.textContent = enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+          if (!enabled) Build.clearBuildRowHoverHighlight();
+          try {
+            await Settings.WriteSettings();
+          } catch {}
+
+          try {
+            Window.updateSliderFill(e.target);
+          } catch {}
+        },
+      ],
+    });
+    hoverValue.textContent = Build.isBuildRowHoverHighlightEnabled() ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+
+    const layoutLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsLayout'));
+    const layoutValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const getLayoutText = (n) => (n === 1 ? Lang.text('buildSettingsLayoutRow') : Lang.text('buildSettingsLayoutColumn'));
+    layoutValue.textContent = getLayoutText(Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0);
+
+    const layoutSlider = DOM({
+      tag: 'input',
+      type: 'range',
+      min: '0',
+      max: '1',
+      step: '1',
+      style: 'castle-menu-slider',
+      value: String(Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0),
+      event: [
+        'input',
+        async (e) => {
+          const next = Number(e.target.value) === 1 ? 1 : 0;
+          Settings.settings.buildTalentViewLayout = next;
+          layoutValue.textContent = getLayoutText(next);
+          Build.applyTalentViewLayoutFromSettings();
+          try {
+            await Settings.WriteSettings();
+          } catch {}
+          try {
+            Window.updateSliderFill(e.target);
+          } catch {}
+        },
+      ],
+    });
+
+    panel.append(
+      title,
+      modeLabel,
+      modeSlider,
+      modeValue,
+      hoverLabel,
+      hoverSlider,
+      hoverValue,
+      layoutLabel,
+      layoutSlider,
+      layoutValue,
+    );
+
+    // Match slider track fill exactly like in Window.settings().
+    requestAnimationFrame(() => {
+      try {
+        Window.updateSliderFill(modeSlider);
+        Window.updateSliderFill(hoverSlider);
+        Window.updateSliderFill(layoutSlider);
+      } catch {}
+    });
+
+    return panel;
+  }
+
+  static getSetLmbModeLabel(mode) {
+    if (mode === 2) return Lang.text('buildSettingsLmbMode2');
+    if (mode === 3) return Lang.text('buildSettingsLmbMode3');
+    return Lang.text('buildSettingsLmbMode1');
+  }
+
+  static toggleBuildSettingsPanel(force) {
+    const panel = Build.buildSettingsPanel;
+    if (!panel) return;
+    const shouldOpen = typeof force === 'boolean' ? force : panel.style.display === 'none';
+    panel.style.display = shouldOpen ? 'flex' : 'none';
+  }
+
+  static attachBuildSettingsToWbuild() {
+    try {
+      // Attach only to the current build window instance.
+      // During window re-open, an old #wbuild can still exist briefly.
+      const candidates = Array.from(document.querySelectorAll('#wbuild'));
+      const wbuild = candidates.find((el) => el?.contains?.(Build.buildActionsView));
+      if (!wbuild) return;
+      if (Build.buildSettingsButton && Build.buildSettingsButton.parentNode !== wbuild) wbuild.append(Build.buildSettingsButton);
+      if (Build.buildSettingsPanel && Build.buildSettingsPanel.parentNode !== wbuild) wbuild.append(Build.buildSettingsPanel);
+    } catch {}
+  }
+
+  static scheduleAttachBuildSettings(maxAttempts = 80) {
+    try {
+      if (Build._buildSettingsAttachTimer) clearTimeout(Build._buildSettingsAttachTimer);
+    } catch {}
+
+    let attempts = 0;
+    const tick = () => {
+      Build._buildSettingsAttachTimer = 0;
+      Build.attachBuildSettingsToWbuild();
+
+      let attached = false;
+      try {
+        const candidates = Array.from(document.querySelectorAll('#wbuild'));
+        const wbuild = candidates.find((el) => el?.contains?.(Build.buildActionsView));
+        attached =
+          !!wbuild &&
+          wbuild.contains(Build.buildActionsView) &&
+          Build.buildSettingsButton?.parentNode === wbuild &&
+          Build.buildSettingsPanel?.parentNode === wbuild;
+      } catch {}
+
+      if (attached || attempts >= maxAttempts) return;
+      attempts++;
+      Build._buildSettingsAttachTimer = setTimeout(tick, 120);
+    };
+
+    tick();
   }
 
   static CleanInvalidDescriptions() {
@@ -2095,6 +2377,23 @@ export class Build {
         try {
           Build.sortInventory();
         } catch {}
+        try {
+          const ids = Build._hoveredSetTalentIds;
+          const anchor = Build._hoveredSetAnchorEl;
+          if (ids?.length && anchor?.isConnected) {
+            Build.highlightSetTalents(ids);
+            Build.previewSetTalentsInEmptySlots({ _manualOrder: ids, key: 'hover_preview_inventory' });
+            const start = performance.now();
+            const tick = () => {
+              if (Build._hoveredSetAnchorEl !== anchor || Build._hoveredSetTalentIds !== ids) return;
+              Build.highlightSetTalents(ids);
+              Build.previewSetTalentsInEmptySlots({ _manualOrder: ids, key: 'hover_preview_inventory_tick' });
+              if (performance.now() - start >= 900) return;
+              setTimeout(tick, 140);
+            };
+            setTimeout(tick, 120);
+          }
+        } catch {}
       },
       'build',
       'inventory',
@@ -2154,9 +2453,12 @@ export class Build {
   static clearEmptySlotPreviews() {
     try {
       Build.fieldView
-        ?.querySelectorAll('.build-hero-grid-item.build-set-empty-slot-preview')
+        ?.querySelectorAll(
+          '.build-hero-grid-item.build-set-empty-slot-preview, .build-hero-grid-item.build-talent-empty-slot-preview',
+        )
         .forEach((el) => {
           el.classList.remove('build-set-empty-slot-preview');
+          el.classList.remove('build-talent-empty-slot-preview');
           el.style.backgroundImage = '';
         });
     } catch {}
@@ -2173,7 +2475,7 @@ export class Build {
     return null;
   }
 
-  static previewSetTalentsInEmptySlots(set, slotDirection = 'right') {
+  static previewSetTalentsInEmptySlots(set, slotDirection = 'right', { previewClass = 'build-set-empty-slot-preview' } = {}) {
     try {
       Build.clearEmptySlotPreviews();
 
@@ -2210,8 +2512,9 @@ export class Build {
 
         const cell = Build.fieldView?.querySelector(`.build-hero-grid-item[data-position="${emptyIndex}"]`);
         if (!cell) continue;
-        cell.classList.add('build-set-empty-slot-preview');
-        cell.style.backgroundImage = `url("content/talents/${id}.webp")`;
+        cell.classList.add(previewClass);
+        const src = id > 0 ? `content/talents/${id}.webp` : `content/htalents/${Math.abs(id)}.webp`;
+        cell.style.backgroundImage = `url("${src}")`;
       }
     } catch {}
   }
@@ -2404,10 +2707,13 @@ export class Build {
     await Build.waitForCondition(hasAny, timeoutMs);
     if (Build._hoveredSetTalentIds !== talentIds) return;
     Build.highlightSetTalents(talentIds);
+    Build.previewSetTalentsInEmptySlots({ _manualOrder: ids, key: 'hover_preview_recover' });
   }
 
   static showSetDescription(set, anchorEl) {
+    if ((Build._setsScrollLockUntil || 0) > performance.now()) return;
     Build._descriptionPinnedBySet = true;
+    const mode = Build.getSetLmbMode();
     const mainId = TalentSets.chooseMainTalentId(set);
     const ids = TalentSets.getTalentIds(set);
 
@@ -2430,12 +2736,20 @@ export class Build {
       const desc = Lang.text(descriptionKey);
       mainDesc = `<div><b>${mainName}</b><br><br>${desc}</div>`;
     }
+
+    let lmbHint = Lang.text('setHintLmb');
+    if (mode === 2) lmbHint = Lang.text('setHintLmbMode2');
+    if (mode === 3) lmbHint = Lang.text('setHintLmbMode3');
+
+    let rmbHint = Lang.text('setHintRmb');
+    if (mode === 3) rmbHint = Lang.text('setHintRmbMode3');
+
     const html =
       `${mainDesc}` +
       `<div class="build-set-desc-icons">${iconHtml}</div>` +
       `<div class="build-set-desc-hints">` +
-      `<div>${Lang.text('setHintLmb')}</div>` +
-      `<div>${Lang.text('setHintRmb')}</div>` +
+      `<div>${lmbHint}</div>` +
+      `<div>${rmbHint}</div>` +
       `</div>`;
 
     const dataForParams = mainId != null ? Build.talents[String(mainId)] : null;
@@ -2450,12 +2764,14 @@ export class Build {
     Build.previewSetTalentsInEmptySlots(set);
     Build.highlightSetTalentsAfterRender(ids);
     if (withDelayedHighlights) {
-      setTimeout(() => {
-        if (Build._hoveredSetAnchorEl === item && Build._hoveredSetTalentIds === ids) Build.highlightSetTalents(ids);
-      }, 250);
-      setTimeout(() => {
-        if (Build._hoveredSetAnchorEl === item && Build._hoveredSetTalentIds === ids) Build.highlightSetTalents(ids);
-      }, 700);
+      const start = performance.now();
+      const tick = () => {
+        if (Build._hoveredSetAnchorEl !== item || Build._hoveredSetTalentIds !== ids) return;
+        Build.highlightSetTalents(ids);
+        if (performance.now() - start >= 1400) return;
+        setTimeout(tick, 140);
+      };
+      setTimeout(tick, 120);
     }
     requestAnimationFrame(() => {
       if (Build._hoveredSetAnchorEl !== item || Build._hoveredSetTalentIds !== ids) return;
@@ -2611,6 +2927,66 @@ export class Build {
     if (!list) return;
 
     const ids = TalentSets.getTalentIds(set);
+    const mode = Build.getSetLmbMode();
+    Build._forceShowOnlyTalentIds = null;
+
+    if (mode === 2 || mode === 3) {
+      const leftovers = new Set();
+      for (const id of ids) {
+        if (Build.isTalentInBuild(id)) continue;
+        leftovers.add(String(id));
+      }
+      if (!leftovers.size) return;
+
+      const prevScroll = list.scrollTop;
+
+      // Show only leftovers; then rebuild DOM order grouped by build rows (levels 6..1).
+      // We preserve the original relative order inside each level group.
+      Build._forceShowOnlyTalentIds = leftovers;
+      Build.sortInventory();
+
+      const visibleContainers = Array.from(list.querySelectorAll('.build-talent-item-container')).filter((container) => {
+        try {
+          return container?.style?.display !== 'none';
+        } catch {
+          return false;
+        }
+      });
+
+      const byLevel = new Map();
+      for (const container of visibleContainers) {
+        const item = container.querySelector('.build-talent-item');
+        const talentId = item?.dataset?.id ? String(item.dataset.id) : null;
+        if (!talentId) continue;
+        const level = Number(Build.talents?.[talentId]?.level) || 0;
+        if (!byLevel.has(level)) byLevel.set(level, []);
+        byLevel.get(level).push(container);
+      }
+
+      const orderedLevels = [6, 5, 4, 3, 2, 1, 0];
+      const ordered = [];
+      for (const lvl of orderedLevels) {
+        const part = byLevel.get(lvl);
+        if (part?.length) ordered.push(...part);
+      }
+
+      for (const container of ordered) {
+        try {
+          if (container.parentNode === list) list.removeChild(container);
+        } catch {}
+      }
+      for (const container of ordered) {
+        try {
+          list.appendChild(container);
+        } catch {}
+      }
+
+      try {
+        list.scrollTop = prevScroll;
+      } catch {}
+      return;
+    }
+
     const toMove = [];
     for (const id of ids) {
       if (Build.isTalentInBuild(id)) continue;
@@ -2682,11 +3058,15 @@ export class Build {
 
     if (!Build._setsHoverMonitorInstalled) {
       Build._setsHoverMonitorInstalled = true;
+      let lastCheck = 0;
       document.addEventListener(
         'mousemove',
         (e) => {
           const anchor = Build._hoveredSetAnchorEl;
           if (!anchor) return;
+          const now = performance.now();
+          if (now - lastCheck < 80) return;
+          lastCheck = now;
           const below = document.elementFromPoint(e.clientX, e.clientY);
           const hoveredSet = below?.closest?.('.build-set-item');
           if (hoveredSet === anchor) return;
@@ -2718,6 +3098,9 @@ export class Build {
         Build.previewSetTalentsInEmptySlots(set);
       });
       item.addEventListener('mouseleave', () => {
+        // After set click, transient mouseleave can happen during fast rerender.
+        // Keep current hover visuals pinned; global mousemove monitor will clear on real leave.
+        if (Build._descriptionPinnedBySet && Build._hoveredSetAnchorEl === item) return;
         Build.descriptionView.style.display = 'none';
         Build._descriptionPinnedBySet = false;
         Build._hoveredSetTalentIds = null;
@@ -2733,12 +3116,18 @@ export class Build {
         if (!Build.tryBeginSetAction()) return;
         (async () => {
           try {
+            const mode = Build.getSetLmbMode();
             Build._descriptionPinnedBySet = true;
             Build._hoveredSetTalentIds = ids;
-            Build._forceShowTalentIds = new Set(ids.map(String));
+            Build._forceShowTalentIds = mode === 1 ? new Set(ids.map(String)) : null;
+            Build._forceShowOnlyTalentIds = null;
 
             Build.applySetInventoryOrder(set);
-            await Build.applySetToBuild(set);
+            if (mode !== 3) {
+              await Build.applySetToBuild(set);
+            } else {
+              Build.sortInventory();
+            }
             Build.refreshSetHoverState(set, item, ids, true);
           } finally {
             Build.endSetAction();
@@ -2755,6 +3144,7 @@ export class Build {
           try {
             Build._hoveredSetTalentIds = ids;
             Build._forceShowTalentIds = new Set(ids.map(String));
+            Build._forceShowOnlyTalentIds = null;
             await Build.removeSetFromBuild(set);
             Build.refreshSetHoverState(set, item, ids);
           } finally {
@@ -2986,34 +3376,30 @@ export class Build {
         Build.enableSmartCast(element);
       }
 
+      const keyName = Build.getKeyName(index);
+
       if (Math.abs(item)) {
         let position = Math.abs(item) - 1;
-
         let findTalent = Build.fieldView.querySelector(`[data-position = "${position}"]`);
 
         if (findTalent && findTalent.firstChild) {
           let clone = findTalent.firstChild.cloneNode(true);
-
           element.append(clone);
 
           clone.dataset.state = 3;
-
           clone.style.opacity = 1;
-
           clone.style.position = 'static';
-
           clone.style.backgroundImage = `url("${clone.dataset.url}")`;
-
           clone.dataset.position = position;
-
           Build.move(clone, true);
         }
       }
 
       Build.activeBarView.append(element);
 
-      const keyElement = DOM({ style: 'build-active-bar-key' }, Build.getKeyName(index));
-
+      // Keep key-label alignment: always append an element per slot.
+      // If no key is assigned, we render an empty text node.
+      const keyElement = DOM({ style: 'build-active-bar-key' }, keyName || '');
       Build.activeBarKeybindingsView.append(keyElement);
 
       index++;
@@ -3021,13 +3407,20 @@ export class Build {
   }
 
   static getKeyName(index) {
-
-    return index < 24 ? Build.binds[index].keys.join('+') : 'Отключен';
+    try {
+      const bind = Build.binds?.[index];
+      const keys = bind?.keys;
+      if (!Array.isArray(keys) || !keys.length) return '';
+      return keys.join('+');
+    } catch {
+      return '';
+    }
 	
   }
 
   static setSortInventory(key, value) {
     Build._forceShowTalentIds = null;
+    Build._forceShowOnlyTalentIds = null;
     if (!(key in Build.ruleSortInventory)) {
       Build.ruleSortInventory[key] = new Array();
 
@@ -3043,6 +3436,7 @@ export class Build {
 
   static removeSortInventory(key, value) {
     Build._forceShowTalentIds = null;
+    Build._forceShowOnlyTalentIds = null;
     if (key in Build.ruleSortInventory) {
       let newArray = new Array();
 
@@ -3069,6 +3463,21 @@ export class Build {
       flag = true;
 
     try {
+      if (Build._forceShowOnlyTalentIds) {
+        const id = String(item.dataset.id);
+        const visible = Build._forceShowOnlyTalentIds.has(id);
+        itemContainer.style.display = visible ? 'block' : 'none';
+        if (visible) {
+          const level = Number(Build.talents?.[id]?.level) || 0;
+          // Build rows are rendered from 6 -> 1 (top -> bottom), mirror this in library.
+          const row = level > 0 ? 7 - level : 1;
+          itemContainer.style.gridRow = `${row}`;
+        } else {
+          itemContainer.style.gridRow = '';
+        }
+        return;
+      }
+      itemContainer.style.gridRow = '';
       if (Build._forceShowTalentIds && Build._forceShowTalentIds.has(String(item.dataset.id))) {
         itemContainer.style.display = 'block';
         return;
@@ -3253,7 +3662,10 @@ export class Build {
           }
         }
 
-        if (Build._hoveredSetTalentIds) Build.highlightSetTalents(Build._hoveredSetTalentIds);
+        if (Build._hoveredSetTalentIds) {
+          Build.highlightSetTalents(Build._hoveredSetTalentIds);
+          Build.previewSetTalentsInEmptySlots({ _manualOrder: Build._hoveredSetTalentIds, key: 'hover_preview_move' });
+        }
         else Build.clearSetHighlights();
 
         let removeFromActive = async (position, skipActiveId) => {
@@ -3652,12 +4064,44 @@ export class Build {
         element.style.position = 'static';
 
         element.style.zIndex = 'auto';
+
+        // If cursor stays over a library talent after click/drag-end,
+        // restore tooltip/row-highlight without requiring mouse movement.
+        try {
+          const hovered = document.elementFromPoint(event.clientX, event.clientY);
+          const hoveredTalent = hovered?.closest?.('.build-talents .build-talent-item');
+          if (hoveredTalent) {
+            hoveredTalent.dispatchEvent(
+              new MouseEvent('mouseover', {
+                bubbles: true,
+                clientX: event.clientX,
+                clientY: event.clientY,
+              }),
+            );
+          }
+        } catch {}
       };
     };
 
     element.ondragstart = () => {
       return false;
     };
+  }
+
+  static highlightBuildRowByLevel(level) {
+    Build.clearBuildRowHoverHighlight();
+    const row = document.getElementById(`bfr${level}`);
+    if (!row) return;
+    row.style.background = 'rgba(255,255,255,0.5)';
+    row.style.borderRadius = '1cqh';
+    Build._hoveredBuildRowEl = row;
+  }
+
+  static clearBuildRowHoverHighlight() {
+    if (!Build._hoveredBuildRowEl) return;
+    Build._hoveredBuildRowEl.style.background = '';
+    Build._hoveredBuildRowEl.style.borderRadius = '';
+    Build._hoveredBuildRowEl = null;
   }
 
   static description(element) {
@@ -3783,14 +4227,22 @@ export class Build {
       });
 
       // Preview: where this library talent would land in the build.
-      if (isInventoryTalent && data.id > 0) {
+      if (isInventoryTalent) {
+        if (Build.isBuildRowHoverHighlightEnabled() && data.level > 0) {
+          Build.highlightBuildRowByLevel(data.level);
+        }
         // Single talent preview in library should pick the left-most empty slot.
-        Build.previewSetTalentsInEmptySlots({ _manualOrder: [data.id], key: `single_${data.id}` }, 'left');
+        Build.previewSetTalentsInEmptySlots(
+          { _manualOrder: [data.id], key: `single_${data.id}` },
+          'left',
+          { previewClass: 'build-talent-empty-slot-preview' },
+        );
       }
     };
 
     let descEventEnd = () => {
       Build.descriptionView.style.display = 'none';
+      Build.clearBuildRowHoverHighlight();
       // Remove only slot previews (keeps set-highlight logic independent).
       if (element.closest?.('.build-talents')) Build.clearEmptySlotPreviews();
     };
@@ -3810,6 +4262,25 @@ export class Build {
     };
   }
   static cleanup() {
+    Build.clearBuildRowHoverHighlight();
+    Build.toggleBuildSettingsPanel(false);
+    try {
+      if (Build._setsScrollStopTimer) clearTimeout(Build._setsScrollStopTimer);
+    } catch {}
+    Build._setsScrollStopTimer = 0;
+    Build._setsScrollLockUntil = 0;
+    try {
+      if (Build._buildSettingsAttachTimer) clearTimeout(Build._buildSettingsAttachTimer);
+    } catch {}
+    Build._buildSettingsAttachTimer = 0;
+    try {
+      Build.buildSettingsButton?.parentNode?.removeChild?.(Build.buildSettingsButton);
+    } catch {}
+    try {
+      Build.buildSettingsPanel?.parentNode?.removeChild?.(Build.buildSettingsPanel);
+    } catch {}
+    Build.buildSettingsButton = null;
+    Build.buildSettingsPanel = null;
     if (Build.descriptionView && Build.descriptionView.parentNode) {
       Build.descriptionView.remove();
       Build.descriptionView = null;
