@@ -17,6 +17,7 @@ export const en = {
     titleTelegram: 'Telegram Chat',
     titleAdministration: 'Administrator',
     titleHelper: 'Helper',
+    titlePhone: 'Phone',
     ready: 'Ready!',
     ready2: "Confirm the hero's choice",
     library: 'Library',

@@ -18,6 +18,7 @@ export const ru = {
     titleTelegram: 'Telegram Чат',
     titleAdministration: 'Администратор',
     titleHelper: 'Поддержка',
+    titlePhone: 'Телефон',
     ready: 'Готов!',
     ready2: 'Подтвердить выбор героя',
     cancel: 'Отменить',
