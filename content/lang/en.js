@@ -271,7 +271,7 @@ export const en = {
     buildSettingsLmbMode1: 'Display all talents in Library',
     buildSettingsLmbMode2: 'Show set leftovers in Library',
     buildSettingsLmbMode3: 'Show set in Library',
-    buildSettingsSetMatchOnly: 'Matching stats only',
+    buildSettingsSetMatchOnly: 'Matching stats only (Sets)',
     buildSettingsStatFilterHighlight: 'Talent highlight (hover over a stat)',
     buildSettingsStatFilterHighlightModeOff: 'Off',
     buildSettingsStatFilterHighlightModeHasStat: 'All matching talents',
