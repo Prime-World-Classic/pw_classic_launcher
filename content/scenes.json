@@ -4367,7 +4367,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_01",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -4375,7 +4375,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_02",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -4383,7 +4383,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_03",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -4391,7 +4391,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_04",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -4399,7 +4399,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_05",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -4407,7 +4407,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_06",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9584,7 +9584,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_01",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9592,7 +9592,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_02",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9600,7 +9600,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_03",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9608,7 +9608,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_04",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9616,7 +9616,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_05",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {
@@ -9624,7 +9624,7 @@
           "indexCount": 6,
           "shader": "shader_pos_uv",
           "texture": "sky_06",
-          "tintColor": [10, 10, 10, 1],
+          "tintColor": [1, 1, 1, 1],
           "transform": [-2857.23, 0, -914.43, 1442, 0, 3000, 0, -500, 914.43, 0, -2857.23, 1504, 0, 0, 0, 1]
         },
         {

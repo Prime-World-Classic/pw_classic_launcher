@@ -123,6 +123,10 @@ void main()
 
   // Albedo
   gl_FragColor = texture2D(tex0, (fragTexCoord + uvScroll) * uvScale.xx);
+#ifdef PS_SKYBOX
+  gl_FragColor.xyz = gl_FragColor.xyz * (1.0 - gl_FragColor.www);
+  gl_FragColor.w = 1.0;
+#endif
 
   gl_FragColor *= tintColor;
 #if defined(PS_FALLOFF_BLEND) && defined(VS_COLOR)
