@@ -324,6 +324,7 @@ export const ru = {
     friendRemoveText: 'Удалить {nickname} из друзей?',
     friendAcceptText: 'Приглашение отправлено игроку {nickname}',
 	friendListClear: 'Очистить список',
+    confirmAction: 'Вы уверены?',
     friendNicknamePlaceholder: 'Ник игрока',
     friendAcceptWaiting: 'Ожидание',
     friendInvitesToLobby: 'Игрок {nickname} приглашает Вас вступить в группу.',
