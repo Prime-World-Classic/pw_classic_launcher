@@ -257,7 +257,7 @@ export class Events {
 
 
   static async VCall(data) {
-    if (data.isCaller) {
+    if (data.isCaller && Number(data?.reconnect || 0) !== 1) {
       let playCallSoundLoop = () => {
         Sound.stop('ui-call');
         Sound.play(
@@ -291,6 +291,10 @@ export class Events {
 
   static async VCandidate(data) {
     await Voice.candidate(data.id, data.candidate);
+  }
+
+  static async VDrop(data) {
+    await Voice.remoteDrop(data.id);
   }
 
   static VKick() {
