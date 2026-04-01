@@ -261,7 +261,8 @@ export class Events {
 
 
   static async VCall(data) {
-    if (data.isCaller && Number(data?.reconnect || 0) !== 1) {
+    const forceAutoAccept = Voice.consumeMergeAutoAccept(data?.id);
+    if (data.isCaller && Number(data?.reconnect || 0) !== 1 && !forceAutoAccept) {
       let playCallSoundLoop = () => {
         Sound.stop('ui-call');
         Sound.play(
@@ -299,6 +300,10 @@ export class Events {
 
   static async VDrop(data) {
     await Voice.remoteDrop(data.id);
+  }
+
+  static async VFriendMerge(data) {
+    await Voice.mergeFriendCalls(data?.users || []);
   }
 
   static VKick() {
