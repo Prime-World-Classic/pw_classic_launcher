@@ -1601,6 +1601,10 @@ body {
   z-index: 8;
 }
 
+.castle-bottom-content-container:hover {
+  z-index: 130;
+}
+
 .castle-bottom-content-container::before {
   content: '';
   position: absolute;
@@ -2324,6 +2328,14 @@ body {
   z-index: 5;
 }
 
+.castle-chat:hover {
+  z-index: 130;
+}
+
+#wbuild:hover {
+  z-index: 140;
+}
+
 .castle-chat:has(.chat.chat-has-pinned) {
   bottom: 17cqh;
 }
@@ -2411,8 +2423,6 @@ body {
   bottom: 20cqh;
 }
 
-.quest-item-hero {
-}
 .quest-list {
   display: flex;
   flex-direction: column;
@@ -2595,11 +2605,6 @@ body {
 }
 .shop_category_hidden {
   display: none;
-}
-.shop_category_hint {
-  font-size: 2cqh;
-  line-height: 2cqh;
-  color: rgb(234, 230, 123);
 }
 .shop_category_hint {
   font-size: 2cqh;
