@@ -219,6 +219,10 @@ export class Events {
     setTimeout(() => {
       MM.searchActive(false);
     }, 1000);
+    
+    if ((data && Number(data.noWarning) === 1) || data?.noWarning === true) {
+      return;
+    }
 
     let body = document.createDocumentFragment();
 
@@ -257,7 +261,14 @@ export class Events {
 
 
   static async VCall(data) {
-    if (data.isCaller) {
+    const existing = Voice.manager?.[Number(data?.id)];
+    if (existing?.peer && existing.peer.connectionState !== 'closed') {
+      // Cross-calls may arrive while we already have an active/pending connection.
+      // Ignore duplicate incoming invite for the same peer to prevent race-induced drops.
+      return;
+    }
+    const forceAutoAccept = Voice.consumeMergeAutoAccept(data?.id);
+    if (data.isCaller && Number(data?.reconnect || 0) !== 1 && !forceAutoAccept) {
       let playCallSoundLoop = () => {
         Sound.stop('ui-call');
         Sound.play(
@@ -291,6 +302,14 @@ export class Events {
 
   static async VCandidate(data) {
     await Voice.candidate(data.id, data.candidate);
+  }
+
+  static async VDrop(data) {
+    await Voice.remoteDrop(data.id);
+  }
+
+  static async VFriendMerge(data) {
+    await Voice.mergeFriendCalls(data?.users || []);
   }
 
   static VKick() {
