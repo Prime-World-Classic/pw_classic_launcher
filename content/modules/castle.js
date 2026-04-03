@@ -1431,7 +1431,7 @@ export class Castle {
           mesh: mesh,
           rotation: building.rot * 1.57,
           position: [building.posX, building.posY],
-          name: Castle.buildings[building.id],2
+          name: Castle.buildings[building.id],
           translation: [
             Castle.zeroTranslation[0] + (building.posX * 7.0 + (mesh.size[0] / 2.0) * 7.0),
             1,
