@@ -27,6 +27,11 @@ export class Window {
     if (!(method in Window)) {
       return;
     }
+    if (category === 'main' && method !== 'build') {
+      try {
+        View.setCastleOpenedBuildHero(0);
+      } catch {}
+    }
     let template = await Window[method](value, value2, value3);
     template.requestClose = () => {
       Window.close(category);
@@ -67,6 +72,15 @@ export class Window {
   }
 
   static close(category) {
+    if (category === 'main') {
+      try {
+        const closingWindow = Window.windows[category];
+        if (closingWindow?.id === 'wbuild') {
+          View.setCastleOpenedBuildHero(0);
+        }
+      } catch {}
+    }
+
     if (category === 'main' && typeof Build !== 'undefined' && Build.cleanup) {
       Build.cleanup();
     }
@@ -623,13 +637,14 @@ export class Window {
 
     const body = DOM({ style: 'wquest__body' }, quest.description);
 
-    const objective = DOM({ style: 'wquest__objective' });
-    const objText = DOM({ style: 'wquest__objective' }, quest.target);
-    objective.appendChild(objText);
+    const objective = DOM({ style: 'wquest__objective' }, quest.target);
+    //const objText = DOM({ style: 'wquest__objective' }, quest.target);
+    //objective.appendChild(objText);
 
     if (quest.total) {
       const counter = DOM({}, quest.score, ' / ', quest.total);
-      objText.append(counter);
+      //objText.append(counter);
+	  objective.append(counter);
     }
 
     const tokens = item.reward;

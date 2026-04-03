@@ -16,9 +16,28 @@ import { Castle } from './castle.js';
 import { KeybindStore } from './keybindings/keybindings.store.js';
 import { TalentSets } from './talentSets.js';
 import { Settings } from './settings.js';
+import { getMainHeroTalentId } from './mainHeroTalent.js';
 
 export class Build {
   static loading = false;
+
+  /** HSL hue для подсветки сетов (как rgba(80,190,255)); толщина рамки в мм (макс. 1.5). */
+  static BUILD_HIGHLIGHT_HUE_DEFAULT = 199;
+  static BUILD_HIGHLIGHT_BORDER_MM_DEFAULT = 0.42;
+  static BUILD_HIGHLIGHT_BORDER_MM_MIN = 0.08;
+  static BUILD_HIGHLIGHT_BORDER_MM_MAX = 1.5;
+  static REGEN_HP_FROM_MAX_HP_PCT = 0.0015; // 0.15%
+  static REGEN_MP_FROM_MAX_MP_PCT = 0.0036; // 0.36%
+
+  /** span с числом подсвеченных по стат-фильтру талантов (см. .build-hero-stats-highlight-count). */
+  static statFilterHighlightCountValueEl = null;
+  static statFilterHighlightCountWrapEl = null;
+  static combatModeButtonEl = null;
+  static combatModeButtonCountEl = null;
+  static combatModeEnabled = false;
+  static combatModeLearnOrder = [];
+  static combatModeLearnOrderBySlot = new Map();
+  static combatModeLearnedSlots = new Set();
 
   static language = {
     sr: 'Сила/Разум',
@@ -64,6 +83,16 @@ export class Build {
     speedstak: 'Стак скорости',
   };
 
+  /** Индексы в build.profile для галочек приоритета статов (на сервере массив из 9 слотов; 0–2 не использовались) */
+  static heroStatProfileIndex = {
+    sila: 3,
+    razum: 4,
+    provorstvo: 5,
+    hitrost: 6,
+    stoikost: 7,
+    volia: 8,
+  };
+
   static talentRefineByRarity = {
     4: 5.0, //И классовые
     3: 7.0,
@@ -85,6 +114,16 @@ export class Build {
     2: 3.24,
     1: 2.625,
     0: 11.28,
+  };
+
+  /** Доля строки билда (слоты сверху вниз) в мощи: суммарно по 6 слотам строки = вклад веса. */
+  static TALENT_POWER_LINE_WEIGHTS = {
+    5: 33.0 / 600.0,
+    4: 23.0 / 600.0,
+    3: 16.0 / 600.0,
+    2: 13.0 / 600.0,
+    1: 9.0 / 600.0,
+    0: 6.0 / 600.0,
   };
 
   static binds = [];
@@ -270,6 +309,7 @@ export class Build {
 
   static async init(heroId, targetId, isWindow) {
     Build.ensureBuildSettingsDefaults();
+    Build.applyBuildHighlightVariablesFromSettings();
 
     try {
       Build.buildSettingsButton?.parentNode?.removeChild?.(Build.buildSettingsButton);
@@ -379,47 +419,61 @@ export class Build {
         if (e.ctrlKey || e.shiftKey) return;
         if (!Build.setsListView) return;
 
-        // Prevent tooltip churn while actively scrolling sets list.
-        Build._setsScrollLockUntil = performance.now() + 180;
-        Build._setsWheelMouseX = e.clientX;
-        Build._setsWheelMouseY = e.clientY;
+        const view = Build.setsListView;
+        const dy = Number(e.deltaY) || 0;
+        if (!dy) return;
+
+        const max = Math.max(0, view.scrollHeight - view.clientHeight);
+        const cur = view.scrollTop;
+        const canScroll = max > 0 && ((dy < 0 && cur > 0) || (dy > 0 && cur < max));
+        // If list is already at edge and cannot scroll further, keep current hover preview.
+        if (!canScroll) return;
+
+        // Match library behavior: wheel scroll drops current hover visuals.
+        Build._setsHoverSuppressed = true;
+        Build._setsLastPointerX = e.clientX;
+        Build._setsLastPointerY = e.clientY;
+        Build.clearEmptySlotPreviews();
+        if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+        Build._descriptionPinnedBySet = false;
+        Build._hoveredSetTalentIds = null;
+        Build._hoveredSetAnchorEl = null;
+        Build.clearSetHighlights();
         try {
           if (Build._setsScrollStopTimer) clearTimeout(Build._setsScrollStopTimer);
         } catch {}
         Build._setsScrollStopTimer = setTimeout(() => {
           Build._setsScrollStopTimer = 0;
-          Build._setsScrollLockUntil = 0;
+          Build._setsHoverSuppressed = false;
           try {
-            const x = Number(Build._setsWheelMouseX) || 0;
-            const y = Number(Build._setsWheelMouseY) || 0;
-            const el = document.elementFromPoint(x, y);
-            const hoveredSet = el?.closest?.('.build-set-item');
-            if (hoveredSet) {
-              hoveredSet.dispatchEvent(
-                new MouseEvent('mouseenter', {
-                  bubbles: true,
-                  clientX: x,
-                  clientY: y,
-                }),
-              );
-            }
+            const x = Number(Build._setsLastPointerX);
+            const y = Number(Build._setsLastPointerY);
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+            const below = document.elementFromPoint(x, y);
+            const hoveredSet = below?.closest?.('.build-set-item');
+            if (!hoveredSet || !Build.setsListView?.contains?.(hoveredSet)) return;
+            hoveredSet.dispatchEvent(
+              new MouseEvent('mouseenter', {
+                bubbles: false,
+                cancelable: false,
+                view: window,
+                clientX: x,
+                clientY: y,
+              }),
+            );
           } catch {}
         }, 140);
-        if (Build.descriptionView) Build.descriptionView.style.display = 'none';
 
         // In row layout, keep native wheel speed (same feel as library).
         if (Build.inventoryView?.classList?.contains('build-talent-view--row')) return;
 
         e.preventDefault();
 
-        const view = Build.setsListView;
-        const dy = Number(e.deltaY) || 0;
         const scaled = dy / 3;
 
         if (typeof Build._setsScrollTarget !== 'number') Build._setsScrollTarget = view.scrollTop;
         Build._setsScrollTarget += scaled;
 
-        const max = Math.max(0, view.scrollHeight - view.clientHeight);
         if (Build._setsScrollTarget < 0) Build._setsScrollTarget = 0;
         if (Build._setsScrollTarget > max) Build._setsScrollTarget = max;
 
@@ -499,10 +553,14 @@ export class Build {
     const setsHeader = DOM({ tag: 'legend', style: 'build-inventory-legend' }, Lang.text('sets'));
     setsSection.append(setsHeader, Build.setsListView);
 
+    Build.altResetHintView = DOM({ style: 'build-alt-reset-hint' }, Lang.text('buildAltResetHint'));
     Build.inventoryView.append(talentsSection, setsSection);
+    Build.attachAltResetHintBelowInventory();
+    Build.installAltResetHandler();
     Build.buildSettingsButton = Build.createBuildSettingsButton();
     Build.buildSettingsPanel = Build.createBuildSettingsPanel();
     Build.attachBuildSettingsToWbuild();
+    Build.applyBuildHighlightVariablesFromSettings();
 
     Build.renderTalentSetsList();
 
@@ -533,6 +591,8 @@ export class Build {
     Build.heroStatsFromPower = {
       hp: 0.0,
       mp: 0.0,
+      regenhp: 0.0,
+      regenmp: 0.0,
       sila: 0.0,
       razum: 0.0,
       provorstvo: 0.0,
@@ -541,6 +601,7 @@ export class Build {
       volia: 0.0,
     };
     Build.installedTalents = new Array(36).fill(null);
+    Build.resetCombatModeState();
     Build.profileStats = new Object();
 
     Build.applyRz = true;
@@ -551,17 +612,27 @@ export class Build {
     Build.list(request.build, isWindow);
     Build.buildActions(request.build, isWindow);
 
-    request.hero.stats['damage'] = 0;
-    request.hero.stats['critProb'] = 0;
-    request.hero.stats['attackSpeed'] = 0;
-    request.hero.stats['punching'] = 0;
-    request.hero.stats['protectionBody'] = 0;
-    request.hero.stats['protectionSpirit'] = 0;
+    const hs = request.hero.stats;
+    hs['damage'] = 0;
+    hs['critProb'] = 0;
+    hs['attackSpeed'] = 0;
+    hs['punching'] = 0;
+    hs['protectionBody'] = 0;
+    hs['protectionSpirit'] = 0;
+    if (hs.regenhp === undefined || hs.regenhp === null) hs.regenhp = 0;
+    else hs.regenhp = parseFloat(hs.regenhp) || 0;
+    if (hs.regenmp === undefined || hs.regenmp === null) hs.regenmp = 0;
+    else hs.regenmp = parseFloat(hs.regenmp) || 0;
+    hs.krajahp = 0;
+    hs.krajamp = 0;
+    hs.speedtal = 0;
     Build.hero(request.hero);
 
     Build.level();
 
     Build.field(request.body);
+    Build.syncCombatModeButtonState();
+    Build.renderCombatOrderBadges();
 
     Build.inventory();
 
@@ -599,6 +670,7 @@ export class Build {
     }
 
     try {
+      Build.setCombatMode(false, { force: true });
       Build.fieldConflict = new Object();
       Build.installedTalents = new Array(36).fill(null);
       Build.fieldView?.replaceChildren();
@@ -624,37 +696,7 @@ export class Build {
     try {
       if (request?.active) Build.activeBar(request.active);
     } catch {}
-  }
-
-  static beginSilentBuildUiUpdate() {
-    try {
-      Build.fieldView?.classList?.add('build-ui-updating');
-    } catch {}
-    try {
-      Build.inventoryView?.classList?.add('build-ui-updating');
-    } catch {}
-  }
-
-  static endSilentBuildUiUpdate() {
-    const end = () => {
-      try {
-        Build.fieldView?.classList?.remove('build-ui-updating');
-      } catch {}
-      try {
-        Build.inventoryView?.classList?.remove('build-ui-updating');
-      } catch {}
-    };
-
-    requestAnimationFrame(() => requestAnimationFrame(end));
-  }
-
-  static async runWithSilentBuildUiUpdate(callback) {
-    Build.beginSilentBuildUiUpdate();
-    try {
-      return await callback();
-    } finally {
-      Build.endSilentBuildUiUpdate();
-    }
+    Build.syncCombatModeButtonState();
   }
 
   static ensureBuildSettingsDefaults() {
@@ -674,6 +716,76 @@ export class Build {
     if (Settings.settings.buildTalentViewLayout !== 0 && Settings.settings.buildTalentViewLayout !== 1) {
       Settings.settings.buildTalentViewLayout = 0;
     }
+    if (typeof Settings.settings.buildSetOnlyMatchingStats !== 'boolean') {
+      Settings.settings.buildSetOnlyMatchingStats = false;
+    }
+    if (!Number.isFinite(Number(Settings.settings.buildStatFilterHighlightMode))) {
+      Settings.settings.buildStatFilterHighlightMode = 1;
+    }
+    if (Settings.settings.buildStatFilterHighlightMode < 0 || Settings.settings.buildStatFilterHighlightMode > 2) {
+      Settings.settings.buildStatFilterHighlightMode = 1;
+    }
+    if (!Number.isFinite(Number(Settings.settings.buildHighlightHue))) {
+      Settings.settings.buildHighlightHue = Build.BUILD_HIGHLIGHT_HUE_DEFAULT;
+    }
+    let bhHue = Number(Settings.settings.buildHighlightHue);
+    bhHue = ((bhHue % 360) + 360) % 360;
+    Settings.settings.buildHighlightHue = bhHue;
+    if (!Number.isFinite(Number(Settings.settings.buildHighlightBorderMm))) {
+      Settings.settings.buildHighlightBorderMm = Build.BUILD_HIGHLIGHT_BORDER_MM_DEFAULT;
+    }
+    const bhMm = Number(Settings.settings.buildHighlightBorderMm);
+    Settings.settings.buildHighlightBorderMm = Math.min(
+      Build.BUILD_HIGHLIGHT_BORDER_MM_MAX,
+      Math.max(Build.BUILD_HIGHLIGHT_BORDER_MM_MIN, bhMm),
+    );
+  }
+
+  static getBuildHighlightHue() {
+    let h = Number(Settings.settings?.buildHighlightHue);
+    if (!Number.isFinite(h)) h = Build.BUILD_HIGHLIGHT_HUE_DEFAULT;
+    return ((h % 360) + 360) % 360;
+  }
+
+  static getBuildHighlightBorderMm() {
+    let mm = Number(Settings.settings?.buildHighlightBorderMm);
+    if (!Number.isFinite(mm)) mm = Build.BUILD_HIGHLIGHT_BORDER_MM_DEFAULT;
+    return Math.min(
+      Build.BUILD_HIGHLIGHT_BORDER_MM_MAX,
+      Math.max(Build.BUILD_HIGHLIGHT_BORDER_MM_MIN, mm),
+    );
+  }
+
+  static applyBuildHighlightVariablesFromSettings() {
+    try {
+      const h = String(Build.getBuildHighlightHue());
+      const b = `${Build.getBuildHighlightBorderMm()}mm`;
+      document.documentElement.style.setProperty('--build-hl-h', h);
+      document.documentElement.style.setProperty('--build-hl-border-mm', b);
+    } catch {}
+  }
+
+  /** Пока зажата ЛКМ на полосках цвета/толщины подсветки — подсветить все таланты (поле + библиотека). */
+  static setHighlightSettingsStripPreviewActive(on) {
+    const fieldCls = 'build-highlight-settings-demo';
+    const libCls = 'build-highlight-settings-demo-lib';
+    const v = !!on;
+    try {
+      Build.fieldView?.querySelectorAll?.('.build-talent-item')?.forEach((el) => {
+        el.classList.toggle(fieldCls, v);
+      });
+    } catch {}
+    try {
+      Build.inventoryView?.querySelectorAll?.('.build-talents .build-talent-item')?.forEach((el) => {
+        el.classList.toggle(libCls, v);
+      });
+    } catch {}
+  }
+
+  static getBuildStatFilterHighlightMode() {
+    const m = Number(Settings.settings?.buildStatFilterHighlightMode);
+    if (!Number.isFinite(m) || m < 0 || m > 2) return 1;
+    return m;
   }
 
   static getSetLmbMode() {
@@ -723,113 +835,313 @@ export class Build {
 
     const modeLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsLmbMode'));
     const modeValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
-    const modeSlider = DOM({
-      tag: 'input',
-      type: 'range',
-      min: '0',
-      max: '2',
-      step: '1',
-      style: 'castle-menu-slider',
-      value: String(Build.getSetLmbMode() - 1),
-      event: [
-        'input',
-        async (e) => {
-          const next = Math.min(3, Math.max(1, (Number(e.target.value) || 0) + 1));
-          Settings.settings.buildSetLmbMode = next;
-          modeValue.textContent = Build.getSetLmbModeLabel(next);
-          try {
-            await Settings.WriteSettings();
-          } catch {}
-
-          try {
-            Window.updateSliderFill(e.target);
-          } catch {}
-        },
-      ],
-    });
-
     modeValue.textContent = Build.getSetLmbModeLabel(Build.getSetLmbMode());
+    const modeDots = DOM({ style: 'build-settings-mode-dots' });
+    const buildSetModeValue = async (next) => {
+      Settings.settings.buildSetLmbMode = next;
+      modeValue.textContent = Build.getSetLmbModeLabel(next);
+      const items = modeDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx + 1 === next));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+
+    for (let i = 1; i <= 3; i++) {
+      const dotStyle = ['build-settings-mode-dot'];
+      if (Build.getSetLmbMode() === i) dotStyle.push('build-settings-mode-dot-active');
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: Lang.text(`buildSettingsLmbMode${i}`),
+        event: [
+          'click',
+          async () => {
+            await buildSetModeValue(i);
+          },
+        ],
+      });
+      modeDots.append(dot);
+    }
 
     const hoverLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsRowHighlight'));
     const hoverValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
-    const hoverSlider = DOM({
-      tag: 'input',
-      type: 'range',
-      min: '0',
-      max: '1',
-      step: '1',
-      style: 'castle-menu-slider',
-      value: Build.isBuildRowHoverHighlightEnabled() ? '1' : '0',
-      event: [
-        'input',
-        async (e) => {
-          const enabled = Number(e.target.value) === 1;
-          Settings.settings.buildRowHoverHighlight = enabled;
-          hoverValue.textContent = enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
-          if (!enabled) Build.clearBuildRowHoverHighlight();
-          try {
-            await Settings.WriteSettings();
-          } catch {}
-
-          try {
-            Window.updateSliderFill(e.target);
-          } catch {}
-        },
-      ],
-    });
-    hoverValue.textContent = Build.isBuildRowHoverHighlightEnabled() ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+    const hoverDots = DOM({ style: 'build-settings-mode-dots' });
+    const applyHoverValue = async (enabled) => {
+      Settings.settings.buildRowHoverHighlight = enabled;
+      hoverValue.textContent = enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+      if (!enabled) Build.clearBuildRowHoverHighlight();
+      const activeIndex = enabled ? 1 : 0;
+      const items = hoverDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx === activeIndex));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+    const hoverEnabledNow = Build.isBuildRowHoverHighlightEnabled();
+    hoverValue.textContent = hoverEnabledNow ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+    for (let i = 0; i < 2; i++) {
+      const enabled = i === 1;
+      const dotStyle = ['build-settings-mode-dot'];
+      if ((hoverEnabledNow && enabled) || (!hoverEnabledNow && !enabled)) dotStyle.push('build-settings-mode-dot-active');
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff'),
+        event: ['click', async () => applyHoverValue(enabled)],
+      });
+      hoverDots.append(dot);
+    }
 
     const layoutLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsLayout'));
     const layoutValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
     const getLayoutText = (n) => (n === 1 ? Lang.text('buildSettingsLayoutRow') : Lang.text('buildSettingsLayoutColumn'));
     layoutValue.textContent = getLayoutText(Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0);
 
-    const layoutSlider = DOM({
-      tag: 'input',
-      type: 'range',
-      min: '0',
-      max: '1',
-      step: '1',
-      style: 'castle-menu-slider',
-      value: String(Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0),
-      event: [
-        'input',
-        async (e) => {
-          const next = Number(e.target.value) === 1 ? 1 : 0;
-          Settings.settings.buildTalentViewLayout = next;
-          layoutValue.textContent = getLayoutText(next);
-          Build.applyTalentViewLayoutFromSettings();
-          try {
-            await Settings.WriteSettings();
-          } catch {}
-          try {
-            Window.updateSliderFill(e.target);
-          } catch {}
-        },
-      ],
+    const layoutDots = DOM({ style: 'build-settings-mode-dots' });
+    const applyLayoutValue = async (next) => {
+      Settings.settings.buildTalentViewLayout = next;
+      layoutValue.textContent = getLayoutText(next);
+      Build.applyTalentViewLayoutFromSettings();
+      const items = layoutDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx === next));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+    const layoutNow = Number(Settings.settings?.buildTalentViewLayout) === 1 ? 1 : 0;
+    for (let i = 0; i < 2; i++) {
+      const dotStyle = ['build-settings-mode-dot'];
+      if (layoutNow === i) dotStyle.push('build-settings-mode-dot-active');
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: i === 1 ? Lang.text('buildSettingsLayoutRow') : Lang.text('buildSettingsLayoutColumn'),
+        event: ['click', async () => applyLayoutValue(i)],
+      });
+      layoutDots.append(dot);
+    }
+
+    const matchLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsSetMatchOnly'));
+    const matchValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const matchDots = DOM({ style: 'build-settings-mode-dots' });
+    const applyMatchValue = async (enabled) => {
+      Settings.settings.buildSetOnlyMatchingStats = enabled;
+      matchValue.textContent = enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+      const activeIndex = enabled ? 1 : 0;
+      const items = matchDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx === activeIndex));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+    const matchEnabledNow = Boolean(Settings.settings?.buildSetOnlyMatchingStats);
+    matchValue.textContent = matchEnabledNow ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+    for (let i = 0; i < 2; i++) {
+      const enabled = i === 1;
+      const dotStyle = ['build-settings-mode-dot'];
+      if ((matchEnabledNow && enabled) || (!matchEnabledNow && !enabled)) dotStyle.push('build-settings-mode-dot-active');
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff'),
+        event: ['click', async () => applyMatchValue(enabled)],
+      });
+      matchDots.append(dot);
+    }
+
+    const statFiltLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsStatFilterHighlight'));
+    const statFiltValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const statFiltModeNow = Build.getBuildStatFilterHighlightMode();
+    statFiltValue.textContent = Build.getBuildStatFilterHighlightModeLabel(statFiltModeNow);
+    const statFiltDots = DOM({ style: 'build-settings-mode-dots' });
+    const applyStatFiltMode = async (next) => {
+      Settings.settings.buildStatFilterHighlightMode = next;
+      statFiltValue.textContent = Build.getBuildStatFilterHighlightModeLabel(next);
+      const items = statFiltDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx === next));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+    for (let i = 0; i < 3; i++) {
+      const dotStyle = ['build-settings-mode-dot'];
+      if (statFiltModeNow === i) dotStyle.push('build-settings-mode-dot-active');
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: Build.getBuildStatFilterHighlightModeLabel(i),
+        event: ['click', async () => applyStatFiltMode(i)],
+      });
+      statFiltDots.append(dot);
+    }
+
+    const hlBlock = DOM({ style: 'build-settings-hl-block' });
+    const hlSliders = DOM({ style: 'build-settings-hl-sliders' });
+    const hlHueLabel = DOM({ style: 'build-settings-hl-line-label' }, Lang.text('buildSettingsHighlightHue'));
+    const hlHueTrack = DOM({ style: 'build-settings-hl-hue-track' });
+    const hlHueThumb = DOM({ style: 'build-settings-hl-thumb' });
+    hlHueTrack.append(hlHueThumb);
+    const hlBorderLabel = DOM({ style: 'build-settings-hl-line-label' }, Lang.text('buildSettingsHighlightBorder'));
+    const hlBorderTrack = DOM({ style: 'build-settings-hl-mm-track' });
+    const hlBorderThumb = DOM({ style: 'build-settings-hl-thumb' });
+    hlBorderTrack.append(hlBorderThumb);
+    hlSliders.append(hlHueLabel, hlHueTrack, hlBorderLabel, hlBorderTrack);
+
+    const hlReset = DOM(
+      {
+        tag: 'button',
+        type: 'button',
+        style: 'build-settings-hl-reset',
+        title: Lang.text('buildSettingsHighlightReset'),
+        domaudio: domAudioPresets.defaultButton,
+      },
+      '↺',
+    );
+
+    const syncHlPanelThumbs = () => {
+      const hue = Build.getBuildHighlightHue();
+      hlHueThumb.style.left = `${(hue / 360) * 100}%`;
+      const mm = Build.getBuildHighlightBorderMm();
+      const span = Build.BUILD_HIGHLIGHT_BORDER_MM_MAX - Build.BUILD_HIGHLIGHT_BORDER_MM_MIN;
+      const t = span > 0 ? (mm - Build.BUILD_HIGHLIGHT_BORDER_MM_MIN) / span : 0;
+      hlBorderThumb.style.left = `${Math.min(1, Math.max(0, t)) * 100}%`;
+    };
+
+    const commitHlSettings = async () => {
+      Build.applyBuildHighlightVariablesFromSettings();
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+
+    const setHueFromClientX = (clientX) => {
+      const r = hlHueTrack.getBoundingClientRect();
+      if (r.width <= 0) return Build.getBuildHighlightHue();
+      const t = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+      const hue = t * 360;
+      Settings.settings.buildHighlightHue = hue;
+      hlHueThumb.style.left = `${t * 100}%`;
+      Build.applyBuildHighlightVariablesFromSettings();
+      return hue;
+    };
+
+    const setBorderMmFromClientX = (clientX) => {
+      const r = hlBorderTrack.getBoundingClientRect();
+      if (r.width <= 0) return Build.getBuildHighlightBorderMm();
+      const t = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+      const mm =
+        Build.BUILD_HIGHLIGHT_BORDER_MM_MIN +
+        t * (Build.BUILD_HIGHLIGHT_BORDER_MM_MAX - Build.BUILD_HIGHLIGHT_BORDER_MM_MIN);
+      Settings.settings.buildHighlightBorderMm = mm;
+      hlBorderThumb.style.left = `${t * 100}%`;
+      Build.applyBuildHighlightVariablesFromSettings();
+      return mm;
+    };
+
+    let hlHueDrag = false;
+    let hlBorderDrag = false;
+    const syncHlStripPreview = () => {
+      Build.setHighlightSettingsStripPreviewActive(hlHueDrag || hlBorderDrag);
+    };
+    hlHueTrack.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      hlHueDrag = true;
+      hlHueTrack.setPointerCapture(e.pointerId);
+      setHueFromClientX(e.clientX);
+      syncHlStripPreview();
+    });
+    hlHueTrack.addEventListener('pointermove', (e) => {
+      if (!hlHueDrag) return;
+      setHueFromClientX(e.clientX);
+    });
+    const endHueDrag = async (e) => {
+      if (!hlHueDrag) return;
+      hlHueDrag = false;
+      syncHlStripPreview();
+      try {
+        hlHueTrack.releasePointerCapture(e.pointerId);
+      } catch {}
+      setHueFromClientX(e.clientX);
+      await commitHlSettings();
+    };
+    hlHueTrack.addEventListener('pointerup', endHueDrag);
+    hlHueTrack.addEventListener('pointercancel', endHueDrag);
+    hlHueTrack.addEventListener('lostpointercapture', async () => {
+      if (!hlHueDrag) return;
+      hlHueDrag = false;
+      syncHlStripPreview();
+      await commitHlSettings();
     });
 
+    hlBorderTrack.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      hlBorderDrag = true;
+      hlBorderTrack.setPointerCapture(e.pointerId);
+      setBorderMmFromClientX(e.clientX);
+      syncHlStripPreview();
+    });
+    hlBorderTrack.addEventListener('pointermove', (e) => {
+      if (!hlBorderDrag) return;
+      setBorderMmFromClientX(e.clientX);
+    });
+    const endBorderDrag = async (e) => {
+      if (!hlBorderDrag) return;
+      hlBorderDrag = false;
+      syncHlStripPreview();
+      try {
+        hlBorderTrack.releasePointerCapture(e.pointerId);
+      } catch {}
+      setBorderMmFromClientX(e.clientX);
+      await commitHlSettings();
+    };
+    hlBorderTrack.addEventListener('pointerup', endBorderDrag);
+    hlBorderTrack.addEventListener('pointercancel', endBorderDrag);
+    hlBorderTrack.addEventListener('lostpointercapture', async () => {
+      if (!hlBorderDrag) return;
+      hlBorderDrag = false;
+      syncHlStripPreview();
+      await commitHlSettings();
+    });
+
+    hlReset.addEventListener('click', async (e) => {
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
+      Settings.settings.buildHighlightHue = Build.BUILD_HIGHLIGHT_HUE_DEFAULT;
+      Settings.settings.buildHighlightBorderMm = Build.BUILD_HIGHLIGHT_BORDER_MM_DEFAULT;
+      Build.ensureBuildSettingsDefaults();
+      syncHlPanelThumbs();
+      await commitHlSettings();
+    });
+
+    syncHlPanelThumbs();
+    Build.refreshBuildHighlightSettingsPanel = syncHlPanelThumbs;
+
+    hlBlock.append(hlSliders, hlReset);
     panel.append(
       title,
       modeLabel,
-      modeSlider,
+      modeDots,
       modeValue,
       hoverLabel,
-      hoverSlider,
+      hoverDots,
       hoverValue,
       layoutLabel,
-      layoutSlider,
+      layoutDots,
       layoutValue,
+      matchLabel,
+      matchDots,
+      matchValue,
+      statFiltLabel,
+      statFiltDots,
+      statFiltValue,
+      hlBlock,
     );
-
-    // Match slider track fill exactly like in Window.settings().
-    requestAnimationFrame(() => {
-      try {
-        Window.updateSliderFill(modeSlider);
-        Window.updateSliderFill(hoverSlider);
-        Window.updateSliderFill(layoutSlider);
-      } catch {}
-    });
 
     return panel;
   }
@@ -840,11 +1152,22 @@ export class Build {
     return Lang.text('buildSettingsLmbMode1');
   }
 
+  static getBuildStatFilterHighlightModeLabel(mode) {
+    if (mode === 0) return Lang.text('buildSettingsStatFilterHighlightModeOff');
+    if (mode === 2) return Lang.text('buildSettingsStatFilterHighlightModeAffectsTotal');
+    return Lang.text('buildSettingsStatFilterHighlightModeHasStat');
+  }
+
   static toggleBuildSettingsPanel(force) {
     const panel = Build.buildSettingsPanel;
     if (!panel) return;
     const shouldOpen = typeof force === 'boolean' ? force : panel.style.display === 'none';
     panel.style.display = shouldOpen ? 'flex' : 'none';
+    if (shouldOpen) {
+      try {
+        Build.refreshBuildHighlightSettingsPanel?.();
+      } catch {}
+    }
   }
 
   static attachBuildSettingsToWbuild() {
@@ -856,6 +1179,7 @@ export class Build {
       if (!wbuild) return;
       if (Build.buildSettingsButton && Build.buildSettingsButton.parentNode !== wbuild) wbuild.append(Build.buildSettingsButton);
       if (Build.buildSettingsPanel && Build.buildSettingsPanel.parentNode !== wbuild) wbuild.append(Build.buildSettingsPanel);
+      Build.applyBuildHighlightVariablesFromSettings();
     } catch {}
   }
 
@@ -915,6 +1239,9 @@ export class Build {
     MM.hero.filter((hero) => {
       return hero.id == heroId;
     })[0].skin = skinId;
+    if (Build.heroId === heroId) {
+      Build.applyBuildHeroAvatarSkin(heroId, skinId);
+    }
 
     try {
       let heroItem = View.castleBottom.querySelector(`#id${heroId}`);
@@ -933,6 +1260,16 @@ export class Build {
     //await App.ShowCurrentViewAsync();
   }
 
+  static applyBuildHeroAvatarSkin(heroId, skinId) {
+    if (!Build.heroImg) return;
+    const sid = Number.isFinite(Number(skinId)) ? Number(skinId) : 1;
+    Build.heroImg.style.backgroundImage = `url(content/hero/${heroId}/${sid}.webp), url(content/hero/background.png)`;
+    // Use contain for hero layer so built-in frame inside skin image is not clipped on non-uniform source sizes.
+    Build.heroImg.style.backgroundSize = 'contain, 100%';
+    Build.heroImg.style.backgroundPosition = 'center, center';
+    Build.heroImg.style.backgroundRepeat = 'no-repeat, no-repeat';
+  }
+
   static skinChange() {
     let bodyHero = DOM({ style: 'skin-change' });
 
@@ -946,9 +1283,8 @@ export class Build {
       hero.dataset.skin = i;
 
       hero.addEventListener('click', async () => {
-        Build.changeSkinForHero(Build.heroId, hero.dataset.skin);
-
-        Build.heroImg.style.backgroundImage = `url(content/hero/${Build.heroId}/${hero.dataset.skin}.webp)`;
+        await Build.changeSkinForHero(Build.heroId, hero.dataset.skin);
+        Build.applyBuildHeroAvatarSkin(Build.heroId, hero.dataset.skin);
 
         Splash.hide();
       });
@@ -1008,6 +1344,32 @@ export class Build {
   }
 
   static buildActions(builds, isWindow) {
+    // Переключаемый боевой режим (симуляция прокачки талантов в текущем билде)
+    {
+      const combatMode = DOM({
+        tag: 'button',
+        domaudio: domAudioPresets.defaultButton,
+        style: ['build-action-item', 'btn-hover', 'color-1', 'build-action-item-combat-mode'],
+        event: [
+          'click',
+          () => {
+            Build.toggleCombatMode();
+          },
+        ],
+      });
+      const combatModeBg = DOM({
+        style: ['btn-combat-mode', 'build-action-item-background'],
+      });
+      const combatModeCount = DOM({ tag: 'span', style: 'btn-combat-mode-count' }, '36');
+      const combatModeGlass = DOM({ tag: 'span', style: 'btn-combat-mode-glass' });
+      combatModeBg.append(combatModeCount, combatModeGlass);
+      combatMode.append(combatModeBg);
+      Build.buildActionsView.append(combatMode);
+      Build.combatModeButtonEl = combatMode;
+      Build.combatModeButtonCountEl = combatModeCount;
+      Build.syncCombatModeButtonState();
+    }
+
     if (builds.length < 6) {
       const create = DOM({
         tag: 'button',
@@ -1020,7 +1382,7 @@ export class Build {
       let createBg = DOM({
         style: ['btn-create', 'build-action-item-background'],
       });
-      createBg.style.backgroundImage = `url('content/icons/plus.svg')`;
+      createBg.style.backgroundImage = `url('content/img/create.png')`;
       create.append(createBg);
       Build.buildActionsView.append(create);
     }
@@ -1162,7 +1524,7 @@ export class Build {
     });
 
     let duplicateBg = DOM({ style: ['btn-duplicate'] });
-    duplicateBg.style.backgroundImage = `url('content/icons/copy.svg')`;
+    duplicateBg.style.backgroundImage = `url('content/img/copy.png')`;
     duplicate.append(duplicateBg);
     Build.buildActionsView.append(duplicate);
 
@@ -1185,7 +1547,7 @@ export class Build {
       let randomBg = DOM({
         style: ['btn-random', 'build-action-item-background'],
       });
-      randomBg.style.backgroundImage = `url('content/icons/dice.svg')`;
+      randomBg.style.backgroundImage = `url('content/img/random.png')`;
       random.append(randomBg);
       Build.buildActionsView.append(random);
     }
@@ -1252,10 +1614,351 @@ export class Build {
       let resetBg = DOM({
         style: ['btn-trash', 'build-action-item-background'],
       });
-      resetBg.style.backgroundImage = `url('content/icons/trash.svg')`;
+      resetBg.style.backgroundImage = `url('content/img/remove.png')`;
       resetBuild.append(resetBg);
       Build.buildActionsView.append(resetBuild);
     }
+
+  }
+
+  static resetCombatModeState() {
+    Build.combatModeButtonEl = null;
+    Build.combatModeButtonCountEl = null;
+    Build.combatModeEnabled = false;
+    Build.combatModeLearnOrder = [];
+    Build.combatModeLearnOrderBySlot = new Map();
+    Build.combatModeLearnedSlots = new Set();
+  }
+
+  static getCombatModeHeroLevel() {
+    return Build.combatModeLearnOrder.length;
+  }
+
+  static getCombatMainTalentSlotIndex() {
+    for (let i = 0; i < (Build.installedTalents || []).length; i++) {
+      const t = Build.installedTalents[i];
+      if (Build.isMainHeroClassTalent(t)) return i;
+    }
+    return -1;
+  }
+
+  static isBuildCompleteForCombatMode() {
+    const list = Build.installedTalents || [];
+    if (!Array.isArray(list) || list.length !== 36) return false;
+    for (const t of list) {
+      if (!t) return false;
+    }
+    return true;
+  }
+
+  static hasMainTalentInBuildForCombatMode() {
+    return Build.getCombatMainTalentSlotIndex() >= 0;
+  }
+
+  static canEnableCombatMode() {
+    return Build.isBuildCompleteForCombatMode() && Build.hasMainTalentInBuildForCombatMode();
+  }
+
+  static getCombatModeTooltip() {
+    if (!Build.canEnableCombatMode()) {
+      return `${Lang.text('combatModeName')}\n${Lang.text('combatModeBuildNotComplete')}`;
+    }
+    return Lang.text('combatModeName');
+  }
+
+  static syncCombatModeButtonState() {
+    const btn = Build.combatModeButtonEl;
+    if (!btn) return;
+    const canEnable = Build.canEnableCombatMode();
+    if (!canEnable && Build.combatModeEnabled) {
+      Build.setCombatMode(false, { force: true });
+    }
+    btn.classList.toggle('build-action-item-active', Build.combatModeEnabled);
+    btn.classList.toggle('build-action-item-disabled', !canEnable);
+    btn.title = Build.getCombatModeTooltip();
+    if (Build.combatModeButtonCountEl) {
+      Build.combatModeButtonCountEl.textContent = Build.combatModeEnabled ? String(Build.getCombatModeHeroLevel()) : '36';
+    }
+  }
+
+  static getCombatUnlockedRowsForLevel(level) {
+    const lvl = Math.max(1, Number(level) || 1);
+    if (lvl >= 20) return 6;
+    return Math.max(1, Math.min(6, 1 + Math.floor(lvl / 4)));
+  }
+
+  static renderCombatOrderBadges() {
+    try {
+      Build.fieldView?.querySelectorAll('.build-combat-order-badge').forEach((el) => el.remove());
+      Build.fieldView?.querySelectorAll('.build-talent-item.build-combat-learned').forEach((el) => el.classList.remove('build-combat-learned'));
+      Build.fieldView?.querySelectorAll('.build-talent-item.build-combat-locked').forEach((el) => el.classList.remove('build-combat-locked'));
+      Build.fieldView?.querySelectorAll('.build-talent-item.build-combat-surrounded-blink').forEach((el) =>
+        el.classList.remove('build-combat-surrounded-blink'),
+      );
+    } catch {}
+    if (!Build.combatModeEnabled) {
+      Build.fieldView?.classList.remove('build-combat-mode-on');
+      return;
+    }
+    Build.fieldView?.classList.add('build-combat-mode-on');
+    const unlockedRows = Build.getCombatUnlockedRowsForLevel(Build.getCombatModeHeroLevel());
+    const cells = Build.fieldView?.querySelectorAll('.build-hero-grid-item') || [];
+    const slotToTalentEl = new Map();
+    for (const cell of cells) {
+      const talentEl = cell?.querySelector?.('.build-talent-item');
+      if (!talentEl) continue;
+      const slot = Number(cell?.dataset?.position);
+      if (!Number.isFinite(slot)) continue;
+      slotToTalentEl.set(slot, talentEl);
+      const slotTalent = Build.installedTalents?.[slot];
+      const row = Math.max(1, Number(slotTalent?.level) || 1);
+      const learnedOrder = Build.combatModeLearnOrderBySlot.get(slot);
+      const isLearned = Number.isFinite(learnedOrder);
+      if (isLearned) {
+        talentEl.classList.add('build-combat-learned');
+        const badge = DOM({ style: 'build-combat-order-badge' }, String(learnedOrder));
+        talentEl.append(badge);
+      } else if (row > unlockedRows) {
+        talentEl.classList.add('build-combat-locked');
+      }
+    }
+
+    // Blink enclosed unlearned talents (4 sides are either walls or already learned talents).
+    const GRID_SIZE = 6;
+    const learnedSet = Build.combatModeLearnedSlots || new Set();
+    for (const [slot, talentEl] of slotToTalentEl.entries()) {
+      if (learnedSet.has(slot)) continue;
+      const row = Math.floor(slot / GRID_SIZE);
+      const col = slot % GRID_SIZE;
+      const topBlocked = row === 0 || learnedSet.has(slot - GRID_SIZE);
+      const rightBlocked = col === GRID_SIZE - 1 || learnedSet.has(slot + 1);
+      const bottomBlocked = row === GRID_SIZE - 1 || learnedSet.has(slot + GRID_SIZE);
+      const leftBlocked = col === 0 || learnedSet.has(slot - 1);
+      if (topBlocked && rightBlocked && bottomBlocked && leftBlocked) {
+        talentEl.classList.add('build-combat-surrounded-blink');
+      }
+    }
+  }
+
+  static getCombatLearnedInstalledTalents() {
+    const effective = new Array(36).fill(null);
+    for (const slot of Build.combatModeLearnedSlots) {
+      if (slot < 0 || slot >= 36) continue;
+      effective[slot] = Build.installedTalents?.[slot] || null;
+    }
+    return effective;
+  }
+
+  static getEffectiveInstalledTalents() {
+    if (!Build.combatModeEnabled) return Build.installedTalents;
+    return Build.getCombatLearnedInstalledTalents();
+  }
+
+  static canLearnTalentInCombatMode(slotIndex) {
+    if (!Build.combatModeEnabled) return false;
+    if (Build.combatModeLearnedSlots.has(slotIndex)) return false;
+    const talent = Build.installedTalents?.[slotIndex];
+    if (!talent) return false;
+    const currentLevel = Build.getCombatModeHeroLevel();
+    const unlockedRows = Build.getCombatUnlockedRowsForLevel(currentLevel);
+    const talentRow = Math.max(1, Number(talent.level) || 1);
+    return talentRow <= unlockedRows;
+  }
+
+  static learnCombatTalentAtSlot(slotIndex) {
+    if (!Build.canLearnTalentInCombatMode(slotIndex)) return false;
+    const order = Build.combatModeLearnOrder.length + 1;
+    Build.combatModeLearnOrder.push(slotIndex);
+    Build.combatModeLearnedSlots.add(slotIndex);
+    Build.combatModeLearnOrderBySlot.set(slotIndex, order);
+    return true;
+  }
+
+  static rebuildCombatLearnOrderMapsFromOrderArray() {
+    Build.combatModeLearnedSlots = new Set(Build.combatModeLearnOrder);
+    Build.combatModeLearnOrderBySlot = new Map();
+    for (let i = 0; i < Build.combatModeLearnOrder.length; i++) {
+      Build.combatModeLearnOrderBySlot.set(Build.combatModeLearnOrder[i], i + 1);
+    }
+  }
+
+  /**
+   * После изменения числа изученных: уровень = длина списка; строки выше допустимой для этого уровня снимаются
+   * (с конца порядка изучения среди нарушителей).
+   */
+  static enforceCombatLearnedRowConstraints() {
+    const requirements = [4, 8, 12, 16, 20];
+    
+    let changed = true;
+    while (changed) {
+      changed = false;
+      
+      const talentsByRow = new Map();
+      Build.combatModeLearnOrder.forEach(slot => {
+        const t = Build.installedTalents?.[slot];
+        const row = Math.max(1, Number(t?.level) || 1);
+        talentsByRow.set(row, (talentsByRow.get(row) || 0) + 1);
+      });
+      
+      let totalTalents = 0;
+      for (let row = 1; row <= 5; row++) {
+        totalTalents += talentsByRow.get(row) || 0;
+        if (totalTalents < requirements[row - 1]) {
+          for (let i = Build.combatModeLearnOrder.length - 1; i > 0; i--) {
+            const slot = Build.combatModeLearnOrder[i];
+            const t = Build.installedTalents?.[slot];
+            const talentRow = Math.max(1, Number(t?.level) || 1);
+            if (talentRow === row + 1) {
+              Build.combatModeLearnOrder.splice(i, 1);
+              Build.rebuildCombatLearnOrderMapsFromOrderArray();
+              changed = true;
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+    
+    while (Build.combatModeLearnOrder.length > 0) {
+      const level = Build.combatModeLearnOrder.length;
+      const unlockedRows = Build.getCombatUnlockedRowsForLevel(level);
+      let removeIdx = -1;
+      for (let j = Build.combatModeLearnOrder.length - 1; j > 0; j--) {
+        const slot = Build.combatModeLearnOrder[j];
+        const t = Build.installedTalents?.[slot];
+        const row = Math.max(1, Number(t?.level) || 1);
+        if (row > unlockedRows) {
+          removeIdx = j;
+          break;
+        }
+      }
+      if (removeIdx < 0) break;
+      Build.combatModeLearnOrder.splice(removeIdx, 1);
+      Build.rebuildCombatLearnOrderMapsFromOrderArray();
+    }
+    
+    if (Build.combatModeLearnOrder.length === 0) {
+      const mainSlot = Build.getCombatMainTalentSlotIndex();
+      if (mainSlot >= 0) {
+        Build.combatModeLearnOrder = [mainSlot];
+        Build.rebuildCombatLearnOrderMapsFromOrderArray();
+      }
+    }
+  }
+
+  /**
+   * Оставить только первые keepLastOrder шагов (номера 1…keepLastOrder). 0 — ни одного; пусто → снова только главный классовый талант.
+   */
+  static rollbackCombatProgressToOrder(keepLastOrder) {
+    let keep = Number(keepLastOrder);
+    if (!Number.isFinite(keep)) keep = 0;
+    keep = Math.max(0, Math.floor(keep));
+    const nextOrder = [];
+    const nextSet = new Set();
+    const nextMap = new Map();
+    for (let i = 0; i < Build.combatModeLearnOrder.length; i++) {
+      const slot = Build.combatModeLearnOrder[i];
+      const ord = i + 1;
+      if (ord > keep) break;
+      nextOrder.push(slot);
+      nextSet.add(slot);
+      nextMap.set(slot, ord);
+    }
+    Build.combatModeLearnOrder = nextOrder;
+    Build.combatModeLearnedSlots = nextSet;
+    Build.combatModeLearnOrderBySlot = nextMap;
+    if (Build.combatModeLearnOrder.length === 0) {
+      const mainSlot = Build.getCombatMainTalentSlotIndex();
+      if (mainSlot >= 0) {
+        Build.combatModeLearnOrder = [mainSlot];
+        Build.rebuildCombatLearnOrderMapsFromOrderArray();
+      }
+    }
+    Build.enforceCombatLearnedRowConstraints();
+  }
+
+  /** ПКМ по изученному таланту: снять только его, номера следующих −1; затем проверка строк по уровню. */
+  static handleCombatTalentContextMenu(talentEl, event) {
+    if (!Build.combatModeEnabled) return false;
+    if (Number(talentEl?.dataset?.state) !== 2) return false;
+    const slot = Number(talentEl?.parentElement?.dataset?.position);
+    if (!Number.isFinite(slot)) return false;
+    
+    const mainSlot = Build.getCombatMainTalentSlotIndex();
+    if (slot === mainSlot) return false;
+    
+    if (!Build.combatModeLearnOrderBySlot.has(slot)) return false;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const idx = Build.combatModeLearnOrder.indexOf(slot);
+    if (idx < 0) return true;
+    Build.combatModeLearnOrder.splice(idx, 1);
+    Build.rebuildCombatLearnOrderMapsFromOrderArray();
+    Build.enforceCombatLearnedRowConstraints();
+    Build.renderCombatOrderBadges();
+    Build.updateHeroStats();
+    Build.refreshStatFilterHighlightCountDisplay();
+    Build.syncCombatModeButtonState();
+    return true;
+  }
+
+  static handleCombatTalentClick(element, event) {
+    if (!Build.combatModeEnabled) return false;
+    if (Number(element?.dataset?.state) !== 2) return false;
+    const slot = Number(element?.parentElement?.dataset?.position);
+    if (!Number.isFinite(slot)) return false;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const existingOrder = Build.combatModeLearnOrderBySlot.get(slot);
+    if (Number.isFinite(existingOrder)) {
+      Build.rollbackCombatProgressToOrder(existingOrder - 1);
+    } else {
+      const learned = Build.learnCombatTalentAtSlot(slot);
+      if (!learned) return true;
+    }
+    Build.renderCombatOrderBadges();
+    Build.updateHeroStats();
+    Build.refreshStatFilterHighlightCountDisplay();
+    Build.syncCombatModeButtonState();
+    return true;
+  }
+
+  static toggleCombatMode() {
+    Build.setCombatMode(!Build.combatModeEnabled);
+  }
+
+  static setCombatMode(enabled, { force = false } = {}) {
+    const next = !!enabled;
+    if (!force && next && !Build.canEnableCombatMode()) {
+      Build.syncCombatModeButtonState();
+      return;
+    }
+    if (Build.combatModeEnabled === next) {
+      Build.syncCombatModeButtonState();
+      return;
+    }
+
+    Build.combatModeEnabled = next;
+    Build.combatModeLearnOrder = [];
+    Build.combatModeLearnOrderBySlot = new Map();
+    Build.combatModeLearnedSlots = new Set();
+
+    if (next) {
+      const mainSlot = Build.getCombatMainTalentSlotIndex();
+      if (mainSlot < 0) {
+        Build.combatModeEnabled = false;
+      } else {
+        Build.combatModeLearnOrder = [mainSlot];
+        Build.combatModeLearnedSlots = new Set([mainSlot]);
+        Build.combatModeLearnOrderBySlot = new Map([[mainSlot, 1]]);
+      }
+    }
+
+    Build.renderCombatOrderBadges();
+    Build.updateHeroStats();
+    Build.refreshStatFilterHighlightCountDisplay();
+    Build.syncCombatModeButtonState();
   }
 
   static list(builds, isWindow) {
@@ -1317,10 +2020,22 @@ export class Build {
 
   static totalStat(stat) {
     let initialStat = Build.initialStats[stat];
+    if (!Number.isFinite(Number(initialStat))) initialStat = 0;
+    else initialStat = Number(initialStat);
     let talentsStat = Build.calculationStats[stat];
+    if (!Number.isFinite(Number(talentsStat))) talentsStat = 0;
+    else talentsStat = Number(talentsStat);
     let powerStat = 0.0;
     if (stat in Build.heroStatsFromPower) {
       powerStat += Build.heroStatsFromPower[stat];
+    }
+    if (!Number.isFinite(powerStat)) powerStat = 0;
+    // speeda — отдельный аддитивный вклад в скорость, суммируется с max-speed.
+    if (stat === 'speed') {
+      let speedAdd = Build.calculationStats['speeda'];
+      if (!Number.isFinite(Number(speedAdd))) speedAdd = 0;
+      else speedAdd = Number(speedAdd);
+      talentsStat += speedAdd;
     }
     return initialStat + talentsStat + powerStat;
   }
@@ -1339,12 +2054,24 @@ export class Build {
       Build.initialStats[stat] = parseFloat(data.stats[stat]);
       Build.calculationStats[stat] = 0.0;
     }
+    if (!('speeda' in Build.initialStats)) Build.initialStats['speeda'] = 0;
+    if (!('speeda' in Build.calculationStats)) Build.calculationStats['speeda'] = 0;
+    // Прямой бонус шанса крита из талантов/сетов.
+    if (!('crit' in Build.initialStats)) Build.initialStats['crit'] = 0;
+    if (!('crit' in Build.calculationStats)) Build.calculationStats['crit'] = 0;
+    Build.initialStats['talentCdPct'] = 0;
+    Build.calculationStats['talentCdPct'] = 0;
 
     let stats = DOM({ style: 'build-hero-stats-view' });
 
     const template = {
       hp: Lang.text('health'),
       mp: Lang.text('energy'),
+      regenhp: Lang.text('statRegenHealth'),
+      regenmp: Lang.text('statRegenEnergy'),
+      krajahp: Lang.text('statStealHealth'),
+      krajamp: Lang.text('statStealEnergy'),
+      talentCdPct: Lang.text('statTalentCooldownPct'),
       speed: Lang.text('speed'),
       sila: Lang.text('strength'),
       razum: Lang.text('intelligence'),
@@ -1393,22 +2120,36 @@ export class Build {
 
                     if (key == 'hp') {
                       Build.removeSortInventory('stats', 'hp');
-                      Build.removeSortInventory('stats', 'krajahp');
-                      Build.removeSortInventory('stats', 'krajahprz');
-                      Build.removeSortInventory('stats', 'regenhpvz');
-                      Build.removeSortInventory('stats', 'krajahpvz');
-                      Build.removeSortInventory('stats', 'regenhp');
                       Build.removeSortInventory('stats', 'hpmp');
                     } else if (key == 'mp') {
                       Build.removeSortInventory('stats', 'mp');
-                      Build.removeSortInventory('stats', 'regenmp');
-                      Build.removeSortInventory('stats', 'krajamp');
-                      Build.removeSortInventory('stats', 'regenmpvz');
                       Build.removeSortInventory('stats', 'hpmp');
+                    } else if (key == 'regenhp') {
+                      Build.removeSortInventory('stats', 'regenhp');
+                      Build.removeSortInventory('stats', 'regenhpvz');
+                    } else if (key == 'regenmp') {
+                      Build.removeSortInventory('stats', 'regenmp');
+                      Build.removeSortInventory('stats', 'regenmpvz');
+                    } else if (key == 'krajahp') {
+                      Build.removeSortInventory('stats', 'krajahp');
+                      Build.removeSortInventory('stats', 'krajahprz');
+                      Build.removeSortInventory('stats', 'krajahpvz');
+                    } else if (key == 'krajamp') {
+                      Build.removeSortInventory('stats', 'krajamp');
+                    } else if (key == 'talentCdPct') {
+                      Build.removeSortInventory('stats', 'speedtal');
+                      Build.removeSortInventory('stats', 'speedtalrz');
+                      Build.removeSortInventory('stats', 'speedtalvz');
                     } else if (key == 'speed') {
                       Build.removeSortInventory('stats', 'speed');
                       Build.removeSortInventory('stats', 'speedrz');
                       Build.removeSortInventory('stats', 'speedvz');
+                      Build.removeSortInventory('stats', 'speeda');
+                      Build.removeSortInventory('stats', 'speedarz');
+                      Build.removeSortInventory('stats', 'speedavz');
+                      Build.removeSortInventory('stats', 'speedd');
+                      Build.removeSortInventory('stats', 'speeddrz');
+                      Build.removeSortInventory('stats', 'speeddvz');
                     } else if (key == 'sila') {
                       Build.removeSortInventory('stats', 'sila');
                       Build.removeSortInventory('stats', 'sr');
@@ -1452,22 +2193,36 @@ export class Build {
                     item.style.background = '#5899';
                     if (key == 'hp') {
                       Build.setSortInventory('stats', 'hp');
-                      Build.setSortInventory('stats', 'krajahp');
-                      Build.setSortInventory('stats', 'krajahprz');
-                      Build.setSortInventory('stats', 'regenhpvz');
-                      Build.setSortInventory('stats', 'krajahpvz');
-                      Build.setSortInventory('stats', 'regenhp');
                       Build.setSortInventory('stats', 'hpmp');
                     } else if (key == 'mp') {
                       Build.setSortInventory('stats', 'mp');
-                      Build.setSortInventory('stats', 'regenmp');
-                      Build.setSortInventory('stats', 'krajamp');
-                      Build.setSortInventory('stats', 'regenmpvz');
                       Build.setSortInventory('stats', 'hpmp');
+                    } else if (key == 'regenhp') {
+                      Build.setSortInventory('stats', 'regenhp');
+                      Build.setSortInventory('stats', 'regenhpvz');
+                    } else if (key == 'regenmp') {
+                      Build.setSortInventory('stats', 'regenmp');
+                      Build.setSortInventory('stats', 'regenmpvz');
+                    } else if (key == 'krajahp') {
+                      Build.setSortInventory('stats', 'krajahp');
+                      Build.setSortInventory('stats', 'krajahprz');
+                      Build.setSortInventory('stats', 'krajahpvz');
+                    } else if (key == 'krajamp') {
+                      Build.setSortInventory('stats', 'krajamp');
+                    } else if (key == 'talentCdPct') {
+                      Build.setSortInventory('stats', 'speedtal');
+                      Build.setSortInventory('stats', 'speedtalrz');
+                      Build.setSortInventory('stats', 'speedtalvz');
                     } else if (key == 'speed') {
                       Build.setSortInventory('stats', 'speed');
                       Build.setSortInventory('stats', 'speedrz');
                       Build.setSortInventory('stats', 'speedvz');
+                      Build.setSortInventory('stats', 'speeda');
+                      Build.setSortInventory('stats', 'speedarz');
+                      Build.setSortInventory('stats', 'speedavz');
+                      Build.setSortInventory('stats', 'speedd');
+                      Build.setSortInventory('stats', 'speeddrz');
+                      Build.setSortInventory('stats', 'speeddvz');
                     } else if (key == 'sila') {
                       Build.setSortInventory('stats', 'sila');
                       Build.setSortInventory('stats', 'sr');
@@ -1519,7 +2274,20 @@ export class Build {
           ],
         },
         DOM({ tag: 'div' }, template[key]),
-        DOM({ tag: 'div' }, data.stats[key] || 0),
+        DOM(
+          { tag: 'div' },
+          key === 'talentCdPct'
+            ? 0
+            : key === 'regenhp' || key === 'regenmp'
+              ? (() => {
+                  const v =
+                    data.stats[key] !== undefined && data.stats[key] !== null ? parseFloat(data.stats[key]) : 0;
+                  return Build.formatRegenStatDisplay(v);
+                })()
+              : data.stats[key] !== undefined && data.stats[key] !== null
+                ? data.stats[key]
+                : 0,
+        ),
       );
 
       if (key === 'groundType') {
@@ -1673,6 +2441,11 @@ export class Build {
         ![
           'hp',
           'mp',
+          'regenhp',
+          'regenmp',
+          'krajahp',
+          'krajamp',
+          'talentCdPct',
           'speed',
           'damage',
           'critProb',
@@ -1706,6 +2479,16 @@ export class Build {
                 Build.profileStats[key] = 0;
 
                 Build.updateHeroStats();
+                try {
+                  if (Build._statFilterHoverRowKey) {
+                    Build.applyStatFilterHoverHighlightOnBuild(Build._statFilterHoverRowKey);
+                  } else {
+                    Build.refreshStatFilterHighlightCountDisplay();
+                  }
+                  if (Build._hoveredSetTalentIds) {
+                    Build.previewSetTalentsInEmptySlots({ _manualOrder: Build._hoveredSetTalentIds });
+                  }
+                } catch {}
               } else {
                 await App.api.request('build', 'setProfile', {
                   id: Build.id,
@@ -1719,16 +2502,32 @@ export class Build {
                 Build.profileStats[key] = 1;
 
                 Build.updateHeroStats();
+                try {
+                  if (Build._statFilterHoverRowKey) {
+                    Build.applyStatFilterHoverHighlightOnBuild(Build._statFilterHoverRowKey);
+                  } else {
+                    Build.refreshStatFilterHighlightCountDisplay();
+                  }
+                  if (Build._hoveredSetTalentIds) {
+                    Build.previewSetTalentsInEmptySlots({ _manualOrder: Build._hoveredSetTalentIds });
+                  }
+                } catch {}
               }
             },
           ],
         });
 
-        daw.dataset.index = i;
+        const profileIdx =
+          key in Build.heroStatProfileIndex ? Build.heroStatProfileIndex[key] : i;
+        daw.dataset.index = profileIdx;
 
-        daw.dataset.status = Build.dataRequest.profile[i];
+        const prof = Build.dataRequest.profile;
+        daw.dataset.status =
+          prof && profileIdx in prof && prof[profileIdx] !== undefined && prof[profileIdx] !== null
+            ? prof[profileIdx]
+            : 0;
 
-        Build.profileStats[key] = parseInt(daw.dataset.status);
+        Build.profileStats[key] = parseInt(daw.dataset.status, 10) || 0;
 
         if (daw.dataset.status == 1) {
           daw.src = 'content/icons/checkbox.webp';
@@ -1736,9 +2535,19 @@ export class Build {
           daw.src = 'content/icons/circle.webp';
         }
 
-        stats.append(DOM({ style: 'build-hero-stats-line' }, daw, item));
+        const statsLineWithDaw = DOM({ style: 'build-hero-stats-line' }, daw, item);
+        if (!cond(key)) {
+          statsLineWithDaw.addEventListener('mouseenter', () => Build.applyStatFilterHoverHighlightOnBuild(key));
+          statsLineWithDaw.addEventListener('mouseleave', () => Build.clearStatFilterHoverHighlightOnBuild());
+        }
+        stats.append(statsLineWithDaw);
       } else {
-        stats.append(DOM({ style: 'build-hero-stats-line' }, item));
+        const statsLinePlain = DOM({ style: 'build-hero-stats-line' }, item);
+        if (!cond(key)) {
+          statsLinePlain.addEventListener('mouseenter', () => Build.applyStatFilterHoverHighlightOnBuild(key));
+          statsLinePlain.addEventListener('mouseleave', () => Build.clearStatFilterHoverHighlightOnBuild());
+        }
+        stats.append(statsLinePlain);
       }
       i++;
     }
@@ -1765,6 +2574,23 @@ export class Build {
     });
 
     stats.append(DOM({ style: 'build-hero-stats-settings' }, landTypeSetting));
+
+    const statFilterHighlightCountValue = DOM({
+      tag: 'span',
+      style: 'build-hero-stats-highlight-count-value',
+    });
+    statFilterHighlightCountValue.textContent = '0';
+    const statFilterHighlightCountBadge = DOM(
+      { style: 'build-hero-stats-highlight-count-badge' },
+      statFilterHighlightCountValue,
+    );
+    const statFilterHighlightCountEl = DOM({ style: 'build-hero-stats-highlight-count' }, statFilterHighlightCountBadge);
+    const statFilterHighlightCountTitle = Lang.text('buildStatsHighlightedTalentsCountTitle');
+    statFilterHighlightCountEl.dataset.tooltip = statFilterHighlightCountTitle;
+    stats.append(statFilterHighlightCountEl);
+    Build.statFilterHighlightCountValueEl = statFilterHighlightCountValue;
+    Build.statFilterHighlightCountWrapEl = statFilterHighlightCountEl;
+    Build.refreshStatFilterHighlightCountDisplay();
 
     Build.heroName = DOM({ tag: 'div', style: 'name' });
 
@@ -1818,12 +2644,7 @@ export class Build {
 	  closeTip();
     };
 
-    Build.heroImg.style.backgroundImage = `url(content/hero/${data.id}/${
-      Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1
-    }.webp), url(content/hero/background.png)`;
-    Build.heroImg.style.backgroundSize = '100%, 100%';
-    Build.heroImg.style.backgroundPosition = 'center, center';
-    Build.heroImg.style.backgroundRepeat = 'no-repeat, no-repeat';
+    Build.applyBuildHeroAvatarSkin(data.id, Build.dataRequest.hero.skin.target ? Build.dataRequest.hero.skin.target : 1);
 
     let rankIcon = DOM({ style: 'rank-icon' });
     rankIcon.style.backgroundImage = `url("content/ranks/${Rank.icon(data.rating)}.webp"), url("content/ranks/rateIconBack.png")`;
@@ -1834,7 +2655,16 @@ export class Build {
     let rank = DOM({ style: 'rank' }, DOM({ style: 'rank-lvl' }, data.rating), rankIcon);
     Build.heroImg.append(rank);
 
+    try {
+      Build._avatarTipEl?.parentNode?.removeChild?.(Build._avatarTipEl);
+    } catch {}
+    Build._avatarTipEl = null;
+    try {
+      document.querySelectorAll('.build-avatar-tip').forEach((el) => el.remove());
+    } catch {}
+
     const avatarTip = DOM({ style: 'build-avatar-tip' }, DOM({ style: 'tip-title' }, Lang.text('tipTitle')), DOM({ style: 'tip-body' }, Lang.text('tipBody')));
+    Build._avatarTipEl = avatarTip;
     document.body.append(avatarTip);
 
     
@@ -1899,33 +2729,384 @@ export class Build {
         window.removeEventListener('scroll', onViewportChange, true);
         window.removeEventListener('resize', onViewportChange);
         if (avatarTip && avatarTip.parentNode) avatarTip.remove();
+        if (Build._avatarTipEl === avatarTip) Build._avatarTipEl = null;
       } catch (e) {}
       if (typeof oldCleanup === 'function') oldCleanup.call(Build);
     };
 
     const avatarWrap = DOM({ style: 'build-avatar-wrap' }, Build.heroImg);
 
-    const wrapper = DOM({ style: 'build-hero-avatar-and-name' }, avatarWrap, Build.skinView, Build.training);
+    const navPrev = DOM({
+      style: ['build-hero-nav-btn', 'build-hero-nav-btn-left'],
+      domaudio: domAudioPresets.defaultButton,
+      event: [
+        'click',
+        async () => {
+          await Build.switchHeroFromCastleBottomList(-1);
+        },
+      ],
+    });
+    navPrev.style.backgroundImage = 'url("content/img/goLeft.png")';
 
-    Build.heroView.append(wrapper, stats);
+    const navNext = DOM({
+      style: ['build-hero-nav-btn', 'build-hero-nav-btn-right'],
+      domaudio: domAudioPresets.defaultButton,
+      event: [
+        'click',
+        async () => {
+          await Build.switchHeroFromCastleBottomList(1);
+        },
+      ],
+    });
+    navNext.style.backgroundImage = 'url("content/img/goRight.png")';
+
+    const avatarActions = DOM({ style: 'build-hero-avatar-actions' }, Build.skinView, Build.training);
+    const wrapper = DOM({ style: 'build-hero-avatar-and-name' }, avatarWrap, avatarActions);
+    const heroNav = DOM({ style: 'build-hero-nav-controls' }, navPrev, navNext);
+
+    Build.heroView.append(wrapper, stats, heroNav);
   }
 
-  static updateHeroStats() {
+  static getHeroIdsFromCastleBottomList() {
+    const ids = [];
+    const seen = new Set();
+    try {
+      const nodes = View.castleBottom?.querySelectorAll?.('.castle-hero-item');
+      for (const node of nodes || []) {
+        let heroId = Number(node?.dataset?.heroId);
+        if (!Number.isFinite(heroId) || heroId <= 0) {
+          const m = String(node?.id || '').match(/^id(\d+)$/);
+          heroId = m ? Number(m[1]) : NaN;
+        }
+        if (!Number.isFinite(heroId) || heroId <= 0 || seen.has(heroId)) continue;
+        seen.add(heroId);
+        ids.push(heroId);
+      }
+    } catch {}
+    return ids;
+  }
+
+  static async switchHeroFromCastleBottomList(direction = 1) {
+    const ids = Build.getHeroIdsFromCastleBottomList();
+    if (!ids.length) return;
+    const dir = Number(direction) < 0 ? -1 : 1;
+    const currentHeroId = Number(Build.heroId);
+    let index = ids.indexOf(currentHeroId);
+    if (index < 0) index = 0;
+    const nextHeroId = ids[(index + dir + ids.length) % ids.length];
+    if (!Number.isFinite(nextHeroId) || nextHeroId <= 0 || nextHeroId === currentHeroId) return;
+
+    try {
+      View.setCastleOpenedBuildHero?.(nextHeroId);
+      View.scrollCastleBottomToHero?.(nextHeroId);
+    } catch {}
+
+    const isWindowBuild = Window.windows?.main?.id === 'wbuild';
+    if (isWindowBuild) {
+      await Window.show('main', 'build', nextHeroId, 0, true);
+      try {
+        View.scrollCastleBottomToHero?.(nextHeroId);
+      } catch {}
+      return;
+    }
+    await View.show('build', nextHeroId);
+  }
+
+  /** Одна десятичная, без «.0» у целых (реген HP/MP). */
+  static formatRegenStatDisplay(value) {
+    const r = Math.round(Number(value) * 10) / 10;
+    const s = r.toFixed(1);
+    return s.endsWith('.0') ? String(Math.round(r)) : s;
+  }
+
+  /** Пересчёт вкладов талантов в calculationStats / силу героя (без обновления подписей в UI). */
+  static recomputeTalentCalculationTotals() {
+    const effectiveInstalledTalents = Build.getEffectiveInstalledTalents() || [];
     Build.heroPower = 0.0;
     for (let key in Build.calculationStats) {
       Build.calculationStats[key] = 0.0;
     }
 
     for (let i = 35; i >= 0; i--) {
-      let talent = Build.installedTalents[i];
+      let talent = effectiveInstalledTalents[i];
       if (talent) {
-        Build.calcStatsFromPower(i);
+        if (!Build.combatModeEnabled) {
+          Build.calcStatsFromPower(i, effectiveInstalledTalents);
+        }
         Build.setStat(talent, true, false);
       }
     }
 
+    // Итоговая мощь: последний calcStatsFromPower(i) шёл до setStat слота i — в heroPower не хватало этого таланта.
+    // Пересчитываем один раз при полном Build.heroPower, как в боевом режиме при полной сумме мощи.
+    if (!Build.combatModeEnabled) {
+      Build.calcStatsFromPower(0, effectiveInstalledTalents);
+    }
+
+    Build.applySetAddStatsForInstalledTalents(effectiveInstalledTalents);
+    if (Build.combatModeEnabled) {
+      Build.applyCombatModeHeroStatsFromPower();
+    }
+  }
+
+  /** Мощь таланта по редкости/заточке (как в setStat). */
+  static getTalentRarityPowerContribution(talent) {
+    if (!talent) return 0;
+    const talentPowerByRarity = {
+      4: Build.talentPowerByRarityFirstLevel[4] + Build.talentPowerByRarityPerLevel[4] * (Build.talentRefineByRarity[4] - 1),
+      3: Build.talentPowerByRarityFirstLevel[3] + Build.talentPowerByRarityPerLevel[3] * (Build.talentRefineByRarity[3] - 1),
+      2: Build.talentPowerByRarityFirstLevel[2] + Build.talentPowerByRarityPerLevel[2] * (Build.talentRefineByRarity[2] - 1),
+      1: Build.talentPowerByRarityFirstLevel[1] + Build.talentPowerByRarityPerLevel[1] * (Build.talentRefineByRarity[1] - 1),
+      0: Build.talentPowerByRarityFirstLevel[0] + Build.talentPowerByRarityPerLevel[0] * (Build.talentRefineByRarity[4] - 1),
+    };
+    return 'rarity' in talent ? talentPowerByRarity[talent.rarity] : talentPowerByRarity[0];
+  }
+
+  /**
+   * Боевой режим: вклад мощи в статы героя.
+   * Сначала по полному билду считаются heroPowerFull и сумма весов строк (позиция на сетке),
+   * от m = heroPowerFull * sumWeightFull получаем «чистый» стат от мощи (как раньше по формуле),
+   * затем к базе идут только доли: statPowerFull * вес_строки_таланта для каждого изученного таланта (уровень строки = talent.level).
+   */
+  static applyCombatModeHeroStatsFromPower() {
+    const w = Build.TALENT_POWER_LINE_WEIGHTS;
+    const full = Build.installedTalents || [];
+    let heroPowerFull = 0;
+    let sumWeightFull = 0;
+    for (let i = 35; i >= 0; i--) {
+      const t = full[i];
+      if (!t) continue;
+      heroPowerFull += Build.getTalentRarityPowerContribution(t);
+      const gridLine = Math.floor((35 - i) / 6);
+      const wl = w[gridLine];
+      if (Number.isFinite(wl)) sumWeightFull += wl;
+    }
+    const mFull = heroPowerFull * sumWeightFull;
+    const q = Build.heroPowerModifier;
+    let sumLearnedLineWeights = 0;
+    for (const slot of Build.combatModeLearnedSlots) {
+      const t = full[slot];
+      if (!t) continue;
+      const rowIdx = Math.max(0, Math.min(5, (Number(t.level) || 1) - 1));
+      const wl = w[rowIdx];
+      if (Number.isFinite(wl)) sumLearnedLineWeights += wl;
+    }
+    for (let stat in Build.heroStatsFromPower) {
+      let Lvl = Number(Build.heroStatMods[stat]);
+      if (!Number.isFinite(Lvl)) Lvl = 0;
+      const statPowerFull = Lvl * (0.6 * q * (mFull / 10.0 - 16.0) + 36.0);
+      Build.heroStatsFromPower[stat] = statPowerFull * sumLearnedLineWeights;
+    }
+  }
+
+  static normalizeSetAddStatsRules(addStats) {
+    const normalized = [];
+    const pushRule = (needRaw, stats) => {
+      const need = Number(needRaw);
+      if (!Number.isFinite(need) || need <= 0 || !stats || typeof stats !== 'object' || Array.isArray(stats)) return;
+      normalized.push({ need, stats });
+    };
+
+    if (Array.isArray(addStats)) {
+      for (const entry of addStats) {
+        if (Array.isArray(entry) && entry.length >= 2) {
+          pushRule(entry[0], entry[1]);
+          continue;
+        }
+        if (!entry || typeof entry !== 'object') continue;
+        if ('need' in entry && 'stats' in entry) {
+          pushRule(entry.need, entry.stats);
+          continue;
+        }
+        for (const [k, v] of Object.entries(entry)) {
+          pushRule(k, v);
+        }
+      }
+    } else if (addStats && typeof addStats === 'object') {
+      for (const [k, v] of Object.entries(addStats)) {
+        pushRule(k, v);
+      }
+    }
+
+    normalized.sort((a, b) => a.need - b.need);
+    return normalized;
+  }
+
+  static resolveCompositeStatAlias(statKey) {
+    if (statKey === 'critProb') return 'crit';
+    if (statKey === 'sr') return Build.getMaxStat(['sila', 'razum']);
+    if (statKey === 'ph') return Build.getMaxStat(['provorstvo', 'hitrost']);
+    if (statKey === 'sv') return Build.getMaxStat(['stoikost', 'volia']);
+    if (statKey === 'srsv') return Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']);
+    if (statKey === 'hpmp') return Build.getMaxStat(['hp', 'mp']);
+    if (statKey === 'srMin') return Build.getMinStat(['sila', 'razum']);
+    if (statKey === 'phMin') return Build.getMinStat(['provorstvo', 'hitrost']);
+    if (statKey === 'svMin') return Build.getMinStat(['volia', 'stoikost']);
+    if (statKey === 'srsvMin') return Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']);
+    if (statKey === 'hpmpMin') return Build.getMinStat(['hp', 'mp']);
+    return statKey;
+  }
+
+  static applyCalculatedStatDelta(calcKey, statChange) {
+    if (!(calcKey in Build.calculationStats)) return;
+    if (calcKey === 'speed') {
+      Build.calculationStats[calcKey] = Math.max(Build.calculationStats[calcKey], statChange);
+      return;
+    }
+    Build.calculationStats[calcKey] += statChange;
+  }
+
+  static resolveConditionalStatKey(rawKey) {
+    if (Build.applyStak && rawKey.indexOf('stak') !== -1) return rawKey.replace('stak', '');
+    if (Build.applyRz && rawKey.indexOf('rz') !== -1) return rawKey.replace('rz', '');
+    if (Build.applyVz && rawKey.indexOf('vz') !== -1) return rawKey.replace('vz', '');
+    if (rawKey.indexOf('dop') !== -1) return rawKey.replace('dop', '');
+    if (Build.applyBuffs && rawKey.indexOf('buff') !== -1) return rawKey.replace('buff', '');
+    return rawKey;
+  }
+
+  static applySetStatMap(statsMap) {
+    if (!statsMap || typeof statsMap !== 'object') return;
+    const resolved = new Object();
+    for (const [rawKey, rawValue] of Object.entries(statsMap)) {
+      const val = Number(rawValue);
+      if (!Number.isFinite(val)) continue;
+      const targetKey = Build.resolveCompositeStatAlias(rawKey);
+      if (!targetKey) continue;
+      resolved[targetKey] = (resolved[targetKey] || 0) + val;
+    }
+
+    for (const [key2, statChange] of Object.entries(resolved)) {
+      Build.applyCalculatedStatDelta(Build.resolveConditionalStatKey(key2), statChange);
+    }
+  }
+
+  static findInstalledTalentById(installedTalents, talentId) {
+    const wanted = Math.abs(Number(talentId));
+    if (!Number.isFinite(wanted) || wanted <= 0) return null;
+    for (const talent of installedTalents || []) {
+      const tid = Math.abs(Number(talent?.id));
+      if (Number.isFinite(tid) && tid === wanted) return talent;
+    }
+    return null;
+  }
+
+  static getResolvedTalentStatValue(talent, targetKey) {
+    if (!talent || !talent.stats || typeof talent.stats !== 'object') return 0;
+    let maxValue = -Infinity;
+    let sumValue = 0;
+    let hasAny = false;
+
+    for (const key in talent.stats) {
+      let statValue = parseFloat(talent.stats[key]);
+      if (!Number.isFinite(statValue)) continue;
+      if ('statsRefine' in talent && 'rarity' in talent) {
+        let refineBonus = Build.getTalentRefineByRarity(talent.rarity);
+        let refineMul = parseFloat(talent.statsRefine[key]);
+        if (Number.isFinite(refineMul)) statValue += refineBonus * refineMul;
+      }
+
+      const resolvedKey = Build.resolveConditionalStatKey(key);
+      if (resolvedKey !== targetKey) continue;
+      hasAny = true;
+      if (targetKey === 'speed') {
+        if (statValue > maxValue) maxValue = statValue;
+      } else {
+        sumValue += statValue;
+      }
+    }
+
+    if (!hasAny) return 0;
+    if (targetKey === 'speed') return Number.isFinite(maxValue) ? maxValue : 0;
+    return Number.isFinite(sumValue) ? sumValue : 0;
+  }
+
+  static applySetAddStatsForInstalledTalents(installedTalents) {
+    const installedIds = new Set();
+    for (const talent of installedTalents || []) {
+      const tid = Number(talent?.id);
+      if (Number.isFinite(tid) && tid !== 0) installedIds.add(Math.abs(tid));
+    }
+    if (!installedIds.size) return;
+
+    const mainTalentSpeedBonusById = new Map();
+    const sets = TalentSets.list();
+    for (const set of sets) {
+      const setIds = TalentSets.getTalentIds(set)
+        .map((id) => Math.abs(Number(id)))
+        .filter((id) => Number.isFinite(id) && id > 0);
+      if (!setIds.length) continue;
+
+      let count = 0;
+      for (const id of setIds) {
+        if (installedIds.has(id)) count++;
+      }
+      if (count <= 0) continue;
+
+      const requiredMain = Number(set?.mainNeed);
+      if (Number.isFinite(requiredMain) && requiredMain > 0 && !installedIds.has(Math.abs(requiredMain))) {
+        continue;
+      }
+
+      const rules = Build.normalizeSetAddStatsRules(set?.addStats);
+      for (const rule of rules) {
+        if (count >= rule.need) {
+          const map = rule.stats && typeof rule.stats === 'object' ? { ...rule.stats } : null;
+          if (!map) continue;
+
+          for (const rawKey of Object.keys(map)) {
+            const resolvedKey = Build.resolveConditionalStatKey(rawKey);
+            if (resolvedKey !== 'speedd') continue;
+            const speedDeltaResolved = Number(map[rawKey]);
+            if (!Number.isFinite(speedDeltaResolved) || speedDeltaResolved === 0) {
+              delete map[rawKey];
+              continue;
+            }
+            let mainId = Number(set?.mainNeed);
+            if (!Number.isFinite(mainId) || mainId <= 0) {
+              mainId = Number(TalentSets.chooseMainTalentId(set));
+            }
+            mainId = Math.abs(mainId);
+            if (Number.isFinite(mainId) && mainId > 0 && installedIds.has(mainId)) {
+              const prev = Number(mainTalentSpeedBonusById.get(mainId)) || 0;
+              mainTalentSpeedBonusById.set(mainId, prev + speedDeltaResolved);
+            }
+            delete map[rawKey];
+          }
+
+          Build.applySetStatMap(map);
+        }
+      }
+    }
+
+    for (const [mainId, bonus] of mainTalentSpeedBonusById.entries()) {
+      const mainTalent = Build.findInstalledTalentById(installedTalents, mainId);
+      if (!mainTalent) continue;
+      const baseMainSpeed = Build.getResolvedTalentStatValue(mainTalent, 'speed');
+      Build.applyCalculatedStatDelta('speed', baseMainSpeed + bonus);
+    }
+  }
+
+  static updateHeroStats() {
+    Build.recomputeTalentCalculationTotals();
+
     for (let key2 in Build.dataStats) {
-      Build.dataStats[key2].lastChild.innerText = Math.round(Build.totalStat(key2));
+      if (key2 === 'talentCdPct') continue;
+      let total = Build.totalStat(key2);
+      if (key2 === 'regenhp' || key2 === 'regenmp') {
+        if (key2 === 'regenhp') {
+          total += Build.totalStat('hp') * Build.REGEN_HP_FROM_MAX_HP_PCT;
+        } else {
+          total += Build.totalStat('mp') * Build.REGEN_MP_FROM_MAX_MP_PCT;
+        }
+        Build.dataStats[key2].lastChild.innerText = Build.formatRegenStatDisplay(total);
+      } else {
+        Build.dataStats[key2].lastChild.innerText = Math.round(total);
+      }
+    }
+    if (Build.dataStats['talentCdPct']) {
+      const cdPct = Math.max(0, Math.round(Build.totalStat('speedtal')));
+      Build.dataStats['talentCdPct'].lastChild.innerText = cdPct === 0 ? '0%' : `-${cdPct}%`;
     }
 
     const statAg = Build.totalStat('provorstvo');
@@ -1969,6 +3150,7 @@ export class Build {
 
     {
       let crit = 62.765 - 11534.0 / (126.04 + statCun);
+      crit += Build.getTalentDirectCalculationValue('crit');
       Build.dataStats['critProb'].lastChild.innerText = Math.max(0.0, Math.round(crit)) + '%';
     }
 
@@ -1978,20 +3160,13 @@ export class Build {
     }
   }
 
-  static calcStatsFromPower(maxTalentId) {
-    const talentPowerByLine = {
-      5: 33.0 / 600.0,
-      4: 23.0 / 600.0,
-      3: 16.0 / 600.0,
-      2: 13.0 / 600.0,
-      1: 9.0 / 600.0,
-      0: 6.0 / 600.0,
-    };
+  static calcStatsFromPower(maxTalentId, installedTalents = Build.installedTalents) {
+    const talentPowerByLine = Build.TALENT_POWER_LINE_WEIGHTS;
 
     Build.heroPowerFromInstalledTalents = 0.0;
 
     for (let i = 35; i >= 0 && i >= maxTalentId; i--) {
-      let talent = Build.installedTalents[i];
+      let talent = installedTalents[i];
       if (talent) {
         let line = Math.floor((35 - i) / 6);
         Build.heroPowerFromInstalledTalents += talentPowerByLine[line];
@@ -1999,7 +3174,8 @@ export class Build {
     }
 
     for (let stat in Build.heroStatsFromPower) {
-      let Lvl = Build.heroStatMods[stat];
+      let Lvl = Number(Build.heroStatMods[stat]);
+      if (!Number.isFinite(Lvl)) Lvl = 0;
       let q = Build.heroPowerModifier;
       let m = Build.heroPower * Build.heroPowerFromInstalledTalents;
       Build.heroStatsFromPower[stat] = Lvl * (0.6 * q * (m / 10.0 - 16.0) + 36.0);
@@ -2126,21 +3302,25 @@ export class Build {
       }
     }
 
+    let hasSpeedCandidate = false;
+    let speedBaseCandidate = -Infinity;
+    let speedDeltaCandidate = 0;
+    let speedNeedsAnimation = false;
+
     // Apply animation and change stats in Build.calculationStats
     for (let key2 in add) {
       let statChange = parseFloat(add[key2]);
-      if (Build.applyStak && key2.indexOf('stak') != -1) {
-        calcualteSpecialStats(key2.replace('stak', ''), statChange);
-      } else if (Build.applyRz && key2.indexOf('rz') != -1) {
-        calcualteSpecialStats(key2.replace('rz', ''), statChange);
-      } else if (Build.applyVz && key2.indexOf('vz') != -1) {
-        calcualteSpecialStats(key2.replace('vz', ''), statChange);
-      } else if (key2.indexOf('dop') != -1) {
-        calcualteSpecialStats(key2.replace('dop', ''), statChange);
-      } else if (Build.applyBuffs && key2.indexOf('buff') != -1) {
-        calcualteSpecialStats(key2.replace('buff', ''), statChange);
+      const resolvedKey = Build.resolveConditionalStatKey(key2);
+      if (resolvedKey === 'speed') {
+        hasSpeedCandidate = true;
+        if (Number.isFinite(statChange)) speedBaseCandidate = Math.max(speedBaseCandidate, statChange);
+        speedNeedsAnimation = true;
+      } else if (resolvedKey === 'speedd') {
+        hasSpeedCandidate = true;
+        if (Number.isFinite(statChange)) speedDeltaCandidate += statChange;
+        speedNeedsAnimation = true;
       } else {
-        calcualteSpecialStats(key2, statChange);
+        calcualteSpecialStats(resolvedKey, statChange);
       }
 
       if (!(key2 in Build.dataStats)) {
@@ -2156,6 +3336,29 @@ export class Build {
         Build.heroImg.animate({ transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] }, { duration: 250, fill: 'both', easing: 'ease-out' });
       }
     }
+
+    if (hasSpeedCandidate) {
+      const base = Number.isFinite(speedBaseCandidate) ? speedBaseCandidate : 0;
+      const addSpeed = Number.isFinite(speedDeltaCandidate) ? speedDeltaCandidate : 0;
+      calcualteSpecialStats('speed', base + addSpeed);
+
+      if (animation && speedNeedsAnimation && Build.dataStats['speed']) {
+        Build.dataStats['speed'].animate(
+          { transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] },
+          { duration: 250, fill: 'both', easing: 'ease-out' },
+        );
+        Build.heroImg.animate({ transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] }, { duration: 250, fill: 'both', easing: 'ease-out' });
+      }
+    }
+  }
+
+  static isMainHeroClassTalent(talent) {
+    const mainTalentId = Math.abs(Number(getMainHeroTalentId(Build.heroId)));
+    if (!Number.isFinite(mainTalentId) || mainTalentId <= 0) return false;
+    const rawTalentId = Number(talent?.id);
+    if (!Number.isFinite(rawTalentId) || rawTalentId >= 0) return false; // only heroic/class talents
+    const classTalentId = Math.abs(rawTalentId);
+    return classTalentId === mainTalentId;
   }
 
   static level() {
@@ -2295,6 +3498,7 @@ export class Build {
     }
 
     Build.updateHeroStats();
+    Build.renderCombatOrderBadges();
   }
 
   static templateViewTalent(data) {
@@ -2335,6 +3539,12 @@ export class Build {
     Build.move(talent);
 
     Build.description(talent);
+    talent.addEventListener('click', (event) => {
+      Build.handleCombatTalentClick(talent, event);
+    });
+    talent.addEventListener('contextmenu', (event) => {
+      Build.handleCombatTalentContextMenu(talent, event);
+    });
 
     if (data.level == 0) {
       talent.style.display = 'none';
@@ -2350,6 +3560,7 @@ export class Build {
     if (container) {
       container.replaceChildren();
     }
+    Build._inventoryDefaultOrder = new Map();
 
     const requestedBuildId = Build.id;
     Build.loading = true;
@@ -2361,8 +3572,12 @@ export class Build {
           return;
         }
 
+        let orderIndex = 0;
         for (let item of data) {
+          const key = `${Number(item?.id)}`;
+          Build._inventoryDefaultOrder.set(key, orderIndex);
           let talentContainer = DOM({ style: 'build-talent-item-container' });
+          talentContainer.dataset.defaultOrder = `${orderIndex}`;
 
           Build.inventoryView.querySelector('.build-talents').append(talentContainer);
 
@@ -2371,6 +3586,7 @@ export class Build {
           item.state = 1;
 
           preload.add(Build.templateViewTalent(item));
+          orderIndex++;
         }
 
         Build.loading = false;
@@ -2402,8 +3618,14 @@ export class Build {
   }
 
   static isTalentInBuild(talentId) {
+    const numericId = Number(talentId);
     for (const t of Build.installedTalents || []) {
-      if (t && t.id === talentId) return true;
+      if (!t) continue;
+      if (Number.isFinite(numericId)) {
+        if (Number(t.id) === numericId) return true;
+      } else if (`${t.id}` === `${talentId}`) {
+        return true;
+      }
     }
     return false;
   }
@@ -2448,6 +3670,450 @@ export class Build {
     } catch {}
 
     Build.clearEmptySlotPreviews();
+    Build.refreshStatFilterHighlightCountDisplay();
+  }
+
+  /** Ключи stats у таланта, совпадающие с фильтром строки героя (как при setSortInventory). */
+  static getHeroStatRowFilterStatKeys(heroRowKey) {
+    const m = {
+      hp: ['hp', 'hpmp'],
+      mp: ['mp', 'hpmp'],
+      regenhp: ['regenhp', 'regenhpvz'],
+      regenmp: ['regenmp', 'regenmpvz'],
+      krajahp: ['krajahp', 'krajahprz', 'krajahpvz'],
+      krajamp: ['krajamp'],
+      talentCdPct: ['speedtal', 'speedtalrz', 'speedtalvz'],
+      speed: ['speed', 'speedrz', 'speedvz', 'speeda', 'speedarz', 'speedavz', 'speedd', 'speeddrz', 'speeddvz'],
+      sila: ['sila', 'sr', 'srsv', 'silarz', 'silavz'],
+      razum: ['razum', 'sr', 'srsv', 'razumrz', 'razumvz'],
+      provorstvo: ['provorstvo', 'ph', 'provorstvorz', 'provorstvovz'],
+      hitrost: ['hitrost', 'ph', 'hitrostrz', 'hitrostvz'],
+      stoikost: ['stoikost', 'sv', 'srsv', 'stoikostrz', 'svvz', 'vs'],
+      volia: ['volia', 'sv', 'srsv', 'voliarz', 'svvz', 'vs'],
+    };
+    return m[heroRowKey] ? m[heroRowKey].slice() : [heroRowKey];
+  }
+
+  /** Ключ в calculationStats (прямой вклад талантов через setStat), соответствующий строке героя. */
+  static getHeroStatRowDisplayTotalKey(heroRowKey) {
+    if (heroRowKey === 'talentCdPct') return 'speedtal';
+    return heroRowKey;
+  }
+
+  static getTalentDirectCalculationValue(statKey) {
+    if (statKey === 'speed') {
+      const base = Number(Build.calculationStats['speed']);
+      const add = Number(Build.calculationStats['speeda']);
+      const b = Number.isFinite(base) ? base : 0;
+      const a = Number.isFinite(add) ? add : 0;
+      return b + a;
+    }
+    const v = Number(Build.calculationStats[statKey]);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  /**
+   * Состояние расчёта до применения таланта в слоте slotIndex (порядок i=35..0 как в updateHeroStats).
+   */
+  static computeStatsStateBeforeSlot(slotIndex) {
+    Build.heroPower = 0.0;
+    for (let key in Build.calculationStats) {
+      Build.calculationStats[key] = 0.0;
+    }
+    const partialInstalledTalents = new Array(36).fill(null);
+    for (let i = 35; i > slotIndex; i--) {
+      const talent = Build.installedTalents[i];
+      if (talent) {
+        partialInstalledTalents[i] = talent;
+        Build.calcStatsFromPower(i);
+        Build.setStat(talent, true, false);
+      }
+    }
+    Build.applySetAddStatsForInstalledTalents(partialInstalledTalents);
+  }
+
+  /** Меняется ли calculationStats[calcKey] при удалении таланта (для строк без max/min-алиасов). */
+  static talentMarginalContributesToCalcKey(slotIndex, calcKey) {
+    const installed = Build.installedTalents;
+    const t = installed?.[slotIndex];
+    if (!t) return false;
+    const eps = 1e-4;
+    Build.recomputeTalentCalculationTotals();
+    const full = Build.getTalentDirectCalculationValue(calcKey);
+    installed[slotIndex] = null;
+    Build.recomputeTalentCalculationTotals();
+    const without = Build.getTalentDirectCalculationValue(calcKey);
+    installed[slotIndex] = t;
+    Build.recomputeTalentCalculationTotals();
+    return Math.abs(full - without) > eps;
+  }
+
+  static isCompositeHeroStatRowForHighlight(heroRowKey) {
+    return ['hitrost', 'provorstvo', 'sila', 'razum', 'stoikost', 'volia', 'hp', 'mp'].includes(heroRowKey);
+  }
+
+  /**
+   * Режим «есть ключ стата»: совпадение с фильтром библиотеки по ключам в данных таланта
+   * (в т.ч. ph на обеих строках ловкости/хитрости), без проверки фактического вклада.
+   */
+  static statRowMatchesTalentByFilterKeysOnly(heroRowKey, t) {
+    const base = t.id != null ? Build.talents?.[String(t.id)] : null;
+    const stats = { ...(base?.stats || {}), ...(t.stats || {}) };
+    const statKeys = Build.getHeroStatRowFilterStatKeys(heroRowKey);
+    for (const sk of statKeys) {
+      if (sk in stats) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Подсветка строки героя: для ph/sr/sv/srsv/hpmp смотрим куда уйдёт бонус в момент setStat
+   * (getMaxStat/getMinStat на состоянии до слота). Маргинальный пересчёт неверен — соседний талант с ph
+   * может перекинуться на другую характеристику при удалении «проворства».
+   */
+  static statRowMatchesTalentForHighlight(heroRowKey, t, slotIndex) {
+    const base = t.id != null ? Build.talents?.[String(t.id)] : null;
+    const stats = { ...(base?.stats || {}), ...(t.stats || {}) };
+    const has = (k) => k in stats;
+
+    if (heroRowKey === 'hitrost') {
+      if (has('hitrost') || has('hitrostrz') || has('hitrostvz')) return true;
+      if (has('ph')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['provorstvo', 'hitrost']) === 'hitrost';
+      }
+      if (has('phMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['provorstvo', 'hitrost']) === 'hitrost';
+      }
+      return false;
+    }
+    if (heroRowKey === 'provorstvo') {
+      if (has('provorstvo') || has('provorstvorz') || has('provorstvovz')) return true;
+      if (has('ph')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['provorstvo', 'hitrost']) === 'provorstvo';
+      }
+      if (has('phMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['provorstvo', 'hitrost']) === 'provorstvo';
+      }
+      return false;
+    }
+    if (heroRowKey === 'sila') {
+      if (has('sila') || has('silarz') || has('silavz')) return true;
+      if (has('sr')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum']) === 'sila';
+      }
+      if (has('srsv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']) === 'sila';
+      }
+      if (has('srMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum']) === 'sila';
+      }
+      if (has('srsvMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']) === 'sila';
+      }
+      return false;
+    }
+    if (heroRowKey === 'razum') {
+      if (has('razum') || has('razumrz') || has('razumvz')) return true;
+      if (has('sr')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum']) === 'razum';
+      }
+      if (has('srsv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']) === 'razum';
+      }
+      if (has('srMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum']) === 'razum';
+      }
+      if (has('srsvMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']) === 'razum';
+      }
+      return false;
+    }
+    if (heroRowKey === 'stoikost') {
+      if (has('stoikost') || has('stoikostrz')) return true;
+      if (has('sv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['stoikost', 'volia']) === 'stoikost';
+      }
+      if (has('srsv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']) === 'stoikost';
+      }
+      if (has('svMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['volia', 'stoikost']) === 'stoikost';
+      }
+      if (has('srsvMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']) === 'stoikost';
+      }
+      if (has('svvz') || has('vs')) {
+        return Build.talentMarginalContributesToCalcKey(slotIndex, 'stoikost');
+      }
+      return false;
+    }
+    if (heroRowKey === 'volia') {
+      if (has('volia') || has('voliarz')) return true;
+      if (has('sv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['stoikost', 'volia']) === 'volia';
+      }
+      if (has('srsv')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['sila', 'razum', 'stoikost', 'volia']) === 'volia';
+      }
+      if (has('svMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['volia', 'stoikost']) === 'volia';
+      }
+      if (has('srsvMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['sila', 'razum', 'stoikost', 'volia']) === 'volia';
+      }
+      if (has('svvz') || has('vs')) {
+        return Build.talentMarginalContributesToCalcKey(slotIndex, 'volia');
+      }
+      return false;
+    }
+    if (heroRowKey === 'hp') {
+      if (has('hp')) return true;
+      if (has('hpmp')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['hp', 'mp']) === 'hp';
+      }
+      if (has('hpmpMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['hp', 'mp']) === 'hp';
+      }
+      return false;
+    }
+    if (heroRowKey === 'mp') {
+      if (has('mp')) return true;
+      if (has('hpmp')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMaxStat(['hp', 'mp']) === 'mp';
+      }
+      if (has('hpmpMin')) {
+        Build.computeStatsStateBeforeSlot(slotIndex);
+        return Build.getMinStat(['hp', 'mp']) === 'mp';
+      }
+      return false;
+    }
+
+    const statKeys = Build.getHeroStatRowFilterStatKeys(heroRowKey);
+    for (const sk of statKeys) {
+      if (sk in stats) return true;
+    }
+    return false;
+  }
+
+  static refreshStatFilterHighlightCountDisplay() {
+    try {
+      const el = Build.statFilterHighlightCountValueEl;
+      const wrap = Build.statFilterHighlightCountWrapEl;
+      if (!el) return;
+      const nodes =
+        Build.fieldView?.querySelectorAll?.(
+          '.build-talent-item.build-stat-filter-hover, .build-talent-item.build-set-highlight',
+        ) || [];
+      el.textContent = String(new Set(Array.from(nodes)).size);
+      if (wrap) wrap.dataset.tooltip = Lang.text('buildStatsHighlightedTalentsCountTitle');
+    } catch {}
+  }
+
+  static clearStatFilterHoverHighlightOnSets() {
+    try {
+      Build.setsListView?.querySelectorAll('.build-set-item.build-stat-filter-hover-set').forEach((el) => {
+        el.classList.remove('build-stat-filter-hover-set');
+      });
+    } catch {}
+  }
+
+  static heroRowMatchesResolvedSetStatKey(heroRowKey, resolvedSetStatKey) {
+    const key = Build.resolveConditionalStatKey(Build.resolveCompositeStatAlias(resolvedSetStatKey));
+    if (!key) return false;
+    if (heroRowKey === 'critProb' && key === 'crit') return true;
+    const rowKeys = Build.getHeroStatRowFilterStatKeys(heroRowKey);
+    for (const rowKey of rowKeys) {
+      const normalizedRowKey = Build.resolveConditionalStatKey(Build.resolveCompositeStatAlias(rowKey));
+      if (normalizedRowKey === key) return true;
+    }
+    return false;
+  }
+
+  static applyStatFilterHoverHighlightOnSets(heroRowKey) {
+    Build.clearStatFilterHoverHighlightOnSets();
+    if (!Build.setsListView) return;
+    const rendered = Array.isArray(Build._renderedSetEntries) ? Build._renderedSetEntries : [];
+    if (!rendered.length) return;
+
+    const installedIds = new Set();
+    for (const talent of Build.installedTalents || []) {
+      const tid = Math.abs(Number(talent?.id));
+      if (Number.isFinite(tid) && tid > 0) installedIds.add(tid);
+    }
+    if (!installedIds.size) return;
+
+    for (const entry of rendered) {
+      const set = entry?.set;
+      const item = entry?.item;
+      if (!set || !item || !item.isConnected) continue;
+
+      const setIds = TalentSets.getTalentIds(set)
+        .map((id) => Math.abs(Number(id)))
+        .filter((id) => Number.isFinite(id) && id > 0);
+      if (!setIds.length) continue;
+
+      let count = 0;
+      for (const id of setIds) {
+        if (installedIds.has(id)) count++;
+      }
+      if (count <= 0) continue;
+
+      const requiredMain = Number(set?.mainNeed);
+      if (Number.isFinite(requiredMain) && requiredMain > 0 && !installedIds.has(Math.abs(requiredMain))) {
+        continue;
+      }
+
+      const rules = Build.normalizeSetAddStatsRules(set?.addStats);
+      let matched = false;
+      for (const rule of rules) {
+        if (count < rule.need) continue;
+        const stats = rule?.stats;
+        if (!stats || typeof stats !== 'object') continue;
+
+        let speeddTotal = 0;
+        for (const [rawKey, rawValue] of Object.entries(stats)) {
+          const value = Number(rawValue);
+          if (!Number.isFinite(value) || value === 0) continue;
+          const resolvedStatKey = Build.resolveConditionalStatKey(Build.resolveCompositeStatAlias(rawKey));
+          if (!resolvedStatKey) continue;
+          if (resolvedStatKey === 'speedd') {
+            speeddTotal += value;
+            continue;
+          }
+          if (Build.heroRowMatchesResolvedSetStatKey(heroRowKey, resolvedStatKey)) {
+            matched = true;
+            break;
+          }
+        }
+        if (matched) break;
+
+        if (speeddTotal !== 0 && Build.heroRowMatchesResolvedSetStatKey(heroRowKey, 'speed')) {
+          let mainId = Number(set?.mainNeed);
+          if (!Number.isFinite(mainId) || mainId <= 0) mainId = Number(TalentSets.chooseMainTalentId(set));
+          mainId = Math.abs(mainId);
+          if (Number.isFinite(mainId) && mainId > 0 && installedIds.has(mainId)) {
+            matched = true;
+            break;
+          }
+        }
+      }
+
+      if (matched) item.classList.add('build-stat-filter-hover-set');
+    }
+  }
+
+  static clearStatFilterHoverHighlightOnBuild() {
+    try {
+      Build.fieldView
+        ?.querySelectorAll('.build-talent-item.build-stat-filter-hover')
+        .forEach((el) => el.classList.remove('build-stat-filter-hover'));
+    } catch {}
+    Build.clearStatFilterHoverHighlightOnSets();
+    Build._statFilterHoverRowKey = null;
+    Build.refreshStatFilterHighlightCountDisplay();
+  }
+
+  /** Подсветка слотов билда при наведении на строку стат-фильтра. */
+  static applyStatFilterHoverHighlightOnBuild(heroRowKey) {
+    Build.clearStatFilterHoverHighlightOnBuild();
+    const mode = Build.getBuildStatFilterHighlightMode();
+    if (mode === 0) {
+      Build._statFilterHoverRowKey = null;
+      return;
+    }
+    Build._statFilterHoverRowKey = heroRowKey;
+    const installed = Build.installedTalents || [];
+    const highlightAt = (index) => {
+      const cell = Build.fieldView?.querySelector?.(`.build-hero-grid-item[data-position="${index}"]`);
+      const el = cell?.querySelector?.('.build-talent-item');
+      if (el) el.classList.add('build-stat-filter-hover');
+    };
+
+    if (mode === 1) {
+      for (let index = 0; index < installed.length; index++) {
+        const t = installed[index];
+        if (!t) continue;
+        if (Build.statRowMatchesTalentByFilterKeysOnly(heroRowKey, t)) highlightAt(index);
+      }
+      Build.applyStatFilterHoverHighlightOnSets(heroRowKey);
+      Build.refreshStatFilterHighlightCountDisplay();
+      return;
+    }
+
+    if (Build.isCompositeHeroStatRowForHighlight(heroRowKey)) {
+      for (let index = 0; index < installed.length; index++) {
+        const t = installed[index];
+        if (!t) continue;
+        if (Build.statRowMatchesTalentForHighlight(heroRowKey, t, index)) highlightAt(index);
+      }
+      Build.recomputeTalentCalculationTotals();
+      Build.applyStatFilterHoverHighlightOnSets(heroRowKey);
+      Build.refreshStatFilterHighlightCountDisplay();
+      return;
+    }
+
+    const displayKey = Build.getHeroStatRowDisplayTotalKey(heroRowKey);
+    Build.recomputeTalentCalculationTotals();
+    const fullDirect = Build.getTalentDirectCalculationValue(displayKey);
+    const eps = 1e-4;
+    for (let index = 0; index < installed.length; index++) {
+      const t = installed[index];
+      if (!t) continue;
+      installed[index] = null;
+      Build.recomputeTalentCalculationTotals();
+      const withoutDirect = Build.getTalentDirectCalculationValue(displayKey);
+      installed[index] = t;
+      if (Math.abs(fullDirect - withoutDirect) > eps) {
+        highlightAt(index);
+      }
+    }
+    Build.recomputeTalentCalculationTotals();
+    Build.applyStatFilterHoverHighlightOnSets(heroRowKey);
+    Build.refreshStatFilterHighlightCountDisplay();
+  }
+
+  static setSelectedSetItem(item) {
+    try {
+      if (Build._selectedSetItem && Build._selectedSetItem !== item) {
+        Build._selectedSetItem.classList.remove('build-set-item-selected');
+      }
+      Build._selectedSetItem = item || null;
+      if (Build._selectedSetItem) {
+        Build._selectedSetItem.classList.add('build-set-item-selected');
+      }
+    } catch {}
+  }
+
+  static clearSelectedSetItem() {
+    try {
+      if (Build._selectedSetItem) {
+        Build._selectedSetItem.classList.remove('build-set-item-selected');
+      }
+    } catch {}
+    Build._selectedSetItem = null;
   }
 
   static clearEmptySlotPreviews() {
@@ -2461,6 +4127,39 @@ export class Build {
           el.classList.remove('build-talent-empty-slot-preview');
           el.style.backgroundImage = '';
         });
+    } catch {}
+    Build.stopPreviewBlinkTickerIfIdle();
+  }
+
+  static ensurePreviewBlinkTicker() {
+    if (Build._previewBlinkTimer) return;
+    Build._previewBlinkState = false;
+    const tick = () => {
+      if (!Build._previewBlinkTimer) return;
+      Build._previewBlinkState = !Build._previewBlinkState;
+      try {
+        Build.fieldView?.classList?.toggle('build-preview-blink-on', Build._previewBlinkState);
+      } catch {}
+    };
+    Build._previewBlinkTimer = setInterval(tick, 450);
+    tick();
+  }
+
+  static stopPreviewBlinkTickerIfIdle() {
+    let hasPreview = false;
+    try {
+      hasPreview = !!Build.fieldView?.querySelector?.(
+        '.build-hero-grid-item.build-set-empty-slot-preview, .build-hero-grid-item.build-talent-empty-slot-preview',
+      );
+    } catch {}
+    if (hasPreview) return;
+    try {
+      if (Build._previewBlinkTimer) clearInterval(Build._previewBlinkTimer);
+    } catch {}
+    Build._previewBlinkTimer = 0;
+    Build._previewBlinkState = false;
+    try {
+      Build.fieldView?.classList?.remove('build-preview-blink-on');
     } catch {}
   }
 
@@ -2479,7 +4178,11 @@ export class Build {
     try {
       Build.clearEmptySlotPreviews();
 
-      const ids = TalentSets.getTalentIds(set);
+      let ids = TalentSets.getTalentIds(set);
+      if (previewClass === 'build-set-empty-slot-preview' && Array.isArray(ids)) {
+        if (ids.length > 1) ids = Build.sortSetTalentIdsByPriority(ids);
+        ids = Build.filterSetTalentIdsByMatchingStats(ids);
+      }
       const simInstalled = Array.isArray(Build.installedTalents) ? Build.installedTalents.slice() : new Array(36).fill(null);
 
       for (const id of ids) {
@@ -2516,6 +4219,7 @@ export class Build {
         const src = id > 0 ? `content/talents/${id}.webp` : `content/htalents/${Math.abs(id)}.webp`;
         cell.style.backgroundImage = `url("${src}")`;
       }
+      Build.ensurePreviewBlinkTicker();
     } catch {}
   }
 
@@ -2676,6 +4380,62 @@ export class Build {
     } catch {}
   }
 
+  static formatCooldownValue(value) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return null;
+    const rounded = Math.round(num * 10) / 10;
+    if (Math.abs(rounded - Math.round(rounded)) < 1e-9) return String(Math.round(rounded));
+    return String(rounded).replace(/\.0$/, '');
+  }
+
+  static applyCooldownReductionToDescriptionMarkup() {
+    if (!Build.descriptionView) return;
+    const cdNodes = Build.descriptionView.querySelectorAll('cd');
+    if (!cdNodes.length) return;
+
+    const rawPct = Number(Build.totalStat('speedtal'));
+    const cdPct = Number.isFinite(rawPct) ? Math.max(0, Math.min(100, rawPct)) : 0;
+    if (cdPct <= 0) return;
+
+    for (const cdNode of cdNodes) {
+      const source = String(cdNode.textContent || '').trim();
+      let base = NaN;
+      const explicit = source.match(/^([0-9]+(?:[.,][0-9]+)?)$/);
+      if (explicit) {
+        base = Number(String(explicit[1]).replace(',', '.'));
+      } else if (!source) {
+        const parent = cdNode.parentElement;
+        if (parent) {
+          const textNodes = Array.from(parent.childNodes).filter((n) => n !== cdNode && n.nodeType === 3);
+          const rawNeighborNumber = textNodes
+            .map((n) => String(n.textContent || ''))
+            .join('')
+            .trim();
+          const implicit = rawNeighborNumber.match(/^([0-9]+(?:[.,][0-9]+)?)$/);
+          if (implicit) {
+            base = Number(String(implicit[1]).replace(',', '.'));
+            for (const tn of textNodes) tn.textContent = '';
+          }
+        }
+      }
+
+      if (!Number.isFinite(base) || base <= 0) continue;
+
+      const reduced = base * (1 - cdPct / 100);
+      const reducedText = Build.formatCooldownValue(reduced);
+      const baseText = Build.formatCooldownValue(base);
+      if (!reducedText || !baseText) continue;
+
+      const leftCd = document.createElement('cd');
+      leftCd.textContent = baseText;
+      const rightCd = document.createElement('cd');
+      rightCd.textContent = reducedText;
+      const fragment = document.createDocumentFragment();
+      fragment.append(leftCd, document.createTextNode(' -> '), rightCd);
+      cdNode.replaceWith(fragment);
+    }
+  }
+
   static renderDescriptionHtml({ html, anchorEl, anchorRect, talentDataForParams }) {
     if (!Build.descriptionView) return;
     Build.descriptionView.innerHTML = html || '';
@@ -2684,6 +4444,7 @@ export class Build {
     if (talentDataForParams) {
       Build.applyTalentParamsToDescription(talentDataForParams);
     }
+    Build.applyCooldownReductionToDescriptionMarkup();
 
     const rect = anchorRect || anchorEl?.getBoundingClientRect?.();
     if (rect) Build.scheduleDescriptionReposition(rect);
@@ -2698,6 +4459,7 @@ export class Build {
     Build.inventoryView?.querySelectorAll('.build-talents .build-talent-item').forEach((el) => {
       if (wanted.has(el.dataset.id)) el.classList.add('build-set-highlight-lib');
     });
+    Build.refreshStatFilterHighlightCountDisplay();
   }
 
   static async highlightSetTalentsAfterRender(talentIds, timeoutMs = 2000) {
@@ -2711,7 +4473,6 @@ export class Build {
   }
 
   static showSetDescription(set, anchorEl) {
-    if ((Build._setsScrollLockUntil || 0) > performance.now()) return;
     Build._descriptionPinnedBySet = true;
     const mode = Build.getSetLmbMode();
     const mainId = TalentSets.chooseMainTalentId(set);
@@ -2734,7 +4495,7 @@ export class Build {
       const descriptionKey = `${prefix}${absId}_description`;
       const mainName = Lang.text(nameKey);
       const desc = Lang.text(descriptionKey);
-      mainDesc = `<div><b>${mainName}</b><br><br>${desc}</div>`;
+      mainDesc = `<div class="build-set-main-desc"><b>${mainName}</b><br><br>${desc}</div>`;
     }
 
     let lmbHint = Lang.text('setHintLmb');
@@ -2860,8 +4621,187 @@ export class Build {
     });
   }
 
+  static getSetApplyPriorityBases(useFallback = true) {
+    const bases = ['sila', 'razum', 'provorstvo', 'hitrost', 'stoikost', 'volia'];
+
+    // Source of truth: profile checkboxes (circle/checkbox) in hero stats block.
+    const profile = Build.profileStats || {};
+    const fromProfile = bases.filter((k) => Number(profile[k]) === 1);
+    if (fromProfile.length) return new Set(fromProfile);
+
+    if (!useFallback) return new Set();
+
+    // Fallback: current stats filter state.
+    const selected = Array.isArray(Build.ruleSortInventory?.stats) ? Build.ruleSortInventory.stats : [];
+    if (!selected.length) return new Set();
+    return new Set(bases.filter((k) => selected.includes(k)));
+  }
+
+  static getSetPriorityFamilyWeights() {
+    return {
+      sila: { pure: ['sila', 'silarz', 'silavz'], mixed: ['sr', 'srsv'] },
+      razum: { pure: ['razum', 'razumrz', 'razumvz'], mixed: ['sr', 'srsv'] },
+      provorstvo: { pure: ['provorstvo', 'provorstvorz', 'provorstvovz'], mixed: ['ph'] },
+      hitrost: { pure: ['hitrost', 'hitrostrz', 'hitrostvz'], mixed: ['ph'] },
+      stoikost: { pure: ['stoikost', 'stoikostrz'], mixed: ['sv', 'svvz', 'vs', 'srsv'] },
+      volia: { pure: ['volia', 'voliarz'], mixed: ['sv', 'svvz', 'vs', 'srsv'] },
+    };
+  }
+
+  static getSetSilaRazumPresence(stats = {}) {
+    const pureSilaKeys = ['sila', 'silarz', 'silavz'];
+    const pureRazumKeys = ['razum', 'razumrz', 'razumvz'];
+    const maxSrKeys = ['sr', 'srsv'];
+    const hasPureSila = pureSilaKeys.some((k) => Build.hasTalentStatKey(stats, k));
+    const hasPureRazum = pureRazumKeys.some((k) => Build.hasTalentStatKey(stats, k));
+    const hasSrMax = maxSrKeys.some((k) => Build.hasTalentStatKey(stats, k));
+    return { hasPureSila, hasPureRazum, hasSrMax };
+  }
+
+  static hasTalentStatKey(stats = {}, key = '') {
+    if (!key) return false;
+    return key in stats || `${key}buff` in stats;
+  }
+
+  static hasNonCheckboxStatKey(stats = {}, familyWeights = null) {
+    const map = familyWeights || Build.getSetPriorityFamilyWeights();
+    const checkboxKeys = new Set(['srMin', 'phMin', 'svMin', 'srsvMin']);
+    try {
+      for (const cfg of Object.values(map)) {
+        for (const k of cfg?.pure || []) checkboxKeys.add(k);
+        for (const k of cfg?.mixed || []) checkboxKeys.add(k);
+      }
+    } catch {}
+
+    for (const rawKey of Object.keys(stats || {})) {
+      const k = String(rawKey).endsWith('buff') ? String(rawKey).slice(0, -4) : String(rawKey);
+      if (!checkboxKeys.has(k)) return true;
+    }
+    return false;
+  }
+
+  static hasAnyCheckboxStatKey(stats = {}, familyWeights = null) {
+    const map = familyWeights || Build.getSetPriorityFamilyWeights();
+    const checkboxKeys = new Set(['srMin', 'phMin', 'svMin', 'srsvMin']);
+    try {
+      for (const cfg of Object.values(map)) {
+        for (const k of cfg?.pure || []) checkboxKeys.add(k);
+        for (const k of cfg?.mixed || []) checkboxKeys.add(k);
+      }
+    } catch {}
+
+    for (const rawKey of Object.keys(stats || {})) {
+      const k = String(rawKey).endsWith('buff') ? String(rawKey).slice(0, -4) : String(rawKey);
+      if (checkboxKeys.has(k)) return true;
+    }
+    return false;
+  }
+
+  static sortSetTalentIdsByPriority(ids) {
+    if (!Array.isArray(ids) || ids.length <= 1) return ids;
+    const bases = Build.getSetApplyPriorityBases(false);
+    if (!bases.size) return ids;
+
+    const familyWeights = Build.getSetPriorityFamilyWeights();
+    const hasSilaSelected = bases.has('sila');
+    const hasRazumSelected = bases.has('razum');
+    const dominantSr = hasSilaSelected && hasRazumSelected ? Build.getMaxStat(['sila', 'razum']) : null;
+
+    const pureWeight = 10;
+    const mixedWeight = 3;
+
+    const scored = ids.map((id, idx) => {
+      const data = Build.talents?.[String(id)];
+      const score = Build.getSetTalentPriorityScore(data, bases, familyWeights, pureWeight, mixedWeight, { dominantSr });
+
+      return { id, idx, score };
+    });
+
+    scored.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.idx - b.idx;
+    });
+
+    return scored.map((x) => x.id);
+  }
+
+  static getSetTalentPriorityScore(data, bases, familyWeights, pureWeight = 10, mixedWeight = 3, options = {}) {
+    const stats = data?.stats || {};
+    let score = 0;
+    for (const base of bases || []) {
+      const map = familyWeights?.[base];
+      if (!map) continue;
+      let basePureWeight = pureWeight;
+      let baseMixedWeight = mixedWeight;
+
+      // If both Sila and Razum are selected, prioritize the larger of those
+      // stats in current build state.
+      if (options?.dominantSr && (base === 'sila' || base === 'razum')) {
+        if (base === options.dominantSr) {
+          basePureWeight += 4;
+          baseMixedWeight += 1;
+        } else {
+          basePureWeight = Math.max(0, basePureWeight - 2);
+          baseMixedWeight = Math.max(0, baseMixedWeight - 1);
+        }
+      }
+
+      for (const k of map.pure) {
+        if (Build.hasTalentStatKey(stats, k)) score += basePureWeight;
+      }
+      for (const k of map.mixed) {
+        if (Build.hasTalentStatKey(stats, k)) score += baseMixedWeight;
+      }
+    }
+    return score;
+  }
+
+  static filterSetTalentIdsByMatchingStats(ids) {
+    if (!Array.isArray(ids) || !ids.length) return ids || [];
+    if (!Settings.settings?.buildSetOnlyMatchingStats) return ids;
+
+    const bases = Build.getSetApplyPriorityBases(false);
+
+    const familyWeights = Build.getSetPriorityFamilyWeights();
+    const hasSilaSelected = bases.has('sila');
+    const hasRazumSelected = bases.has('razum');
+    const bothSelected = hasSilaSelected && hasRazumSelected;
+    const dominantSr = bothSelected ? Build.getMaxStat(['sila', 'razum']) : null;
+    const nonSrBases = new Set([...bases].filter((b) => b !== 'sila' && b !== 'razum'));
+
+    return ids.filter((id) => {
+      const data = Build.talents?.[String(id)];
+      const stats = data?.stats || {};
+      const hasCheckbox = Build.hasAnyCheckboxStatKey(stats, familyWeights);
+      const hasNonCheckbox = Build.hasNonCheckboxStatKey(stats, familyWeights);
+      if (!bases.size) return !hasCheckbox && hasNonCheckbox;
+      // Always allow "other stats" only when talent has no checkbox-related
+      // stats at all. Mixed talents must still obey checkbox filters.
+      if (!hasCheckbox && hasNonCheckbox) return true;
+      const srPresence = Build.getSetSilaRazumPresence(stats);
+
+      // If only Razum is selected, reject only pure Sila talents.
+      // "Largest stat" aliases (sr/srsv) are allowed.
+      if (hasRazumSelected && !hasSilaSelected && srPresence.hasPureSila) return false;
+      // If only Sila is selected, reject only pure Razum talents.
+      // "Largest stat" aliases (sr/srsv) are allowed.
+      if (hasSilaSelected && !hasRazumSelected && srPresence.hasPureRazum) return false;
+
+      // If neither Sila nor Razum is selected, reject talents that are only
+      // Sila/Razum-based (including "max between them" aliases like sr/srsv).
+      if (!hasSilaSelected && !hasRazumSelected && (srPresence.hasPureSila || srPresence.hasPureRazum || srPresence.hasSrMax)) {
+        const nonSrScore = Build.getSetTalentPriorityScore(data, nonSrBases, familyWeights);
+        if (nonSrScore <= 0) return false;
+      }
+
+      return Build.getSetTalentPriorityScore(data, bases, familyWeights, 10, 3, { dominantSr }) > 0;
+    });
+  }
+
   static async applySetToBuild(set) {
-    const ids = TalentSets.getTalentIds(set);
+    const setIds = TalentSets.getTalentIds(set);
+    let ids = Build.sortSetTalentIdsByPriority(setIds);
+    ids = Build.filterSetTalentIdsByMatchingStats(ids);
     const simInstalled = Array.isArray(Build.installedTalents) ? Build.installedTalents.slice() : new Array(36).fill(null);
     for (const id of ids) {
       if (Build.isTalentInBuild(id)) continue;
@@ -2909,17 +4849,71 @@ export class Build {
       }
     }
 
-    try {
-      Build.updateHeroStats();
-    } catch {}
+    Build.refreshLocalBuildUiAfterSet(setIds);
 
-    await Build.runWithSilentBuildUiUpdate(async () => {
-      await Build.refreshBuildStateFromServer({ refreshInventory: true });
+  }
+
+  /** Индекс порядка из карты загрузки библиотеки (устойчиво к типу id). */
+  static lookupInventoryDefaultOrderIndex(talentIdRaw) {
+    try {
+      const m = Build._inventoryDefaultOrder;
+      if (!m) return null;
+      if (talentIdRaw === undefined || talentIdRaw === null) return null;
+      const s = String(talentIdRaw).trim();
+      if (!s) return null;
+      const n = Number(s);
+      if (Number.isFinite(n)) {
+        const v = m.get(`${n}`);
+        if (Number.isFinite(Number(v))) return Number(v);
+      }
+      const v2 = m.get(s);
+      if (Number.isFinite(Number(v2))) return Number(v2);
+    } catch {}
+    return null;
+  }
+
+  /** Проставить data-default-order с карты (новые обёртки после билда часто без него). */
+  static attachDefaultOrderDatasetToInventoryContainer(container) {
+    try {
+      const item = container?.querySelector?.('.build-talent-item');
+      const idx = Build.lookupInventoryDefaultOrderIndex(item?.dataset?.id);
+      if (idx !== null) container.dataset.defaultOrder = `${idx}`;
+    } catch {}
+  }
+
+  /** Порядок таланта в библиотеке как при загрузке (не после перестановок сета). */
+  static getInventoryContainerDefaultOrder(container) {
+    const item = container?.querySelector?.('.build-talent-item');
+    const byData = Number(container?.dataset?.defaultOrder);
+    if (Number.isFinite(byData)) return byData;
+    const fromMap = Build.lookupInventoryDefaultOrderIndex(item?.dataset?.id);
+    if (fromMap !== null) return fromMap;
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  /** Вернуть узлы библиотеки в исходный порядок (после Alt / сброса режима сета). */
+  static reorderInventoryByDefaultOrder() {
+    const list = Build.inventoryView?.querySelector('.build-talents');
+    if (!list) return;
+    const allContainers = Array.from(list.querySelectorAll('.build-talent-item-container'));
+    for (const c of allContainers) {
+      Build.attachDefaultOrderDatasetToInventoryContainer(c);
+    }
+    if (allContainers.length < 2) return;
+    const sorted = allContainers.slice().sort((a, b) => {
+      const da = Build.getInventoryContainerDefaultOrder(a);
+      const db = Build.getInventoryContainerDefaultOrder(b);
+      if (da !== db) return da - db;
+      const ia = Number(a.querySelector('.build-talent-item')?.dataset?.id);
+      const ib = Number(b.querySelector('.build-talent-item')?.dataset?.id);
+      if (Number.isFinite(ia) && Number.isFinite(ib) && ia !== ib) return ia - ib;
+      return 0;
     });
-
-    try {
-      Build.promoteSetTalentsInInventoryAfterRender(set);
-    } catch {}
+    for (const container of sorted) {
+      try {
+        list.appendChild(container);
+      } catch {}
+    }
   }
 
   static applySetInventoryOrder(set) {
@@ -2928,21 +4922,24 @@ export class Build {
 
     const ids = TalentSets.getTalentIds(set);
     const mode = Build.getSetLmbMode();
+    Build._forceShowOnlySetTalentIds = null;
     Build._forceShowOnlyTalentIds = null;
 
     if (mode === 2 || mode === 3) {
-      const leftovers = new Set();
-      for (const id of ids) {
-        if (Build.isTalentInBuild(id)) continue;
-        leftovers.add(String(id));
+      Build._forceShowOnlySetTalentIds = new Set(ids.map(String));
+      Build.refreshForcedSetOnlyTalentIds();
+      // Весь сет уже в билде — не оставляем «пустой» фильтр (вся библиотека пропадала без sortInventory).
+      if (!Build._forceShowOnlyTalentIds?.size) {
+        Build._forceShowOnlySetTalentIds = null;
+        Build._forceShowOnlyTalentIds = null;
+        Build.sortInventory();
+        return;
       }
-      if (!leftovers.size) return;
 
       const prevScroll = list.scrollTop;
 
       // Show only leftovers; then rebuild DOM order grouped by build rows (levels 6..1).
       // We preserve the original relative order inside each level group.
-      Build._forceShowOnlyTalentIds = leftovers;
       Build.sortInventory();
 
       const visibleContainers = Array.from(list.querySelectorAll('.build-talent-item-container')).filter((container) => {
@@ -2986,37 +4983,56 @@ export class Build {
       } catch {}
       return;
     }
+    Build._forceShowOnlySetTalentIds = null;
 
-    const toMove = [];
+    Build.sortInventory();
+    const allContainers = Array.from(list.querySelectorAll('.build-talent-item-container'));
+    const setContainers = [];
+    const setContainerKeys = new Set();
     for (const id of ids) {
       if (Build.isTalentInBuild(id)) continue;
       const el = list.querySelector(`.build-talent-item[data-id="${id}"]`);
       if (!el) continue;
       const container = el.closest('.build-talent-item-container');
       if (!container) continue;
-      toMove.push(container);
+      if (container.style.display === 'none') continue;
+      const key = `${Number(id)}`;
+      if (setContainerKeys.has(key)) continue;
+      setContainerKeys.add(key);
+      setContainers.push(container);
     }
-    if (!toMove.length) return;
-    for (let i = toMove.length - 1; i >= 0; i--) list.prepend(toMove[i]);
+    const restContainers = allContainers.filter((container) => {
+      const item = container?.querySelector?.('.build-talent-item');
+      const id = `${Number(item?.dataset?.id)}`;
+      return !setContainerKeys.has(id);
+    });
+    restContainers.sort(
+      (a, b) => Build.getInventoryContainerDefaultOrder(a) - Build.getInventoryContainerDefaultOrder(b),
+    );
+    const ordered = [...setContainers, ...restContainers];
+    for (const container of ordered) {
+      try {
+        list.appendChild(container);
+      } catch {}
+    }
     try {
       list.scrollTop = 0;
     } catch {}
   }
 
-  static async promoteSetTalentsInInventoryAfterRender(set, timeoutMs = 2000) {
-    const list = Build.inventoryView?.querySelector('.build-talents');
-    if (!list) return;
-    const ids = TalentSets.getTalentIds(set);
-    await Build.waitForCondition(() => ids.some((id) => list.querySelector(`.build-talent-item[data-id="${id}"]`)), timeoutMs);
-    Build.applySetInventoryOrder(set);
-  }
-
   static async removeSetFromBuild(set) {
     const ids = TalentSets.getTalentIds(set);
     for (const id of ids) {
+      const setTalentIdNum = Number(id);
       for (let index = 0; index < (Build.installedTalents || []).length; index++) {
         const t = Build.installedTalents[index];
-        if (!t || t.id !== id) continue;
+        if (!t) continue;
+        const installedIdNum = Number(t.id);
+        if (Number.isFinite(setTalentIdNum) && Number.isFinite(installedIdNum)) {
+          if (installedIdNum !== setTalentIdNum) continue;
+        } else if (`${t.id}` !== `${id}`) {
+          continue;
+        }
 
         try {
           await Build.removeTalentFromActiveByFieldIndex(index);
@@ -3029,17 +5045,8 @@ export class Build {
       }
     }
 
-    try {
-      Build.updateHeroStats();
-    } catch {}
+    Build.refreshLocalBuildUiAfterSet(ids, set);
 
-    await Build.runWithSilentBuildUiUpdate(async () => {
-      await Build.refreshBuildStateFromServer({ refreshInventory: true });
-    });
-
-    try {
-      Build.promoteSetTalentsInInventoryAfterRender(set);
-    } catch {}
   }
 
   static tryBeginSetAction() {
@@ -3055,6 +5062,7 @@ export class Build {
   static renderTalentSetsList() {
     if (!Build.setsListView) return;
     Build.setsListView.replaceChildren();
+    Build._renderedSetEntries = [];
 
     if (!Build._setsHoverMonitorInstalled) {
       Build._setsHoverMonitorInstalled = true;
@@ -3088,9 +5096,11 @@ export class Build {
 
       const item = DOM({ style: 'build-set-item' });
       item.style.backgroundImage = `url("${src}")`;
+      Build._renderedSetEntries.push({ set, item });
 
       const ids = TalentSets.getTalentIds(set);
       item.addEventListener('mouseenter', () => {
+        if (Build._setsHoverSuppressed) return;
         Build.showSetDescription(set, item);
         Build._hoveredSetTalentIds = ids;
         Build._hoveredSetAnchorEl = item;
@@ -3116,17 +5126,25 @@ export class Build {
         if (!Build.tryBeginSetAction()) return;
         (async () => {
           try {
+            Build.setSelectedSetItem(item);
             const mode = Build.getSetLmbMode();
             Build._descriptionPinnedBySet = true;
             Build._hoveredSetTalentIds = ids;
             Build._forceShowTalentIds = mode === 1 ? new Set(ids.map(String)) : null;
+            Build._forceShowOnlySetTalentIds = null;
             Build._forceShowOnlyTalentIds = null;
 
-            Build.applySetInventoryOrder(set);
+            if (mode === 2) {
+              Build._forceShowOnlySetTalentIds = new Set(ids.map(String));
+              Build._forceShowOnlyTalentIds = new Set();
+            } else if (mode === 3) {
+              Build.applySetInventoryOrder(set);
+            }
             if (mode !== 3) {
               await Build.applySetToBuild(set);
+              Build.applySetInventoryOrder(set);
             } else {
-              Build.sortInventory();
+              Build.applySetInventoryOrder(set);
             }
             Build.refreshSetHoverState(set, item, ids, true);
           } finally {
@@ -3136,15 +5154,20 @@ export class Build {
       });
       item.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        if (Build.combatModeEnabled) return;
         try {
           Sound.play(SOUNDS_LIBRARY.CLICK, { id: 'ui-set-down', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
         } catch {}
         if (!Build.tryBeginSetAction()) return;
         (async () => {
           try {
+            Build.setSelectedSetItem(item);
+            const mode = Build.getSetLmbMode();
             Build._hoveredSetTalentIds = ids;
-            Build._forceShowTalentIds = new Set(ids.map(String));
+            Build._forceShowTalentIds = mode === 1 ? new Set(ids.map(String)) : null;
+            Build._forceShowOnlySetTalentIds = null;
             Build._forceShowOnlyTalentIds = null;
+            Build.applySetInventoryOrder(set);
             await Build.removeSetFromBuild(set);
             Build.refreshSetHoverState(set, item, ids);
           } finally {
@@ -3155,6 +5178,9 @@ export class Build {
 
       Build.setsListView.append(item);
     }
+    if (Build._statFilterHoverRowKey) {
+      Build.applyStatFilterHoverHighlightOnSets(Build._statFilterHoverRowKey);
+    }
   }
 
   static rarity() {
@@ -3164,15 +5190,44 @@ export class Build {
       { id: '2', name: Lang.text('titleThePurple'), color: '205,0,205' },
       { id: '1', name: Lang.text('titleTheBlue'), color: '17,105,237' },
     ];
+    const rarityImageBaseById = {
+      4: 'red',
+      3: 'orange',
+      2: 'purple',
+      1: 'blue',
+    };
+    const applyActiveFilterVisualByState = (button, isActive) => {
+      if (!button) return;
+      const suffix = isActive ? 'Show' : 'NoShow';
+      button.style.backgroundImage = `url("content/img/active${suffix}.png")`;
+      button.style.backgroundColor = 'transparent';
+      button.style.backgroundRepeat = 'no-repeat';
+      button.style.backgroundPosition = 'center';
+      button.style.backgroundSize = 'cover';
+      button.style.filter = isActive
+        ? 'brightness(1.04) saturate(2.02) drop-shadow(0 0 0.45cqh rgba(255,255,255,0.35))'
+        : 'none';
+    };
+    const applyRarityVisualByState = (button, rarityId, isActive) => {
+      const base = rarityImageBaseById[Number(rarityId)];
+      if (!base || !button) return;
+      const suffix = isActive ? 'Show' : 'NoShow';
+      button.style.backgroundImage = `url("content/img/${base}${suffix}.png")`;
+      button.style.backgroundColor = 'transparent';
+      button.style.backgroundRepeat = 'no-repeat';
+      button.style.backgroundPosition = 'center';
+      button.style.backgroundSize = 'cover';
+    };
 
     let a = document.createElement('div');
     a.title = Lang.text('titleActiveTalents');
 
     a.classList.add('build-rarity-other');
 
-    a.innerText = 'А';
+    a.innerText = '';
 
     a.dataset.active = 0;
+    applyActiveFilterVisualByState(a, false);
 
     a.addEventListener('click', (e) => {
       Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
@@ -3180,21 +5235,19 @@ export class Build {
         volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
       });
       if (a.dataset.active == 1) {
-        a.style.background = 'rgba(255,255,255,0.1)';
-
         Build.removeSortInventory('active', '1');
 
         Build.sortInventory();
 
         a.dataset.active = 0;
+        applyActiveFilterVisualByState(a, false);
       } else {
-        a.style.background = 'rgba(153,255,51,0.7)';
-
         Build.setSortInventory('active', '1');
 
         Build.sortInventory();
 
         a.dataset.active = 1;
+        applyActiveFilterVisualByState(a, true);
       }
     });
 
@@ -3210,18 +5263,21 @@ export class Build {
       }
 
       for (let l = 0; l < a.parentElement.childNodes.length; l++) {
-        a.parentElement.childNodes[l].dataset.active = 0;
-        a.parentElement.childNodes[l].style.border = 'none';
+        const node = a.parentElement.childNodes[l];
+        node.dataset.active = 0;
+        node.style.border = 'none';
+        if (node !== a) {
+          applyRarityVisualByState(node, node?.dataset?.rarityId, false);
+        }
       }
-      a.style.background = 'rgba(255,255,255,0.1)';
+      applyActiveFilterVisualByState(a, false);
 
       Build.setSortInventory('active', '1');
 
       Build.sortInventory();
 
       a.dataset.active = 1;
-
-      a.style.background = 'rgba(153,255,51,0.7)';
+      applyActiveFilterVisualByState(a, true);
     });
 
     Build.rarityView.append(a);
@@ -3232,6 +5288,7 @@ export class Build {
       button.dataset.active = 0;
 
       button.style.boxSizing = 'border-box';
+      button.dataset.rarityId = item.id;
 
       button.addEventListener('click', (e) => {
         Sound.play(SOUNDS_LIBRARY.CLICK_BUTTON_PRESS_SMALL, {
@@ -3246,14 +5303,16 @@ export class Build {
           Build.sortInventory();
 
           button.dataset.active = 0;
+          applyRarityVisualByState(button, item.id, false);
         } else {
-          button.style.border = 'solid calc(min(0.5cqh, 1cqw)) rgb(153,255,51)';
+          button.style.border = 'none';
 
           Build.setSortInventory('rarity', item.id);
 
           Build.sortInventory();
 
           button.dataset.active = 1;
+          applyRarityVisualByState(button, item.id, true);
         }
       });
 
@@ -3266,10 +5325,14 @@ export class Build {
         Build.removeSortInventory('active', '1');
 
         for (let l = 0; l < button.parentElement.childNodes.length; l++) {
-          button.parentElement.childNodes[l].dataset.active = 0;
-          button.parentElement.childNodes[l].style.border = 'none';
+          const node = button.parentElement.childNodes[l];
+          node.dataset.active = 0;
+          node.style.border = 'none';
+          if (node !== a) {
+            applyRarityVisualByState(node, node?.dataset?.rarityId, false);
+          }
         }
-        a.style.background = 'rgba(255,255,255,0.1)';
+        applyActiveFilterVisualByState(a, false);
 
         Build.setSortInventory('rarity', item.id);
 
@@ -3277,10 +5340,11 @@ export class Build {
 
         button.dataset.active = 1;
 
-        button.style.border = 'solid calc(min(0.5cqh, 1cqw)) rgb(153,255,51)';
+        button.style.border = 'none';
+        applyRarityVisualByState(button, item.id, true);
       });
 
-      button.style.background = `rgba(${item.color},0.6)`;
+      applyRarityVisualByState(button, item.id, false);
 
       button.title = Lang.text('talentQualityTitle').replace('{name}', item.name);
 
@@ -3420,6 +5484,7 @@ export class Build {
 
   static setSortInventory(key, value) {
     Build._forceShowTalentIds = null;
+    Build._forceShowOnlySetTalentIds = null;
     Build._forceShowOnlyTalentIds = null;
     if (!(key in Build.ruleSortInventory)) {
       Build.ruleSortInventory[key] = new Array();
@@ -3436,6 +5501,7 @@ export class Build {
 
   static removeSortInventory(key, value) {
     Build._forceShowTalentIds = null;
+    Build._forceShowOnlySetTalentIds = null;
     Build._forceShowOnlyTalentIds = null;
     if (key in Build.ruleSortInventory) {
       let newArray = new Array();
@@ -3463,7 +5529,16 @@ export class Build {
       flag = true;
 
     try {
-      if (Build._forceShowOnlyTalentIds) {
+      // Сначала: в билде — никогда не показывать в библиотеке (в т.ч. при режиме «остаток сета» и после Alt).
+      const tid0 = item?.dataset?.id;
+      if (tid0 != null && `${tid0}` !== '' && Build.isTalentInBuild(tid0)) {
+        itemContainer.style.display = 'none';
+        itemContainer.style.gridRow = '';
+        return;
+      }
+
+      // Пустой Set — не режим «только остаток сета» (иначе скрывается вся библиотека).
+      if (Build._forceShowOnlyTalentIds && Build._forceShowOnlyTalentIds.size > 0) {
         const id = String(item.dataset.id);
         const visible = Build._forceShowOnlyTalentIds.has(id);
         itemContainer.style.display = visible ? 'block' : 'none';
@@ -3533,9 +5608,158 @@ export class Build {
   }
 
   static sortInventory() {
+    Build.refreshForcedSetOnlyTalentIds();
     for (let itemContainer of Build.inventoryView.querySelectorAll('.build-talent-item-container')) {
       Build.applySorting(itemContainer);
     }
+  }
+
+  static refreshLocalBuildUiAfterSet(ids, set = null) {
+    try {
+      Build.updateHeroStats();
+    } catch {}
+    try {
+      Build.rebuildFieldConflictFromInstalledTalents();
+      Build.syncFieldSlotsFromInstalledTalents();
+      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+      Build.ensureTalentIdsPresentInInventory(ids);
+      Build.sortInventory();
+      if (set) Build.applySetInventoryOrder(set);
+    } catch {}
+  }
+
+  static rebuildFieldConflictFromInstalledTalents() {
+    Build.fieldConflict = new Object();
+    for (const talent of Build.installedTalents || []) {
+      if (!talent) continue;
+      if ('conflict' in talent) {
+        Build.fieldConflict[Math.abs(talent.id)] = true;
+      }
+    }
+  }
+
+  static syncFieldSlotsFromInstalledTalents() {
+    for (let index = 0; index < 36; index++) {
+      const cell = Build.fieldView?.querySelector?.(`.build-hero-grid-item[data-position="${index}"]`);
+      if (!cell) continue;
+      const currentEl = cell.querySelector('.build-talent-item');
+      const expectedTalent = Build.installedTalents?.[index] || null;
+      const currentId = currentEl ? Number(currentEl.dataset.id) : null;
+      const expectedId = expectedTalent ? Number(expectedTalent.id) : null;
+      if (currentEl && expectedTalent && currentId === expectedId) continue;
+      if (currentEl) {
+        try {
+          currentEl.remove();
+        } catch {}
+      }
+      if (!expectedTalent) continue;
+      const view = Build.templateViewTalent({ ...expectedTalent, state: 2 });
+      const preload = new PreloadImages(cell);
+      preload.add(view, cell);
+    }
+  }
+
+  static ensureTalentIdsPresentInInventory(ids) {
+    const list = Build.inventoryView?.querySelector('.build-talents');
+    if (!list || !Array.isArray(ids)) return;
+    const normalizeId = (v) => {
+      const n = Number(v);
+      if (Number.isFinite(n)) return `${n}`;
+      return `${v}`;
+    };
+    const existing = new Map();
+    for (const item of Array.from(list.querySelectorAll('.build-talent-item'))) {
+      const id = item?.dataset?.id;
+      if (!id) continue;
+      const key = normalizeId(id);
+      const container = item.closest('.build-talent-item-container');
+      if (!container) continue;
+      if (existing.has(key)) {
+        try { container.remove(); } catch {}
+        continue;
+      }
+      existing.set(key, container);
+    }
+    const uniqueIds = new Set((ids || []).map((id) => normalizeId(id)));
+    for (const key of uniqueIds) {
+      if (Build.isTalentInBuild(key)) continue;
+      if (existing.has(key)) continue;
+      const data = Build.talents?.[key] || Build.talents?.[String(key)];
+      if (!data) continue;
+      const talentContainer = DOM({ style: 'build-talent-item-container' });
+      const preload = new PreloadImages(talentContainer);
+      const talentView = Build.templateViewTalent({ ...data, state: 1 });
+      preload.add(talentView);
+      list.append(talentContainer);
+      Build.attachDefaultOrderDatasetToInventoryContainer(talentContainer);
+      existing.set(key, talentContainer);
+    }
+  }
+
+  static refreshForcedSetOnlyTalentIds() {
+    if (!Build._forceShowOnlySetTalentIds) {
+      // Без активного сета не держим «остаток» — иначе после Alt/sortInventory остаётся устаревший фильтр.
+      Build._forceShowOnlyTalentIds = null;
+      return;
+    }
+    const leftovers = new Set();
+    for (const id of Build._forceShowOnlySetTalentIds) {
+      if (Build.isTalentInBuild(id)) continue;
+      leftovers.add(String(id));
+    }
+    Build._forceShowOnlyTalentIds = leftovers;
+  }
+
+  static attachAltResetHintBelowInventory() {
+    try {
+      const hint = Build.altResetHintView;
+      const inv = Build.inventoryView;
+      const parent = inv?.parentElement;
+      if (!hint || !inv || !parent) {
+        requestAnimationFrame(() => Build.attachAltResetHintBelowInventory());
+        return;
+      }
+      if (hint.parentNode !== parent || hint.previousSibling !== inv) {
+        inv.insertAdjacentElement('afterend', hint);
+      }
+    } catch {}
+  }
+
+  static resetSetForcedLibraryView() {
+    Build._forceShowTalentIds = null;
+    Build._forceShowOnlySetTalentIds = null;
+    Build._forceShowOnlyTalentIds = null;
+    Build.clearSelectedSetItem();
+    try {
+      Build._descriptionPinnedBySet = false;
+      Build._hoveredSetTalentIds = null;
+      Build._hoveredSetAnchorEl = null;
+      Build.clearSetHighlights();
+      Build.clearEmptySlotPreviews();
+      if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+    } catch {}
+    try {
+      Build.sortInventory();
+      Build.reorderInventoryByDefaultOrder();
+    } catch {}
+  }
+
+  static installAltResetHandler() {
+    try {
+      if (Build._altResetHandler) {
+        window.removeEventListener('keydown', Build._altResetHandler, true);
+      }
+    } catch {}
+
+    Build._altResetHandler = (e) => {
+      const isAlt = e?.key === 'Alt' || e?.code === 'AltLeft' || e?.code === 'AltRight';
+      if (!isAlt || e?.repeat) return;
+      Build.resetSetForcedLibraryView();
+    };
+
+    try {
+      window.addEventListener('keydown', Build._altResetHandler, true);
+    } catch {}
   }
 
   static cancelSortInventory() {
@@ -3562,13 +5786,20 @@ export class Build {
 
     element.onmousedown = (event) => {
       if (event.button != 0) return;
+      if (Build.combatModeEnabled) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
 
       let moveStart = Date.now();
       if (!Build._descriptionPinnedBySet) Build.descriptionView.style.display = 'none';
 
       if (!Build._hoveredSetTalentIds) Build.clearSetHighlights();
       try {
-        element.classList.remove('build-set-highlight', 'build-set-highlight-lib');
+        const hadStatHover = element.classList.contains('build-stat-filter-hover');
+        element.classList.remove('build-set-highlight', 'build-set-highlight-lib', 'build-stat-filter-hover');
+        if (hadStatHover) Build.refreshStatFilterHighlightCountDisplay();
       } catch {}
 
       let data = Build.talents[element.dataset.id];
@@ -3807,6 +6038,14 @@ export class Build {
                 } else {
                   if (performSwapFromLibrary) {
                     swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
+                    if (Build.isMainHeroClassTalent(swappingTal)) {
+                      App.notify(Lang.text('mainHeroClassTalentLocked'));
+                      elementSetDisplay(element, 'block');
+                      fieldRow.style.background = '';
+                      element.style.position = 'static';
+                      element.style.zIndex = 'auto';
+                      return;
+                    }
                   }
                   Build.installedTalents[parseInt(elemBelow.dataset.position)] = data;
                   Build.installedTalents[parseInt(swapParentNode.dataset.position)] = null;
@@ -3901,6 +6140,7 @@ export class Build {
                       invList.prepend(container);
                     } else {
                       const wrapped = DOM({ style: 'build-talent-item-container' }, element);
+                      Build.attachDefaultOrderDatasetToInventoryContainer(wrapped);
                       Build.applySorting(wrapped);
                       invList.prepend(wrapped);
                     }
@@ -3934,10 +6174,34 @@ export class Build {
 
           if (elemBelow && targetElement.className == 'build-talents' && element.dataset.state != 1) {
             let oldParentNode = element.parentNode;
+            if (Build.isMainHeroClassTalent(data)) {
+              App.notify(Lang.text('mainHeroClassTalentLocked'));
+              elementSetDisplay(element, 'block');
+              fieldRow.style.background = '';
+              element.style.position = 'static';
+              element.style.zIndex = 'auto';
+              return;
+            }
 
             element.dataset.state = 1;
 
+            try {
+              const duplicates = Array.from(
+                targetElement.querySelectorAll(`.build-talent-item[data-id="${data.id}"]`)
+              );
+              for (const dup of duplicates) {
+                if (dup === element) continue;
+                const dupContainer = dup.closest('.build-talent-item-container');
+                if (dupContainer) {
+                  dupContainer.remove();
+                } else {
+                  dup.remove();
+                }
+              }
+            } catch {}
+
             let containedTalent = DOM({ style: 'build-talent-item-container' }, element);
+            Build.attachDefaultOrderDatasetToInventoryContainer(containedTalent);
 
             Build.applySorting(containedTalent);
 
@@ -4057,7 +6321,13 @@ export class Build {
           await removeFromActive(element.dataset.position);
         }
 
+        try {
+          // Всегда пересчитать видимость (в т.ч. скрыть дубликаты «в билде + в библиотеке» без режима сета).
+          Build.sortInventory();
+        } catch {}
+
         Build.updateHeroStats();
+        Build.syncCombatModeButtonState();
 
         fieldRow.style.background = '';
 
@@ -4168,8 +6438,16 @@ export class Build {
             statValue += refineBonus * refineMul;
           }
 
-          let sign = key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz' ? '-' : '+';
-          stats += sign + `${Math.floor(statValue * 10.0) / 10.0} ${Lang.text(key)}<br>`;
+          const v = Math.floor(statValue * 10.0) / 10.0;
+          if (key == 'speedtal' || key == 'speedtalrz' || key == 'speedtalvz') {
+            if (Math.abs(v) < 1e-9) {
+              stats += `0 ${Lang.text(key)}<br>`;
+            } else {
+              stats += `-${Math.abs(v)} ${Lang.text(key)}<br>`;
+            }
+          } else {
+            stats += '+' + `${v} ${Lang.text(key)}<br>`;
+          }
         }
       }
 
@@ -4265,10 +6543,25 @@ export class Build {
     Build.clearBuildRowHoverHighlight();
     Build.toggleBuildSettingsPanel(false);
     try {
+      if (Build._altResetHandler) window.removeEventListener('keydown', Build._altResetHandler, true);
+    } catch {}
+    Build._altResetHandler = null;
+    try {
+      Build.altResetHintView?.parentNode?.removeChild?.(Build.altResetHintView);
+    } catch {}
+    Build.altResetHintView = null;
+    try {
+      if (Build._previewBlinkTimer) clearInterval(Build._previewBlinkTimer);
+    } catch {}
+    Build._previewBlinkTimer = 0;
+    Build._previewBlinkState = false;
+    try {
+      Build.fieldView?.classList?.remove('build-preview-blink-on');
+    } catch {}
+    try {
       if (Build._setsScrollStopTimer) clearTimeout(Build._setsScrollStopTimer);
     } catch {}
     Build._setsScrollStopTimer = 0;
-    Build._setsScrollLockUntil = 0;
     try {
       if (Build._buildSettingsAttachTimer) clearTimeout(Build._buildSettingsAttachTimer);
     } catch {}
@@ -4281,6 +6574,13 @@ export class Build {
     } catch {}
     Build.buildSettingsButton = null;
     Build.buildSettingsPanel = null;
+    try {
+      Build._avatarTipEl?.parentNode?.removeChild?.(Build._avatarTipEl);
+    } catch {}
+    Build._avatarTipEl = null;
+    try {
+      document.querySelectorAll('.build-avatar-tip').forEach((el) => el.remove());
+    } catch {}
     if (Build.descriptionView && Build.descriptionView.parentNode) {
       Build.descriptionView.remove();
       Build.descriptionView = null;

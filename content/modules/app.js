@@ -16,11 +16,12 @@ import { Sound } from './sound.js';
 import { loadKeybinds } from './keybindings/keybindings.io.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY, generateHeroSoundsNative, generateHeroSoundsFallback } from './soundsLibrary.js';
+import { SessionPulse } from './sessionPulse.js';
 
 export class App {
   static APP_VERSION = '0';
 
-  static PW_VERSION = '2.14.2';
+  static PW_VERSION = '2.14.3';
 
   static CURRENT_MM = 'mmtest';
 
@@ -164,6 +165,7 @@ export class App {
         // },3000);
 
     await loadKeybinds();
+    await App.syncAuthPulse();
     Chat.init();
 
     document.addEventListener('keydown', (e) => {
@@ -234,7 +236,7 @@ export class App {
 
   static ShowCurrentView() {
     console.log('ShowCurrentView');
-    if (App.storage.data.login) {
+    if (App.storage.data.login && !App.isAuthPulseActiveSync()) {
       View.show('castle');
     } else {
       View.show('authorization');
@@ -242,11 +244,82 @@ export class App {
   }
 
   static async ShowCurrentViewAsync() {
-    if (App.storage.data.login) {
+    await App.syncAuthPulse();
+    if (App.storage.data.login && !App.isAuthPulseActiveSync()) {
       await View.show('castle');
     } else {
       await View.show('authorization');
     }
+  }
+
+  static parseAuthPulse(raw) {
+    return SessionPulse.parse(raw);
+  }
+
+  static encodeCompactData(text) {
+    return SessionPulse.encodeCompactData(text);
+  }
+
+  static decodeCompactData(text) {
+    return SessionPulse.decodeCompactData(text);
+  }
+
+  static readAuthPulseFromStorage() {
+    return SessionPulse.readFromStorage();
+  }
+
+  static getAuthPulseFilePath() {
+    return SessionPulse.getFilePath(NativeAPI);
+  }
+
+  static async readAuthPulseFromFile() {
+    return SessionPulse.readFromFile(NativeAPI);
+  }
+
+  static async writeAuthPulse(pulse) {
+    await SessionPulse.writeToAll(NativeAPI, pulse);
+  }
+
+  static isAuthPulseActive(pulse) {
+    return SessionPulse.isActive(pulse);
+  }
+
+  static isAuthPulseActiveSync() {
+    return App.isAuthPulseActive(App.readAuthPulseFromStorage());
+  }
+
+  static buildAuthPulseMessage(pulse) {
+    return SessionPulse.buildMessage(pulse, (key) => Lang.text(key));
+  }
+
+  static parseSignalMinutes(text) {
+    return SessionPulse.parseSignalMinutes(text);
+  }
+
+  static isAuthPulseSignal(text) {
+    return SessionPulse.isSignal(text, `${Lang.text('accountBanned') || ''}`);
+  }
+
+  static async syncAuthPulse() {
+    return await SessionPulse.sync(NativeAPI);
+  }
+
+  static async handleAuthPulseSignal(text, context = null) {
+    const pulse = SessionPulse.createFromSignal(
+      text,
+      context,
+      {
+        ownerLogin: `${App.storage?.data?.login || ''}`.trim(),
+        ownerId: Number(App.storage?.data?.id || 0),
+      },
+      `${Lang.text('accountBanned') || ''}`,
+    );
+    if (!pulse) return null;
+    await SessionPulse.writeToAll(NativeAPI, pulse);
+    try {
+      View.show('authorization');
+    } catch {}
+    return pulse;
   }
 
   static OpenExternalLink(url) {
@@ -283,8 +356,24 @@ export class App {
         analysis: analysis,
       });
     } catch (error) {
+      await App.handleAuthPulseSignal(error, { ownerLogin: login.value.trim() });
       return App.error(error);
     }
+
+    const activePulse = await App.syncAuthPulse();
+    if (App.isAuthPulseActive(activePulse)) {
+      const ownerLogin = `${activePulse?.ownerLogin || ''}`.trim().toLowerCase();
+      const ownerId = Number(activePulse?.ownerId || 0);
+      const hasOwnerMeta = !!ownerLogin || ownerId > 0;
+      const enteredLogin = `${login.value || ''}`.trim().toLowerCase();
+      if (!hasOwnerMeta || (ownerLogin && enteredLogin && ownerLogin === enteredLogin)) {
+        await App.writeAuthPulse(null);
+      } else {
+        return App.error(App.buildAuthPulseMessage(activePulse));
+      }
+    }
+
+    await App.writeAuthPulse(null);
 
     await App.storage.set({
       id: request.id,
@@ -296,7 +385,22 @@ export class App {
     View.show('castle');
   }
 
-  static setNickname() {
+  static formatNicknameCooldown(ms = 0) {
+    const totalMinutes = Math.max(0, Math.ceil(Number(ms || 0) / 60000));
+    const days = Math.floor(totalMinutes / 1440);
+    const hours = Math.floor((totalMinutes % 1440) / 60);
+    const minutes = totalMinutes % 60;
+    const dayUnit = Lang.text('nicknameTimeDayShort');
+    const hourUnit = Lang.text('nicknameTimeHourShort');
+    const minuteUnit = Lang.text('nicknameTimeMinuteShort');
+    const parts = [];
+    if (days > 0) parts.push(`${days}${dayUnit}`);
+    if (hours > 0 || days > 0) parts.push(`${hours}${hourUnit}`);
+    parts.push(`${minutes}${minuteUnit}`);
+    return parts.join(' ');
+  }
+
+  static async setNickname() {
     
     const close = DOM({
       tag: 'div',
@@ -310,6 +414,13 @@ export class App {
     let template = document.createDocumentFragment();
     let modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('nicknamePlaceholder')));
     let title = DOM({ tag: 'div', style: 'castle-menu-text', id: 'castle-menu-text-change-nickname' }, Lang.text('nicknameChangeCooldown'));
+    try {
+      const cooldown = await App.api.request('user', 'nicknameCooldown', {});
+      const remainingMs = Number(cooldown?.remainingMs || 0);
+      title.textContent = remainingMs > 0
+        ? Lang.text('nicknameChangeRemaining').replace('{time}', App.formatNicknameCooldown(remainingMs))
+        : Lang.text('nicknameChangeReadyNow');
+    } catch {}
 
     let name = DOM({
       domaudio: domAudioPresets.defaultInput,
@@ -439,7 +550,7 @@ export class App {
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        cursor: 'pointer',
+        cursor: 'url(content/img/cursor_button32x32.png) 0 0, pointer',
         transition: 'all 0.3s ease',
         transform: selectedFaction === faction.id ? 'scale(1.05)' : 'scale(1)',
         filter: selectedFaction === faction.id ? 'brightness(1) drop-shadow(0 0 5px rgba(255,215,0,0.7))' : 'brightness(0.7)',

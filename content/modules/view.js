@@ -24,10 +24,37 @@ import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { Sound } from './sound.js';
 import { ensureActionBarSlotsInNativeCfg, loadKeybinds } from './keybindings/keybindings.io.js';
+import { getHeroSearchAliases } from './heroSearchAliases.js';
 
 export class View {
   static mmQueueMap = {};
   static _actionBarCfgEnsured = false;
+  static friendsMenuItem = null;
+  static hasFriendIncomingRequest = false;
+  static castleActiveTab = 'heroes';
+  static castleOpenedBuildHeroId = 0;
+  static CASTLE_HERO_LISTS_MAX = 8;
+  static CASTLE_HERO_LIST_STORAGE_KEY = 'castleHeroSelectedList';
+  static CASTLE_HERO_LIST_NAMES_STORAGE_KEY = 'castleHeroListNames';
+  static CASTLE_FRIEND_LISTS_MAX = 1;
+  static CASTLE_FRIEND_LIST_STORAGE_KEY = 'castleFriendSelectedList';
+  static castleHeroAll = [];
+  static castleHeroSelectedList = 0;
+  static castleHeroSearch = '';
+  static castleHeroPhantomList = 0;
+  static castleHeroListEditMode = '';
+  static castleHeroEditSelection = new Set();
+  static castleHeroListNames = {};
+  static castleHeroDeleteConfirmListId = 0;
+  static castleHeroPrevSelectedList = 0;
+  static castleHeroListsBar = null;
+  static castleHeroPinnedEditor = null;
+  static castleFriendAll = [];
+  static castleFriendSelectedList = 0;
+  static castleFriendSearch = '';
+  static castleFriendListEditMode = '';
+  static castleFriendEditSelection = new Set();
+  static castleFriendClearConfirm = false;
 
   static getQueue(cssKey) {
     const map = {
@@ -40,6 +67,39 @@ export class View {
     };
     const index = map[cssKey];
     return (View.mmQueueMap.mode && View.mmQueueMap.mode[index]) || '-';
+  }
+
+  static setFriendIncomingStatus(value) {
+    View.hasFriendIncomingRequest = Boolean(value);
+    View.updateFriendsMenuIncomingState();
+  }
+
+  static updateFriendsMenuIncomingState() {
+    if (!View.friendsMenuItem) {
+      return;
+    }
+
+    View.friendsMenuItem.classList.toggle('friends-menu-item-incoming', View.hasFriendIncomingRequest);
+  }
+
+  static setCastleOpenedBuildHero(heroId = 0) {
+    const id = Number(heroId);
+    View.castleOpenedBuildHeroId = Number.isFinite(id) && id > 0 ? id : 0;
+    View.syncCastleOpenedBuildHeroGlow();
+  }
+
+  static syncCastleOpenedBuildHeroGlow() {
+    try {
+      const container = View.castleBottom;
+      if (!container) return;
+      const isBuildOpen = Window.windows?.main?.id === 'wbuild';
+      const targetId = Number(View.castleOpenedBuildHeroId);
+      container.querySelectorAll('.castle-hero-item').forEach((el) => {
+        const heroId = Number(el.dataset.heroId);
+        const isActive = isBuildOpen && Number.isFinite(targetId) && targetId > 0 && heroId === targetId;
+        el.classList.toggle('castle-hero-item-build-open', isActive);
+      });
+    } catch {}
   }
   static activeTemplate = false;
 
@@ -398,7 +458,12 @@ export class View {
       body.append(castlePlay);
     } catch (error) {
       if (String(error).search(new RegExp(`session is not valid`, 'i')) != -1) {
-        await App.exit();
+        const pulse = await App.syncAuthPulse();
+        if (App.isAuthPulseActive(pulse)) {
+          await View.show('authorization');
+        } else {
+          await App.exit();
+        }
 
         NativeAPI.reset();
 
@@ -428,6 +493,7 @@ export class View {
   }
 
   static async castlePlay() {
+    const DEMO_PARTY_SIZE = 0;
     let body = DOM({ style: 'castle-play' });
 
     let play = MM.play();
@@ -481,8 +547,58 @@ export class View {
         ready: data.users[key].ready,
         rating: userRating,
         skin: data.users[key].skin,
+        demo: false,
       });
     }
+
+    if (players.length < DEMO_PARTY_SIZE) {
+      const heroPool = Array.isArray(MM.hero) ? MM.hero.filter((h) => Number(h?.id) > 0) : [];
+      const usedHeroIds = new Set(players.map((p) => Number(p.hero)).filter((id) => Number.isFinite(id) && id > 0));
+      const pickDemoHero = (seed) => {
+        if (!heroPool.length) return { hero: 0, skin: 1, rating: 1100 };
+        let idx = Math.abs(Number(seed) || 0) % heroPool.length;
+        for (let tries = 0; tries < heroPool.length; tries++) {
+          const cand = heroPool[(idx + tries) % heroPool.length];
+          const cid = Number(cand?.id);
+          if (!Number.isFinite(cid) || cid <= 0) continue;
+          if (!usedHeroIds.has(cid)) {
+            usedHeroIds.add(cid);
+            return {
+              hero: cid,
+              skin: Number(cand?.skin) > 0 ? Number(cand.skin) : 1,
+              rating: Number(cand?.rating) || 1100,
+            };
+          }
+        }
+        const fallback = heroPool[idx];
+        return {
+          hero: Number(fallback?.id) || 0,
+          skin: Number(fallback?.skin) > 0 ? Number(fallback.skin) : 1,
+          rating: Number(fallback?.rating) || 1100,
+        };
+      };
+
+      const need = DEMO_PARTY_SIZE - players.length;
+      for (let i = 0; i < need; i++) {
+        const demoId = `demo-${i + 1}`;
+        const demoHero = pickDemoHero(i + 37);
+        players.push({
+          id: demoId,
+          hero: demoHero.hero,
+          nickname: `Teammate ${i + 1}`,
+          ready: i % 3 !== 0 ? 1 : 0,
+          rating: demoHero.rating,
+          skin: demoHero.skin,
+          demo: true,
+        });
+      }
+    }
+
+    const partySize = Math.max(1, players.length);
+    const maxInRow = partySize <= 4 ? partySize : Math.max(1, Math.ceil(partySize / 2));
+    lobby.style.setProperty('--castle-play-lobby-max-in-row', String(maxInRow));
+    const rowCount = Math.max(1, Math.ceil(partySize / maxInRow));
+    lobby.dataset.rows = String(rowCount);
     /*
         if(players.length < 5){
             
@@ -613,7 +729,7 @@ export class View {
 
       nickname.firstChild.firstChild.classList.add('castle-player-nickname');
 
-      if (MM.partyId == App.storage.data.id && playerX.dataset.id != App.storage.data.id && playerX.dataset.id != 0) {
+      if (MM.partyId == App.storage.data.id && !player.demo && playerX.dataset.id != App.storage.data.id && playerX.dataset.id != 0) {
         removeButton.addEventListener('click', async () => {
           await App.api.request(App.CURRENT_MM, 'leaderKickParty', {
             id: playerX.dataset.id,
@@ -800,13 +916,13 @@ export class View {
       'pve-ep2-red': 5,
     };
 
-    // тип медалей
+    // тип медалей (Испытание / Дуэль — без зала славы в лаунчере)
     const medalMap = {
       pvp: 'gold',
       anderkrug: 'gold',
       cte: 'gold',
       m4: 'gold',
-      'pve-ep2-red': 'gold',
+      'pve-ep2-red': 'silver',
       'custom-battle': 'silver',
     };
 
@@ -1057,27 +1173,31 @@ export class View {
 
     View.castleBottom.addEventListener('wheel', function (event) {
       if (event.deltaY != 0) {
+        let deltaPx = 0;
         if (event.deltaMode == event.DOM_DELTA_PIXEL) {
-          event.preventDefault();
-
-          View.scrollHero((event.deltaY / 100) * SCROLL_MODIFIER);
+          deltaPx = event.deltaY * SCROLL_MODIFIER;
         } else if (event.deltaMode == event.DOM_DELTA_LINE) {
-          event.preventDefault();
-
-          View.scrollHeroLine((event.deltaY / 100) * SCROLL_MODIFIER);
+          deltaPx = event.deltaY * 18 * SCROLL_MODIFIER;
         } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
+          deltaPx = this.clientWidth;
+        }
+        if (deltaPx !== 0) {
           event.preventDefault();
-
-          let modifier = this.clientWidth;
-
-          View.castleBottom.scrollLeft += modifier;
-
-          View.updateArrows();
+          View.applyCastleBottomScrollDelta(deltaPx);
         }
       }
-    });
-
-    View.bodyCastleHeroes();
+    }, { passive: false });
+    View.castleBottom.addEventListener(
+      'scroll',
+      () => {
+        View.currentFloatScroll = Number(View.castleBottom?.scrollLeft) || 0;
+        if (!View.castleBottomScrollRaf) {
+          View.castleBottomTargetScroll = View.currentFloatScroll;
+        }
+        View.updateArrows();
+      },
+      { passive: true },
+    );
 
     let nicknameValue = String(App?.storage?.data?.login || '').trim();
     let nicknameMenuItem = DOM(
@@ -1151,8 +1271,7 @@ export class View {
         'click',
         () => {
           View.bodyCastleHeroes();
-          View.castleBottom.scrollLeft = 0;
-          View.updateArrows();
+          View.resetCastleBottomScroll(0);
           Castle.buildMode = false;
         },
       ],
@@ -1165,13 +1284,14 @@ export class View {
         'click',
         () => {
           View.bodyCastleFriends();
-          View.castleBottom.scrollLeft = 0;
-          View.updateArrows();
+          View.resetCastleBottomScroll(0);
           Castle.buildMode = false;
         },
       ],
       title: Lang.text('titlefriends'),
     });
+    View.friendsMenuItem = friendsMenuItem;
+    View.updateFriendsMenuIncomingState();
     let buildingsMenuItem = DOM({
       domaudio: domAudioPresets.defaultButton,
       style: 'buildings-menu-item',
@@ -1179,8 +1299,7 @@ export class View {
         'click',
         () => {
           View.bodyCastleBuildings();
-          View.castleBottom.scrollLeft = 0;
-          View.updateArrows();
+          View.resetCastleBottomScroll(0);
           Castle.buildMode = true;
         },
       ],
@@ -1211,6 +1330,8 @@ export class View {
       style: 'castle-bottom-right-scroll-double',
       event: ['click', () => View.scrollHeroLine(1)],
     });
+    View.castleHeroListsBar = DOM({ style: 'castle-hero-lists-bar' });
+    View.castleHeroPinnedEditor = DOM({ style: 'castle-hero-pinned-editor' });
     body.append(
       DOM(
         { style: 'castle-bottom-menu' },
@@ -1225,47 +1346,130 @@ export class View {
       ),
       DOM(
         { style: 'castle-bottom-content-container' },
+        View.castleHeroListsBar,
+        View.castleHeroPinnedEditor,
         View.castleBottom,
         DOM({ style: 'castle-bottom-content-left-scroll' }, View.arrows.ls, View.arrows.ld),
         DOM({ style: 'castle-bottom-content-right-scroll' }, View.arrows.rs, View.arrows.rd),
       ),
     );
 
-    View.updateArrows();
+    // Инициализируем вкладку героев после создания toolbar-контейнера,
+    // чтобы кнопки списков появились сразу при входе в замок.
+    View.bodyCastleHeroes();
+
+    View.resetCastleBottomScroll(Number(View.castleBottom?.scrollLeft) || 0);
 
     return body;
   }
 
   static currentFloatScroll = 0.0;
+  static castleBottomTargetScroll = 0.0;
+  static castleBottomScrollRaf = 0;
 
-  static scrollHero(delta) {
-    let modifier =
-      parseFloat(getComputedStyle(View.castleBottom.firstChild).width) +
-      parseFloat(getComputedStyle(View.castleBottom.firstChild).borderRightWidth);
+  static getCastleBottomMaxScrollLeft() {
+    if (!View.castleBottom) return 0;
+    return Math.max(0, View.castleBottom.scrollWidth - View.castleBottom.clientWidth);
+  }
 
-    let maxScrollLeft = View.castleBottom.scrollWidth - View.castleBottom.clientWidth;
-    if (isNaN(View.currentFloatScroll)) {
-      View.currentFloatScroll = 0;
+  static stopCastleBottomScrollAnimation() {
+    if (!View.castleBottomScrollRaf) return;
+    cancelAnimationFrame(View.castleBottomScrollRaf);
+    View.castleBottomScrollRaf = 0;
+  }
+
+  static animateCastleBottomScroll() {
+    if (!View.castleBottom) {
+      View.castleBottomScrollRaf = 0;
+      return;
     }
-    View.currentFloatScroll += modifier * delta;
-    View.currentFloatScroll = Castle.clamp(View.currentFloatScroll, 0, maxScrollLeft);
-    View.castleBottom.scrollLeft = View.currentFloatScroll;
+    const max = View.getCastleBottomMaxScrollLeft();
+    View.castleBottomTargetScroll = Castle.clamp(View.castleBottomTargetScroll, 0, max);
+    const current = Number(View.castleBottom.scrollLeft) || 0;
+    const target = Number(View.castleBottomTargetScroll) || 0;
+    const diff = target - current;
+    if (Math.abs(diff) <= 0.35) {
+      View.castleBottom.scrollLeft = target;
+      View.currentFloatScroll = target;
+      View.castleBottomScrollRaf = 0;
+      View.updateArrows();
+      return;
+    }
 
+    const next = current + diff * 0.22;
+    View.castleBottom.scrollLeft = next;
+    View.currentFloatScroll = next;
+    View.castleBottomScrollRaf = requestAnimationFrame(() => View.animateCastleBottomScroll());
+  }
+
+  static applyCastleBottomScrollDelta(deltaPx) {
+    if (!View.castleBottom) return;
+    const max = View.getCastleBottomMaxScrollLeft();
+    if (!Number.isFinite(View.castleBottomTargetScroll)) {
+      View.castleBottomTargetScroll = Number(View.castleBottom.scrollLeft) || 0;
+    }
+    View.castleBottomTargetScroll = Castle.clamp(View.castleBottomTargetScroll + deltaPx, 0, max);
+    if (!View.castleBottomScrollRaf) {
+      View.castleBottomScrollRaf = requestAnimationFrame(() => View.animateCastleBottomScroll());
+    }
+  }
+
+  static resetCastleBottomScroll(value = 0) {
+    if (!View.castleBottom) return;
+    View.stopCastleBottomScrollAnimation();
+    const max = View.getCastleBottomMaxScrollLeft();
+    const v = Castle.clamp(Number(value) || 0, 0, max);
+    View.castleBottomTargetScroll = v;
+    View.currentFloatScroll = v;
+    View.castleBottom.scrollLeft = v;
     View.updateArrows();
   }
 
-  static scrollHeroLine(delta) {
-    let width = parseFloat(getComputedStyle(View.castleBottom).width);
+  static scrollCastleBottomToHero(heroId, { center = false } = {}) {
+    const targetHeroId = Number(heroId);
+    if (!View.castleBottom || !Number.isFinite(targetHeroId) || targetHeroId <= 0) return;
+    const item = View.castleBottom.querySelector(`.castle-hero-item[data-hero-id="${targetHeroId}"]`);
+    if (!item) return;
 
-    let maxScrollLeft = View.castleBottom.scrollWidth - View.castleBottom.clientWidth;
-    if (isNaN(View.currentFloatScroll)) {
-      View.currentFloatScroll = 0;
+    const max = View.getCastleBottomMaxScrollLeft();
+    let target = Number(item.offsetLeft) || 0;
+    if (center) {
+      target = target - (View.castleBottom.clientWidth - item.clientWidth) / 2;
+    } else {
+      // Scroll only when selected hero starts touching/leaving edges.
+      const current = Number(View.castleBottom.scrollLeft) || 0;
+      const edgePad = Math.max(12, Math.round(item.clientWidth * 1.5));
+      const itemLeft = Number(item.offsetLeft) || 0;
+      const itemRight = itemLeft + (Number(item.offsetWidth) || 0);
+      const safeLeft = current + edgePad;
+      const safeRight = current + View.castleBottom.clientWidth - edgePad;
+
+      if (itemLeft < safeLeft) {
+        target = itemLeft - edgePad;
+      } else if (itemRight > safeRight) {
+        target = itemRight - View.castleBottom.clientWidth + edgePad;
+      } else {
+        return;
+      }
     }
-    View.currentFloatScroll += width * delta;
-    View.currentFloatScroll = Castle.clamp(View.currentFloatScroll, 0, maxScrollLeft);
-    View.castleBottom.scrollLeft = View.currentFloatScroll;
+    View.castleBottomTargetScroll = Castle.clamp(target, 0, max);
+    if (!View.castleBottomScrollRaf) {
+      View.castleBottomScrollRaf = requestAnimationFrame(() => View.animateCastleBottomScroll());
+    }
+  }
 
-    View.updateArrows();
+  static scrollHero(delta) {
+    if (!View.castleBottom?.firstChild) return;
+    const style = getComputedStyle(View.castleBottom.firstChild);
+    const itemWidth = parseFloat(style.width) || View.castleBottom.clientHeight;
+    const itemBorder = parseFloat(style.borderRightWidth) || 0;
+    const modifier = itemWidth + itemBorder;
+    View.applyCastleBottomScrollDelta(modifier * delta);
+  }
+
+  static scrollHeroLine(delta) {
+    const width = parseFloat(getComputedStyle(View.castleBottom).width) || View.castleBottom.clientWidth;
+    View.applyCastleBottomScrollDelta(width * delta);
   }
 
   static updateArrows() {
@@ -1398,10 +1602,38 @@ export class View {
       btnDown.classList.toggle('disabled', noScroll || start >= maxStart);
     }
 
+    list.addEventListener(
+      'wheel',
+      (event) => {
+        if (items.length <= PAGE) return;
+        if (!event.deltaY) return;
+        event.preventDefault();
+        const maxStart = Math.max(0, items.length - PAGE);
+        if (event.deltaY > 0) {
+          if (start < maxStart) {
+            start++;
+            render();
+          }
+        } else if (start > 0) {
+          start--;
+          render();
+        }
+      },
+      { passive: false },
+    );
+
     render();
   }
 
   static bodyCastleBuildings() {
+    View.castleActiveTab = 'buildings';
+    View.castleHeroDeleteConfirmListId = 0;
+    View.castleFriendClearConfirm = false;
+    View.cleanupCastleHeroPhantomList();
+    View.castleHeroListsBar?.classList?.add('castle-hero-lists-bar-hidden');
+    View.castleHeroListsBar?.replaceChildren?.();
+    View.castleHeroPinnedEditor?.replaceChildren?.();
+    View.castleBottom?.classList?.remove('castle-bottom-content-with-editor');
     while (View.castleBottom.firstChild) {
       View.castleBottom.firstChild.remove();
     }
@@ -1459,50 +1691,1062 @@ export class View {
     }
   }
 
+  static getCastleHeroFavouriteMask(hero) {
+    const raw = Number(hero?.favourite);
+    if (!Number.isFinite(raw)) return 0;
+    return Math.max(0, Math.min(255, raw | 0));
+  }
+
+  static isCastleHeroInList(hero, listId) {
+    if (!Number.isFinite(listId) || listId < 1 || listId > View.CASTLE_HERO_LISTS_MAX) return false;
+    const mask = View.getCastleHeroFavouriteMask(hero);
+    return (mask & (1 << (listId - 1))) !== 0;
+  }
+
+  static getCastleCreatedHeroListCount() {
+    let maxList = 0;
+    for (const hero of View.castleHeroAll || []) {
+      const mask = View.getCastleHeroFavouriteMask(hero);
+      for (let bit = 0; bit < View.CASTLE_HERO_LISTS_MAX; bit++) {
+        if (mask & (1 << bit)) {
+          maxList = Math.max(maxList, bit + 1);
+        }
+      }
+    }
+    return maxList;
+  }
+
+  static persistCastleHeroSelectedList() {
+    try {
+      localStorage.setItem(View.CASTLE_HERO_LIST_STORAGE_KEY, String(View.castleHeroSelectedList || 0));
+    } catch {}
+  }
+
+  static loadCastleHeroSelectedList() {
+    try {
+      const value = Number(localStorage.getItem(View.CASTLE_HERO_LIST_STORAGE_KEY));
+      if (Number.isFinite(value) && value >= 0 && value <= View.CASTLE_HERO_LISTS_MAX) {
+        View.castleHeroSelectedList = value;
+      }
+    } catch {}
+  }
+
+  static cleanupCastleHeroPhantomList() {
+    if (!View.castleHeroPhantomList) return;
+    const hasHeroes = (View.castleHeroAll || []).some((hero) => View.isCastleHeroInList(hero, View.castleHeroPhantomList));
+    if (hasHeroes) {
+      View.castleHeroPhantomList = 0;
+      return;
+    }
+    if (View.castleHeroSelectedList === View.castleHeroPhantomList) {
+      View.castleHeroSelectedList = 0;
+    }
+    View.castleHeroPhantomList = 0;
+    View.castleHeroListEditMode = '';
+    View.castleHeroEditSelection = new Set();
+  }
+
+  static async updateCastleHeroListBackend(action, listId, heroIds = []) {
+    try {
+      await App.api.request('build', 'favouriteSet', {
+        action,
+        list: listId,
+        heroes: heroIds,
+      });
+    } catch (error) {
+      App.error(error);
+    }
+  }
+
+  static patchCastleHeroListLocal(action, listId, heroIds = []) {
+    const bit = 1 << (listId - 1);
+    const heroIdSet = new Set((heroIds || []).map((id) => Number(id)));
+    for (const hero of View.castleHeroAll || []) {
+      const heroId = Number(hero?.id);
+      if (action === 'clear' || heroIdSet.has(heroId)) {
+        let mask = View.getCastleHeroFavouriteMask(hero);
+        if (action === 'add') mask = mask | bit;
+        else mask = mask & (255 ^ bit);
+        hero.favourite = mask;
+      }
+    }
+  }
+
+  static getCastleListButtonLabel(listId) {
+    return listId === 0 ? '' : String(listId);
+  }
+
+  static loadCastleHeroListNames() {
+    try {
+      const raw = localStorage.getItem(View.CASTLE_HERO_LIST_NAMES_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      const names = {};
+      for (let i = 1; i <= View.CASTLE_HERO_LISTS_MAX; i++) {
+        const value = String(parsed?.[i] || '').trim();
+        if (value) names[i] = value;
+      }
+      View.castleHeroListNames = names;
+    } catch {
+      View.castleHeroListNames = {};
+    }
+  }
+
+  static persistCastleHeroListNames() {
+    try {
+      localStorage.setItem(View.CASTLE_HERO_LIST_NAMES_STORAGE_KEY, JSON.stringify(View.castleHeroListNames || {}));
+    } catch {}
+  }
+
+  static getCastleHeroListName(listId) {
+    const id = Number(listId) || 0;
+    const custom = String(View.castleHeroListNames?.[id] || '').trim();
+    return custom || `Список ${id}`;
+  }
+
+  static setCastleHeroListName(listId, value) {
+    const id = Number(listId) || 0;
+    if (id < 1 || id > View.CASTLE_HERO_LISTS_MAX) return;
+    const name = String(value || '').trim().slice(0, 32);
+    if (name) View.castleHeroListNames[id] = name;
+    else delete View.castleHeroListNames[id];
+    View.persistCastleHeroListNames();
+  }
+
+  static openCastleHeroListRenameDialog(listId) {
+    const id = Number(listId) || 0;
+    if (id < 1 || id > View.CASTLE_HERO_LISTS_MAX) return;
+    const close = DOM({
+      tag: 'div',
+      domaudio: domAudioPresets.closeButton,
+      style: 'close-button',
+      event: ['click', () => Splash.hide()],
+    });
+    close.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+    const template = document.createDocumentFragment();
+    const modal = DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, Lang.text('assembly')));
+    const name = DOM({
+      id: 'build-create-input',
+      domaudio: domAudioPresets.defaultInput,
+      tag: 'input',
+      placeholder: Lang.text('buildNamePlaceholder'),
+      value: String(View.castleHeroListNames?.[id] || ''),
+    });
+    const button = DOM(
+      {
+        style: 'splash-content-button-modal',
+        domaudio: domAudioPresets.bigButton,
+        event: [
+          'click',
+          () => {
+            View.setCastleHeroListName(id, name.value);
+            Splash.hide();
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      Lang.text('renameBuild'),
+    );
+    template.append(modal, name, button, close);
+    Splash.show(template);
+    setTimeout(() => name.focus(), 0);
+  }
+
+  static renderCastleHeroListsToolbar() {
+    const bar = View.castleHeroListsBar;
+    if (!bar) return;
+    bar.classList.remove('castle-friend-lists-bar');
+    bar.replaceChildren();
+
+    const createdCount = View.getCastleCreatedHeroListCount();
+    const visibleCount = Math.max(createdCount, View.castleHeroPhantomList || 0);
+
+    const allBtn = DOM(
+      {
+        style: ['castle-hero-list-btn', 'castle-hero-list-btn-all', View.castleHeroSelectedList === 0 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        title: Lang.text('titleheroes'),
+        event: [
+          'click',
+          () => {
+            View.castleHeroSelectedList = 0;
+            View.castleHeroListEditMode = '';
+            View.castleHeroEditSelection = new Set();
+            View.castleHeroDeleteConfirmListId = 0;
+            View.cleanupCastleHeroPhantomList();
+            View.persistCastleHeroSelectedList();
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      View.getCastleListButtonLabel(0),
+    );
+    bar.append(allBtn);
+
+    for (let i = 1; i <= View.CASTLE_HERO_LISTS_MAX; i++) {
+      if (i > visibleCount) continue;
+      const isActive = View.castleHeroSelectedList === i;
+      const isPhantom = View.castleHeroPhantomList === i;
+      const btn = DOM(
+        {
+          style: ['castle-hero-list-btn', isActive ? 'castle-hero-list-btn-active' : null, isPhantom ? 'castle-hero-list-btn-phantom' : null].filter(Boolean),
+          domaudio: domAudioPresets.defaultButton,
+          title: View.getCastleHeroListName(i),
+          event: [
+            'click',
+            () => {
+              if (!isPhantom) {
+                View.cleanupCastleHeroPhantomList();
+              }
+              View.castleHeroSelectedList = i;
+              if (isPhantom && !View.castleHeroListEditMode) View.castleHeroListEditMode = 'add';
+              View.castleHeroEditSelection = new Set();
+              View.castleHeroDeleteConfirmListId = 0;
+              View.persistCastleHeroSelectedList();
+              View.renderCastleHeroesFromCache();
+            },
+          ],
+        },
+        View.getCastleListButtonLabel(i),
+      );
+      bar.append(btn);
+    }
+
+    if (visibleCount < View.CASTLE_HERO_LISTS_MAX) {
+      const addBtn = DOM(
+        {
+          style: ['castle-hero-list-btn', 'castle-hero-list-btn-add'],
+          domaudio: domAudioPresets.defaultButton,
+          event: [
+            'click',
+            () => {
+              if (View.castleHeroPhantomList) {
+                View.castleHeroSelectedList = View.castleHeroPhantomList;
+              } else {
+                View.castleHeroPhantomList = visibleCount + 1;
+                View.castleHeroSelectedList = View.castleHeroPhantomList;
+              }
+              View.castleHeroListEditMode = 'add';
+              View.castleHeroEditSelection = new Set();
+              View.castleHeroDeleteConfirmListId = 0;
+              View.persistCastleHeroSelectedList();
+              View.renderCastleHeroesFromCache();
+            },
+          ],
+        },
+        '',
+      );
+      bar.append(addBtn);
+    }
+
+    const search = DOM({
+      tag: 'input',
+      style: 'castle-hero-list-search',
+      placeholder: Lang.text('castleHeroFilterPlaceholder'),
+      value: View.castleHeroSearch || '',
+      event: [
+        'input',
+        (event) => {
+          View.castleHeroSearch = String(event?.target?.value || '');
+          /* Не пересобирать toolbar: replaceChildren() снимает фокус с input */
+          View.renderCastleHeroesFromCache({ refreshToolbar: false });
+        },
+      ],
+    });
+    bar.append(search);
+
+  }
+
+  static buildCastleHeroListEditorCard(listId) {
+    const mode = View.castleHeroListEditMode || '';
+    const listName = View.getCastleHeroListName(listId);
+    const modeClass = mode === 'add'
+      ? 'castle-hero-list-editor-mode-add'
+      : mode === 'remove'
+        ? 'castle-hero-list-editor-mode-remove'
+        : 'castle-hero-list-editor-mode-idle';
+    const titleText = mode === 'add'
+      ? `Добавить выбранных героев в ${listName}`
+      : mode === 'remove'
+        ? `Удалить выбранных героев из ${listName}`
+        : listName;
+    const totalHeroes = (View.castleHeroAll || []).length;
+    let heroesInList = 0;
+    for (const hero of View.castleHeroAll || []) {
+      if (View.isCastleHeroInList(hero, listId)) heroesInList++;
+    }
+    const canAddToList = totalHeroes > 0 && heroesInList < totalHeroes;
+    const canRemoveFromList = heroesInList > 0;
+
+    const topPlus = DOM(
+      {
+        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-add', canAddToList ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!canAddToList) return;
+            View.castleHeroListEditMode = 'add';
+            View.castleHeroEditSelection = new Set();
+            View.castleHeroDeleteConfirmListId = 0;
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      '',
+    );
+    const bottomMinus = DOM(
+      {
+        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-remove', canRemoveFromList ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!canRemoveFromList) return;
+            View.castleHeroListEditMode = 'remove';
+            View.castleHeroEditSelection = new Set();
+            View.castleHeroDeleteConfirmListId = 0;
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      '',
+    );
+
+    const confirm = DOM(
+      {
+        style: ['castle-hero-list-editor-confirm', 'castle-hero-list-editor-confirm-action'],
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          async () => {
+            const selectedCount = View.castleHeroEditSelection?.size || 0;
+            if (!selectedCount) return;
+            const currentMode = View.castleHeroListEditMode || '';
+            const action = currentMode === 'add' ? 'add' : 'remove';
+            const heroIds = Array.from(View.castleHeroEditSelection || []);
+            await View.updateCastleHeroListBackend(action, listId, heroIds);
+            View.patchCastleHeroListLocal(action, listId, heroIds);
+            View.castleHeroEditSelection = new Set();
+            View.castleHeroListEditMode = '';
+            View.castleHeroDeleteConfirmListId = 0;
+            View.cleanupCastleHeroPhantomList();
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      'Подтвердить',
+    );
+    const clear = DOM(
+      {
+        style: ['castle-hero-list-editor-confirm', 'castle-hero-list-editor-delete-action'],
+        domaudio: domAudioPresets.defaultButton,
+        title: `Удалить список ${listId}`,
+        event: [
+          'click',
+          async () => {
+            if (View.castleHeroDeleteConfirmListId !== listId) {
+              View.castleHeroDeleteConfirmListId = listId;
+              View.renderCastleHeroesFromCache({ refreshToolbar: false });
+              return;
+            }
+            await View.updateCastleHeroListBackend('clear', listId, []);
+            View.patchCastleHeroListLocal('clear', listId, []);
+            View.setCastleHeroListName(listId, '');
+            View.castleHeroEditSelection = new Set();
+            View.castleHeroListEditMode = '';
+            View.castleHeroDeleteConfirmListId = 0;
+            View.cleanupCastleHeroPhantomList();
+            View.renderCastleHeroesFromCache();
+          },
+        ],
+      },
+      View.castleHeroDeleteConfirmListId === listId ? Lang.text('confirmAction') : 'Удалить список',
+    );
+
+    const middle = DOM(
+      {
+        style: 'castle-hero-list-editor-middle',
+        event: [
+          'click',
+          (event) => {
+            event.preventDefault();
+            View.openCastleHeroListRenameDialog(listId);
+          },
+        ],
+      },
+      DOM({}, titleText),
+    );
+    middle.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      View.openCastleHeroListRenameDialog(listId);
+      return false;
+    });
+
+    return DOM(
+      { style: ['castle-hero-item', 'castle-hero-list-editor-item', modeClass] },
+      DOM({ style: 'castle-item-background' }),
+      DOM({ style: 'castle-item-ornament' }),
+      DOM({ style: 'castle-hero-list-editor-top' }, topPlus, bottomMinus),
+      middle,
+      DOM({ style: 'castle-hero-list-editor-bottom' }, confirm, clear),
+    );
+  }
+
+  static renderCastleHeroesFromCache(options = {}) {
+    if (!View.castleBottom) return;
+    if (options.refreshToolbar !== false) {
+      View.renderCastleHeroListsToolbar();
+    }
+
+    const selectedList = Number(View.castleHeroSelectedList) || 0;
+    if (View.castleHeroPrevSelectedList !== selectedList) {
+      View.castleHeroEditSelection = new Set();
+      View.castleHeroDeleteConfirmListId = 0;
+      View.castleHeroPrevSelectedList = selectedList;
+    }
+    const editMode = selectedList > 0 ? View.castleHeroListEditMode : '';
+    const searchValue = String(View.castleHeroSearch || '').trim().toLowerCase();
+    const preload = new PreloadImages(View.castleBottom);
+    const pinnedEditorRoot = View.castleHeroPinnedEditor;
+    let renderedHeroCount = 0;
+
+    View.castleBottom.replaceChildren();
+    pinnedEditorRoot?.replaceChildren?.();
+    View.castleBottom.classList.toggle('castle-bottom-content-with-editor', selectedList > 0);
+
+    if (selectedList > 0) {
+      pinnedEditorRoot?.append(View.buildCastleHeroListEditorCard(selectedList));
+    }
+
+    for (let item of View.castleHeroAll || []) {
+      const localizedNameRaw = String(Lang.heroName(item.id, item.skin) || item.name || `Hero ${item.id}`);
+      const localizedName = localizedNameRaw.replace(/<[^>]*>/g, '').trim();
+      const fallbackName = String(item?.name || '').replace(/<[^>]*>/g, '').trim();
+      const customNames = getHeroSearchAliases(item.id)
+        .map((name) => String(name).replace(/<[^>]*>/g, '').trim())
+        .filter(Boolean)
+        .join(' ');
+      const filterHaystack = `${localizedName} ${fallbackName} ${customNames}`.toLowerCase();
+      if (searchValue && !filterHaystack.includes(searchValue)) {
+        continue;
+      }
+
+      if (selectedList > 0) {
+        const inList = View.isCastleHeroInList(item, selectedList);
+        if (!editMode && !inList) continue;
+        if (editMode === 'add' && inList) continue;
+        if (editMode === 'remove' && !inList) continue;
+      }
+
+      const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, localizedName));
+      if (localizedName.length > 10) {
+        heroName.firstChild.classList.add('castle-name-autoscroll');
+      }
+      let heroNameBase = DOM({ style: ['castle-item-hero-name', 'hover-brightness'] }, heroName);
+      let rank = Rank.createRankNode(item.rating, { stylePrefix: 'castle-hero-' });
+      const hero = DOM(
+        {
+          domaudio: domAudioPresets.defaultButton,
+          id: `id${item.id}`,
+          style: ['castle-hero-item', 'hover-brightness'],
+        },
+        DOM({ style: ['castle-item-background', 'hover-brightness'] }),
+        DOM({ style: ['castle-hero-item-bg', 'hover-brightness'] }),
+        DOM({ style: ['castle-hero-item-img', 'no-hover-brightness'] }),
+        DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+        rank,
+        heroNameBase,
+      );
+
+      hero.dataset.heroId = String(item.id);
+      hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
+
+      if (editMode) {
+        const selected = View.castleHeroEditSelection.has(Number(item.id));
+        const pick = DOM({ style: ['castle-hero-list-pick', selected ? 'castle-hero-list-pick-active' : null].filter(Boolean) }, '');
+        hero.append(pick);
+        hero.addEventListener('click', () => {
+          const heroId = Number(item.id);
+          const isSelected = View.castleHeroEditSelection.has(heroId);
+          if (isSelected) View.castleHeroEditSelection.delete(heroId);
+          else View.castleHeroEditSelection.add(heroId);
+          pick.classList.toggle('castle-hero-list-pick-active', !isSelected);
+        });
+      } else {
+        hero.addEventListener('click', async () => {
+          View.setCastleOpenedBuildHero(item.id);
+          await Window.show('main', 'build', item.id, 0, true);
+          View.syncCastleOpenedBuildHeroGlow();
+        });
+      }
+
+      preload.add(hero);
+      renderedHeroCount++;
+    }
+
+    if (renderedHeroCount === 0) {
+      const emptyText = searchValue ? 'Ничего не найдено' : 'Список пуст';
+      View.castleBottom.append(
+        DOM(
+          { style: ['castle-hero-item', 'castle-hero-list-empty-item'] },
+          DOM({ style: 'castle-item-background' }),
+          DOM({ style: 'castle-item-ornament' }),
+          DOM({ style: 'castle-hero-list-empty-label' }, emptyText),
+        ),
+      );
+    }
+
+    View.syncCastleOpenedBuildHeroGlow();
+    View.updateArrows();
+  }
+
+  static loadCastleFriendSelectedList() {
+    try {
+      const value = Number(localStorage.getItem(View.CASTLE_FRIEND_LIST_STORAGE_KEY));
+      if (Number.isFinite(value) && value >= 0 && value <= View.CASTLE_FRIEND_LISTS_MAX) {
+        View.castleFriendSelectedList = value;
+      }
+    } catch {}
+  }
+
+  static persistCastleFriendSelectedList() {
+    try {
+      localStorage.setItem(View.CASTLE_FRIEND_LIST_STORAGE_KEY, String(View.castleFriendSelectedList || 0));
+    } catch {}
+  }
+
+  static isCastleFriendInList(item, listId) {
+    if (!Number.isFinite(listId) || listId < 1 || listId > 8) return false;
+    const mask = Number(item?.favourite) || 0;
+    return (mask & (1 << (listId - 1))) !== 0;
+  }
+
+  static patchCastleFriendListLocal(action, listId, friendIds = []) {
+    const bit = 1 << (listId - 1);
+    const ids = new Set((friendIds || []).map((id) => Number(id)));
+    for (const item of View.castleFriendAll || []) {
+      const id = Number(item?.id);
+      if (action === 'clear' || ids.has(id)) {
+        let mask = Number(item?.favourite) || 0;
+        if (action === 'add') mask = mask | bit;
+        else mask = mask & (255 ^ bit);
+        item.favourite = mask;
+      }
+    }
+  }
+
+  static async updateCastleFriendListBackend(action, listId, friendIds = []) {
+    try {
+      await App.api.request('friend', 'favouriteSet', {
+        action,
+        list: listId,
+        friends: friendIds,
+      });
+    } catch (error) {
+      App.error(error);
+    }
+  }
+
+  static renderCastleFriendListsToolbar() {
+    const bar = View.castleHeroListsBar;
+    if (!bar) return;
+    bar.replaceChildren();
+    bar.classList.remove('castle-hero-lists-bar-hidden');
+    bar.classList.add('castle-friend-lists-bar');
+
+    const allBtn = DOM(
+      {
+        style: ['castle-hero-list-btn', 'castle-hero-list-btn-all', 'castle-friend-list-btn-all', View.castleFriendSelectedList === 0 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        title: Lang.text('titlefriends'),
+        event: [
+          'click',
+          () => {
+            View.castleFriendSelectedList = 0;
+            View.castleFriendListEditMode = '';
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendClearConfirm = false;
+            View.persistCastleFriendSelectedList();
+            View.renderCastleFriendsFromCache();
+          },
+        ],
+      },
+      '',
+    );
+    bar.append(allBtn);
+
+    const favBtn = DOM(
+      {
+        style: ['castle-hero-list-btn', 'castle-friend-list-btn-fav', View.castleFriendSelectedList === 1 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            View.castleFriendSelectedList = 1;
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendClearConfirm = false;
+            View.persistCastleFriendSelectedList();
+            View.renderCastleFriendsFromCache();
+          },
+        ],
+      },
+      '',
+    );
+    bar.append(favBtn);
+
+    const search = DOM({
+      tag: 'input',
+      style: 'castle-hero-list-search',
+      placeholder: Lang.text('friendNicknamePlaceholder'),
+      value: View.castleFriendSearch || '',
+      event: [
+        'input',
+        (event) => {
+          View.castleFriendSearch = String(event?.target?.value || '');
+          View.renderCastleFriendsFromCache({ refreshToolbar: false });
+        },
+      ],
+    });
+    bar.append(search);
+  }
+
+  static buildCastleFriendListEditorCard() {
+    const mode = View.castleFriendListEditMode || '';
+    let friendsInList = 0;
+    for (const f of View.castleFriendAll || []) {
+      if (Number(f?.status) === 1 && View.isCastleFriendInList(f, 1)) friendsInList++;
+    }
+    const totalFriends = (View.castleFriendAll || []).filter((f) => Number(f?.status) === 1).length;
+    const canAdd = totalFriends > 0 && friendsInList < totalFriends;
+    const canRemove = friendsInList > 0;
+
+    const topPlus = DOM(
+      {
+        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-add', canAdd ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!canAdd) return;
+            View.castleFriendListEditMode = 'add';
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendClearConfirm = false;
+            View.renderCastleFriendsFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      '',
+    );
+    const bottomMinus = DOM(
+      {
+        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-remove', canRemove ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!canRemove) return;
+            View.castleFriendListEditMode = 'remove';
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendClearConfirm = false;
+            View.renderCastleFriendsFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      '',
+    );
+
+    const confirm = DOM(
+      {
+        style: ['castle-hero-list-editor-confirm', 'castle-hero-list-editor-confirm-action'],
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          async () => {
+            const selectedCount = View.castleFriendEditSelection?.size || 0;
+            if (!selectedCount) return;
+            const ids = Array.from(View.castleFriendEditSelection || []);
+            const currentMode = View.castleFriendListEditMode || '';
+            if (currentMode === 'add') {
+              await View.updateCastleFriendListBackend('add', 1, ids);
+              View.patchCastleFriendListLocal('add', 1, ids);
+            } else {
+              await View.updateCastleFriendListBackend('remove', 1, ids);
+              View.patchCastleFriendListLocal('remove', 1, ids);
+            }
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendListEditMode = '';
+            View.castleFriendClearConfirm = false;
+            View.renderCastleFriendsFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      'Подтвердить',
+    );
+
+    const clear = DOM(
+      {
+        style: ['castle-hero-list-editor-confirm', 'castle-hero-list-editor-delete-action'],
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          async () => {
+            if (!View.castleFriendClearConfirm) {
+              View.castleFriendClearConfirm = true;
+              View.renderCastleFriendsFromCache({ refreshToolbar: false });
+              return;
+            }
+            await View.updateCastleFriendListBackend('clear', 1, []);
+            View.patchCastleFriendListLocal('clear', 1, []);
+            View.castleFriendEditSelection = new Set();
+            View.castleFriendListEditMode = '';
+            View.castleFriendClearConfirm = false;
+            View.castleFriendSelectedList = 0;
+            View.persistCastleFriendSelectedList();
+            View.renderCastleFriendsFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      View.castleFriendClearConfirm ? Lang.text('confirmAction') : Lang.text('friendListClear'),
+    );
+
+    const modeClass = mode === 'add'
+      ? 'castle-hero-list-editor-mode-add'
+      : mode === 'remove'
+        ? 'castle-hero-list-editor-mode-remove'
+        : 'castle-hero-list-editor-mode-idle';
+    const titleText = mode === 'add' ? 'Добавить друзей в список' : mode === 'remove' ? 'Удалить друзей из списка' : 'Избранные друзья';
+
+    return DOM(
+      { style: ['castle-hero-item', 'castle-hero-list-editor-item', modeClass] },
+      DOM({ style: 'castle-item-background' }),
+      DOM({ style: 'castle-item-ornament' }),
+      DOM({ style: 'castle-hero-list-editor-top' }, topPlus, bottomMinus),
+      DOM({ style: 'castle-hero-list-editor-middle' }, DOM({}, titleText)),
+      DOM({ style: 'castle-hero-list-editor-bottom' }, confirm, clear),
+    );
+  }
+
+  static renderCastleFriendsFromCache(options = {}) {
+    if (!View.castleBottom) return;
+    if (options.refreshToolbar !== false) {
+      View.renderCastleFriendListsToolbar();
+    }
+
+    const selectedList = Number(View.castleFriendSelectedList) || 0;
+    const editMode = selectedList > 0 ? View.castleFriendListEditMode : '';
+    const searchValue = String(View.castleFriendSearch || '').trim().toLowerCase();
+    const pinnedEditorRoot = View.castleHeroPinnedEditor;
+    const preload = new PreloadImages(View.castleBottom);
+
+    View.castleBottom.replaceChildren();
+    pinnedEditorRoot?.replaceChildren?.();
+    View.castleBottom.classList.toggle('castle-bottom-content-with-editor', selectedList > 0);
+    if (selectedList > 0) {
+      pinnedEditorRoot?.append(View.buildCastleFriendListEditorCard());
+    }
+
+    const modal = DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, Lang.text('searchForFriends')));
+    const buttonAdd = DOM(
+      {
+        style: 'castle-friend-item',
+        onclick: () => {
+          let input = DOM({
+            tag: 'input',
+            domaudio: domAudioPresets.defaultInput,
+            style: 'search-input',
+            id: 'search-friend-window-input',
+            placeholder: Lang.text('friendNicknamePlaceholder'),
+          });
+          let body = DOM({ style: 'search-body' });
+          let closeButton = DOM({
+            tag: 'div',
+            domaudio: domAudioPresets.closeButton,
+            style: 'close-button',
+            event: ['click', () => Splash.hide()],
+          });
+          closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+          let search = DOM({ style: 'search' }, modal, input, body, closeButton);
+          const inviteFromFavList = (Number(View.castleFriendSelectedList) || 0) === 1;
+          input.addEventListener('input', async () => {
+            const request = await App.api.request('user', 'find', { nickname: input.value });
+            while (body.firstChild) body.firstChild.remove();
+            for (const found of request || []) {
+              const openAdminFoundUserModal = () => {
+                let adminBody = document.createDocumentFragment();
+                adminBody.append(
+                  DOM({}, found.nickname),
+                  DOM(
+                    {
+                      domaudio: domAudioPresets.bigButton,
+                      style: 'splash-content-button',
+                      event: [
+                        'click',
+                        async () => {
+                          await App.api.request('user', 'blocked', { id: found.id });
+                          Splash.hide();
+                        },
+                      ],
+                    },
+                    found.blocked ? 'Разблокировать' : 'Заблокировать',
+                  ),
+                  DOM(
+                    {
+                      domaudio: domAudioPresets.bigButton,
+                      style: 'splash-content-button',
+                      event: [
+                        'click',
+                        async () => {
+                          await App.api.request('user', 'mute', { id: found.id });
+                          Splash.hide();
+                        },
+                      ],
+                    },
+                    found.mute ? 'Убрать мут' : 'Мут чата',
+                  ),
+                  DOM(
+                    {
+                      domaudio: domAudioPresets.bigButton,
+                      style: 'splash-content-button',
+                      event: [
+                        'click',
+                        async () => {
+                          let password = await App.api.request('user', 'restore', { id: found.id });
+                          App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
+                          navigator.clipboard.writeText(password);
+                        },
+                      ],
+                    },
+                    'Сброс пароля',
+                  ),
+                  DOM(
+                    {
+                      domaudio: domAudioPresets.closeButton,
+                      style: 'splash-content-button',
+                      event: ['click', () => Splash.hide()],
+                    },
+                    Lang.text('cancel'),
+                  ),
+                );
+                Splash.show(adminBody);
+              };
+
+              const template = DOM(
+                {
+                  domaudio: domAudioPresets.defaultButton,
+                  event: [
+                    'click',
+                    async () => {
+                      await App.api.request('friend', 'request', { id: found.id, fromFav: inviteFromFavList ? 1 : 0 });
+                      if (inviteFromFavList) {
+                        View.patchCastleFriendListLocal('add', 1, [found.id]);
+                        await View.updateCastleFriendListBackend('add', 1, [found.id]);
+                      }
+                      App.notify(`Заявка в друзья ${found.nickname} отправлена`, 1000);
+                      Splash.hide();
+                      View.bodyCastleFriends();
+                    },
+                  ],
+                },
+                found.nickname,
+              );
+
+              if (App.isAdmin() && ('blocked' in found)) {
+                template.addEventListener('contextmenu', (event) => {
+                  event.preventDefault();
+                  openAdminFoundUserModal();
+                  return false;
+                });
+                if (found.mute) template.style.color = 'yellow';
+                if (found.blocked) template.style.color = 'red';
+              }
+
+              body.append(template);
+            }
+          });
+          Splash.show(search, false);
+          input.focus();
+        },
+      },
+      DOM(
+        { style: 'castle-friend-item-middle' },
+        DOM({ style: 'castle-item-hero-name' }, DOM({ style: ['castle-hero-name', 'add-to-friend-text'] }, DOM({ tag: 'span' }, Lang.text('addFriend')))),
+        DOM({ src: 'content/hero/addFriend.png', style: 'addToFriendIcon', tag: 'img' }),
+        DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+        DOM({ style: 'castle-friend-item-bottom' }, DOM({ style: ['castle-friend-add-group', 'add-to-friend-button'] }, Lang.text('inviteToAFriend'))),
+      ),
+    );
+    buttonAdd.dataset.url = `content/hero/empty.png`;
+    preload.add(buttonAdd);
+    View.castleBottom.append(buttonAdd);
+
+    for (let item of View.castleFriendAll || []) {
+      const status = Number(item?.status);
+      const nickname = String(item?.nickname || '');
+      if (searchValue && !nickname.toLowerCase().includes(searchValue)) continue;
+      const inList = status === 1 && View.isCastleFriendInList(item, 1);
+      if (selectedList > 0) {
+        const inFavList = View.isCastleFriendInList(item, 1);
+        if (editMode) {
+          if (status !== 1) continue;
+          if (editMode === 'add' && inFavList) continue;
+          if (editMode === 'remove' && !inFavList) continue;
+        } else {
+          if (!inFavList) continue;
+        }
+      }
+
+      const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, nickname));
+      if (nickname.length > 10) heroName.firstChild.classList.add('castle-name-autoscroll');
+      let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
+      let bottom = DOM({ style: 'castle-friend-item-bottom' });
+      let friend = DOM(
+        { style: 'castle-friend-item' },
+        DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
+        heroNameBase,
+        bottom,
+      );
+
+      if (editMode && status === 1) {
+        const selected = View.castleFriendEditSelection.has(Number(item.id));
+        const pick = DOM({ style: ['castle-hero-list-pick', selected ? 'castle-hero-list-pick-active' : null].filter(Boolean) });
+        friend.append(pick);
+        friend.addEventListener('click', () => {
+          const id = Number(item.id);
+          const isSelected = View.castleFriendEditSelection.has(id);
+          if (isSelected) View.castleFriendEditSelection.delete(id);
+          else View.castleFriendEditSelection.add(id);
+          pick.classList.toggle('castle-hero-list-pick-active', !isSelected);
+        });
+      } else {
+        // Keep existing friend actions in non-edit mode (copied minimal core behavior).
+        if (status == 1) {
+          let group = DOM({ style: 'castle-friend-add-group' }, item.online ? Lang.text('inviteToAGroup') : Lang.text('friendIsOffline'));
+          let call = DOM({ style: 'castle-friend-add-group' }, Lang.text('callAFriend'));
+          if (!item.online) {
+            group.style.filter = 'grayscale(0.8)';
+            call.style.filter = 'grayscale(.8)';
+          } else {
+            group.onclick = async () => {
+              await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
+              App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
+            };
+            call.onclick = async () => {
+              try {
+                let voice = new Voice(item.id, 'friend', item.nickname, true);
+                await voice.call();
+              } catch (error) {
+                App.error(error);
+              }
+            };
+          }
+          friend.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            let body = document.createDocumentFragment();
+            const modal = DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, Lang.text('friends')));
+            let removeButton = DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'splash-content-button',
+                event: [
+                  'click',
+                  async () => {
+                    await App.api.request('friend', 'remove', {
+                      id: item.id,
+                    });
+                    friend.remove();
+                    Splash.hide();
+                  },
+                ],
+              },
+              Lang.text('friendRemove'),
+            );
+            let cancelButton = DOM(
+              {
+                domaudio: domAudioPresets.closeButton,
+                style: 'splash-content-button',
+                event: ['click', () => Splash.hide()],
+              },
+              Lang.text('friendCancle'),
+            );
+            body.append(modal, DOM({ id: 'friendRemoveText' }, Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), removeButton, cancelButton);
+            Splash.show(body);
+            return false;
+          });
+          bottom.append(call, group);
+        } else if (status == 2) {
+          bottom.append(
+            DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'castle-friend-confirm',
+                event: ['click', async () => {
+                  await App.api.request('friend', 'accept', { id: item.id });
+                  View.bodyCastleFriends();
+                }],
+              },
+              Lang.text('friendAccept'),
+            ),
+            DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'castle-friend-cancel',
+                event: ['click', async () => {
+                  await App.api.request('friend', 'remove', { id: item.id });
+                  View.bodyCastleFriends();
+                }],
+              },
+              Lang.text('friendDecline'),
+            ),
+          );
+        } else if (status == 3) {
+          friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('friendAcceptWaiting'))));
+          friend.style.filter = 'grayscale(1)';
+          bottom.append(
+            DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'castle-friend-cancel',
+                event: ['click', async () => {
+                  await App.api.request('friend', 'remove', { id: item.id });
+                  View.bodyCastleFriends();
+                }],
+              },
+              Lang.text('cancel'),
+            ),
+          );
+        }
+      }
+
+      friend.dataset.url = `content/hero/friendLogo.png`;
+      preload.add(friend);
+    }
+
+    View.updateArrows();
+  }
+
   static bodyCastleHeroes() {
-    let preload = new PreloadImages(View.castleBottom);
+    View.castleActiveTab = 'heroes';
+    View.castleHeroDeleteConfirmListId = 0;
+    View.castleFriendClearConfirm = false;
+    View.castleHeroListsBar?.classList?.remove('castle-hero-lists-bar-hidden');
+    View.loadCastleHeroSelectedList();
+    View.loadCastleHeroListNames();
+    if (View.castleHeroSelectedList === 0) View.castleHeroListEditMode = '';
 
     App.api.silent(
       (result) => {
-        MM.hero = result;
-
-        while (View.castleBottom.firstChild) {
-          View.castleBottom.firstChild.remove();
+        if (View.castleActiveTab !== 'heroes') return;
+        MM.hero = Array.isArray(result) ? result : [];
+        View.castleHeroAll = Array.isArray(result) ? result : [];
+        View.cleanupCastleHeroPhantomList();
+        const maxAllowed = Math.max(View.getCastleCreatedHeroListCount(), View.castleHeroPhantomList || 0);
+        if (View.castleHeroSelectedList > maxAllowed && View.castleHeroSelectedList > 0) {
+          View.castleHeroSelectedList = 0;
+          View.castleHeroListEditMode = '';
+          View.castleHeroEditSelection = new Set();
         }
-
-        for (let item of result) {
-          // Используем новый метод для получения имени с учётом скина
-          const localizedName = Lang.heroName(item.id, item.skin);
-          const heroName = DOM({ style: 'castle-hero-name' }, DOM({}, localizedName));
-
-          if (localizedName.length > 10) {
-            heroName.firstChild.classList.add('castle-name-autoscroll');
-          }
-
-          let heroNameBase = DOM({ style: ['castle-item-hero-name', 'hover-brightness'] }, heroName);
-
-          let rank = Rank.createRankNode(item.rating, { stylePrefix: 'castle-hero-' });
-
-          let hero = DOM(
-            {
-              domaudio: domAudioPresets.defaultButton,
-              id: `id${item.id}`,
-              style: ['castle-hero-item', 'hover-brightness'],
-            },
-            DOM({ style: ['castle-item-background', 'hover-brightness'] }),
-            DOM({ style: ['castle-hero-item-bg', 'hover-brightness'] }),
-            DOM({ style: ['castle-hero-item-img', 'no-hover-brightness'] }),
-            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-            rank,
-            heroNameBase,
-          );
-
-          hero.addEventListener('click', async () => Window.show('main', 'build', item.id, 0, true));
-
-          hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
-
-          preload.add(hero);
-        }
+        View.persistCastleHeroSelectedList();
+        View.renderCastleHeroesFromCache();
       },
       'build',
       'heroAll',
@@ -1510,356 +2754,23 @@ export class View {
   }
 
   static bodyCastleFriends() {
-    let preload = new PreloadImages(View.castleBottom);
+    View.castleActiveTab = 'friends';
+    View.castleHeroDeleteConfirmListId = 0;
+    View.castleFriendClearConfirm = false;
+    View.cleanupCastleHeroPhantomList();
+    View.castleHeroListsBar?.classList?.remove('castle-hero-lists-bar-hidden');
+    View.castleHeroPinnedEditor?.replaceChildren?.();
+    View.loadCastleFriendSelectedList();
+    while (View.castleBottom.firstChild) {
+      View.castleBottom.firstChild.remove();
+    }
 
     App.api.silent(
       (result) => {
-        while (View.castleBottom.firstChild) {
-          View.castleBottom.firstChild.remove();
-        }
-        // status 1 - друг, 2 - запрос дружбы, 3 - дружбу отправил, игрок еще не подтвердил
-        console.log('ДРУЗЬЯ', result);
-        const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('searchForFriends')));
-        let buttonAdd = DOM(
-          {
-            style: 'castle-friend-item',
-            onclick: () => {
-              let input = DOM({
-                tag: 'input',
-                domaudio: domAudioPresets.defaultInput,
-                style: 'search-input',
-                id: 'search-friend-window-input',
-                placeholder: Lang.text('friendNicknamePlaceholder'),
-              });
-              let body = DOM({ style: 'search-body' });
-
-              // Создаём крестик для закрытия (как в buildSelectName)
-              let closeButton = DOM({
-                tag: 'div',
-                domaudio: domAudioPresets.closeButton,
-                style: 'close-button',
-                event: ['click', () => Splash.hide()],
-              });
-              closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-
-              let search = DOM({ style: 'search' },modal, input, body, closeButton);
-
-              input.addEventListener('input', async () => {
-                let request = await App.api.request('user', 'find', {
-                  nickname: input.value,
-                });
-
-                if (body.firstChild) {
-                  while (body.firstChild) {
-                    body.firstChild.remove();
-                  }
-                }
-
-                for (let item of request) {
-                  let template = DOM(
-                    {
-                      domaudio: domAudioPresets.defaultButton,
-                      event: [
-                        'click',
-                        async () => {
-                          await App.api.request('friend', 'request', {
-                            id: item.id,
-                          });
-
-                          View.bodyCastleFriends();
-
-                          App.notify(`Заявка в друзья ${item.nickname} отправлена`, 1000);
-
-                          Splash.hide();
-                        },
-                      ],
-                    },
-                    item.nickname,
-                  );
-
-                  if ('blocked' in item) {
-                    template.oncontextmenu = () => {
-                      let body = document.createDocumentFragment();
-
-                      // Создаём крестик для закрытия
-                      const closeButton = DOM({
-                        tag: 'div',
-                        domaudio: domAudioPresets.closeButton,
-                        style: 'close-button',
-                        event: ['click', () => Splash.hide()],
-                      });
-                      closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
-
-                      body.append(
-                        DOM({}, item.nickname),
-                        DOM(
-                          {
-                            domaudio: domAudioPresets.bigButton,
-                            style: 'splash-content-button',
-                            event: [
-                              'click',
-                              async () => {
-                                await App.api.request('user', 'blocked', {
-                                  id: item.id,
-                                });
-                                Splash.hide();
-                              },
-                            ],
-                          },
-                          item.blocked ? 'Разблокировать' : 'Заблокировать',
-                        ),
-                        DOM(
-                          {
-                            domaudio: domAudioPresets.bigButton,
-                            style: 'splash-content-button',
-                            event: [
-                              'click',
-                              async () => {
-                                await App.api.request('user', 'mute', {
-                                  id: item.id,
-                                });
-                                Splash.hide();
-                              },
-                            ],
-                          },
-                          item.mute ? 'Убрать мут' : 'Мут чата',
-                        ),
-                        DOM(
-                          {
-                            domaudio: domAudioPresets.bigButton,
-                            style: 'splash-content-button',
-                            event: [
-                              'click',
-                              async () => {
-                                let password = await App.api.request('user', 'restore', { id: item.id });
-                                App.notify(`Скопировано в буфер обмена! Пароль: ${password}`);
-                                navigator.clipboard.writeText(password);
-                              },
-                            ],
-                          },
-                          'Сброс пароля',
-                        ),
-                        closeButton, // Добавляем крестик вместо кнопки "Назад"
-                      );
-
-                      Splash.show(body);
-                      return false;
-                    };
-
-                    if (item.mute) {
-                      template.style.color = 'yellow';
-                    }
-
-                    if (item.blocked) {
-                      template.style.color = 'red';
-                    }
-                  }
-
-                  body.append(template);
-                }
-              });
-
-              Splash.show(search, false);
-
-              input.focus();
-            },
-          },
-          DOM(
-            { style: 'castle-friend-item-middle' },
-            DOM(
-              { style: 'castle-item-hero-name' },
-              DOM({ style: ['castle-hero-name', 'add-to-friend-text'] }, DOM({ tag: 'span' }, Lang.text('addFriend'))),
-            ),
-            DOM({ src: 'content/hero/addFriend.png', style: 'addToFriendIcon', tag: 'img' }),
-
-            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-            DOM(
-              { style: 'castle-friend-item-bottom' },
-              DOM({ style: ['castle-friend-add-group', 'add-to-friend-button'] }, Lang.text('inviteToAFriend')),
-            ),
-          ),
-        );
-
-        preload.add(buttonAdd);
-
-        buttonAdd.dataset.url = `content/hero/empty.png`;
-
-        for (let item of result) {
-          const heroName = DOM({ style: 'castle-hero-name' }, DOM({ tag: 'span' }, item.nickname));
-
-          if (item.nickname.length > 10) {
-            heroName.firstChild.classList.add('castle-name-autoscroll');
-          }
-
-          let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
-
-          let bottom = DOM({ style: 'castle-friend-item-bottom' });
-
-          let friend = DOM(
-            { style: 'castle-friend-item' },
-            DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-            heroNameBase,
-            bottom,
-          );
-
-          if (item.status == 1) {
-            let group = DOM({ style: 'castle-friend-add-group' }, item.online ? Lang.text('inviteToAGroup') : Lang.text('friendIsOffline'));
-
-            let call = DOM({ style: 'castle-friend-add-group' }, Lang.text('callAFriend'));
-
-            if (!item.online) {
-              group.style.filter = 'grayscale(0.8)';
-
-              call.style.filter = 'grayscale(.8)';
-            } else {
-              group.onclick = async () => {
-                await App.api.request(App.CURRENT_MM, 'inviteParty', {
-                  id: item.id,
-                });
-
-                App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
-              };
-
-              call.onclick = async () => {
-                try {
-                  let voice = new Voice(item.id, 'friend', item.nickname, true);
-
-                  await voice.call();
-                } catch (error) {
-                  App.error(error);
-                }
-              };
-            }
-
-            friend.oncontextmenu = () => {
-              let body = document.createDocumentFragment();
-              const modal = DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('friends')));
-              let b1 = DOM(
-                {
-                  domaudio: domAudioPresets.smallButton,
-                  style: 'splash-content-button',
-                  event: [
-                    'click',
-                    async () => {
-                      await App.api.request('friend', 'remove', {
-                        id: item.id,
-                      });
-
-                      friend.remove();
-
-                      Splash.hide();
-                    },
-                  ],
-                },
-                Lang.text('friendRemove'),
-              );
-
-              let b2 = DOM(
-                {
-                  domaudio: domAudioPresets.closeButton,
-                  style: 'splash-content-button',
-                  event: ['click', () => Splash.hide()],
-                },
-                Lang.text('friendCancle'),
-              );
-
-              body.append(modal, DOM({id: 'friendRemoveText'},Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), b1, b2);
-
-              Splash.show(body);
-
-              return false;
-            };
-
-            bottom.append(call, group);
-          } else if (item.status == 2) {
-            bottom.append(
-              DOM(
-                {
-                  domaudio: domAudioPresets.smallButton,
-                  style: 'castle-friend-confirm',
-                  event: [
-                    'click',
-                    async () => {
-                      await App.api.request('friend', 'accept', {
-                        id: item.id,
-                      });
-
-                      while (bottom.firstChild) {
-                        bottom.firstChild.remove();
-                      }
-
-                      bottom.append(
-                        DOM(
-                          {
-                            domaudio: domAudioPresets.bigButton,
-                            style: 'castle-friend-add-group',
-                            event: [
-                              'click',
-                              async () => {
-                                await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
-
-                                App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
-                              },
-                            ],
-                          },
-                          Lang.text('inviteToAGroup'),
-                        ),
-                      );
-                    },
-                  ],
-                },
-                Lang.text('friendAccept'),
-              ),
-              DOM(
-                {
-                  domaudio: domAudioPresets.smallButton,
-                  style: 'castle-friend-cancel',
-                  event: [
-                    'click',
-                    async () => {
-                      await App.api.request('friend', 'remove', {
-                        id: item.id,
-                      });
-
-                      friend.remove();
-                    },
-                  ],
-                },
-                Lang.text('friendDecline'),
-              ),
-            );
-          } else if (item.status == 3) {
-            friend.append(
-              DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('friendAcceptWaiting'))),
-            );
-
-            friend.style.filter = 'grayscale(1)';
-
-            bottom.append(
-              DOM(
-                {
-                  domaudio: domAudioPresets.smallButton,
-                  style: 'castle-friend-cancel',
-                  event: [
-                    'click',
-                    async () => {
-                      await App.api.request('friend', 'remove', {
-                        id: item.id,
-                      });
-
-                      friend.remove();
-                    },
-                  ],
-                },
-                Lang.text('cancel'),
-              ),
-            );
-          }
-
-          friend.dataset.url = `content/hero/friendLogo.png`;
-
-          preload.add(friend);
-        }
+        if (View.castleActiveTab !== 'friends') return;
+        View.setFriendIncomingStatus(Array.isArray(result) && result.some((item) => Number(item?.status) == 2));
+        View.castleFriendAll = Array.isArray(result) ? result : [];
+        View.renderCastleFriendsFromCache();
       },
       'friend',
       'list',
@@ -2404,19 +3315,236 @@ export class View {
     }
     */
   static async top(hero = 0, isSplah = false, mode = 0) {
+    const TOP_MODE_TABS = [
+      { id: 0, labelKey: 'gm1' },
+      { id: 1, labelKey: 'gm2' },
+      { id: 2, labelKey: 'gm3' },
+      { id: 3, labelKey: 'gm4' },
+    ];
+
+    const heroId = hero == null || hero === '' ? 0 : Number(hero) || 0;
+    let activeMode = mode == null || mode === '' ? 0 : Number(mode);
+    if (!Number.isFinite(activeMode) || activeMode < 0) {
+      activeMode = 0;
+    }
+    if (activeMode === 4 || activeMode === 5) {
+      activeMode = 0;
+    }
+
     let body = DOM({ style: 'main' });
 
-    let result = await App.api.request(App.CURRENT_MM, 'top', {
-      limit: 100,
-      hero: hero,
-      mode: mode,
-    });
+    const [result] = await Promise.all([
+      App.api.request(App.CURRENT_MM, 'top', {
+        limit: 100,
+        hero: heroId,
+        mode: activeMode,
+      }),
+      (async () => {
+        if (!MM.hero) {
+          try {
+            MM.hero = await App.api.request('build', 'heroAll');
+          } catch {
+            MM.hero = [];
+          }
+        }
+      })(),
+    ]);
 
-    if (!result) {
+    if (result == null) {
       throw 'Рейтинг отсутствует';
     }
 
-    let helpBtn = DOM({
+    const list = Array.isArray(result) ? result : [];
+
+    const heroNameById = (id) => {
+      const row = MM.hero && MM.hero.find((h) => Number(h.id) === Number(id));
+      return row && row.name ? row.name : '';
+    };
+
+    const makeCrownForRank = (rankNum, variant) => {
+      if (rankNum < 1 || rankNum > 3) {
+        return [];
+      }
+      const src =
+        rankNum === 1
+          ? 'content/icons/crown_5.png'
+          : rankNum === 2
+            ? 'content/icons/crown_3.png'
+            : 'content/icons/crown_2.png';
+      const style =
+        variant === 'podium' ? ['wtop-crown', 'wtop-crown--podium'] : ['wtop-crown', 'wtop-crown--row'];
+      return [
+        DOM({
+          tag: 'img',
+          src,
+          alt: '',
+          style,
+          draggable: false,
+        }),
+      ];
+    };
+
+    const makePodiumCard = (player, rankNum) => {
+      const rank = DOM({ style: 'top-item-hero-rank' });
+      rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
+      const heroFace = DOM({ style: 'top-item-hero' }, rank);
+      heroFace.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
+      const heroBlock = DOM({ style: 'wtop-podium-hero-wrap' }, heroFace);
+      const crownSlot = DOM({ style: 'wtop-podium-crown-slot' }, ...makeCrownForRank(rankNum, 'podium'));
+      const playerBlock = DOM(
+        { style: 'wtop-podium-player' },
+        DOM({ style: 'wtop-podium-name-line' }, `#${rankNum}. ${player.nickname}`),
+        DOM(`${player.rating}`),
+      );
+      const middle = DOM({ style: 'wtop-podium-card-body' }, playerBlock, crownSlot);
+      return DOM(
+        {
+          domaudio: domAudioPresets.defaultButton,
+          style: ['top-item', 'wtop-podium-card', `wtop-podium-card--${rankNum}`],
+          event: ['click', () => Build.view(player.id, player.hero, player.nickname)],
+        },
+        heroBlock,
+        middle,
+      );
+    };
+
+    const makeTableRow = (player, rankNum) => {
+      const hName = heroNameById(player.hero);
+      const placeCell = DOM({ style: ['wtop-cell', 'wtop-cell--place'] }, String(rankNum));
+      const nameCell = DOM(
+        { style: ['wtop-cell', 'wtop-cell--name'] },
+        DOM({ tag: 'span', style: 'wtop-cell-name-text' }, player.nickname || '—'),
+      );
+      const heroIcon = DOM({ style: 'wtop-cell-hero-icon' });
+      heroIcon.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
+      const heroNameEl = DOM({ style: 'wtop-cell-hero-name' }, hName || '—');
+      const heroCellStyle = ['wtop-cell', 'wtop-cell--hero'];
+      if (rankNum <= 3) {
+        heroCellStyle.push('wtop-cell--hero-with-crown');
+      }
+      const heroCell = DOM(
+        { style: heroCellStyle },
+        heroIcon,
+        heroNameEl,
+        ...makeCrownForRank(rankNum, 'row'),
+      );
+      const ratingCell = DOM({ style: ['wtop-cell', 'wtop-cell--rating'] }, String(player.rating));
+      return DOM(
+        {
+          domaudio: domAudioPresets.defaultButton,
+          style: 'wtop-table-row',
+          event: ['click', () => Build.view(player.id, player.hero, player.nickname)],
+        },
+        placeCell,
+        nameCell,
+        heroCell,
+        ratingCell,
+      );
+    };
+
+    const openHeroPicker = async () => {
+      let request = await App.api.request('build', 'heroAll');
+      request.push({ id: 0 });
+      const bodyHero = DOM({ style: 'party-hero' });
+      const preload = new PreloadImages(bodyHero);
+      for (let item of request) {
+        const heroEl = DOM({ domaudio: domAudioPresets.smallButton });
+        if (item.id) {
+          heroEl.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
+        } else {
+          heroEl.dataset.url = `content/hero/empty.webp`;
+        }
+        heroEl.addEventListener('click', async () => {
+          if (isSplah) {
+            Window.show('main', 'top', item.id, activeMode);
+          } else {
+            View.show('top', item.id, false, activeMode);
+          }
+          Splash.hide();
+        });
+        preload.add(heroEl);
+      }
+      Splash.show(bodyHero, false);
+    };
+
+    const scrollClass = isSplah ? 'wtop-scroll' : 'top-scroll';
+    const modeBar = DOM({ style: 'wtop-mode-bar' });
+    for (const tab of TOP_MODE_TABS) {
+      const isActive = tab.id === activeMode;
+      const btn = DOM({
+        domaudio: domAudioPresets.defaultButton,
+        style: ['wtop-mode-tab', isActive ? 'is-active' : null].filter(Boolean),
+        tag: 'button',
+        type: 'button',
+        textContent: Lang.text(tab.labelKey),
+        event: [
+          'click',
+          () => {
+            if (tab.id === activeMode) return;
+            if (isSplah) {
+              Window.show('main', 'top', heroId, tab.id);
+            } else {
+              View.show('top', heroId, false, tab.id);
+            }
+          },
+        ],
+      });
+      modeBar.append(btn);
+    }
+
+    const podium = DOM({ style: 'wtop-podium' });
+    for (let i = 0; i < 3 && i < list.length; i++) {
+      podium.append(makePodiumCard(list[i], i + 1));
+    }
+
+    const listScroll = DOM({ style: 'wtop-list-scroll' });
+    if (list.length === 0) {
+      listScroll.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
+    } else {
+      listScroll.append(
+        DOM(
+          { style: 'wtop-table-header' },
+          DOM({ style: ['wtop-cell', 'wtop-cell--place'] }, Lang.text('topColPlace')),
+          DOM(
+            { style: ['wtop-cell', 'wtop-cell--name'] },
+            DOM({ tag: 'span', style: 'wtop-cell-name-text' }, Lang.text('topColPlayer')),
+          ),
+          DOM({ style: ['wtop-cell', 'wtop-cell--hero'] }, Lang.text('topColHero')),
+          DOM({ style: ['wtop-cell', 'wtop-cell--rating'] }, Lang.text('topColRating')),
+        ),
+      );
+      for (let i = 0; i < list.length; i++) {
+        listScroll.append(makeTableRow(list[i], i + 1));
+      }
+    }
+
+    const heroFilterImg = DOM({
+      tag: 'img',
+      src: 'content/icons/ЗалСлавы.png',
+      alt: '',
+      style: 'wtop-hero-filter-img',
+      draggable: false,
+    });
+    const heroFilterBtn = DOM(
+      {
+        domaudio: domAudioPresets.defaultButton,
+        tag: 'button',
+        type: 'button',
+        style: 'wtop-hero-filter',
+        title: Lang.text('clickToViewHeroRating'),
+        event: ['click', openHeroPicker],
+      },
+      heroFilterImg,
+    );
+    heroFilterBtn.setAttribute('aria-label', Lang.text('clickToViewHeroRating'));
+
+    const podiumRow = DOM({ style: 'wtop-podium-row' }, podium, heroFilterBtn);
+
+    const listRow = DOM({ style: 'wtop-list-row' }, listScroll);
+
+    const top = DOM({ style: [scrollClass, 'top-layout'] }, modeBar, podiumRow, listRow);
+
+    const helpBtn = DOM({
       id: 'wtop_help',
       domaudio: domAudioPresets.defaultButton,
       style: 'help-button',
@@ -2427,90 +3555,6 @@ export class View {
         },
       ],
     });
-    let top = DOM(
-      { style: isSplah ? 'wtop-scroll' : 'top-scroll' },
-      DOM(
-        {
-          domaudio: domAudioPresets.defaultButton,
-          style: 'top-filter',
-          title: Lang.text('titleClickToViewHeroRating'),
-          event: [
-            'click',
-            async () => {
-              let request = await App.api.request('build', 'heroAll');
-
-              request.push({ id: 0 });
-
-              let bodyHero = DOM({ style: 'party-hero' });
-
-              let preload = new PreloadImages(bodyHero);
-
-              for (let item of request) {
-                let hero = DOM({ domaudio: domAudioPresets.smallButton });
-
-                if (item.id) {
-                  hero.dataset.url = `content/hero/${item.id}/${item.skin ? item.skin : 1}.webp`;
-                } else {
-                  hero.dataset.url = `content/hero/empty.webp`;
-                }
-
-                hero.addEventListener('click', async () => {
-                  if (isSplah) {
-                    Window.show('main', 'top', item.id, mode);
-                  } else {
-                    View.show('top', item.id, false, mode);
-                  }
-
-                  Splash.hide();
-                });
-
-                preload.add(hero);
-              }
-
-              Splash.show(bodyHero, false);
-            },
-          ],
-        },
-        DOM({ tag: 'div' }),
-        DOM({ tag: 'div' }),
-      ),
-    );
-
-    const topFilter = top.querySelector('.top-filter');
-
-    topFilter.style.setProperty('--filter-text', `'${Lang.text('clickToViewHeroRating')}'`);
-
-    top.firstChild.classList.add('animation1');
-
-    top.firstChild.firstChild.style.backgroundImage = `url(content/hero/${result[0].hero}/${result[0].skin ? result[0].skin : 1}.webp)`;
-
-    top.firstChild.lastChild.innerText = `#1. ${result[0].nickname}`;
-
-    let number = 1;
-
-    for (let player of result) {
-      let rank = DOM({ style: 'top-item-hero-rank' });
-
-      rank.style.backgroundImage = `url(content/ranks/${Rank.icon(player.rating)}.webp)`;
-
-      let hero = DOM({ style: 'top-item-hero' }, rank);
-
-      hero.style.backgroundImage = `url(content/hero/${player.hero}/${player.skin ? player.skin : 1}.webp)`;
-
-      let item = DOM(
-        {
-          domaudio: domAudioPresets.defaultButton,
-          style: 'top-item',
-          event: ['click', () => Build.view(player.id, player.hero, player.nickname)],
-        },
-        hero,
-        DOM({ style: 'top-item-player' }, DOM(`#${number}. ${player.nickname}`), DOM(`${player.rating}`)),
-      );
-
-      top.append(item);
-
-      number++;
-    }
 
     if (!isSplah) {
       body.append(View.header());

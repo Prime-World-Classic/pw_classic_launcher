@@ -124,6 +124,14 @@ export class Events {
 
     MM.select(data);
   }
+  
+  static MMSyncHeroes(data) {
+    if (!NativeAPI.status) {
+      return;
+    }
+    
+    MM.syncHeroes(data);
+  }
 
   static MMEnd(data) {
     if (!NativeAPI.status) {
@@ -235,6 +243,16 @@ export class Events {
   /** Обновление только списка закреплённых (бэк шлёт UChatPinned, не UChat). */
   static UChatPinned(data) {
     Chat.viewMessage(data);
+  }
+
+  static UFriendIncoming(data) {
+    View.setFriendIncomingStatus(data && Number(data.hasIncoming) == 1);
+    if (View.castleActiveTab === 'friends') {
+      View.bodyCastleFriends();
+      View.castleBottom.scrollLeft = 0;
+      View.updateArrows();
+      Castle.buildMode = false;
+    }
   }
 
 
