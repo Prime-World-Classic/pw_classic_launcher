@@ -174,6 +174,11 @@ export class Window {
     let view = await View.game(true);
     return DOM({ id: 'wgame' }, view);
   }
+  static async clans() {
+    let view = await View.game(true);
+    return DOM({ id: 'clan-Window' }, view);
+  }
+  
   static async history() {
     let view = await View.history(true);
     return DOM({ id: 'whistory' }, view);

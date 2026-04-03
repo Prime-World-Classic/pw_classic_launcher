@@ -10,4 +10,7 @@ export class CastleBuildingsEvents {
   static fair() {
     Window.show('main', 'shop');
   }
+  static clan_house() {
+        Window.show('main', 'clans');
+  }
 }
