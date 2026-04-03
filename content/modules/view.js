@@ -771,19 +771,6 @@ export class View {
           // request.sort((a, b) => b.rating - a.rating);
 
           MM.hero = request;
-          
-          let bannedHeroesResponse = new Array();
-          try {
-            bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
-          } catch (error) {
-            bannedHeroesResponse = new Array();
-          }
-          
-          const bannedHeroes = new Set(
-            (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
-              .map((id) => Number(id))
-              .filter((id) => Number.isFinite(id) && id > 0),
-          );
 
           request.push({ id: 0 });
 
@@ -793,20 +780,8 @@ export class View {
 
           for (let item2 of request) {
             let hero = DOM({ domaudio: domAudioPresets.smallButton });
-            
-            const isBannedInMode = item2.id && bannedHeroes.has(Number(item2.id));
-            if (isBannedInMode) {
-              hero.style.filter = 'grayscale(100%)';
-              hero.style.opacity = '0.6';
-              hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
-            }
 
             hero.addEventListener('click', async () => {
-              if (isBannedInMode) {
-                App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
-                return;
-              }
-              
               try {
                 await App.api.request(App.CURRENT_MM, 'heroParty', {
                   id: MM.partyId,
@@ -1256,15 +1231,8 @@ export class View {
     });
 
     const partyData = await App.api.request(App.CURRENT_MM, 'loadParty', {});
-    const dbNickname = String(partyData?.users?.[App.storage.data.id]?.nickname || '').trim();
-    if (dbNickname) {
-      nicknameMenuItem.firstChild.textContent = dbNickname;
-      nicknameMenuItem.firstChild.classList.toggle('castle-name-autoscroll', dbNickname.length > 10);
-      if (App?.storage?.data?.login !== dbNickname) {
-        App.storage.data.login = dbNickname;
-      }
-    }
     const playerRatingVisual = partyData.users[App.storage.data.id]?.playerRatingVisual || 0;
+    console.log('DEBUG: Received partyData from loadParty:', partyData);
     let accountRatingItem = DOM(
       {
         style: 'account-rating-menu-item',
@@ -1970,10 +1938,6 @@ export class View {
       bar.append(addBtn);
     }
 
-    const searchWrap = DOM({
-      style: ['castle-hero-list-search-wrap', View.castleHeroSearch ? 'castle-hero-list-search-wrap-has-value' : null].filter(Boolean),
-    });
-
     const search = DOM({
       tag: 'input',
       style: 'castle-hero-list-search',
@@ -1983,38 +1947,12 @@ export class View {
         'input',
         (event) => {
           View.castleHeroSearch = String(event?.target?.value || '');
-          if (View.castleHeroSearch) {
-            searchWrap.classList.add('castle-hero-list-search-wrap-has-value');
-          } else {
-            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
-          }
           /* Не пересобирать toolbar: replaceChildren() снимает фокус с input */
           View.renderCastleHeroesFromCache({ refreshToolbar: false });
         },
       ],
     });
-    const clearSearchBtn = DOM(
-      {
-        tag: 'button',
-        type: 'button',
-        style: 'castle-hero-list-search-clear',
-        domaudio: domAudioPresets.defaultButton,
-        event: [
-          'click',
-          () => {
-            if (!search.value) return;
-            search.value = '';
-            View.castleHeroSearch = '';
-            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
-            search.focus();
-            View.renderCastleHeroesFromCache({ refreshToolbar: false });
-          },
-        ],
-      },
-      '×',
-    );
-    searchWrap.append(search, clearSearchBtn);
-    bar.append(searchWrap);
+    bar.append(search);
 
   }
 
@@ -2356,10 +2294,6 @@ export class View {
     );
     bar.append(favBtn);
 
-    const searchWrap = DOM({
-      style: ['castle-hero-list-search-wrap', View.castleFriendSearch ? 'castle-hero-list-search-wrap-has-value' : null].filter(Boolean),
-    });
-
     const search = DOM({
       tag: 'input',
       style: 'castle-hero-list-search',
@@ -2369,37 +2303,11 @@ export class View {
         'input',
         (event) => {
           View.castleFriendSearch = String(event?.target?.value || '');
-          if (View.castleFriendSearch) {
-            searchWrap.classList.add('castle-hero-list-search-wrap-has-value');
-          } else {
-            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
-          }
           View.renderCastleFriendsFromCache({ refreshToolbar: false });
         },
       ],
     });
-    const clearSearchBtn = DOM(
-      {
-        tag: 'button',
-        type: 'button',
-        style: 'castle-hero-list-search-clear',
-        domaudio: domAudioPresets.defaultButton,
-        event: [
-          'click',
-          () => {
-            if (!search.value) return;
-            search.value = '';
-            View.castleFriendSearch = '';
-            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
-            search.focus();
-            View.renderCastleFriendsFromCache({ refreshToolbar: false });
-          },
-        ],
-      },
-      '×',
-    );
-    searchWrap.append(search, clearSearchBtn);
-    bar.append(searchWrap);
+    bar.append(search);
   }
 
   static buildCastleFriendListEditorCard() {
@@ -2853,7 +2761,9 @@ export class View {
     View.castleHeroListsBar?.classList?.remove('castle-hero-lists-bar-hidden');
     View.castleHeroPinnedEditor?.replaceChildren?.();
     View.loadCastleFriendSelectedList();
-    View.renderCastleFriendsFromCache();
+    while (View.castleBottom.firstChild) {
+      View.castleBottom.firstChild.remove();
+    }
 
     App.api.silent(
       (result) => {
@@ -3261,19 +3171,6 @@ export class View {
           let request = await App.api.request('build', 'heroAll');
 
           MM.hero = request;
-          
-          let bannedHeroesResponse = new Array();
-          try {
-            bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
-          } catch (error) {
-            bannedHeroesResponse = new Array();
-          }
-          
-          const bannedHeroes = new Set(
-            (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
-              .map((id) => Number(id))
-              .filter((id) => Number.isFinite(id) && id > 0),
-          );
 
           request.push({ id: 0 });
 
@@ -3283,20 +3180,8 @@ export class View {
 
           for (let item of request) {
             let hero = DOM({ domaudio: domAudioPresets.smallButton });
-            
-            const isBannedInMode = item.id && bannedHeroes.has(Number(item.id));
-            if (isBannedInMode) {
-              hero.style.filter = 'grayscale(100%)';
-              hero.style.opacity = '0.6';
-              hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
-            }
 
             hero.addEventListener('click', async () => {
-              if (isBannedInMode) {
-                App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
-                return;
-              }
-              
               try {
                 await App.api.request(App.CURRENT_MM, 'heroParty', {
                   id: MM.partyId,

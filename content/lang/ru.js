@@ -33,7 +33,6 @@ export const ru = {
     radminPriority: 'Приоритет RadminVPN',
     threeD: '3D графика',
     voiceEnabled: 'Выключить войс чат',
-    voiceRadioMode: 'Включить режим рации',
     volume: 'Общая громкость',
     volumeMusic: 'Громкость музыки',
     volumeSound: 'Громкость звуков',
@@ -188,7 +187,6 @@ export const ru = {
     mmRandomBuild: 'Случайный билд',
     mmConfirm: 'Подтвердить',
     mmMouseControls: 'ЛКМ (ВЫБРАТЬ) / ПКМ (ЗАБЛОКИРОВАТЬ)',
-    thisHeroIsUnavailableInCurrentGameMode: 'Герой запрещен для текущего режима',
 
     //NativeApi
     updateCheckComplete: 'Проверка обновлений и файлов игры завершена',
@@ -344,7 +342,6 @@ export const ru = {
     cantDefaultMic: 'Не можем найти микрофон по умолчанию',
     waitingResponse: 'ожидание ответа',
     voiceConnecting: 'соединение',
-    voiceReconnectingAttempt: 'переподключение {attempt}',
     callsDropped: 'Звонки успешно сброшены за исключением ваших друзей',
     voiceDisabled: 'Голосовая связь отключена',
     synthesisLang: 'ru-RU',
@@ -1266,10 +1263,8 @@ export const ru = {
     hero_58_skin_2_name: 'Греза',
     hero_59_skin_2_name: 'Снегирь',
     hero_60_skin_2_name: 'Голограмма',
-	hero_61_skin_2_name: 'Индиго',
     hero_62_skin_2_name: 'Чернокнижник',
     hero_63_skin_2_name: 'Проклятая Графиня',
-	hero_64_skin_2_name: 'Факир',
     hero_65_skin_2_name: 'Детоняша',
 
     //Стата талантов
@@ -5688,7 +5683,7 @@ export const ru = {
       'Увеличивает дальность и скорость полета гарпуна на <num>50%</num>. <br> <br> <gray>Сет</gray> <tn>"Абордажный гарпун"</tn><br><br><gray>- может быть улучшен <num>2</num> талантами</gray>',
 	talent_777_name: 'Абордажное превосходство',
 	talent_777_description:
-      'Снижает время восстановления таланта Абордажный гарпун на <num>20</num> сек. Оглушает не только основную цель, но и все цели вокруг нее в радиусе <num>5</num>. После оглушения цели дополнительно замедляются на <num>50%</num> на <num>2</num> сек. секунды <br> <br> <gray>Сет</gray> <tn>"Абордажный гарпун"</tn><br><br><gray>- может быть улучшен <num>2</num> талантами</gray>',
+      'Снижает время восстановления таланта Абордажный гарпун на <num>20</num> сек. Оглушает не только основную цель, но и все цели вокруг нее в радиусе 5. После оглушения цели дополнительно замедляются на <num>50%</num> на <num>2</num> сек. секунды <br> <br> <gray>Сет</gray> <tn>"Абордажный гарпун"</tn><br><br><gray>- может быть улучшен <num>2</num> талантами</gray>',
 
     },
 };

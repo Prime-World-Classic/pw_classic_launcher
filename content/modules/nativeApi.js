@@ -6,7 +6,6 @@ import { Lang } from './lang.js';
 
 export class NativeAPI {
   static status = false;
-  static exitRequested = false;
 
   static platform;
 
@@ -68,10 +67,6 @@ export class NativeAPI {
 
     NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
     NativeAPI.refreshVoiceHotkeys();
-
-    NativeAPI.window.on('close', () => {
-      NativeAPI.exit();
-    });
 
     NativeAPI.loadModules();
 
@@ -151,7 +146,7 @@ export class NativeAPI {
       NativeAPI.voiceShortcut = new nw.Shortcut({
         key: toggleKey,
         active: () => {
-          Voice.handleVoiceToggleHotkey?.();
+          Voice.toggleEnabledMic();
         },
         failed: (error) => {
           console.log(error);
@@ -251,20 +246,8 @@ export class NativeAPI {
     if (!NativeAPI.status) {
       return false;
     }
-    if (NativeAPI.exitRequested) {
-      return true;
-    }
-    NativeAPI.exitRequested = true;
 
-    try {
-      Voice.destroy(true);
-    } catch {}
-
-    setTimeout(() => {
-      try {
-        NativeAPI.app.quit();
-      } catch {}
-    }, 150);
+    NativeAPI.app.quit();
 
     return true;
   }

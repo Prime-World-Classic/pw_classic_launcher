@@ -2,6 +2,13 @@
   width: 0px;
   height: 0px;
 }
+::-webkit-scrollbar-button {
+}
+::-webkit-scrollbar-track-piece {
+}
+::-webkit-scrollbar-thumb {
+}
+
 :root {
   --cursor-pointer: url('img/cursor_button32x32.png') 0 0, pointer;
   --build-hl-h: 199;
@@ -988,18 +995,26 @@ input::placeholder {
   
 }
 
+/* Модификаторы ДОЛЖНЫ содержать только отличия от базового стиля */
+.build-list-close {
+  /* Если нужны специфичные стили, иначе можно удалить этот класс */
+}
+
+
+
 .close-image-style {
   width: 5vh !important;
   height: 5vh !important;
 }
 
 .build-active-bar-hint {
-  width: 100cqw;
+  width: 150cqw;
   font-size: 1.5cqmin;
   font-family: 'DejaVuSans', sans-serif;
   color: rgb(255 255 255 / 50%);
   position: absolute;
   bottom: -7cqh;
+  left: -25cqw;
 }
 
 button.build-action-item {
@@ -1107,18 +1122,11 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -52%);
-  color: rgb(175 170 104 / 98%);
+  color: rgb(211 205 124 / 98%);
   font: 600 3.8cqh / 1 'DejaVuSans', sans-serif;
   text-shadow: 0 0.25cqh 0.35cqh rgba(0, 0, 0, 0.72);
   pointer-events: none;
   z-index: 2;
-}
-
-.btn-combat-mode-count.btn-combat-mode-count-raw {
-  width: 7.2cqh;
-  height: 4.6cqh;
-  transform: translate(-50%, -50%);
-  background: url('img/combatModeRaw.png') center/contain no-repeat;
 }
 
 .btn-combat-mode-glass {
@@ -1350,20 +1358,20 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 
 .build-talent-item .build-combat-order-badge {
   position: absolute;
-  right: 6cqw;
-  bottom: 6cqw;
+  right: 4cqw;
+  bottom: 4cqw;
   min-width: 22cqw;
-  height: 26cqw;
+  height: 22cqw;
   padding: 0 4cqw;
   border-radius: 6cqw;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #c2c786b8;
-  font: 21cqw / 1 'DejaVuSans', sans-serif;
+  color: #fff;
+  font: 16cqw / 1 'DejaVuSans', sans-serif;
   font-weight: 700;
   text-shadow: 0 0 1.2cqw rgba(0, 0, 0, 0.9);
-  background: linear-gradient(178deg, rgb(17 86 118 / 65%), rgb(12 54 76 / 65%));
+  background: linear-gradient(180deg, rgba(17, 86, 118, 0.95), rgba(12, 54, 76, 0.95));
   box-shadow: 0 0 1cqw rgba(0, 0, 0, 0.55);
   pointer-events: none;
   z-index: 1200;
@@ -2922,6 +2930,9 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 	box-shadow:0 0 25px rgba(0,0,0,0.3);*/
 }
 
+.mm-ready {
+}
+
 .mm-ready-count {
   font: 4rem / 1 'DejaVuSans', sans-serif;
   color: rgba(255, 255, 255, 0.9);
@@ -2984,6 +2995,9 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   height: 100cqh;
   display: flex;
   flex-flow: column nowrap;
+}
+
+.mm-lobby-confirm {
 }
 
 .mm-lobby-header {
@@ -3055,6 +3069,9 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 0 0 3px 3px;
   color: rgba(255, 255, 255, 0.7);
+}
+
+.mm-lobby-ready-button {
 }
 
 .mm-lobby-middle-build {
@@ -4588,13 +4605,6 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   color: rgb(250, 229, 108);
 }	
 
-.chat-body-item-time {
-  display: inline-block;
-  margin-left: 0.5cqh;
-  font: 1.25cqh / 1 'DejaVuSans', sans-serif;
-  color: rgb(254 255 235 / 60%);
-}
-
 .chat-pinned-message {
   background: rgba(255, 215, 0, 0.06);
   border-left: 0.2cqh solid rgba(255, 215, 0, 0.7);
@@ -5107,7 +5117,7 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   left: 50%;
   top: 15cqh;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: 9998;
   width: 80cqh;
   max-width: 92vw;
   height: auto;
@@ -5130,10 +5140,6 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   color: #e7f7f9;
   text-align: left;
   overflow: visible;
-}
-
-#wquest:hover {
-  z-index: 140;
 }
 .wquest__avatar,
 .quest_container {
@@ -5643,29 +5649,6 @@ i-success {
   z-index: 9996;
 }
 
-.voice-info-panel-close {
-  position: absolute;
-  top: -0.9cqh;
-  right: -0.9cqh;
-  width: 2.8vh;
-  height: 2.8vh;
-  min-width: 2.8vh;
-  min-height: 2.8vh;
-  background-image: url('content/icons/close-cropped.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  border: none;
-  opacity: 1;
-  display: block;
-  z-index: 9997;
-  transform: none !important;
-}
-
-.voice-info-panel-close:hover {
-  transform: scale(1.08) !important;
-}
-
 .left-offset-with-shift {
   position: absolute;
   left: 10vh;
@@ -5741,14 +5724,6 @@ i-success {
   position: relative;
   overflow: hidden;
   /*animation:pulse 2s infinite;*/
-}
-
-.voice-info-panel-body-item-bar-level-muted {
-  background: transparent;
-}
-
-.voice-info-panel-body-item-bar-level-muted::before {
-  display: none;
 }
 
 .voice-info-panel-body-item-bar-level::before {
@@ -6551,8 +6526,7 @@ body:has(#wcastle-call)::before {
     align-content: center;
     margin-bottom: 20cqh;
     margin: 0;
-	position: relative;
-	top: -26cqh;
+	top: -21cqh;
   }
   .build-hero-stats-line {
     height: 18cqh;
@@ -6695,7 +6669,9 @@ body:has(#wcastle-call)::before {
   .build-hero-stats-settings {
     margin-top: 1cqh;
     display: flex;
-    left: 7cqh;
+    position: absolute;
+	top: 30cqh;
+    left: 222cqw;
   }
   .build-hero {
     width: 86cqw;

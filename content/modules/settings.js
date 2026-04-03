@@ -14,7 +14,6 @@ export class Settings {
     radminPriority: false,
     language: 'ru',
     novoice: false,
-    voiceRadioMode: false,
     voiceToggleHotkey: ['CTRL', 'Z'],
     voiceDropHotkey: ['CTRL', 'K'],
     buildSetLmbMode: 1,

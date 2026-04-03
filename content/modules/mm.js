@@ -40,8 +40,6 @@ export class MM {
   static targetPlayerAnimate = false;
 
   static activeSelectHero = 0;
-  
-  static modeRules = {};
 
   static isInTambur = false;
 
@@ -90,12 +88,6 @@ export class MM {
 
   static async init() {
     MM.initView();
-    
-    MM.loadModeRules();
-    
-    window.addEventListener('CastleModeChanged', () => {
-      MM.loadModeRules();
-    });
 
     // Linux test
     //let testRun = DOM({style:'castle-button-play-test'}, "Test");
@@ -120,25 +112,6 @@ export class MM {
       id: 'MM_found',
       volume: Castle.GetVolume(Castle.AUDIO_SOUNDS),
     });
-  }
-  
-  static async loadModeRules() {
-    try {
-      const response = await App.api.request(App.CURRENT_MM, 'modes');
-      MM.modeRules = response || {};
-    } catch (error) {
-      MM.modeRules = {};
-    }
-  }
-  
-  static getBannedHeroesForCurrentMode() {
-    const modeId = Number(CastleNAVBAR.mode);
-    const modeRule = MM.modeRules && MM.modeRules[`${modeId}`] ? MM.modeRules[`${modeId}`] : MM.modeRules?.[modeId];
-    const list = modeRule?.bannedHeroes;
-    if (!Array.isArray(list)) {
-      return new Set();
-    }
-    return new Set(list.map((item) => Number(item)).filter((item) => Number.isFinite(item) && item > 0));
   }
 
   static play() {
@@ -363,7 +336,7 @@ export class MM {
             'click',
             async () => {
               try {
-                Voice.destroyTamburCallsOnly();
+                Voice.destroy();
               } catch (error) {
                 console.log(error);
               }
@@ -659,13 +632,9 @@ export class MM {
     }
 
     //let preload = new PreloadImages(MM.lobbyHeroes);
-    
-    View.loadCastleHeroSelectedList();
-    View.loadCastleHeroListNames();
-    const selectedHeroListId = Number(View.castleHeroSelectedList) || 0;
-    const selectedHeroListMask = selectedHeroListId > 0 ? 1 << (selectedHeroListId - 1) : 0;
 
-    let filteredHeroes = [];
+    let activeRankName = '';
+
     for (let item of MM.hero) {
       if (!item.id) {
         continue;
@@ -676,10 +645,25 @@ export class MM {
           continue;
         }
       }
-      filteredHeroes.push(item);
-    }
-    
-    const appendHeroCard = (item) => {
+
+      let getRankName = Rank.getName(item.rating);
+
+      if (getRankName != activeRankName) {
+        let rankIcon = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+
+        rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+
+        let rankIcon2 = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+
+        rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+
+        MM.lobbyHeroes.append(
+          DOM({ style: 'mm-lobby-middle-hero-line' }, rankIcon, DOM({ style: 'mm-lobby-middle-hero-line-name' }, getRankName), rankIcon2),
+        );
+
+        activeRankName = getRankName;
+      }
+
       let hero = DOM({
         id: `HERO${item.id}`,
         data: { ban: 0 },
@@ -715,58 +699,6 @@ export class MM {
       MM.lobbyHeroes.append(hero);
 
       //preload.add(hero);
-    };
-
-    let favouriteHeroes = [];
-    let otherHeroes = filteredHeroes;
-
-    if (selectedHeroListMask > 0) {
-      favouriteHeroes = filteredHeroes
-        .filter((item) => (Number(item?.favourite || 0) & selectedHeroListMask) !== 0)
-        .sort((a, b) => Number(b?.rating || 0) - Number(a?.rating || 0));
-
-      otherHeroes = filteredHeroes.filter((item) => (Number(item?.favourite || 0) & selectedHeroListMask) === 0);
-
-      if (favouriteHeroes.length) {
-        const emptyIconLeft = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-        emptyIconLeft.style.backgroundImage = 'url(content/icons/favouriteHero.png)';
-        emptyIconLeft.style.opacity = 1;
-        const emptyIconRight = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-        emptyIconRight.style.backgroundImage = 'url(content/icons/favouriteHero.png)';
-        emptyIconRight.style.opacity = 1;
-        MM.lobbyHeroes.append(
-          DOM(
-            { style: 'mm-lobby-middle-hero-line' },
-            emptyIconLeft,
-            DOM({ style: 'mm-lobby-middle-hero-line-name' }, View.getCastleHeroListName(selectedHeroListId)),
-            emptyIconRight,
-          ),
-        );
-        for (let item of favouriteHeroes) {
-          appendHeroCard(item);
-        }
-      }
-    }
-
-    let activeRankName = '';
-    for (let item of otherHeroes) {
-      let getRankName = Rank.getName(item.rating);
-
-      if (getRankName != activeRankName) {
-        let rankIcon = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-        rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-        let rankIcon2 = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-        rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-        MM.lobbyHeroes.append(
-          DOM({ style: 'mm-lobby-middle-hero-line' }, rankIcon, DOM({ style: 'mm-lobby-middle-hero-line-name' }, getRankName), rankIcon2),
-        );
-
-        activeRankName = getRankName;
-      }
-
-      appendHeroCard(item);
     }
 
     if (App.storage.data.id == data.target) {
