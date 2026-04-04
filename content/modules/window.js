@@ -248,7 +248,7 @@ export class Window {
       const showPlayerInfo = (e) => {
         e.stopPropagation();
   
-        const splashContent = DOM({ tag: "div", style: "splash-content-window" });
+        const splashContent = DOM({ tag: "div", style: "splash-content" });
   
         const escHandler = (event) => {
           if (event.key === 'Escape') {
@@ -274,8 +274,9 @@ export class Window {
   
         splashContent.append(
           DOM({ style: "splash-title" }, 
+            DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('clanActionModal'))),
             DOM({style: "splashClanMemberMenu"},
-              DOM({}, Lang.text("settingsSplashLabel") + row.name),
+              DOM({}, Lang.text("settingsSplashLabel") + '"' +row.name + '"'),
               (userRole == 'lider')
               ? DOM({style: "buttonsMembersMenuList"},
                   DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
@@ -548,89 +549,60 @@ export class Window {
       updateRightSideContent();
     }
   
-    // === ВОССТАНОВЛЕННЫЙ БЛОК С ИКОНКОЙ СПРАВКИ ===
-    const createClanManagement = (hideHandler) => {
-      return DOM({
-        tag: "div",
-        className: "clanManagement",
-        id: "clanManagement"
-      },
-      DOM({ tag: "h2" }, "Руководство по клановой системе игры Prime World. "),
-      DOM({ tag: "br" }),
-      DOM({ tag: "p" }, "Клан – это объединение игроков под одним гербом, выполняя задания и участвуя в совместных боях участники повышают уровень и продвигают свой клан на вершину пьедестала."),
-      DOM({ tag: "br" }),
-      DOM({ tag: "br" }),
-      DOM({ tag: "h4" }, DOM({ tag: "b" }, "Задачи клана:")),
-      DOM({ tag: "p" }, "-  объединение в группы для совместной игры в режимах;"),
-      DOM({ tag: "p" }, "-  выполнение клановых заданий для повышения уровня клана;"),
-      DOM({ tag: "p" }, "-  накопление очков для повышения уровня клана. "),
-      DOM({ tag: "br" }),
-      DOM({ tag: "br" }),
-      DOM({ tag: "p" }, " По мере достижения последующих уровней клана, каждый участник в будущем сможет учувствовать в клановых войнах, а также получать бонусы на свой аккаунт."),
-      DOM({ tag: "p" }, DOM({ tag: "b" }, "Подробнее по очкам клана:")),
-      DOM({ tag: "p" }, 
-        "–	очки клана – это заработанный рейтинг каждого участника клана через бои;",
-        DOM({ tag: "br" }),
-        "–	очки определяют уровень клана и сколько игроков, может быть, в клане; ",
-        DOM({ tag: "br" }),
-        "–	чем выше рейтинг клана (очки), тем больше игроков можно будет пригласить; ",
-        DOM({ tag: "br" }),
-        "–	количество игроков в клане не ограничено; ",
-        DOM({ tag: "br" }),
-        "–	за каждые 24 часа надо будет платить очками клана, за одного игрока в клане 15 очков (каждые 24 часа от рейтинга клана будут отниматься очки: количество игроков в клане * 15); ",
-        DOM({ tag: "br" }),
-        "–	глава клана и 4 вассала не могут быть исключены из клана, даже если уровень клана придет к нулю (если игроки прокачали клан до 5 игроков и если один из них глава, а четыре вассала, то они останутся); ",
-        DOM({ tag: "br" }),
-        "–	если количество игроков в клане больше лимита игроков по уровню клана, то игроки будут автоматически удаляться (сортировка игроков по бездействию)."
-      ),
-      DOM({ tag: "br" }),
-      DOM({ tag: "p" }, DOM({ tag: "b" }, "Ранговое распределение возможностей внутри клана:"), DOM({ tag: "br" }),
-      "–	глава клана имеет все возможности: смена имени и герба, приглашение/принятие/удаление игроков, просмотр аудита, повышение/понижение участников клана в ранге, брать квесты, добывать очки клану, роспуск клана; ",
-      DOM({ tag: "br" }),
-      "–	заместитель клана: приглашение/принятие/удаление игроков, просмотр аудита, брать квесты, добывать очки клану; ",
-      DOM({ tag: "br" }),
-      "–	участник клана: брать квесты, добывать очки клану. "
-      ),
-      DOM({ tag: "br" }),
-      DOM({ tag: "h2" }, "В будущем планируется расширение возможностей клана, а также новые механики."),)
-    };
+// === В НАЧАЛЕ метода clans() — отдельная переменная с контентом справки ===
+const clanGuideContent = DOM({ style: 'clan-help-content' },
+  DOM({ tag: "h2" }, "Руководство по клановой системе игры Prime World"),
+  DOM({ tag: "br" }),
+  DOM({ tag: "p" }, "Клан – это объединение игроков под одним гербом, выполняя задания и участвуя в совместных боях участники повышают уровень и продвигают свой клан на вершину пьедестала."),
+  DOM({ tag: "br" }), DOM({ tag: "br" }),
   
-    const clanGuideSpan = DOM({
-      tag: "span",
-      style: "clanGuideSpan",
-      event: ["click", () => {
-        const splashContent = DOM({ style: "splash-content-window" });
+  DOM({ tag: "h4" }, DOM({ tag: "b" }, "Задачи клана:")),
+  DOM({ tag: "p" }, "- объединение в группы для совместной игры в режимах;"),
+  DOM({ tag: "p" }, "- выполнение клановых заданий для повышения уровня клана;"),
+  DOM({ tag: "p" }, "- накопление очков для повышения уровня клана."),
+  DOM({ tag: "br" }), DOM({ tag: "br" }),
   
-        const escHandler = (e) => {
-          if (e.key === 'Escape' && Splash.body && Splash.body.style.display === 'flex' && Splash.body.contains(splashContent)) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            Splash.hide();
-            document.removeEventListener('keydown', escHandler, true);
-          }
-        };
+  DOM({ tag: "p" }, "По мере достижения последующих уровней клана, каждый участник в будущем сможет учувствовать в клановых войнах, а также получать бонусы на свой аккаунт."),
   
-        const hideHandler = () => {
-          Splash.hide();
-          document.removeEventListener('keydown', escHandler, true);
-        };
+  DOM({ tag: "p" }, DOM({ tag: "b" }, "Подробнее по очкам клана:")),
+  DOM({ tag: "p" }, 
+    "– очки клана – это заработанный рейтинг каждого участника клана через бои;",
+    DOM({ tag: "br" }),
+    "– очки определяют уровень клана и сколько игроков может быть в клане;",
+    DOM({ tag: "br" }),
+    "– чем выше рейтинг клана (очки), тем больше игроков можно будет пригласить;",
+    DOM({ tag: "br" }),
+    "– за каждые 24 часа надо будет платить очками клана: количество игроков × 15 очков;",
+    DOM({ tag: "br" }),
+    "– глава клана и 4 вассала не могут быть исключены из клана, даже если уровень клана придёт к нулю;",
+    DOM({ tag: "br" }),
+    "– если игроков больше лимита, они будут автоматически удаляться (сортировка по бездействию)."
+  ),
+  DOM({ tag: "br" }),
   
-        const closeButton = DOM({
-          tag: "div",
-          style: "close-button",
-          event: ["click", hideHandler]
-        });
-        closeButton.style.backgroundImage = "url(content/icons/close-cropped.svg)";
-  
-        const clanManagement = createClanManagement(hideHandler);
-        splashContent.append(closeButton, clanManagement);
-  
-        document.addEventListener('keydown', escHandler, true);
-        Splash.show(splashContent, false);
-      }]
-    }, DOM({ src: 'content/clanImages/clan-info.png', tag: 'img' }));
-    // === КОНЕЦ ВОССТАНОВЛЕННОГО БЛОКА ===
+  DOM({ tag: "p" }, 
+    DOM({ tag: "b" }, "Ранговое распределение возможностей внутри клана:"), DOM({ tag: "br" }),
+    "– глава клана: все возможности (смена имени/герба, управление игроками, аудит, ранги, квесты, роспуск);", DOM({ tag: "br" }),
+    "– заместитель: приглашение/удаление игроков, аудит, квесты;", DOM({ tag: "br" }),
+    "– участник: брать квесты, добывать очки клану."
+  ),
+  DOM({ tag: "br" }),
+  DOM({ tag: "h2" }, "В будущем планируется расширение возможностей клана, а также новые механики.")
+);
+
+// === БЛОК С ИКОНКОЙ СПРАВКИ ===
+const clanGuideSpan = DOM({
+  tag: "span",
+  style: "clanGuideSpan",
+  domaudio: domAudioPresets.defaultButton,
+  event: [
+        'click',
+        () => {
+          HelpSplash(Lang.text('clanGuideContent'));
+        },
+  ]
+}, DOM({ src: 'content/clanImages/clan-info.png', tag: 'img' }));
+
   
     const topSideWrapper = DOM(
       { style: "top__side__wrapper" },
