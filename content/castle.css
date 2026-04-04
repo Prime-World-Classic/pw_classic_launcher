@@ -2860,6 +2860,7 @@ body {
 .castle_building_bubble:hover {
   filter: brightness(120%);
 }
+
 /* clans - Xenoz */
 .ClanWindow{
 	width: 90%;
@@ -2871,7 +2872,7 @@ body {
 .clan-wapper{
     width:100vw;
     height:100vh;
-  
+  z-index: 9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -3765,7 +3766,7 @@ height: 10cqh;
     border-right: 0.5cqh groove rgb(10, 44, 38);
 }
 #head{
-    height: 17cqh;
+    height: 12cqh;
 }
 .application-stats{
     width: 75%;
