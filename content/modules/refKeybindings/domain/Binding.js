@@ -1,10 +1,16 @@
-class Binding {
+import Action from "./Action";
+import KeyCombo from "./KeyCombo";
+
+/** 
+ * Class representing a binding.
+*/
+export default class Binding {
   /**
    * Constructor for Binding class.
    * @param {string} id - id of the binding.
-   * @param {string[]} actions - list of actions this binding is bound to.
-   * @param {string[]} keys - list of keys this binding is bound to.
    * @param {'bind' | 'bind_command'} type - type of the binding.
+   * @param {Action[]} actions - list of actions this binding is bound to.
+   * @param {KeyCombo[]} keys - list of keys this binding is bound to.
    */
   constructor (id, type, actions, keys) {
     this.id = id;
@@ -18,12 +24,11 @@ class Binding {
       result = [];
       this.actions.forEach(action => {
         result.push(
-          `${this.type} ${action.toString()} ${
-            this.keys && this.keys.length ? bind.keys.map((k) => `'${k}'`).join(' + ') : "''"
-          }`
+          `${this.type} ${action.toString()} ${this.keys.toString()}`
         );
       });
+    } else {
+      return `${this.type} ${this.actions[0].toString()} ${this.keys.toString()}`
     }
-    
   }
 }

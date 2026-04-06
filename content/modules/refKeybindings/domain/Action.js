@@ -1,4 +1,7 @@
-class Action {
+/**  
+ * Class representing an action.
+*/
+export default class Action {
   /**
    * Constructor for Action class.
    * @param {string} name - name of the action.
