@@ -19,6 +19,14 @@ export default class Binding {
     this.keys = keys;
   }
 
+  /**
+   * Returns a string representation of the binding.
+   * If the binding has multiple actions, it will return an array of strings
+   * with each string representing an action and its bound keys.
+   * If the binding has only one action, it will return a single string
+   * representing the action and its bound keys.
+   * @returns {string[]|string} - string representation of the binding.
+   */
   toString() {
     if (this.actions.length > 1) {
       result = [];
