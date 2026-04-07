@@ -4,6 +4,7 @@
 }
 :root {
   --cursor-pointer: url('img/cursor_button32x32.png') 0 0, pointer;
+  --cursor-default: url('img/cursor32x32.png') 0 0, default;
   --build-hl-h: 199;
   --build-hl-border-mm: 0.42mm;
 }
@@ -5659,7 +5660,21 @@ i-success {
   transform: none !important;
   z-index: 1 !important;
   --voice-monitor-scale: 1;
-  --voice-window-size-factor: 0.6;
+  --voice-window-size-factor: 0.9;
+}
+
+.voice-window-mode,
+.voice-window-mode * {
+  cursor: var(--cursor-default);
+}
+
+.voice-window-mode .voice-info-panel-body-item-name,
+.voice-window-mode .voice-info-panel-body-item-mute,
+.voice-window-mode .voice-info-panel-close,
+.voice-window-mode button,
+.voice-window-mode [role='button'],
+.voice-window-mode a:any-link {
+  cursor: var(--cursor-pointer);
 }
 
 .voice-window-mode .voice-info-panel-close {
@@ -5708,6 +5723,14 @@ i-success {
 .voice-window-mode .voice-info-panel-body-item-mute {
   font-size: calc(28px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
   line-height: 1;
+}
+
+.voice-window-mode .voice-info-panel-body-item-muted-by {
+  font-size: calc(22px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  line-height: 1;
+  color: #ff3b30;
+  text-shadow: 0 0 6px rgba(255, 59, 48, 0.65);
+  user-select: none;
 }
 
 .voice-window-mode .voice-info-panel-body-item-nostream {
@@ -5840,6 +5863,14 @@ i-success {
 .voice-info-panel-body-item-mute {
   font-size: clamp(0.9em, 1.2vw, 1.6em);
   line-height: 1;
+}
+
+.voice-info-panel-body-item-muted-by {
+  font-size: clamp(0.8em, 1.1vw, 1.4em);
+  line-height: 1;
+  color: #ff3b30;
+  text-shadow: 0 0 0.4em rgba(255, 59, 48, 0.65);
+  user-select: none;
 }
 
 .voice-info-panel-body-item-nostream {
