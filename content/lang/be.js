@@ -21,6 +21,8 @@ export const be = {
     radminPriority: 'Прыярытэт RadminVPN',
     threeD: '3D графіка',
     voiceInWindow: 'Голас у акне',
+    voiceInWindowRequiresWin11: 'Патрабуецца Windows 11',
+    voiceInWindowRequiresNwjs: 'Патрабуецца nw.js 100.1 або вышэй',
     volume: 'Агульная гучнасць',
     volumeMusic: 'Гучнасць музыкі',
     volumeSound: 'Гучнасць гукаў',

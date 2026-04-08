@@ -15,6 +15,7 @@ export class Settings {
     language: 'ru',
     novoice: false,
     voiceInWindow: true,
+    voiceWindowCrashGuard: false,
     voiceRadioMode: false,
     voiceToggleHotkey: ['CTRL', 'Z'],
     voiceDropHotkey: ['CTRL', 'K'],
@@ -86,6 +87,29 @@ export class Settings {
     } catch (e) {
       App.error(Lang.text('settingsSaveFailed') + e);
     }
+  }
+  
+  static WriteSettingsSync() {
+    if (!this.settingsFilePath || !NativeAPI.status) {
+      return;
+    }
+    try {
+      NativeAPI.fileSystem.writeFileSync(this.settingsFilePath, JSON.stringify(this.settings, null, 2), 'utf-8');
+    } catch {}
+  }
+  
+  static setVoiceWindowCrashGuard(active = false) {
+    this.settings.voiceWindowCrashGuard = Boolean(active);
+    this.WriteSettingsSync();
+  }
+  
+  static async applyVoiceWindowCrashRecovery() {
+    if (!this.settings?.voiceWindowCrashGuard) {
+      return;
+    }
+    this.settings.voiceWindowCrashGuard = false;
+    this.settings.voiceInWindow = false;
+    await this.WriteSettings();
   }
 
   // Инициализация глобальных горячих клавиш
@@ -197,6 +221,7 @@ export class Settings {
 
   static async init() {
     await this.ReadSettings();
+    await this.applyVoiceWindowCrashRecovery();
     NativeAPI.refreshVoiceHotkeys?.();
     await this.ApplySettings();
 

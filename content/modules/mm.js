@@ -48,6 +48,9 @@ export class MM {
   static skipVoiceRestoreOnClose = false;
 
   static gameRunEvent() {
+    if (Settings.settings?.voiceInWindow && !Settings.settings?.novoice) {
+      Settings.setVoiceWindowCrashGuard(true);
+    }
     MM.isInBattle = true;
     Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
     Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
@@ -59,6 +62,7 @@ export class MM {
   }
 
   static gameStopEvent() {
+    Settings.setVoiceWindowCrashGuard(false);
     MM.isInBattle = false;
     Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
     Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);

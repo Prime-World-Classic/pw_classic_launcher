@@ -6187,6 +6187,14 @@ body:has(#wcastle-call)::before {
   position: relative;
 }
 
+.castle-menu-item-checkbox.is-disabled {
+  opacity: 0.45;
+}
+
+.castle-menu-item-checkbox.is-disabled label {
+  filter: grayscale(0.35);
+}
+
 .castle-menu-item-checkbox input[type='checkbox'] {
   appearance: none;
   width: 10cqw;

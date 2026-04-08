@@ -222,6 +222,29 @@ export class NativeAPI {
     // Windows 10+ kernel is 10.0+.
     return major < 10;
   }
+  
+  static isLegacyNwjsForVoiceWindow() {
+    let nwVersion = '';
+    try {
+      nwVersion = String(process?.versions?.nw || '');
+    } catch {}
+    if (!nwVersion) {
+      return false;
+    }
+    const parts = nwVersion.split('.').map((x) => Number(String(x || '').replace(/[^\d]/g, '')));
+    let major = Number(parts[0] || 0);
+    let minor = Number(parts[1] || 0);
+    // Some builds report NW.js as "0.100.1".
+    // Normalize to major=100, minor=1 for threshold checks.
+    if (major === 0 && Number.isFinite(parts[1]) && parts[1] > 0) {
+      major = Number(parts[1] || 0);
+      minor = Number(parts[2] || 0);
+    }
+    if (!Number.isFinite(major) || !Number.isFinite(minor)) {
+      return false;
+    }
+    return major < 100 || (major === 100 && minor < 1);
+  }
 
   static restoreVoicePanelToMainWindow() {
     if (!Voice.infoPanel) return;
@@ -261,6 +284,9 @@ export class NativeAPI {
       return;
     }
     if (NativeAPI.isLegacyWindowsForVoiceWindow()) {
+      return;
+    }
+    if (NativeAPI.isLegacyNwjsForVoiceWindow()) {
       return;
     }
     if (!NativeAPI.status || !NativeAPI.app || NativeAPI.voiceWindow) {

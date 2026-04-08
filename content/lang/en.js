@@ -32,6 +32,8 @@ export const en = {
     threeD: '3D',
     voiceEnabled: 'Turn off voice chat',
     voiceInWindow: 'Voice in window',
+    voiceInWindowRequiresWin11: 'Windows 11 is required',
+    voiceInWindowRequiresNwjs: 'nw.js 100.1 or newer is required',
     voiceRadioMode: 'Enable radio mode',
     volume: 'Volume',
     volumeMusic: 'Volume of music',

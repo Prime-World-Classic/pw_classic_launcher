@@ -34,6 +34,8 @@ export const ru = {
     threeD: '3D графика',
     voiceEnabled: 'Выключить войс чат',
     voiceInWindow: 'Войс в окне',
+    voiceInWindowRequiresWin11: 'Требуется Windows 11',
+    voiceInWindowRequiresNwjs: 'Требуется nw.js 100.1 или выше',
     voiceRadioMode: 'Включить режим рации',
     volume: 'Общая громкость',
     volumeMusic: 'Громкость музыки',
