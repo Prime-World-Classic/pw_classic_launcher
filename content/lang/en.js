@@ -515,12 +515,12 @@ export const en = {
       {
         type: 'p',
         content:
-          '<b>Skills(2)</b> — abilities of the character available from the start in the build window. They can be active or passive. Skills cannot be transferred between heroes.',
+          '<b>Class Talents(2)</b> — abilities of the character available from the start in the build window. They can be active or passive. Skills cannot be transferred between heroes.',
       },
       {
         type: 'p',
         content:
-          '<b>Talents(3)</b> — hero items that improve their attributes. They allow your hero to deal more damage, evade attacks more effectively, and recover health faster. They can be active or passive.',
+          '<b>Non-Class Talents(3)</b> — hero items that improve their attributes. They allow your hero to deal more damage, evade attacks more effectively, and recover health faster. They can be active or passive.',
       },
       {
         type: 'p',
