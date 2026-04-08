@@ -202,6 +202,26 @@ export class NativeAPI {
     });
     NativeAPI.app.registerGlobalHotKey(NativeAPI.voiceDownVolume);
   }
+  
+  static isLegacyWindowsForVoiceWindow() {
+    if (NativeAPI.platform !== 'win32') {
+      return false;
+    }
+    let release = '';
+    try {
+      release = String(NativeAPI.os?.release?.() || '');
+    } catch {}
+    if (!release) {
+      return false;
+    }
+    const parts = release.split('.');
+    const major = Number(parts[0] || 0);
+    if (!Number.isFinite(major)) {
+      return false;
+    }
+    // Windows 10+ kernel is 10.0+.
+    return major < 10;
+  }
 
   static restoreVoicePanelToMainWindow() {
     if (!Voice.infoPanel) return;
@@ -234,6 +254,9 @@ export class NativeAPI {
   }
 
   static openVoiceWindow() {
+    if (NativeAPI.isLegacyWindowsForVoiceWindow()) {
+      return;
+    }
     if (!NativeAPI.status || !NativeAPI.app || NativeAPI.voiceWindow) {
       return;
     }
