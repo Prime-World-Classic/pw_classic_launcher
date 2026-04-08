@@ -31,6 +31,7 @@ export const en = {
     radminPriority: 'RadminVPN Priority',
     threeD: '3D',
     voiceEnabled: 'Turn off voice chat',
+    voiceInWindow: 'Voice in window',
     voiceRadioMode: 'Enable radio mode',
     volume: 'Volume',
     volumeMusic: 'Volume of music',

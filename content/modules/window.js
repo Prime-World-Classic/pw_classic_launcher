@@ -959,6 +959,26 @@ export class Window {
               tag: 'input',
               domaudio: domAudioPresets.defaultSelect,
               type: 'checkbox',
+              id: 'voice-in-window',
+              checked: Settings.settings.voiceInWindow !== false,
+              event: [
+                'change',
+                (e) => {
+                  Settings.settings.voiceInWindow = e.target.checked;
+                },
+              ],
+            },
+            { checked: Settings.settings.voiceInWindow !== false },
+          ),
+          DOM({ tag: 'label', for: 'voice-in-window' }, Lang.text('voiceInWindow')),
+        ),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
               id: 'voice-radio-mode',
               checked: Settings.settings.voiceRadioMode,
               event: [

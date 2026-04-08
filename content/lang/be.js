@@ -20,6 +20,7 @@ export const be = {
     windowMode: 'Аконны рэжым',
     radminPriority: 'Прыярытэт RadminVPN',
     threeD: '3D графіка',
+    voiceInWindow: 'Голас у акне',
     volume: 'Агульная гучнасць',
     volumeMusic: 'Гучнасць музыкі',
     volumeSound: 'Гучнасць гукаў',

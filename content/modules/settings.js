@@ -14,6 +14,7 @@ export class Settings {
     radminPriority: false,
     language: 'ru',
     novoice: false,
+    voiceInWindow: true,
     voiceRadioMode: false,
     voiceToggleHotkey: ['CTRL', 'Z'],
     voiceDropHotkey: ['CTRL', 'K'],

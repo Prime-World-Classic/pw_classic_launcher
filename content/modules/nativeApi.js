@@ -254,6 +254,12 @@ export class NativeAPI {
   }
 
   static openVoiceWindow() {
+    if (Settings.settings?.novoice) {
+      return;
+    }
+    if (Settings.settings?.voiceInWindow === false) {
+      return;
+    }
     if (NativeAPI.isLegacyWindowsForVoiceWindow()) {
       return;
     }

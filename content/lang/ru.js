@@ -33,6 +33,7 @@ export const ru = {
     radminPriority: 'Приоритет RadminVPN',
     threeD: '3D графика',
     voiceEnabled: 'Выключить войс чат',
+    voiceInWindow: 'Войс в окне',
     voiceRadioMode: 'Включить режим рации',
     volume: 'Общая громкость',
     volumeMusic: 'Громкость музыки',

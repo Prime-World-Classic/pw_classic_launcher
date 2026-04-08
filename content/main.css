@@ -6114,6 +6114,10 @@ body:has(#wcastle-call)::before {
   padding-top: 3cqh;
 }
 
+#wcastle-menu {
+  z-index: 2147483647 !important;
+}
+
 #wcastle-render-debug {
   bottom: 0;
 }
