@@ -95,9 +95,12 @@ export const ru = {
 		settingsSplashLabel:'Выберите действие с игроком ',
 		addInFriendsButton: "Добавить в друзья",
 		addInPartyButton: "Пригласить в группу",
-		appClanStatusButton: "Дать повышение",
 		kickFromClanButton: "Выгнать из клана",
 		clanActionModal: 'Настройки участника',
+    addPlayerWithNickNameDesc: 'Введите никнейм игрока',
+    clanStatusToMemberButton: 'Понизить в звании',
+    clanStatusToColiderButton: "Дать повышение",
+    youAreLeaderText: 'Вы являетесь лидером',
   clanGuideContent: [
   { type: 'h2', content: 'Руководство по клановой системе игры Prime World' },
   { type: 'br' },

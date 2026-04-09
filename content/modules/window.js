@@ -189,8 +189,8 @@ export class Window {
     return DOM({ id: 'wgame' }, view);
   }
     static async clans() {
-    const userRole = "lider";
-    // const userRole = "coLider";
+     const userRole = "lider";
+    //const userRole = "coLider";
     // const userRole = "member";
     // const userRole = "noClan";
   
@@ -246,62 +246,109 @@ export class Window {
     const memberRows = clanData.clanMembers.map(row => {
       const roleData = clanRolesList[row.role] || clanRolesList.Member;
       const showPlayerInfo = (e) => {
-        e.stopPropagation();
-  
-        const splashContent = DOM({ tag: "div", style: "splash-content" });
-  
-        const escHandler = (event) => {
-          if (event.key === 'Escape') {
-            event.preventDefault();
-            event.stopPropagation();
-            Splash.hide();
-            document.removeEventListener('keydown', escHandler, true);
-          }
-        };
-  
-        const closeHandler = (closeEvent) => {
-          closeEvent.stopPropagation();
+  e.stopPropagation();
+
+  const splashContent = DOM({ tag: "div", style: "splash-content" });
+
+  const escHandler = (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      Splash.hide();
+      document.removeEventListener('keydown', escHandler, true);
+    }
+  };
+
+  const closeHandler = (closeEvent) => {
+    closeEvent.stopPropagation();
+    Splash.hide();
+    document.removeEventListener('keydown', escHandler, true);
+  };
+
+  const closeButton = DOM({
+    tag: "div",
+    style: "close-button",
+    event: ["click", closeHandler]
+  });
+  closeButton.style.backgroundImage = "url(content/icons/close-cropped.svg)";
+
+  const renderStatusButton = () => {
+    if (userRole === 'lider' && row.role === 'Colider') {
+      return DOM({ 
+        style: "clanMembersButton", 
+        tag: "button",
+        event: ['click', () => {
+          console.log('Demote to Member:', row.name);
           Splash.hide();
-          document.removeEventListener('keydown', escHandler, true);
-        };
-  
-        const closeButton = DOM({
-          tag: "div",
-          style: "close-button",
-          event: ["click", closeHandler]
-        });
-        closeButton.style.backgroundImage = "url(content/icons/close-cropped.svg)";
-  
-        splashContent.append(
-          DOM({ style: "splash-title" }, 
-            DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('clanActionModal'))),
-            DOM({style: "splashClanMemberMenu"},
-              DOM({}, Lang.text("settingsSplashLabel") + '"' +row.name + '"'),
-              (userRole == 'lider')
-              ? DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('appClanStatusButton')),
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('kickFromClanButton')),
-              )
-              : (userRole == 'coLider')
-              ?DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
-              )
-              : DOM({style: "buttonsMembersMenuList"},
-                  DOM({ style: "clanMembersButton", tag: "button" },  Lang.text('addInFriendsButton')),
-                  DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
-              )
-            )
-          ),
-          // DOM({ style: "splash-text" }, `Игрок: ${row.name}`),
-          closeButton
-        );
-  
-        document.addEventListener('keydown', escHandler, true);
-        Splash.show(splashContent, false);
-      };
+        }]
+      }, Lang.text('clanStatusToMemberButton'));
+    }
+    if (userRole === 'lider' && row.role === 'Member') {
+      return DOM({ 
+        style: "clanMembersButton", 
+        tag: "button",
+        event: ['click', () => {
+          console.log('Promote to Colider:', row.name);
+          Splash.hide();
+        }]
+      }, Lang.text('clanStatusToColiderButton'));
+    }
+    if (userRole === 'coLider' && row.role === 'Member') {
+      return DOM({ 
+        style: "clanMembersButton", 
+        tag: "button",
+        event: ['click', () => {
+          console.log('Promote to Colider:', row.name);
+          Splash.hide();
+        }]
+      }, Lang.text('clanStatusToColiderButton'));
+    }
+    return DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('appClanStatusButton'));
+  };
+
+  const statusButton = renderStatusButton();
+
+  const renderButtonsList = () => {
+    if (userRole === 'lider' && row.role === 'Lider') {
+      return DOM({ style: "buttonsMembersMenuList" },
+        DOM({ style: "clanMembersText" }, Lang.text('youAreLeaderText'))
+      );
+    }
+    if (userRole == 'lider') {
+      return DOM({style: "buttonsMembersMenuList"},
+        DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
+        DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
+        statusButton,
+        DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('kickFromClanButton'))
+      );
+    }
+    if (userRole == 'coLider') {
+      return DOM({style: "buttonsMembersMenuList"},
+        DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
+        DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
+        statusButton
+      );
+    }
+    return DOM({style: "buttonsMembersMenuList"},
+      DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
+      DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton'))
+    );
+  };
+
+  splashContent.append(
+    DOM({ style: "splash-title" }, 
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('clanActionModal'))),
+      DOM({style: "splashClanMemberMenu"},
+        DOM({}, Lang.text("settingsSplashLabel") + '"' + row.name + '"'),
+        renderButtonsList()
+      )
+    ),
+    closeButton
+  );
+
+  document.addEventListener('keydown', escHandler, true);
+  Splash.show(splashContent, false);
+};
   
       return DOM(
         { style: "row__main__case__clan" },
@@ -480,13 +527,50 @@ export class Window {
     );
   
     const tab3 = DOM({ style: "tab-content", id: "tab3" },
-      userRole == "lider" || userRole == "coLider"
-      ? DOM({ style: "applications-main-wrapper" },
-          DOM({ style: "wrap-add-witch-nickname" }, DOM({ style: "add_with_nickname", tag: "button" }, Lang.text("addPlayerWithNickName"))),
-          DOM({ style: "applications-list" }, ...applicationsList)
-        )
-      : DOM({ style: "applications-main-wrapper" }, DOM({ tag: "span" }, "У вас нет должных полномочий"))
-    );
+  userRole == "lider" || userRole == "coLider"
+  ? DOM({ style: "applications-main-wrapper" },
+      DOM({ style: "wrap-add-witch-nickname" }, 
+        DOM({ 
+          style: "add_with_nickname", 
+          tag: "button",
+          domaudio: domAudioPresets.defaultButton,
+          event: ['click', () => {
+            const splashContent = DOM({ tag: "div", style: "splash-content" });
+            
+            const escHandler = (e) => {
+              if (e.key === 'Escape' && Splash.body && Splash.body.contains(splashContent)) {
+                e.preventDefault();
+                e.stopPropagation();
+                Splash.hide();
+                document.removeEventListener('keydown', escHandler, true);
+              }
+            };
+            
+            const hideHandler = () => {
+              Splash.hide();
+              document.removeEventListener('keydown', escHandler, true);
+            };
+            
+            const closeButton = DOM({
+              tag: "div",
+              style: "close-button",
+              event: ["click", hideHandler]
+            });
+            closeButton.style.backgroundImage = "url(content/icons/close-cropped.svg)";
+            
+            const addPlayerContent = createAddPlayerSplash(hideHandler);
+            
+            splashContent.append(closeButton, addPlayerContent);
+            
+            document.addEventListener('keydown', escHandler, true);
+            Splash.show(splashContent, false);
+          }]
+        }, Lang.text("addPlayerWithNickName"))
+      ),
+      DOM({ style: "applications-list" }, ...applicationsList)
+    )
+  : DOM({ style: "applications-main-wrapper" }, DOM({ tag: "span" }, "У вас нет должных полномочий"))
+);
   
     const tab4 = DOM({ style: "tab-content", id: "tab4" },
       DOM({ style: "clan-rating-wrapper" }, ...clanTopList)
@@ -590,7 +674,37 @@ const clanGuideContent = DOM({ style: 'clan-help-content' },
   DOM({ tag: "h2" }, "В будущем планируется расширение возможностей клана, а также новые механики.")
 );
 
-// === БЛОК С ИКОНКОЙ СПРАВКИ ===
+const createAddPlayerSplash = (hideHandler) => {
+  return DOM({ style: 'splash-add-player' },
+    DOM({ style: 'splash-title' }, 
+      DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('addPlayerWithNickName')))
+    ),
+    DOM({ style: 'splash-add-player-content' },
+      DOM({ tag: 'p', id: 'text-clans-modal', style: 'title-modal-text'}, Lang.text('addPlayerWithNickNameDesc')),
+      DOM({ style: 'add-player-input-wrapper' },
+        DOM({
+          tag: 'input',
+          type: 'text',
+          id: 'addPlayerNickname',
+          placeholder: Lang.text('enterNickname'),
+          style: 'add-player-input'
+        }),
+        DOM({
+          tag: 'button',
+          style: 'clanMembersButton',
+          domaudio: domAudioPresets.defaultButton,
+          event: ['click', () => {
+            const nickname = document.getElementById('addPlayerNickname')?.value?.trim();
+            if (nickname) {
+              Splash.hide();
+            }
+          }]
+        }, Lang.text('inviteToAFriend'))
+      )
+    )
+  );
+};
+
 const clanGuideSpan = DOM({
   tag: "span",
   style: "clanGuideSpan",

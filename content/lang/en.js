@@ -97,6 +97,64 @@ export const en = {
 		appClanStatusButton: "Promote",
 		kickFromClanButton: "Kick from clan",
 		clanActionModal: 'Member settings',
+    addPlayerWithNickNameDesc: "Enter the player's nickname",
+    clanStatusToMemberButton: 'Demote',
+    clanStatusToColiderButton: "Give a raise",
+    youAreLeaderText: 'You are already the leader',
+    clanGuideContent: [
+  { type: 'h2', content: 'Prime World Clan System Guide' },
+  { type: 'br' },
+  {
+    type: 'p',
+    content:
+      'A clan is an alliance of players under a single coat of arms. By completing quests and participating in joint battles, members level up and push their clan to the top of the leaderboard.',
+  },
+  { type: 'br' },
+  { type: 'h4', content: '<b>Clan Objectives:</b>' },
+  {
+    type: 'ul',
+    content: [
+      'Forming groups to play together in various game modes;',
+      'Completing clan quests to increase the clan level;',
+      'Accumulating points to advance the clan level.',
+    ],
+  },
+  { type: 'br' },
+  {
+    type: 'p',
+    content:
+      'As the clan reaches new levels, every member will eventually be able to participate in <magenta>clan wars</magenta> and receive account bonuses.',
+  },
+  { type: 'br' },
+  { type: 'h4', content: '<b>Clan Points Details:</b>' },
+  {
+    type: 'ul',
+    content: [
+      'Clan points represent the rating earned by each member through battles;',
+      'Points determine the clan level and the maximum number of members;',
+      'The higher the clan rating, the more players can be invited;',
+      'Every <num>24</num> hours, points are deducted from the clan rating: <num>number of members × 15</num>;',
+      'The clan leader and <num>4</num> vassals cannot be removed, even if the clan level drops to zero;',
+      'If the member count exceeds the limit, players are automatically removed (sorted by inactivity).',
+    ],
+  },
+  { type: 'br' },
+  { type: 'h4', content: '<b>Rank-Based Permissions:</b>' },
+  {
+    type: 'ul',
+    content: [
+      '<b>Clan Leader</b>: change name/coat of arms, invite/remove players, view logs, manage ranks, take quests, disband the clan;',
+      '<b>Deputy</b>: invite/remove players, view logs, take quests;',
+      '<b>Member</b>: take quests, earn points for the clan.',
+    ],
+  },
+  { type: 'br' },
+  {
+    type: 'p',
+    content:
+      'Future updates will expand clan features and introduce new mechanics. Stay tuned for updates!',
+  },
+],
   
 	//BackEnd
 	structureError: 'Structure error',
