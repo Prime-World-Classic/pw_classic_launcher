@@ -746,29 +746,31 @@ const clanGuideSpan = DOM({
     topSideWrapper.style.position = "relative";
   
     return DOM(
-      { style: 'clan-wapper', id: 'clan-wapper' },
-      userRole !== "noClan"
-        ? DOM(
-            { style: 'main__clan__wrapper' },
+  { style: 'clan-wapper', id: 'clan-wapper' },
+  userRole !== "noClan"
+    ? DOM(
+        { style: 'main__clan__wrapper' },
+        DOM(
+          { style: "left-side-clan" },
+          topSideWrapper,
+          DOM(
+            { style: "bottom__side__wrapper" },
             DOM(
-              { style: "left-side-clan" },
-              topSideWrapper,
-              DOM(
-                { style: "bottom__side__wrapper" },
-                DOM(
-                  { style: "btns-list-clan" },
-                  DOM({ id: "tab-btn-1", style: ["btn__clan", "active"], tag: "button", event: ["click", (e) => setActiveButton(e.target, 0)] }, Lang.text("mainPage")),
-                  DOM({ id: "tab-btn-2", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 1)] }, Lang.text("QuestsPage")),
-                  DOM({ id: "tab-btn-3", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 2)] }, Lang.text("applicationsPage")),
-                  DOM({ id: "tab-btn-4", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 3)] }, Lang.text("clansRatingPage")),
-                  DOM({ id: "tab-btn-5", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 4)] }, Lang.text("settingsPage"))
-                )
-              )
-            ),
-            rightSideContainer
+              { style: "btns-list-clan" },
+              DOM({ id: "tab-btn-1", style: ["btn__clan", "active"], tag: "button", event: ["click", (e) => setActiveButton(e.target, 0)] }, Lang.text("mainPage")),
+              DOM({ id: "tab-btn-2", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 1)] }, Lang.text("QuestsPage")),
+              DOM({ id: "tab-btn-3", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 2)] }, Lang.text("applicationsPage")),
+              DOM({ id: "tab-btn-4", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 3)] }, Lang.text("clansRatingPage")),
+              DOM({ id: "tab-btn-5", style: "btn__clan", tag: "button", event: ["click", (e) => setActiveButton(e.target, 4)] }, Lang.text("settingsPage"))
+            )
           )
-        : DOM({ style: 'main__clan__wrapper' })
-    );
+        ),
+        rightSideContainer
+      )
+    : DOM({ style: 'main__clan__wrapper' },
+        DOM({ style: "clan-rating-wrapper" }, ...clanTopList)
+      )
+);
   }
   
   static async history() {
