@@ -5026,21 +5026,21 @@ export const en = {
     talent_489_name: 'The Radiance of Inflexibility',
     talent_489_description:
       'Talent <tn>Life-giving radiance</tn> removes all negative effects.<br> <br> <gray>Set</gray> <orange-d>"Life-giving radiance"</orange-d>',
-    talent_490_name: 'The excitement of a bomber<white> <CD>80</CD></white>',
+   talent_490_name: 'The excitement of a bomber<white> <CD>80</CD></white>',
     talent_490_description:
       '<num>The attacker</num><br><br>The selected target becomes Explosive for <num>3</num> sec, and its Speed is reduced by <num>20%</num>. On death or when the effect ends, all enemies around take <fiz>%s</fiz> damage (from the highest of Strength and Intellect). Each learned talent in the set increases the number of explosive targets after the first explosion by <num>1</num>.<br> <br> <gray>Set</gray> <orange-d>"Demolition Man\'s Excitement"</orange-d><br><br><gray>- can be improved by <num>3</num> talents</gray>',
     talent_491_name: 'Explosive persistence',
     talent_491_description:
-      'Makes <num>2</num> enemies hurt by talent <tn>The excitement of a bomber</tn> is also explosive.<br> <br> <gray>Set</gray> <orange-d>"Excitement of the bomber"</orange-d>',
+      'Increases the slow effect of explosive charges by <num>20%</num>.<br> <br> <gray>Set</gray> <tn>"The excitement of a bomber"</tn>',
     talent_492_name: 'Explosive violence',
     talent_492_description:
-      'Talent <tn>The  The excitement of a bomber</tn> causes <fiz>%s</fiz> more damage.<br> <br> <gray>Set</gray> <orange-d>"Excitement of the bomber"</orange-d>',
+      'Allows you to apply the <tn>"The excitement of a bomber"</tn> talent to a building, causing it to explode as many times as the set can generate explosive charges.<br> <br> <gray>Set</gray> <tn>"The excitement of a bomber"</tn>',
     talent_493_name: 'Explosive indefatigability',
     talent_493_description:
-      'Makes <num>2</num> enemies hurt by talent <tn>The excitement of a bomber is also explosive.<br> <br> <gray>Set</gray> <orange-d>"Excitement of the bomber"</orange-d>',
+      'Reduces the cooldown of the <tn>"The excitement of a bomber"</tn> talent by <num>30</num> seconds.<br> <br> <gray>Set</gray> <tn>"The excitement of a bomber"</tn>',
     talent_494_name: 'Explosive Domination',
     talent_494_description:
-      'Talent <tn>The excitement of a bomber</tn> additionally deals damage equal to <num>3%</num> (<num>1.5%</num> against structures) of the target\'s maximum Health. <br> <br> <gray>Set</gray> <orange-d>"Demolition Man\'s Excitement"</orange-d>',
+      'Talent <tn>The excitement of a bomber</tn> additionally deals damage equal to <num>3%</num> (<num>1.5%</num> against structures) of the target\'s maximum Health. <br> <br> <gray>Set</gray> <orange-d>"The excitement of a bomber"</orange-d>',
     talent_495_name: 'Ritual extermination<white> <CD>100</CD></white>',
     talent_495_description:
       '<num>The attacker</num><br><br>Deals <fiz>%s</fiz> damage to the specified enemy.<br> <br> <gray>Set</gray> <orange-d>"Ritual extermination"</orange-d><br><br><gray>- can be improved by <num>3</num> talents</gray>',
@@ -5310,16 +5310,16 @@ export const en = {
       'Talent <orange-d>Forest symbol</orange-d> additionally deals <mag>%s</mag> damage. The damage is distributed evenly across the set targets affected by the class ability.<br> <br> <gray>Set</gray> <orange-d>"Forest symbol"</orange-d>',
     talent_584_name: 'The Order of Victory',
     talent_584_description:
-      '<gray>Set</gray> <orange-d>"An experienced warrior"</orange-d> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>Hero\'s attack deals enemy soldiers <fiz>15</fiz> additional damage</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Every <num>15</num> seconds. the attack deals the enemy Hero or tower <mag>75</mag> damage</gray> <br> <orange-l>3 talents</orange-l> <br> <num>+6</num> <gray> to the highest out of Strength and Intellect</gray>',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
     talent_585_name: 'Order of Courage',
     talent_585_description:
-      '<gray>Set</gray> <orange-d>"An experienced warrior"</orange-d> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>Hero\'s attack deals enemy soldiers <fiz>15</fiz> additional damage</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Every <num>15</num> seconds. the attack deals the enemy Hero or tower <mag>75</mag> damage</gray> <br> <orange-l>3 talents</orange-l> <br> <num>+6</num> <gray> to the highest out of Strength and Intellect</gray>',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
     talent_586_name: 'Order of Courage',
     talent_586_description:
-      '<gray>Set</gray> <orange-d>"An experienced warrior"</orange-d> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>Hero\'s attack deals enemy soldiers <fiz>15</fiz> additional damage</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Every <num>15</num> seconds. the attack deals the enemy Hero or tower <mag>75</mag> damage</gray> <br> <orange-l>3 talents</orange-l> <br> <num>+6</num> <gray> to the highest out of Strength and Intellect</gray>',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
     talent_587_name: 'The Order of Nobility',
     talent_587_description:
-      '<gray>Set</gray> <orange-d>"An experienced warrior"</orange-d> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>Hero\'s attack deals enemy soldiers <fiz>15</fiz> additional damage</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Every <num>15</num> seconds. the attack deals the enemy Hero or tower <mag>75</mag> damage</gray> <br> <orange-l>3 talents</orange-l> <br> <num>+6</num> <gray> to the highest out of Strength and Intellect</gray>',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
     talent_588_name: 'Stronghold of Life',
     talent_588_description:
       '<gray>Set</gray> <orange-d>"Impenetrable bulwark"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>+6</num> <gray>to the greatest of Stamina and Will</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Hero\'s damage is reduced by <num>10%</num></gray>',
@@ -5427,16 +5427,16 @@ export const en = {
       '<gray>Set</gray> <orange-d>"The Healing Pillar"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <gray>Increases Health recovery for yourself and your allies next to the Hero by <num>10%</num></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The Healing Pillar</orange-d></gray>',
     talent_623_name: 'A Moment of Cunning',
     talent_623_description:
-      '<gray>Set</gray> <orange-d>"Desperate moment"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>A desperate moment</orange-d></gray>',
+      '<gray>Set</gray> <tn>"Desperate Moment"</tn> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>The cooldown of the <tn>"Desperate Moment"</tn> talent is reduced by <num>80</num> seconds</gray>',
     talent_624_name: 'Desperate moment<white> <CD>240</CD></white>',
     talent_624_description:
-      '<num>Tactical</num><br><br>Instantly restores all class talents except the ultimate ability <br> <br> <gray>Set</gray> <orange-d>"Desperate moment"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>A desperate moment</orange-d></gray>',
+      '<num>Tactical</num><br><br>Instantly restores all class talents except the ultimate ability <br> <br> <gray>Set</gray> <tn>"Desperate Moment"</tn> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>The cooldown of the <tn>"Desperate Moment"</tn> talent is reduced by <num>80</num> seconds</gray>',
     talent_625_name: 'A Moment of audacity',
     talent_625_description:
-      '<gray>Set</gray> <orange-d>"Desperate moment"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>A desperate moment</orange-d></gray>',
+      '<gray>Set</gray> <tn>"Desperate Moment"</tn> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>The cooldown of the <tn>"Desperate Moment"</tn> talent is reduced by <num>80</num> seconds</gray>',
     talent_626_name: 'A Moment of wit',
     talent_626_description:
-      '<gray>Set</gray> <orange-d>"Desperate moment"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>A desperate moment</orange-d></gray>',
+      '<gray>Set</gray> <tn>"Desperate Moment"</tn> <br> <br> <orange-l>2 talents</orange-l> <br> <num>-6%</num>⌛ <gray></gray> <br> <orange-l>3 talents</orange-l> <br> <gray>The cooldown of the <tn>"Desperate Moment"</tn> talent is reduced by <num>80</num> seconds</gray>',
     talent_627_name: 'Champion of Stamina',
     talent_627_description:
       '<gray>Set</gray> <orange-d>"The Reward of the Champion"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>+6</num> <gray>to the greatest of Stamina and Will</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The reward of the champion</orange-d></gray>',
@@ -5449,18 +5449,18 @@ export const en = {
     talent_630_name: 'Champion of Freedom',
     talent_630_description:
       '<gray>Set</gray> <orange-d>"The Reward of the Champion"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>+6</num> <gray>to the greatest of Stamina and Will</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The reward of the champion</orange-d></gray>',
-    talent_631_name: 'Destructive Agility',
+     talent_631_name: 'Destructive Agility',
     talent_631_description:
-      '<gray>Set</gray> <orange-d>"The Power of the destroyer"</orange-d> <br> <br> <orange-l>2 talents</orange-l><br> <num>+6</num> <gray>to the greatest of Agility and Cunning</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The power of the destroyer</orange-d></gray>',
+      '<gray>Set</gray> <tn>"The Power of the Destroyer"</tn> <br> <orange-l>2 talents</orange-l> <br> <gray>Reduces the cooldown of the <tn>The Power of the Destroyer</tn> talent by <num>45</num> seconds</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Increases the duration of the <tn>The Power of the Destroyer</tn> talent by <num>2</num> seconds</gray>',
     talent_632_name: 'The Power of the destroyer<white> <CD>180</CD></white>',
     talent_632_description:
-      '<num>The attacker</num><br><br>For <num>5</num> seconds, the Hero\'s attacks deal additional damage equal to <num>5%</num> of the target\'s max Health (bosses <num>2%</num>) <br> <br> <gray>Set</gray> <orange-d>"The Power of the destroyer"</orange-d> <br> <br> <orange-l>2 talents</orange-l><br> <num>+6</num> <gray>to the greatest of Agility and Cunning</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The power of the destroyer</orange-d></gray>',
+      '<num>The attacker</num><br><br>For <num>5</num> seconds, the Hero\'s attacks deal additional damage equal to <num>5%</num> of the target\'s max Health (bosses <num>2%</num>) <br> <br> <gray>Set</gray> <tn>"The Power of the Destroyer"</tn> <br> <orange-l>2 talents</orange-l> <br> <gray>Reduces the cooldown of the <tn>The Power of the Destroyer</tn> talent by <num>45</num> seconds</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Increases the duration of the <tn>The Power of the Destroyer</tn> talent by <num>2</num> seconds</gray>',
     talent_633_name: 'Destructive Knowledge',
     talent_633_description:
-      '<gray>Set</gray> <orange-d>"The Power of the destroyer"</orange-d> <br> <br> <orange-l>2 talents</orange-l><br> <num>+6</num> <gray>to the greatest of Agility and Cunning</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The power of the destroyer</orange-d></gray>',
+      '<gray>Set</gray> <tn>"The Power of the Destroyer"</tn> <br> <orange-l>2 talents</orange-l> <br> <gray>Reduces the cooldown of the <tn>The Power of the Destroyer</tn> talent by <num>45</num> seconds</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Increases the duration of the <tn>The Power of the Destroyer</tn> talent by <num>2</num> seconds</gray>',
     talent_634_name: 'Destructive Rage',
     talent_634_description:
-      '<gray>Set</gray> <orange-d>"The Power of the destroyer"</orange-d> <br> <br> <orange-l>2 talents</orange-l><br> <num>+6</num> <gray>to the greatest of Agility and Cunning</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use talent <orange-d>The power of the destroyer</orange-d></gray>',
+      '<gray>Set</gray> <tn>"The Power of the Destroyer"</tn> <br> <orange-l>2 talents</orange-l> <br> <gray>Reduces the cooldown of the <tn>The Power of the Destroyer</tn> talent by <num>45</num> seconds</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Increases the duration of the <tn>The Power of the Destroyer</tn> talent by <num>2</num> seconds</gray>',
     talent_635_name: 'Infantry assault',
     talent_635_description:
       '<gray>Set</gray> <orange-d>"Storming the Fortress"</orange-d> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>Allied towers next to the hero increase damage to heroes, while enemy towers decrease damage by <num>10%</num></gray><br> <orange-l>2 talents</orange-l> <br> <num>+6</num> <gray>to the greatest of Strength and Intellect</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Allows you to use the talent <orange-d>Storming the fortress</orange-d></gray>',
