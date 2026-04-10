@@ -165,10 +165,131 @@ export class Chat {
     );
   }
 
+  static getMessageIdentityKey(data) {
+    if (!data || typeof data !== 'object') {
+      return '';
+    }
+    const uuid = data.uuid;
+    if (uuid !== undefined && uuid !== null && String(uuid) !== '') {
+      return `uuid:${String(uuid)}`;
+    }
+    const messageId = data.messageId;
+    if (messageId !== undefined && messageId !== null && String(messageId) !== '') {
+      return `messageId:${String(messageId)}`;
+    }
+    return '';
+  }
+
+  static isSameMessage(left, right) {
+    const leftKey = Chat.getMessageIdentityKey(left);
+    const rightKey = Chat.getMessageIdentityKey(right);
+    return Boolean(leftKey && rightKey && leftKey === rightKey);
+  }
+
+  static escapeSelectorAttributeValue(value) {
+    const stringValue = String(value ?? '');
+    if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+      return CSS.escape(stringValue);
+    }
+    return stringValue.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  static findMessageItemByAttribute(attrName, datasetKey, value) {
+    const body = Chat.body?.firstChild;
+    if (!body || value === undefined || value === null || value === '') {
+      return null;
+    }
+    const rawValue = String(value);
+    const escapedValue = Chat.escapeSelectorAttributeValue(rawValue);
+    if (escapedValue) {
+      try {
+        const item = body.querySelector(`.chat-body-item[data-${attrName}="${escapedValue}"]`);
+        if (item) return item;
+      } catch (error) {
+        // Fallback below for malformed selectors or unsupported escaping.
+      }
+    }
+    const list = body.querySelectorAll(`.chat-body-item[data-${attrName}]`);
+    for (const item of list) {
+      if (item.dataset?.[datasetKey] === rawValue) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  static findMessageItemByKey(messageKey) {
+    return Chat.findMessageItemByAttribute('message-key', 'messageKey', messageKey);
+  }
+
+  static findMessageItemByEchoId(echoId) {
+    return Chat.findMessageItemByAttribute('echo-id', 'echoId', echoId);
+  }
+
+  static isLocalEchoItem(item) {
+    if (!item) return false;
+    if (item.dataset?.localEcho === '1') return true;
+    return String(item.dataset?.messageId || '').startsWith('local-');
+  }
+
+  static findLocalEchoItemByEchoId(echoId) {
+    const body = Chat.body?.firstChild;
+    if (!body || echoId === undefined || echoId === null || echoId === '') {
+      return null;
+    }
+    const rawEchoId = String(echoId);
+    const escapedEchoId = Chat.escapeSelectorAttributeValue(rawEchoId);
+    if (escapedEchoId) {
+      try {
+        const localBySelector = body.querySelector(
+          `.chat-body-item[data-echo-id="${escapedEchoId}"][data-local-echo="1"]`,
+        );
+        if (localBySelector) return localBySelector;
+      } catch (error) {
+        // Fallback below when selector cannot be parsed.
+      }
+    }
+    const items = body.querySelectorAll('.chat-body-item[data-echo-id]');
+    for (const item of items) {
+      if (item.dataset?.echoId !== rawEchoId) continue;
+      if (Chat.isLocalEchoItem(item)) return item;
+    }
+    return null;
+  }
+
+  static removeLocalEcho(echoId) {
+    const localEcho = Chat.findLocalEchoItemByEchoId(echoId);
+    if (localEcho) {
+      localEcho.remove();
+    }
+  }
+
+  static updateExistingMessageItem(existingItem, data, messageKey) {
+    const { flag, sourceIcon, nickname, message, time } = Chat.buildMessageContent(data);
+    const parts = [];
+    if (flag) parts.push(flag);
+    if (sourceIcon) parts.push(sourceIcon);
+    parts.push(nickname, message, time);
+    const contentWrap = DOM({ style: 'chat-body-item-content' }, ...parts);
+    const oldContentWrap = existingItem.querySelector('.chat-body-item-content');
+    if (oldContentWrap) oldContentWrap.replaceWith(contentWrap);
+    else existingItem.prepend(contentWrap);
+    existingItem.dataset.messageId = data.messageId;
+    existingItem.dataset.messageKey = messageKey || existingItem.dataset.messageKey || '';
+    existingItem.dataset.localEcho = data.localEcho ? '1' : '0';
+    if (data.echoId) {
+      existingItem.dataset.echoId = data.echoId;
+    }
+  }
+
   /** Syncs pinned list from one message (add/update or remove), keeps list open, re-renders. */
   static syncPinnedMessage(data) {
     if (!Array.isArray(Chat.pinnedMessages)) Chat.pinnedMessages = [];
-    Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => m.messageId !== data.messageId);
+    const messageKey = Chat.getMessageIdentityKey(data);
+    Chat.pinnedMessages = Chat.pinnedMessages.filter((m) => {
+      if (!messageKey) return true;
+      return Chat.getMessageIdentityKey(m) !== messageKey;
+    });
     if (data.pinned) Chat.pinnedMessages.push(data);
     Chat.pinnedCollapsed = false;
     Chat.renderPinnedMessages();
@@ -187,7 +308,42 @@ export class Chat {
     Chat.pinnedCollapsed = true;
   }
 
+  static clearPinnedMessages() {
+    Chat.pinnedMessages = [];
+    Chat.pinnedCollapsed = true;
+    Chat.renderPinnedMessages();
+  }
+
+  static syncPinnedMessagesWithBackend() {
+    if (!Array.isArray(Chat.pinnedMessages) || !Chat.pinnedMessages.length) {
+      return;
+    }
+
+    const messages = Chat.pinnedMessages
+      .map((item) => ({
+        messageId: Number(item?.messageId || 0),
+        id: Number(item?.id || 0),
+        nickname: String(item?.nickname || ''),
+        to: Number(item?.to || 0),
+        flag: Number(item?.flag || 0),
+        message: String(item?.message || ''),
+        client: Number(item?.client || 0),
+        source: String(item?.source || ''),
+        pinned: true,
+      }))
+      .filter((item) => Number.isFinite(item.messageId) && item.messageId > 0);
+
+    if (!messages.length) {
+      return;
+    }
+
+    App.api.ghost('user', 'chatPinnedSync', { messages });
+  }
+
   static getMessageSourceType(data) {
+    const source = String(data?.source || '').toLowerCase();
+    if (source === 'steam' || source === 'phone' || source === 'telegram') return source;
+    if (Number(data?.client) === 2) return 'steam';
     if (Number(data?.client) === 1) return 'phone';
     if (Number(data?.id) === -2) return 'telegram';
     return null;
@@ -196,6 +352,7 @@ export class Chat {
   static getMessageSourceLabel(data) {
     const source = Chat.getMessageSourceType(data);
     if (source === 'phone') return Lang.text('titlePhone');
+    if (source === 'steam') return Lang.text('titleSteamClient');
     if (source === 'telegram') return Lang.text('titleTelegram');
     return '';
   }
@@ -299,28 +456,31 @@ export class Chat {
     }
     
     if (data.echoId && !data.localEcho) {
-      const localEcho = Chat.body?.firstChild?.querySelector(`.chat-body-item[data-echo-id="${data.echoId}"]`);
-      if (localEcho) {
-        localEcho.remove();
-      }
+      Chat.removeLocalEcho(data.echoId);
     }
 
     if (!data.messageId) {
       data.messageId = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     }
+    if (!Number.isFinite(Number(data?._ts))) {
+      data._ts = Chat.extractMessageTimestamp(data);
+    }
+    const messageKey = Chat.getMessageIdentityKey(data);
 
-    const existingItem = Chat.body?.firstChild?.querySelector(
-      `.chat-body-item[data-message-id="${data.messageId}"]`,
-    );
+    let existingItem = Chat.findMessageItemByKey(messageKey);
+    if (!existingItem && data.uuid && data.messageId !== undefined && data.messageId !== null && data.messageId !== '') {
+      existingItem = Chat.findMessageItemByKey(`messageId:${String(data.messageId)}`);
+    }
     if (existingItem) {
+      Chat.updateExistingMessageItem(existingItem, data, messageKey);
+      existingItem.querySelector('.chat-pin-button')?.remove();
       if (data.pinned) {
-        existingItem.querySelector('.chat-pin-button')?.remove();
         Chat.syncPinnedMessage(data);
         if (!fromHistory) Chat.revealChatIfNeeded();
       } else {
-        const wasInPinned = Chat.pinnedMessages.some((m) => m.messageId === data.messageId);
+        const wasInPinned = Chat.pinnedMessages.some((m) => Chat.isSameMessage(m, data));
         if (wasInPinned) Chat.syncPinnedMessage(data);
-        if (Chat.canManagePins && !existingItem.querySelector('.chat-pin-button')) {
+        if (Chat.canManagePins) {
           existingItem.append(Chat.createPinButton(data));
         }
       }
@@ -335,7 +495,7 @@ export class Chat {
       return;
     }
 
-    const wasOnlyPinned = Chat.pinnedMessages.some((m) => m.messageId === data.messageId);
+    const wasOnlyPinned = Chat.pinnedMessages.some((m) => Chat.isSameMessage(m, data));
     if (wasOnlyPinned) {
       Chat.syncPinnedMessage(data);
       return;
@@ -357,15 +517,39 @@ export class Chat {
     );
 
     item.dataset.messageId = data.messageId;
+    item.dataset.messageKey = messageKey;
     item.dataset.echoId = data.echoId || '';
+    item.dataset.localEcho = data.localEcho ? '1' : '0';
     if (Chat.canManagePins && !data.pinned) item.append(Chat.createPinButton(data));
 
-    item.addEventListener('contextmenu', () => {
-      if (App.isAdmin() || App.isHelper()) {
-        let body = document.createDocumentFragment();
+    item.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      const canModerate = App.isAdmin() || App.isHelper();
+      let body = document.createDocumentFragment();
+      const modalTitle = DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, 'Чат'));
+      const nicknameLine = DOM({ id: 'friendRemoveText' }, String(data.nickname || ''));
 
+      body.append(
+        modalTitle,
+        nicknameLine,
+        DOM(
+          {
+            style: 'splash-content-button',
+            domaudio: domAudioPresets.bigButton,
+            event: [
+              'click',
+              () => {
+                Splash.hide();
+                App.openStatsProfile({ id: data.id, login: data.nickname });
+              },
+            ],
+          },
+          Lang.text('showStatistics'),
+        ),
+      );
+
+      if (canModerate) {
         body.append(
-          DOM(`Выдать мут чата ${data.nickname}?`),
           DOM(
             {
               style: 'splash-content-button',
@@ -379,21 +563,23 @@ export class Chat {
                 },
               ],
             },
-            'Да',
-          ),
-          DOM(
-            {
-              style: 'splash-content-button',
-              domaudio: domAudioPresets.bigButton,
-              event: ['click', async () => Splash.hide()],
-            },
-            'Нет',
+            'Выдать мут',
           ),
         );
-
-        Splash.show(body);
       }
 
+      body.append(
+        DOM(
+          {
+            style: 'splash-content-button',
+            domaudio: domAudioPresets.bigButton,
+            event: ['click', () => Splash.hide()],
+          },
+          Lang.text('cancel'),
+        ),
+      );
+
+      Splash.show(body);
       return false;
     });
 
@@ -402,7 +588,7 @@ export class Chat {
     if (data.pinned) {
       Chat.syncPinnedMessage(data);
       if (!fromHistory) Chat.revealChatIfNeeded();
-    } else if (Chat.pinnedMessages.some((m) => m.messageId === data.messageId)) {
+    } else if (Chat.pinnedMessages.some((m) => Chat.isSameMessage(m, data))) {
       Chat.syncPinnedMessage(data);
     }
     if (!fromHistory && !data.pinned && !data.localEcho) Chat.addMessageToHistory(data);
@@ -422,6 +608,7 @@ export class Chat {
     }
     const to = Chat.to;
     const echoId = `${App.storage.data.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const outgoingClient = NativeAPI.isSteamClient ? 2 : 0;
     
     Chat.viewMessage({
       messageId: `local-${echoId}`,
@@ -431,7 +618,8 @@ export class Chat {
       flag: 0,
       message: text,
       pinned: false,
-      client: 0,
+      client: outgoingClient,
+      source: outgoingClient === 2 ? 'steam' : '',
       echoId,
       localEcho: true,
     });
@@ -440,13 +628,11 @@ export class Chat {
       await App.api.request('user', 'chat', {
         message: text,
         to,
+        client: outgoingClient,
         echoId,
       });
     } catch (error) {
-      const localEcho = Chat.body?.firstChild?.querySelector(`.chat-body-item[data-echo-id="${echoId}"]`);
-      if (localEcho) {
-        localEcho.remove();
-      }
+      Chat.removeLocalEcho(echoId);
       throw error;
     }
 
@@ -473,8 +659,9 @@ export class Chat {
       if (!Array.isArray(Chat.messages)) {
         Chat.messages = [];
       }
-      if (clone.messageId) {
-        Chat.messages = Chat.messages.filter((msg) => msg.messageId !== clone.messageId);
+      const messageKey = Chat.getMessageIdentityKey(clone);
+      if (messageKey) {
+        Chat.messages = Chat.messages.filter((msg) => Chat.getMessageIdentityKey(msg) !== messageKey);
       }
       Chat.messages.unshift(clone);
       if (Chat.messages.length > Chat.MAX_HISTORY) {
@@ -613,7 +800,7 @@ export class Chat {
     }
 
     const isPinnedNow =
-      Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.some((msg) => msg.messageId === data.messageId);
+      Array.isArray(Chat.pinnedMessages) && Chat.pinnedMessages.some((msg) => Chat.isSameMessage(msg, data));
     const shouldPin = !isPinnedNow;
 
     try {

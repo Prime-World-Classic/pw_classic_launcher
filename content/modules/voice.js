@@ -6,6 +6,7 @@ import { Castle } from './castle.js';
 import { Lang } from './lang.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
+import { normalizeKey } from './keybindings/keybindings.input.js';
 
 export class Voice {
   static peerConnectionConfig = {
@@ -33,7 +34,7 @@ export class Voice {
   static mediaAudioConfigHighQality = {
     echoCancellation: true,
     noiseSuppression: true,
-    autoGainControl: true,
+    autoGainControl: false,
     channelCount: 1,
     sampleRate: 32000,
     sampleSize: 16,
@@ -42,7 +43,7 @@ export class Voice {
   static mediaAudioConfig = {
     echoCancellation: true,
     noiseSuppression: true,
-    autoGainControl: true,
+    autoGainControl: false,
     channelCount: 1,
     sampleRate: 16000,
     sampleSize: 16,
@@ -51,7 +52,7 @@ export class Voice {
   static mediaAudioConfigLowQality = {
     echoCancellation: true,
     noiseSuppression: true,
-    autoGainControl: true,
+    autoGainControl: false,
     channelCount: 1,
     sampleRate: 8000,
     sampleSize: 16,
@@ -59,11 +60,25 @@ export class Voice {
 
   static userMedia = null;
 
+  static rawMic = null;
+
   static mic = null;
+
+  static processingContext = null;
+
+  static processingInput = null;
+
+  static processingGain = null;
+
+  static processingCompressor = null;
+
+  static processingDestination = null;
 
   static manager = new Object();
 
   static infoPanel = null;
+
+  static infoPanelHiddenByUser = false;
 
   static cacheCandidate = new Object();
 
@@ -71,16 +86,337 @@ export class Voice {
 
   static volumeLevel = 1.0;
 
-  static volumeLevelStep = 0.2;
+  static reconnectJobs = new Map();
+
+  static mergeAutoAcceptUntil = new Map();
+  
+  static battleSuspendedPeers = new Map();
+  
+  static mutedPeers = new Set();
+  
+  static mutedByPeers = new Set();
+  
+  static panelMeterStops = new Set();
+
+  static reconnectPlanMs = [2000, 5000, 10000, 15000, 20000];
+
+  static reconnectMaxDurationMs = 15 * 60 * 1000;
+
+  static reconnectDisconnectedGraceMs = 3000;
+
+  static radioHotkeyListenersBound = false;
+
+  static radioPressedByKeyboard = false;
+
+  static radioPulseTimer = null;
+
+  static getReconnectToken(id, key) {
+    return `${String(key || '')}:${Number(id) || 0}`;
+  }
+
+  static markMergeAutoAccept(id, ttlMs = 20000) {
+    const targetId = Number(id);
+    if (!Number.isFinite(targetId) || targetId <= 0) return;
+    Voice.mergeAutoAcceptUntil.set(targetId, Date.now() + Math.max(1000, Number(ttlMs) || 20000));
+  }
+
+  static consumeMergeAutoAccept(id) {
+    const targetId = Number(id);
+    if (!Number.isFinite(targetId) || targetId <= 0) return false;
+    const until = Voice.mergeAutoAcceptUntil.get(targetId);
+    if (!until) return false;
+    Voice.mergeAutoAcceptUntil.delete(targetId);
+    return until >= Date.now();
+  }
+
+  static shouldAutoReconnectKey(key) {
+    return !!key;
+  }
+
+  static isPeerMuted(id) {
+    const targetId = Number(id);
+    return Number.isFinite(targetId) && targetId > 0 && Voice.mutedPeers.has(targetId);
+  }
+
+  static setPeerMuted(id, muted = true) {
+    const targetId = Number(id);
+    if (!Number.isFinite(targetId) || targetId <= 0) {
+      return;
+    }
+    if (muted) {
+      Voice.mutedPeers.add(targetId);
+    } else {
+      Voice.mutedPeers.delete(targetId);
+    }
+    const target = Voice.manager?.[targetId];
+    if (target?.controller) {
+      target.controller.muted = Boolean(muted);
+    }
+  }
+
+  static togglePeerMuted(id) {
+    const targetId = Number(id);
+    if (!Number.isFinite(targetId) || targetId <= 0) {
+      return;
+    }
+    const nextMuted = !Voice.isPeerMuted(targetId);
+    Voice.setPeerMuted(targetId, nextMuted);
+    App.api
+      .ghost('user', 'callMuteState', {
+        id: targetId,
+        muted: nextMuted ? 1 : 0,
+      })
+      .catch(() => {});
+    Voice.updateInfoPanel();
+  }
+
+  static isMutedByPeer(id) {
+    const targetId = Number(id);
+    return Number.isFinite(targetId) && targetId > 0 && Voice.mutedByPeers.has(targetId);
+  }
+
+  static setMutedByPeer(id, muted = true) {
+    const targetId = Number(id);
+    if (!Number.isFinite(targetId) || targetId <= 0) {
+      return;
+    }
+    if (muted) {
+      Voice.mutedByPeers.add(targetId);
+    } else {
+      Voice.mutedByPeers.delete(targetId);
+    }
+    Voice.updateInfoPanel();
+  }
+
+  static stopPanelMeters() {
+    for (const stop of Voice.panelMeterStops) {
+      try {
+        stop?.();
+      } catch {}
+    }
+    Voice.panelMeterStops.clear();
+  }
+
+  static isFriendScopedConnection(target) {
+    const key = String(target?.key || '');
+    if (key === 'friend') {
+      return true;
+    }
+    // Backward compatibility: old friend calls could arrive without key.
+    return !key && Boolean(target?.important);
+  }
+
+  static stopReconnectJob(id, key) {
+    const token = Voice.getReconnectToken(id, key);
+    const job = Voice.reconnectJobs.get(token);
+    if (!job) return;
+    if (job.timer) {
+      clearTimeout(job.timer);
+      job.timer = null;
+    }
+    Voice.reconnectJobs.delete(token);
+  }
+
+  static getReconnectJob(id, key) {
+    const token = Voice.getReconnectToken(id, key);
+    return Voice.reconnectJobs.get(token) || null;
+  }
+
+  static getInfoPanelBody() {
+    return Voice.infoPanel?.querySelector?.('.voice-info-panel-body') || null;
+  }
+
+  static showInfoPanel(force = false) {
+    if (!Voice.infoPanel) return;
+    if (!force && Voice.infoPanelHiddenByUser) return;
+    Voice.infoPanel.style.display = 'flex';
+  }
+
+  static stopAllReconnectJobs() {
+    for (const job of Voice.reconnectJobs.values()) {
+      if (job.timer) {
+        clearTimeout(job.timer);
+        job.timer = null;
+      }
+    }
+    Voice.reconnectJobs.clear();
+  }
+
+  static ensureReconnectJob(id, key, name = '', important = false, initialDelayMs = 0) {
+    if (!Voice.shouldAutoReconnectKey(key)) return;
+    const token = Voice.getReconnectToken(id, key);
+    if (Voice.reconnectJobs.has(token)) return;
+    const job = {
+      id: Number(id),
+      key: String(key || ''),
+      name: String(name || ''),
+      important: Boolean(important),
+      attempt: 0,
+      startedAt: Date.now(),
+      timer: null,
+      activeCallAttempt: false,
+    };
+    Voice.reconnectJobs.set(token, job);
+    const run = async () => {
+      const current = Voice.reconnectJobs.get(token);
+      if (!current) return;
+      if (Date.now() - current.startedAt > Voice.reconnectMaxDurationMs) {
+        Voice.stopReconnectJob(current.id, current.key);
+        return;
+      }
+      const existing = Voice.manager[current.id];
+      if (existing && existing.peer && existing.peer.connectionState !== 'closed') {
+        const delayBusy = Voice.reconnectPlanMs[Math.min(current.attempt, Voice.reconnectPlanMs.length - 1)];
+        current.timer = setTimeout(run, delayBusy);
+        return;
+      }
+      let voice = null;
+      try {
+        current.activeCallAttempt = true;
+        voice = new Voice(current.id, current.key, current.name, current.important);
+        await voice.call({ reconnect: 1 });
+      } catch (error) {
+        console.log('Voice reconnect attempt failed:', error);
+        try {
+          voice?.close({ keepReconnect: true });
+        } catch {}
+      } finally {
+        current.activeCallAttempt = false;
+      }
+      current.attempt += 1;
+      const delay = Voice.reconnectPlanMs[Math.min(current.attempt, Voice.reconnectPlanMs.length - 1)];
+      current.timer = setTimeout(run, delay);
+    };
+    job.timer = setTimeout(run, Math.max(0, Number(initialDelayMs) || 0));
+  }
 
   static init() {
     if (!Voice.infoPanel) {
-      Voice.infoPanel = DOM({ style: ['voice-info-panel', 'left-offset-with-shift'] }, DOM({ style: 'voice-info-panel-body' }));
+      const closeButton = DOM(
+        {
+          tag: 'div',
+          style: ['close-button', 'voice-info-panel-close'],
+          domaudio: domAudioPresets.defaultButton,
+          event: [
+            'click',
+            () => {
+              Voice.infoPanelHiddenByUser = true;
+              if (Voice.infoPanel) Voice.infoPanel.style.display = 'none';
+            },
+          ],
+        },
+      );
+      closeButton.style.backgroundImage = 'url(content/icons/close-cropped.svg)';
+      Voice.infoPanel = DOM({ style: ['voice-info-panel', 'left-offset-with-shift'] }, closeButton, DOM({ style: 'voice-info-panel-body' }));
     }
 
     document.body.append(Voice.infoPanel);
 
+    Voice.ensureRadioHotkeyListeners();
+
     requestAnimationFrame(() => Voice.updatePanelPosition());
+  }
+
+  static getVoiceToggleTokens() {
+    const fallback = ['CTRL', 'Z'];
+    const tokens = Array.isArray(Settings.settings?.voiceToggleHotkey) ? Settings.settings.voiceToggleHotkey : fallback;
+    const cleaned = tokens.map((x) => String(x || '').trim().toUpperCase()).filter(Boolean);
+    return cleaned.length ? cleaned : fallback;
+  }
+
+  static tokensEqual(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (String(a[i]) !== String(b[i])) return false;
+    }
+    return true;
+  }
+
+  static eventMatchesVoiceToggleHotkey(event) {
+    const expected = Voice.getVoiceToggleTokens();
+    if (!expected.length) return false;
+    const actual = normalizeKey(event);
+    return Voice.tokensEqual(expected, Array.isArray(actual) ? actual : []);
+  }
+
+  static async setMicEnabled(enabled) {
+    if (Settings.settings.novoice) return;
+    if (!Voice.userMedia || !Voice.mic) {
+      await Voice.initLocalMedia();
+    }
+    if (!Voice.mic) return;
+    if (Voice.mic.enabled === Boolean(enabled)) return;
+    Voice.mic.enabled = Boolean(enabled);
+    Voice.updateInfoPanel();
+  }
+
+  static async setRadioPressed(pressed) {
+    if (!Settings.settings?.voiceRadioMode) return;
+    const next = Boolean(pressed);
+    if (Voice.radioPressedByKeyboard === next) return;
+    Voice.radioPressedByKeyboard = next;
+    await Voice.setMicEnabled(next);
+  }
+
+  static clearRadioPulseTimer() {
+    if (!Voice.radioPulseTimer) return;
+    clearTimeout(Voice.radioPulseTimer);
+    Voice.radioPulseTimer = null;
+  }
+
+  static async pulseRadioTalk(durationMs = 700) {
+    if (!Settings.settings?.voiceRadioMode) return;
+    if (Voice.radioPressedByKeyboard) return;
+    await Voice.setMicEnabled(true);
+    Voice.clearRadioPulseTimer();
+    Voice.radioPulseTimer = setTimeout(async () => {
+      Voice.radioPulseTimer = null;
+      if (Voice.radioPressedByKeyboard) return;
+      await Voice.setMicEnabled(false);
+    }, Math.max(120, Number(durationMs) || 700));
+  }
+
+  static ensureRadioHotkeyListeners() {
+    if (Voice.radioHotkeyListenersBound) return;
+    Voice.radioHotkeyListenersBound = true;
+
+    document.addEventListener('keydown', async (event) => {
+      if (!Settings.settings?.voiceRadioMode) return;
+      if (event.repeat) return;
+      if (!Voice.eventMatchesVoiceToggleHotkey(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      Voice.clearRadioPulseTimer();
+      await Voice.setRadioPressed(true);
+    });
+
+    document.addEventListener('keyup', async (event) => {
+      if (!Settings.settings?.voiceRadioMode) return;
+      if (!Voice.radioPressedByKeyboard) return;
+      const keyUpper = String(event.key || '').trim().toUpperCase();
+      const isModifierRelease = keyUpper === 'CONTROL' || keyUpper === 'ALT' || keyUpper === 'SHIFT' || keyUpper === 'META';
+      const isMainRelease = Voice.eventMatchesVoiceToggleHotkey(event);
+      if (!isModifierRelease && !isMainRelease) return;
+      Voice.clearRadioPulseTimer();
+      await Voice.setRadioPressed(false);
+    });
+
+    window.addEventListener('blur', async () => {
+      Voice.clearRadioPulseTimer();
+      Voice.radioPressedByKeyboard = false;
+      if (Settings.settings?.voiceRadioMode) {
+        await Voice.setMicEnabled(false);
+      }
+    });
+  }
+
+  static async handleVoiceToggleHotkey() {
+    if (Settings.settings?.voiceRadioMode) {
+      await Voice.pulseRadioTalk(700);
+      return;
+    }
+    await Voice.toggleEnabledMic();
   }
 
   static async initLocalMedia() {
@@ -88,7 +424,7 @@ export class Voice {
       return;
     }
 
-    Voice.infoPanel.style.display = 'flex';
+    Voice.showInfoPanel();
 
     try {
       Voice.userMedia = await navigator.mediaDevices.getUserMedia({
@@ -119,12 +455,63 @@ export class Voice {
       return App.error(Lang.text('cantDefaultMic'));
     }
 
-    Voice.mic = tracks[0];
+    Voice.rawMic = tracks[0];
 
-    Voice.mic.enabled = false;
+    try {
+      Voice.processingContext = new AudioContext();
+      Voice.processingInput = Voice.processingContext.createMediaStreamSource(new MediaStream([Voice.rawMic]));
+      Voice.processingGain = Voice.processingContext.createGain();
+      Voice.processingGain.gain.value = 2.1;
+      Voice.processingCompressor = Voice.processingContext.createDynamicsCompressor();
+      Voice.processingCompressor.threshold.value = -30;
+      Voice.processingCompressor.knee.value = 20;
+      Voice.processingCompressor.ratio.value = 3.5;
+      Voice.processingCompressor.attack.value = 0.01;
+      Voice.processingCompressor.release.value = 0.22;
+      Voice.processingDestination = Voice.processingContext.createMediaStreamDestination();
+
+      Voice.processingInput.connect(Voice.processingGain);
+      Voice.processingGain.connect(Voice.processingCompressor);
+      Voice.processingCompressor.connect(Voice.processingDestination);
+
+      const processedTrack = Voice.processingDestination.stream.getAudioTracks()[0];
+      Voice.mic = processedTrack || Voice.rawMic;
+    } catch (error) {
+      console.log('Voice DSP init failed, fallback to raw mic:', error);
+      Voice.mic = Voice.rawMic;
+    }
+
+    if (Voice.mic) {
+      Voice.mic.enabled = false;
+    }
+  }
+
+  static resetMicProcessing() {
+    try {
+      Voice.processingInput?.disconnect?.();
+    } catch {}
+    try {
+      Voice.processingGain?.disconnect?.();
+    } catch {}
+    try {
+      Voice.processingCompressor?.disconnect?.();
+    } catch {}
+    try {
+      Voice.processingDestination?.disconnect?.();
+    } catch {}
+    try {
+      Voice.processingContext?.close?.();
+    } catch {}
+    Voice.processingContext = null;
+    Voice.processingInput = null;
+    Voice.processingGain = null;
+    Voice.processingCompressor = null;
+    Voice.processingDestination = null;
   }
 
   static async toggleEnabledMic() {
+    Voice.infoPanelHiddenByUser = false;
+    Voice.showInfoPanel(true);
     if (!Voice.userMedia) {
       await Voice.initLocalMedia();
 
@@ -157,63 +544,116 @@ export class Voice {
   }
 
   static indication(source, callback) {
-    let audioContext = new AudioContext();
+    let audioContext = null;
+    let mediaStreamSource = null;
+    let analyser = null;
+    let processor = null;
+    let zeroGain = null;
+    let stopped = false;
 
-    let mediaStreamSource = audioContext.createMediaStreamSource(source);
-
-    let analyser = audioContext.createAnalyser();
-
-    mediaStreamSource.connect(analyser);
-
-    analyser.fftSize = 256;
-
-    let bufferLength = analyser.frequencyBinCount;
-
-    let dataArray = new Uint8Array(bufferLength);
-
-    let checkVolume = () => {
-      analyser.getByteFrequencyData(dataArray);
-
-      let sum = 0;
-
-      for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i];
+    const stop = () => {
+      if (stopped) return;
+      stopped = true;
+      if (processor) {
+        processor.onaudioprocess = null;
       }
-
-      let average = Math.round(sum / bufferLength);
-
-      if (average > 100) {
-        average = 100;
-      }
-
-      if (callback) {
-        callback(average);
-      }
-
-      requestAnimationFrame(checkVolume);
+      try {
+        mediaStreamSource?.disconnect?.();
+      } catch {}
+      try {
+        analyser?.disconnect?.();
+      } catch {}
+      try {
+        processor?.disconnect?.();
+      } catch {}
+      try {
+        zeroGain?.disconnect?.();
+      } catch {}
+      try {
+        audioContext?.close?.();
+      } catch {}
+      mediaStreamSource = null;
+      analyser = null;
+      processor = null;
+      zeroGain = null;
+      audioContext = null;
     };
 
-    checkVolume();
+    try {
+      audioContext = new AudioContext();
+      mediaStreamSource = audioContext.createMediaStreamSource(source);
+      analyser = audioContext.createAnalyser();
+      processor = audioContext.createScriptProcessor(2048, 1, 1);
+      zeroGain = audioContext.createGain();
+      zeroGain.gain.value = 0;
+      mediaStreamSource.connect(analyser);
+      analyser.connect(processor);
+      processor.connect(zeroGain);
+      zeroGain.connect(audioContext.destination);
+      analyser.fftSize = 256;
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      processor.onaudioprocess = () => {
+        if (stopped) return;
+        analyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          sum += dataArray[i];
+        }
+
+        let average = Math.round(sum / bufferLength);
+        if (average > 100) {
+          average = 100;
+        }
+
+        if (callback) {
+          callback(average);
+        }
+      };
+    } catch (error) {
+      console.log('Voice indication init failed:', error);
+      stop();
+    }
+
+    return stop;
   }
 
   static updateInfoPanel() {
-    while (Voice.infoPanel.firstChild.firstChild) {
-      Voice.infoPanel.firstChild.firstChild.remove();
+    if (Number.isFinite(Number(Settings.settings?.voiceVolume))) {
+      Voice.setVolumeLevel(Number(Settings.settings.voiceVolume));
+    }
+    Voice.stopPanelMeters();
+    const panelBody = Voice.getInfoPanelBody();
+    if (!panelBody) return;
+    while (panelBody.firstChild) {
+      panelBody.firstChild.remove();
     }
 
     let level = DOM({ style: 'voice-info-panel-body-item-bar-level' });
 
     let bar = DOM({ style: 'voice-info-panel-body-item-bar' }, level);
 
-    if (Voice.mic) {
-      Voice.indication(Voice.userMedia, (percent) => {
+    if (!Voice.mic) {
+      level.style.width = '0%';
+      level.classList.remove('voice-info-panel-body-item-bar-level-muted');
+      bar.classList.add('voice-info-panel-body-item-nostream');
+    } else if (Voice.mic.enabled) {
+      level.classList.remove('voice-info-panel-body-item-bar-level-muted');
+      bar.classList.remove('voice-info-panel-body-item-nostream');
+      const stopMeter = Voice.indication(Voice.userMedia, (percent) => {
         level.style.width = `${percent}%`;
       });
+      Voice.panelMeterStops.add(stopMeter);
     } else {
-      bar.classList.add('voice-info-panel-body-item-nostream');
+      level.style.width = '0%';
+      bar.classList.remove('voice-info-panel-body-item-nostream');
+      level.classList.add('voice-info-panel-body-item-bar-level-muted');
     }
 
-    Voice.infoPanel.firstChild.append(
+    panelBody.append(
       DOM(
         { style: 'voice-info-panel-body-item' },
         DOM(
@@ -258,18 +698,17 @@ export class Voice {
       const dropKey = formatHotkey(Settings.settings?.voiceDropHotkey, 'Ctrl+K');
       const toggleKey = formatHotkey(Settings.settings?.voiceToggleHotkey, 'Ctrl+Z');
       if (Voice.mic.enabled) {
-        tutorial.innerHTML = `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}<br>${Lang.text('hotkeyVolumeControl')}`;
+        tutorial.innerHTML = `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}`;
       } else {
+        const micLabel = String(Voice.rawMic?.label || Voice.mic?.label || 'microphone');
         tutorial.innerHTML =
           `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}` +
-          '<br>' +
-          Lang.text('hotkeyVolumeControl') +
           '<br>────────────<br>' +
-          `<strong>${toggleKey}</strong>${Lang.text('enableMicSuffix').replace('{Voice.mic.label}', Voice.mic.label)}`;
+          `<strong>${toggleKey}</strong>${Lang.text('enableMicSuffix').replace('{Voice.mic.label}', micLabel)}`;
       }
     }
 
-    Voice.infoPanel.firstChild.append(tutorial);
+    panelBody.append(tutorial);
   }
 
   static playerInfoPanel(id) {
@@ -277,22 +716,27 @@ export class Voice {
 
     let state = () => {
       let status = '';
+      const reconnectJob = Voice.getReconnectJob(id, Voice.manager[id].key);
 
-      switch (Voice.manager[id].peer.connectionState) {
-        case 'new':
-          status = Lang.text('waitingResponse');
-          break;
+      if (reconnectJob && Voice.manager[id].peer.connectionState !== 'connected') {
+        status = Lang.text('voiceReconnectingAttempt').replace('{attempt}', String((reconnectJob.attempt || 0) + 1));
+      } else {
+        switch (Voice.manager[id].peer.connectionState) {
+          case 'new':
+            status = Lang.text('waitingResponse');
+            break;
 
-        case 'connecting':
-          status = Lang.text('voiceConnecting');
-          break;
+          case 'connecting':
+            status = Lang.text('voiceConnecting');
+            break;
 
-        default:
-          status = Voice.manager[id].peer.connectionState;
-          break;
+          default:
+            status = Voice.manager[id].peer.connectionState;
+            break;
+        }
       }
 
-      return Voice.manager[id].peer.connectionState == 'connected' ? `${name} [Х]` : `${name} (${status})`;
+      return Voice.manager[id].peer.connectionState == 'connected' ? `${name}` : `${name} (${status})`;
     };
 
     let item = DOM(
@@ -302,24 +746,61 @@ export class Voice {
         event: [
           'click',
           () => {
-            Voice.manager[id].close();
-
+            if (Voice.infoPanel?.classList?.contains('voice-window-mode')) {
+              return;
+            }
+            Voice.drop(Number(id));
             item.remove();
           },
         ],
       },
-      state(),
+      '',
     );
+    
+    let mute = DOM(
+      {
+        domaudio: domAudioPresets.defaultButton,
+        style: ['voice-info-panel-body-item-name', 'voice-info-panel-body-item-mute'],
+        event: ['click', () => Voice.togglePeerMuted(Number(id))],
+      },
+      '',
+    );
+    
+    mute.style.marginRight = '0.5cqw';
+    
+    let mutedByIcon = DOM(
+      {
+        style: 'voice-info-panel-body-item-muted-by',
+      },
+      '✖',
+    );
+    
+    const updateItemView = () => {
+      const mutedMark = Voice.isPeerMuted(Number(id)) ? ' [MUTED]' : '';
+      item.innerText = `${state()}${mutedMark}`;
+      mute.innerText = Voice.isPeerMuted(Number(id)) ? '🔇' : '🔊';
+      mutedByIcon.style.display = Voice.isMutedByPeer(Number(id)) ? '' : 'none';
+    };
+    
+    updateItemView();
 
     let level = DOM({ style: 'voice-info-panel-body-item-bar-level' });
 
     let bar = DOM({ style: 'voice-info-panel-body-item-bar' }, level);
+    let currentStopMeter = null;
 
     let indication = () => {
+      if (currentStopMeter) {
+        currentStopMeter();
+        Voice.panelMeterStops.delete(currentStopMeter);
+        currentStopMeter = null;
+      }
       if (Voice.manager[id].peer.connectionState == 'connected' && Voice.manager[id].stream) {
-        Voice.indication(Voice.manager[id].stream, (percent) => {
+        const stopMeter = Voice.indication(Voice.manager[id].stream, (percent) => {
           level.style.width = `${percent}%`;
         });
+        currentStopMeter = stopMeter;
+        Voice.panelMeterStops.add(stopMeter);
       }
 
       if (Voice.manager[id].stream) {
@@ -335,14 +816,24 @@ export class Voice {
 
     indication();
 
-    Voice.manager[id].peer.onconnectionstatechange = () => {
-      item.innerText = state();
+    const originalOnConnectionStateChange = Voice.manager[id].peer.onconnectionstatechange;
+    Voice.manager[id].peer.onconnectionstatechange = (...args) => {
+      try {
+        originalOnConnectionStateChange?.(...args);
+      } catch {}
+      updateItemView();
 
       indication();
     };
 
-    Voice.infoPanel.firstChild.append(
-      DOM({ style: 'voice-info-panel-body-item' }, item, DOM({ style: 'voice-info-panel-body-item-status' }, bar)),
+    const panelBody = Voice.getInfoPanelBody();
+    if (!panelBody) return;
+    panelBody.append(
+      DOM(
+        { style: 'voice-info-panel-body-item' },
+        DOM({ style: 'voice-info-panel-body-item-controls' }, mute, mutedByIcon, item),
+        DOM({ style: 'voice-info-panel-body-item-status' }, bar),
+      ),
     );
   }
 
@@ -379,12 +870,160 @@ export class Voice {
     await Voice.manager[id].peer.addIceCandidate(candidate);
   }
 
+  static async mergeFriendCalls(users) {
+    if (!Array.isArray(users) || !users.length) {
+      return;
+    }
+    const selfId = Number(App.storage?.data?.id || 0);
+
+    for (const item of users) {
+      const id = Number(item?.id);
+      if (!Number.isFinite(id) || id <= 0) {
+        continue;
+      }
+      if (id === selfId) {
+        continue;
+      }
+      if (id in Voice.manager) {
+        continue;
+      }
+      // Deterministic initiator to avoid both sides calling simultaneously.
+      if (Number.isFinite(selfId) && selfId > 0 && selfId > id) {
+        continue;
+      }
+
+      try {
+        Voice.markMergeAutoAccept(id);
+        const voice = new Voice(id, 'friend', String(item?.name || ''), true);
+        await voice.call({ reconnect: 1 });
+      } catch (error) {
+        console.log('Voice friend merge failed:', error);
+        const msg = String(error || '').toLowerCase();
+        if (msg.includes('request') && msg.includes('pending')) {
+          setTimeout(async () => {
+            if (id in Voice.manager) return;
+            try {
+              Voice.markMergeAutoAccept(id);
+              const retryVoice = new Voice(id, 'friend', String(item?.name || ''), true);
+              await retryVoice.call({ reconnect: 1 });
+            } catch (retryError) {
+              console.log('Voice friend merge retry failed:', retryError);
+            }
+          }, 700);
+        }
+      }
+    }
+  }
+
+  static getConnectedPeerIds(excludeId = 0) {
+    const skipId = Number(excludeId) || 0;
+    const result = [];
+    for (const key of Object.keys(Voice.manager)) {
+      const id = Number(key);
+      if (!Number.isFinite(id) || id <= 0 || id === skipId) continue;
+      const item = Voice.manager[key];
+      const state = String(item?.peer?.connectionState || '');
+      if (state === 'connected' || state === 'connecting') {
+        result.push(id);
+      }
+    }
+    return Array.from(new Set(result));
+  }
+
+  static suspendPeersForBattle(allyIds = []) {
+    const cleanIds = Array.from(new Set((allyIds || []).map((x) => Number(x)).filter((x) => Number.isFinite(x) && x > 0)));
+    const allySet = new Set(cleanIds);
+    for (const idText of Object.keys(Voice.manager)) {
+      const id = Number(idText);
+      if (allySet.has(id)) {
+        continue;
+      }
+      const target = Voice.manager[idText];
+      if (!target) {
+        continue;
+      }
+
+      const key = String(target.key || '');
+      Voice.stopReconnectJob(id, key);
+
+      if (Voice.isFriendScopedConnection(target)) {
+        if (!Voice.battleSuspendedPeers.has(id)) {
+          Voice.battleSuspendedPeers.set(id, {
+            id,
+            key: key || 'friend',
+            name: String(target.name || ''),
+            important: Boolean(target.important),
+          });
+        }
+        App.api.ghost('user', 'callPause', { id }).catch(() => {
+          App.api.ghost('user', 'callDrop', { id }).catch(() => {});
+        });
+      } else {
+        App.api.ghost('user', 'callDrop', { id }).catch(() => {});
+      }
+
+      target.close();
+    }
+
+    if (Voice.mic && !Object.keys(Voice.manager).length) {
+      Voice.mic.enabled = false;
+      Voice.updateInfoPanel();
+    }
+  }
+
+  static restoreSuspendedBattlePeers() {
+    if (!Voice.battleSuspendedPeers.size) {
+      return;
+    }
+
+    const list = Array.from(Voice.battleSuspendedPeers.values());
+    Voice.battleSuspendedPeers.clear();
+
+    let delayMs = 0;
+    for (const item of list) {
+      setTimeout(async () => {
+        if (item.id in Voice.manager) {
+          return;
+        }
+        try {
+          const voice = new Voice(item.id, String(item.key || 'friend'), String(item.name || ''), Boolean(item.important));
+          await voice.call({ reconnect: 1 });
+        } catch (error) {
+          console.log('Voice battle restore failed:', error);
+        }
+      }, delayMs);
+      delayMs += 250;
+    }
+  }
+
+  static async remoteDrop(id) {
+    const target = Voice.manager[id];
+    if (!target) return;
+    Voice.setMutedByPeer(id, false);
+    await target.close();
+  }
+
+  static drop(id) {
+    const target = Voice.manager[id];
+    if (!target) return;
+    App.api.ghost('user', 'callDrop', { id }).catch(() => {});
+    target.close();
+  }
+
   static destroy(full = false, say = false) {
+    if (!full && Voice.infoPanel?.classList?.contains('voice-window-mode')) {
+      return;
+    }
+    Voice.stopAllReconnectJobs();
+    Voice.battleSuspendedPeers.clear();
     for (let id in Voice.manager) {
       if (!full && Voice.manager[id].important) {
         continue;
       }
 
+      if (Number(id) > 0) {
+        App.api.ghost('user', 'callDrop', { id: Number(id) }).catch(() => {});
+      }
       Voice.manager[id].close();
     }
 
@@ -394,9 +1033,17 @@ export class Voice {
 
     if (Voice.mic) {
       if (full) {
-        Voice.mic.stop();
+        try {
+          Voice.mic?.stop?.();
+        } catch {}
+        try {
+          Voice.rawMic?.stop?.();
+        } catch {}
+        Voice.resetMicProcessing();
 
         Voice.mic = null;
+        
+        Voice.rawMic = null;
 
         Voice.userMedia = null;
       } else {
@@ -411,29 +1058,34 @@ export class Voice {
     }
   }
 
-  static volumeControl(increase = false) {
-    let volumeLevel = 0.0;
-
-    if (increase) {
-      volumeLevel = Voice.volumeLevel + Voice.volumeLevelStep;
-
-      if (volumeLevel > 1.0) {
-        return;
+  static destroyTamburCallsOnly() {
+    for (let id in Voice.manager) {
+      const target = Voice.manager[id];
+      if (!target) continue;
+      const key = String(target.key || '');
+      // Preserve friend/friend-of-friend calls; drop only MM/tambur scoped calls.
+      if (Voice.isFriendScopedConnection(target)) {
+        continue;
       }
-
-      App.say(`${Math.round(volumeLevel * 100)}%`);
-    } else {
-      volumeLevel = Voice.volumeLevel - Voice.volumeLevelStep;
-
-      if (volumeLevel < 0.0) {
-        return;
+      Voice.stopReconnectJob(Number(id), key);
+      if (Number(id) > 0) {
+        App.api.ghost('user', 'callDrop', { id: Number(id) }).catch(() => {});
       }
-
-      App.say(`${Math.round(volumeLevel * 100)}%`);
+      target.close();
     }
 
+    if (Voice.mic && !Object.keys(Voice.manager).length) {
+      Voice.mic.enabled = false;
+      Voice.updateInfoPanel();
+    }
+  }
+
+  static setVolumeLevel(level = 1.0) {
+    const volumeLevel = Math.max(0, Math.min(1, Number(level) || 0));
     for (let id in Voice.manager) {
-      Voice.manager[id].controller.volume = volumeLevel;
+      if (Voice.manager[id]?.controller) {
+        Voice.manager[id].controller.volume = volumeLevel;
+      }
     }
 
     Voice.volumeLevel = volumeLevel;
@@ -456,6 +1108,9 @@ export class Voice {
       throw Lang.text('voiceDisabled');
     }
 
+    Voice.infoPanelHiddenByUser = false;
+    Voice.showInfoPanel(true);
+
     let start = false;
 
     for (let user of users) {
@@ -476,6 +1131,9 @@ export class Voice {
   }
 
   constructor(id, key = '', name = '', important = false) {
+    if (Number.isFinite(Number(Settings.settings?.voiceVolume))) {
+      Voice.setVolumeLevel(Number(Settings.settings.voiceVolume));
+    }
     this.id = id;
 
     this.key = key;
@@ -485,6 +1143,14 @@ export class Voice {
     this.important = important;
 
     this.isCaller = false;
+
+    this.reconnectScheduled = false;
+    
+    this.hasEverConnected = false;
+    
+    this.disconnectTimer = null;
+
+    this.allowAutoReconnect = true;
 
     this.stream = null;
 
@@ -514,6 +1180,8 @@ export class Voice {
       this.controller.controls = true;
 
       this.controller.volume = Voice.volumeLevel;
+      
+      this.controller.muted = Voice.isPeerMuted(this.id);
 
       this.controller.play();
 
@@ -545,22 +1213,139 @@ export class Voice {
       }
     };
 
+    const clearDisconnectTimer = () => {
+      if (this.disconnectTimer) {
+        clearTimeout(this.disconnectTimer);
+        this.disconnectTimer = null;
+      }
+    };
+
+    const canScheduleReconnect = () => {
+      return (
+        this.allowAutoReconnect &&
+        Voice.shouldAutoReconnectKey(this.key) &&
+        this.isCaller &&
+        !this.reconnectScheduled &&
+        (this.key !== 'friend' || this.hasEverConnected)
+      );
+    };
+
+    this.peer.onconnectionstatechange = () => {
+      const state = String(this.peer?.connectionState || '');
+      switch (state) {
+        case 'connected':
+          this.hasEverConnected = true;
+          if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+          }
+          clearDisconnectTimer();
+          Voice.stopReconnectJob(this.id, this.key);
+          this.reconnectScheduled = false;
+          break;
+
+        case 'disconnected':
+          clearDisconnectTimer();
+          this.disconnectTimer = setTimeout(() => {
+            this.disconnectTimer = null;
+            if (!this.peer || this.peer.connectionState === 'closed') {
+              this.close();
+              return;
+            }
+            if (this.peer.connectionState !== 'disconnected') {
+              return;
+            }
+            if (canScheduleReconnect()) {
+              this.reconnectScheduled = true;
+              Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, Voice.reconnectDisconnectedGraceMs);
+              this.close({ keepReconnect: true });
+            } else {
+              this.close();
+            }
+          }, Voice.reconnectDisconnectedGraceMs);
+          break;
+
+        case 'failed':
+          clearDisconnectTimer();
+          if (canScheduleReconnect()) {
+            this.reconnectScheduled = true;
+            Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, 0);
+            this.close({ keepReconnect: true });
+          } else {
+            this.close();
+          }
+          break;
+
+        case 'closed':
+          clearDisconnectTimer();
+          if (canScheduleReconnect()) {
+            this.reconnectScheduled = true;
+            Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, Voice.reconnectDisconnectedGraceMs);
+            this.close({ keepReconnect: true });
+          } else {
+            this.close();
+          }
+          break;
+      }
+    };
+
     this.peer.oniceconnectionstatechange = () => {
       switch (this.peer.iceConnectionState) {
         case 'connected':
           console.log('Соединение успешно установлено');
+          this.hasEverConnected = true;
+          if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+          }
+          clearDisconnectTimer();
+          Voice.stopReconnectJob(this.id, this.key);
+          this.reconnectScheduled = false;
           break;
 
         case 'disconnected':
-          this.close();
-          break; // reconnect
+          // WebRTC may report transient "disconnected" during glare/rechecks.
+          // Do not drop UI entry immediately; wait and close only if it persists.
+          clearDisconnectTimer();
+          this.disconnectTimer = setTimeout(() => {
+            this.disconnectTimer = null;
+            if (!this.peer || this.peer.connectionState === 'closed') {
+              this.close();
+              return;
+            }
+            if (this.peer.iceConnectionState !== 'disconnected') {
+              return;
+            }
+            if (canScheduleReconnect()) {
+              this.reconnectScheduled = true;
+              Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, Voice.reconnectDisconnectedGraceMs);
+              this.close({ keepReconnect: true });
+            } else {
+              this.close();
+            }
+          }, Voice.reconnectDisconnectedGraceMs);
+          break;
 
         case 'failed':
-          this.close();
-          break; // reconnect
+          clearDisconnectTimer();
+          if (canScheduleReconnect()) {
+            this.reconnectScheduled = true;
+            Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, 0);
+            this.close({ keepReconnect: true });
+          } else {
+            this.close();
+          }
+          break;
 
         case 'closed':
-          this.close();
+          clearDisconnectTimer();
+          if (canScheduleReconnect()) {
+            this.reconnectScheduled = true;
+            Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, Voice.reconnectDisconnectedGraceMs);
+            this.close({ keepReconnect: true });
+          } else {
+            this.close();
+          }
           break;
       }
 
@@ -568,10 +1353,13 @@ export class Voice {
     };
   }
 
-  async call() {
+  async call(options = {}) {
     if (Settings.settings.novoice) {
       throw Lang.text('voiceDisabled');
     }
+
+    Voice.infoPanelHiddenByUser = false;
+    Voice.showInfoPanel(true);
 
     if (!this.peer) {
       return;
@@ -604,6 +1392,7 @@ export class Voice {
       id: this.id,
       key: this.key,
       offer: offer,
+      reconnect: Number(options?.reconnect || 0) ? 1 : 0,
     });
 
     this.isCaller = true;
@@ -615,6 +1404,9 @@ export class Voice {
     if (Settings.settings.novoice) {
       throw Lang.text('voiceDisabled');
     }
+
+    Voice.infoPanelHiddenByUser = false;
+    Voice.showInfoPanel(true);
 
     if (!this.peer) {
       return;
@@ -630,7 +1422,11 @@ export class Voice {
 
     let answer = await this.peer.createAnswer();
 
-    await App.api.ghost('user', 'callAccept', { id: this.id, answer: answer });
+    await App.api.ghost('user', 'callAccept', {
+      id: this.id,
+      answer: answer,
+      mergePeers: Voice.getConnectedPeerIds(this.id),
+    });
 
     await this.peer.setLocalDescription(answer);
 
@@ -638,26 +1434,35 @@ export class Voice {
   }
 
   async reconnect() {
-    console.log('Реконнект...');
-    this.close();
-
-    if (!this.isCaller) {
-      return;
-    }
-
-    let voice = new Voice(this.id, this.key);
-
-    try {
-      voice.call();
-    } catch (error) {
-      console.log(error);
-    }
+    if (!Voice.shouldAutoReconnectKey(this.key) || !this.isCaller) return;
+    Voice.ensureReconnectJob(this.id, this.key, this.name, this.important, 0);
+    this.close({ keepReconnect: true });
   }
 
-  async close() {
-    this.peer.close();
+  async close(options = {}) {
+    const keepReconnect = Boolean(options?.keepReconnect);
+    if (!keepReconnect) {
+      this.allowAutoReconnect = false;
+    }
+    if (!keepReconnect) {
+      Voice.stopReconnectJob(this.id, this.key);
+    }
+    if (this.disconnectTimer) {
+      clearTimeout(this.disconnectTimer);
+      this.disconnectTimer = null;
+    }
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    try {
+      this.peer?.close?.();
+    } catch {}
 
     delete Voice.manager[this.id];
+    
+    Voice.mutedByPeers.delete(this.id);
 
     if (this.id in Voice.cacheCandidate) {
       delete Voice.cacheCandidate[this.id];

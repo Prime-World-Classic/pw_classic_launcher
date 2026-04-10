@@ -42,17 +42,28 @@ export class MM {
   static activeSelectHero = 0;
 
   static isInTambur = false;
+  
+  static isInBattle = false;
+  
+  static skipVoiceRestoreOnClose = false;
 
   static gameRunEvent() {
+    if (Settings.settings?.voiceInWindow && !Settings.settings?.novoice) {
+      Settings.setVoiceWindowCrashGuard(true);
+    }
+    MM.isInBattle = true;
     Castle.toggleRender(Castle.RENDER_LAYER_GAME, false);
     Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, false);
     document.body.style.display = 'none';
+    NativeAPI.openVoiceWindow();
     NativeAPI.window.hide();
 
     NativeAPI.app.unregisterGlobalHotKey(NativeAPI.altEnterShortcut);
   }
 
   static gameStopEvent() {
+    Settings.setVoiceWindowCrashGuard(false);
+    MM.isInBattle = false;
     Castle.toggleRender(Castle.RENDER_LAYER_GAME, true);
     Castle.toggleMusic(Castle.MUSIC_LAYER_GAME, true);
     document.body.style.display = 'block';
@@ -61,6 +72,7 @@ export class MM {
       try {
         Settings.ApplySettings();
 
+        NativeAPI.closeVoiceWindow();
         NativeAPI.window.show();
         NativeAPI.app.registerGlobalHotKey(NativeAPI.altEnterShortcut);
       } catch (e) {
@@ -69,6 +81,8 @@ export class MM {
     }
 
     View.show('castle');
+
+    Voice.restoreSuspendedBattlePeers();
   }
 
   static initView() {
@@ -143,6 +157,12 @@ export class MM {
       clearTimeout(MM.pendingHeroFlushTimer);
       MM.pendingHeroFlushTimer = 0;
     }
+    
+    if (!MM.skipVoiceRestoreOnClose) {
+      Voice.restoreSuspendedBattlePeers();
+    }
+    
+    MM.skipVoiceRestoreOnClose = false;
 
     MM.view.style.display = 'none';
 
@@ -293,6 +313,8 @@ export class MM {
 
         if (request.type == 'reconnect') {
           MM.searchActive(false);
+          
+          MM.id = request.id;
 
           MM.gameRunEvent();
 
@@ -326,6 +348,12 @@ export class MM {
     MM.searchActive(false);
 
     MM.soundEvent();
+    
+    try {
+      Voice.destroyTamburCallsOnly();
+    } catch (error) {
+      console.log(error);
+    }
 
     if (canConfirm) {
       let button = DOM(
@@ -335,12 +363,6 @@ export class MM {
           event: [
             'click',
             async () => {
-              try {
-                Voice.destroy();
-              } catch (error) {
-                console.log(error);
-              }
-  
               try {
                 await App.api.request(App.CURRENT_MM, 'ready', { id: data.id });
               } catch (error) {
@@ -632,9 +654,13 @@ export class MM {
     }
 
     //let preload = new PreloadImages(MM.lobbyHeroes);
+    
+    View.loadCastleHeroSelectedList();
+    View.loadCastleHeroListNames();
+    const selectedHeroListId = Number(View.castleHeroSelectedList) || 0;
+    const selectedHeroListMask = selectedHeroListId > 0 ? 1 << (selectedHeroListId - 1) : 0;
 
-    let activeRankName = '';
-
+    let filteredHeroes = [];
     for (let item of MM.hero) {
       if (!item.id) {
         continue;
@@ -645,25 +671,10 @@ export class MM {
           continue;
         }
       }
-
-      let getRankName = Rank.getName(item.rating);
-
-      if (getRankName != activeRankName) {
-        let rankIcon = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-
-        rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-        let rankIcon2 = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
-
-        rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
-
-        MM.lobbyHeroes.append(
-          DOM({ style: 'mm-lobby-middle-hero-line' }, rankIcon, DOM({ style: 'mm-lobby-middle-hero-line-name' }, getRankName), rankIcon2),
-        );
-
-        activeRankName = getRankName;
-      }
-
+      filteredHeroes.push(item);
+    }
+    
+    const appendHeroCard = (item) => {
       let hero = DOM({
         id: `HERO${item.id}`,
         data: { ban: 0 },
@@ -699,6 +710,58 @@ export class MM {
       MM.lobbyHeroes.append(hero);
 
       //preload.add(hero);
+    };
+
+    let favouriteHeroes = [];
+    let otherHeroes = filteredHeroes;
+
+    if (selectedHeroListMask > 0) {
+      favouriteHeroes = filteredHeroes
+        .filter((item) => (Number(item?.favourite || 0) & selectedHeroListMask) !== 0)
+        .sort((a, b) => Number(b?.rating || 0) - Number(a?.rating || 0));
+
+      otherHeroes = filteredHeroes.filter((item) => (Number(item?.favourite || 0) & selectedHeroListMask) === 0);
+
+      if (favouriteHeroes.length) {
+        const emptyIconLeft = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+        emptyIconLeft.style.backgroundImage = 'url(content/icons/favouriteHero.png)';
+        emptyIconLeft.style.opacity = 1;
+        const emptyIconRight = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+        emptyIconRight.style.backgroundImage = 'url(content/icons/favouriteHero.png)';
+        emptyIconRight.style.opacity = 1;
+        MM.lobbyHeroes.append(
+          DOM(
+            { style: 'mm-lobby-middle-hero-line' },
+            emptyIconLeft,
+            DOM({ style: 'mm-lobby-middle-hero-line-name' }, View.getCastleHeroListName(selectedHeroListId)),
+            emptyIconRight,
+          ),
+        );
+        for (let item of favouriteHeroes) {
+          appendHeroCard(item);
+        }
+      }
+    }
+
+    let activeRankName = '';
+    for (let item of otherHeroes) {
+      let getRankName = Rank.getName(item.rating);
+
+      if (getRankName != activeRankName) {
+        let rankIcon = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+        rankIcon.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+
+        let rankIcon2 = DOM({ style: 'mm-lobby-middle-hero-line-icon' });
+        rankIcon2.style.backgroundImage = `url(content/ranks/${Rank.icon(item.rating)}.webp)`;
+
+        MM.lobbyHeroes.append(
+          DOM({ style: 'mm-lobby-middle-hero-line' }, rankIcon, DOM({ style: 'mm-lobby-middle-hero-line-name' }, getRankName), rankIcon2),
+        );
+
+        activeRankName = getRankName;
+      }
+
+      appendHeroCard(item);
     }
 
     if (App.storage.data.id == data.target) {
@@ -803,13 +866,23 @@ export class MM {
     }
 
     try {
+      const myId = Number(App.storage?.data?.id || 0);
+      const myTeam = data?.users?.[myId]?.team;
+      const allyIds = new Array();
       let list = new Array();
 
       for (let key of data.map) {
-        if (data.users[App.storage.data.id].team == data.users[key].team) {
-          list.push({ id: key, name: data.users[key].nickname });
+        const peerId = Number(key);
+        if (!Number.isFinite(peerId) || peerId <= 0) {
+          continue;
+        }
+        if (myTeam && data.users[key].team == myTeam) {
+          allyIds.push(peerId);
+          list.push({ id: peerId, name: data.users[key].nickname });
         }
       }
+      
+      Voice.suspendPeersForBattle(allyIds);
 
       Voice.association(App.storage.data.id, list, data.id);
     } catch (error) {
@@ -1028,6 +1101,7 @@ export class MM {
 
   static finish(data) {
     Timer.stop();
+    MM.skipVoiceRestoreOnClose = true;
     MM.close();
 
     MM.isInTambur = false;

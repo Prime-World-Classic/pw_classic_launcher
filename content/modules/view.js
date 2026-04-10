@@ -26,6 +26,63 @@ import { Sound } from './sound.js';
 import { ensureActionBarSlotsInNativeCfg, loadKeybinds } from './keybindings/keybindings.io.js';
 import { getHeroSearchAliases } from './heroSearchAliases.js';
 
+const KEYBOARD_LAYOUT_EN_TO_RU = {
+  q: 'й',
+  w: 'ц',
+  e: 'у',
+  r: 'к',
+  t: 'е',
+  y: 'н',
+  u: 'г',
+  i: 'ш',
+  o: 'щ',
+  p: 'з',
+  '[': 'х',
+  ']': 'ъ',
+  a: 'ф',
+  s: 'ы',
+  d: 'в',
+  f: 'а',
+  g: 'п',
+  h: 'р',
+  j: 'о',
+  k: 'л',
+  l: 'д',
+  ';': 'ж',
+  "'": 'э',
+  z: 'я',
+  x: 'ч',
+  c: 'с',
+  v: 'м',
+  b: 'и',
+  n: 'т',
+  m: 'ь',
+  ',': 'б',
+  '.': 'ю',
+  '/': '.',
+  '`': 'ё',
+};
+const KEYBOARD_LAYOUT_RU_TO_EN = Object.fromEntries(Object.entries(KEYBOARD_LAYOUT_EN_TO_RU).map(([enChar, ruChar]) => [ruChar, enChar]));
+const KEYBOARD_LAYOUT_GRID_ROWS = [
+  ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'],
+];
+const KEYBOARD_LAYOUT_POSITIONS = (() => {
+  const positions = new Map();
+  for (let rowIndex = 0; rowIndex < KEYBOARD_LAYOUT_GRID_ROWS.length; rowIndex++) {
+    const row = KEYBOARD_LAYOUT_GRID_ROWS[rowIndex];
+    for (let colIndex = 0; colIndex < row.length; colIndex++) {
+      const enChar = row[colIndex];
+      positions.set(enChar, [rowIndex, colIndex]);
+      const ruChar = KEYBOARD_LAYOUT_EN_TO_RU[enChar];
+      if (ruChar) positions.set(ruChar, [rowIndex, colIndex]);
+    }
+  }
+  return positions;
+})();
+
 export class View {
   static mmQueueMap = {};
   static _actionBarCfgEnsured = false;
@@ -80,6 +137,128 @@ export class View {
     }
 
     View.friendsMenuItem.classList.toggle('friends-menu-item-incoming', View.hasFriendIncomingRequest);
+  }
+
+  static remapQueryByKeyboardLayout(value, layoutMap) {
+    return String(value || '')
+      .split('')
+      .map((char) => layoutMap[char] || char)
+      .join('');
+  }
+
+  static getLayoutAwareSearchVariants(value) {
+    const normalized = String(value || '')
+      .trim()
+      .toLowerCase();
+    if (!normalized) return [];
+    const variants = new Set([normalized]);
+    variants.add(View.remapQueryByKeyboardLayout(normalized, KEYBOARD_LAYOUT_EN_TO_RU));
+    variants.add(View.remapQueryByKeyboardLayout(normalized, KEYBOARD_LAYOUT_RU_TO_EN));
+    return [...variants].filter(Boolean);
+  }
+
+  static splitSearchWords(value) {
+    return String(value || '')
+      .toLowerCase()
+      .split(/[^a-zа-яё0-9]+/i)
+      .filter(Boolean);
+  }
+
+  static hasSingleAdjacentTransposition(left, right) {
+    if (left.length !== right.length || left === right) return false;
+    let firstDiff = -1;
+    for (let i = 0; i < left.length; i++) {
+      if (left[i] !== right[i]) {
+        firstDiff = i;
+        break;
+      }
+    }
+    if (firstDiff < 0 || firstDiff >= left.length - 1) return false;
+    if (!(left[firstDiff] === right[firstDiff + 1] && left[firstDiff + 1] === right[firstDiff])) return false;
+    for (let i = firstDiff + 2; i < left.length; i++) {
+      if (left[i] !== right[i]) return false;
+    }
+    return true;
+  }
+
+  static hasEditDistanceAtMostOne(left, right) {
+    if (left === right) return true;
+    const lenDiff = Math.abs(left.length - right.length);
+    if (lenDiff > 1) return false;
+    let i = 0;
+    let j = 0;
+    let edits = 0;
+    while (i < left.length && j < right.length) {
+      if (left[i] === right[j]) {
+        i++;
+        j++;
+        continue;
+      }
+      edits++;
+      if (edits > 1) return false;
+      if (left.length > right.length) {
+        i++;
+      } else if (left.length < right.length) {
+        j++;
+      } else {
+        if (!View.isKeyboardNeighbor(left[i], right[j])) return false;
+        i++;
+        j++;
+      }
+    }
+    if (i < left.length || j < right.length) edits++;
+    return edits <= 1;
+  }
+
+  static toKeyboardLayoutKey(char) {
+    const normalizedChar = String(char || '').toLowerCase();
+    return KEYBOARD_LAYOUT_RU_TO_EN[normalizedChar] || normalizedChar;
+  }
+
+  static toKeyboardLayoutString(value) {
+    return String(value || '')
+      .split('')
+      .map((char) => View.toKeyboardLayoutKey(char))
+      .join('');
+  }
+
+  static isKeyboardNeighbor(leftChar, rightChar) {
+    if (leftChar === rightChar) return true;
+    const leftPosition = KEYBOARD_LAYOUT_POSITIONS.get(View.toKeyboardLayoutKey(leftChar));
+    const rightPosition = KEYBOARD_LAYOUT_POSITIONS.get(View.toKeyboardLayoutKey(rightChar));
+    if (!leftPosition || !rightPosition) return true;
+    return Math.abs(leftPosition[0] - rightPosition[0]) <= 1 && Math.abs(leftPosition[1] - rightPosition[1]) <= 1;
+  }
+
+  static isFuzzySearchVariantMatch(filterHaystack, filterWords, variant) {
+    if (!variant) return false;
+    if (filterHaystack.includes(variant)) return true;
+    const variantKey = View.toKeyboardLayoutString(variant);
+    if (variantKey && filterWords.some((word) => View.toKeyboardLayoutString(word).includes(variantKey))) return true;
+    if (variant.length < 3) return false;
+    for (const word of filterWords) {
+      if (word.includes(variant)) return true;
+      const prefix = word.slice(0, variant.length);
+      if (prefix && prefix !== word) {
+        if (View.hasSingleAdjacentTransposition(prefix, variant)) return true;
+        if (View.hasEditDistanceAtMostOne(prefix, variant)) return true;
+      }
+      if (Math.abs(word.length - variant.length) > 1) continue;
+      if (View.hasSingleAdjacentTransposition(word, variant)) return true;
+      if (View.hasEditDistanceAtMostOne(word, variant)) return true;
+
+      const wordKey = View.toKeyboardLayoutString(word);
+      const keyPrefix = wordKey.slice(0, variantKey.length);
+      if (keyPrefix && keyPrefix !== wordKey) {
+        if (View.hasSingleAdjacentTransposition(keyPrefix, variantKey)) return true;
+        if (View.hasEditDistanceAtMostOne(keyPrefix, variantKey)) return true;
+      }
+      if (Math.abs(wordKey.length - variantKey.length) <= 1) {
+        if (View.hasSingleAdjacentTransposition(wordKey, variantKey)) return true;
+        if (View.hasEditDistanceAtMostOne(wordKey, variantKey)) return true;
+      }
+    }
+    return false;
   }
 
   static setCastleOpenedBuildHero(heroId = 0) {
@@ -772,6 +951,19 @@ export class View {
 
           MM.hero = request;
 
+          let bannedHeroesResponse = new Array();
+          try {
+            bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
+          } catch (error) {
+            bannedHeroesResponse = new Array();
+          }
+
+          const bannedHeroes = new Set(
+            (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
+              .map((id) => Number(id))
+              .filter((id) => Number.isFinite(id) && id > 0),
+          );
+
           request.push({ id: 0 });
 
           let bodyHero = DOM({ style: 'party-hero' });
@@ -781,7 +973,19 @@ export class View {
           for (let item2 of request) {
             let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
+            const isBannedInMode = item2.id && bannedHeroes.has(Number(item2.id));
+            if (isBannedInMode) {
+              hero.style.filter = 'grayscale(100%)';
+              hero.style.opacity = '0.6';
+              hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
+            }
+
             hero.addEventListener('click', async () => {
+              if (isBannedInMode) {
+                App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
+                return;
+              }
+
               try {
                 await App.api.request(App.CURRENT_MM, 'heroParty', {
                   id: MM.partyId,
@@ -1022,50 +1226,7 @@ export class View {
       event: [
         'click',
         () => {
-          const onEsc = (e) => {
-            if (e.key === 'Escape') {
-              Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, { id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
-              Splash.hide();
-              document.removeEventListener('keydown', onEsc);
-            }
-          };
-          document.addEventListener('keydown', onEsc, { once: true });
-
-          const BASE = 'https://pw2.26rus-game.ru/stats/';
-          const id = Number(App?.storage?.data?.id) || 0;
-          const login = String(App?.storage?.data?.login || '').trim();
-
-          const qs = new URLSearchParams();
-          if (id > 0) qs.set('user_id', String(id));
-          else if (login) qs.set('login', login);
-          else qs.set('user_id', '0');
-          qs.set('tab', 'info');
-          qs.set('q', '');
-          qs.set('_', Date.now().toString());
-
-          const src = `${BASE}?${qs.toString()}`;
-
-          Splash.show(
-            DOM(
-              {
-                domaudio: domAudioPresets.closeButton,
-                style: 'iframe-stats',
-                event: [
-                  'click',
-                  (e) => {
-                    if (e.target === e.currentTarget) Splash.hide();
-                  },
-                ],
-              },
-              DOM({
-                domaudio: domAudioPresets.closeButton,
-                style: 'iframe-stats-navbar',
-                event: ['click', () => Splash.hide()],
-              }),
-              DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' }),
-            ),
-            false,
-          );
+          App.openStatsProfile();
         },
       ],
     });
@@ -1171,22 +1332,26 @@ export class View {
 
     View.castleBottom = DOM({ style: 'castle-bottom-content' });
 
-    View.castleBottom.addEventListener('wheel', function (event) {
-      if (event.deltaY != 0) {
-        let deltaPx = 0;
-        if (event.deltaMode == event.DOM_DELTA_PIXEL) {
-          deltaPx = event.deltaY * SCROLL_MODIFIER;
-        } else if (event.deltaMode == event.DOM_DELTA_LINE) {
-          deltaPx = event.deltaY * 18 * SCROLL_MODIFIER;
-        } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
-          deltaPx = this.clientWidth;
+    View.castleBottom.addEventListener(
+      'wheel',
+      function (event) {
+        if (event.deltaY != 0) {
+          let deltaPx = 0;
+          if (event.deltaMode == event.DOM_DELTA_PIXEL) {
+            deltaPx = event.deltaY * SCROLL_MODIFIER;
+          } else if (event.deltaMode == event.DOM_DELTA_LINE) {
+            deltaPx = event.deltaY * 18 * SCROLL_MODIFIER;
+          } else if (event.deltaMode == event.DOM_DELTA_PAGE) {
+            deltaPx = this.clientWidth;
+          }
+          if (deltaPx !== 0) {
+            event.preventDefault();
+            View.applyCastleBottomScrollDelta(deltaPx);
+          }
         }
-        if (deltaPx !== 0) {
-          event.preventDefault();
-          View.applyCastleBottomScrollDelta(deltaPx);
-        }
-      }
-    }, { passive: false });
+      },
+      { passive: false },
+    );
     View.castleBottom.addEventListener(
       'scroll',
       () => {
@@ -1231,8 +1396,15 @@ export class View {
     });
 
     const partyData = await App.api.request(App.CURRENT_MM, 'loadParty', {});
+    const dbNickname = String(partyData?.users?.[App.storage.data.id]?.nickname || '').trim();
+    if (dbNickname) {
+      nicknameMenuItem.firstChild.textContent = dbNickname;
+      nicknameMenuItem.firstChild.classList.toggle('castle-name-autoscroll', dbNickname.length > 10);
+      if (App?.storage?.data?.login !== dbNickname) {
+        App.storage.data.login = dbNickname;
+      }
+    }
     const playerRatingVisual = partyData.users[App.storage.data.id]?.playerRatingVisual || 0;
-    console.log('DEBUG: Received partyData from loadParty:', partyData);
     let accountRatingItem = DOM(
       {
         style: 'account-rating-menu-item',
@@ -1806,7 +1978,9 @@ export class View {
   static setCastleHeroListName(listId, value) {
     const id = Number(listId) || 0;
     if (id < 1 || id > View.CASTLE_HERO_LISTS_MAX) return;
-    const name = String(value || '').trim().slice(0, 32);
+    const name = String(value || '')
+      .trim()
+      .slice(0, 32);
     if (name) View.castleHeroListNames[id] = name;
     else delete View.castleHeroListNames[id];
     View.persistCastleHeroListNames();
@@ -1862,7 +2036,11 @@ export class View {
 
     const allBtn = DOM(
       {
-        style: ['castle-hero-list-btn', 'castle-hero-list-btn-all', View.castleHeroSelectedList === 0 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        style: [
+          'castle-hero-list-btn',
+          'castle-hero-list-btn-all',
+          View.castleHeroSelectedList === 0 ? 'castle-hero-list-btn-active' : null,
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         title: Lang.text('titleheroes'),
         event: [
@@ -1888,7 +2066,11 @@ export class View {
       const isPhantom = View.castleHeroPhantomList === i;
       const btn = DOM(
         {
-          style: ['castle-hero-list-btn', isActive ? 'castle-hero-list-btn-active' : null, isPhantom ? 'castle-hero-list-btn-phantom' : null].filter(Boolean),
+          style: [
+            'castle-hero-list-btn',
+            isActive ? 'castle-hero-list-btn-active' : null,
+            isPhantom ? 'castle-hero-list-btn-phantom' : null,
+          ].filter(Boolean),
           domaudio: domAudioPresets.defaultButton,
           title: View.getCastleHeroListName(i),
           event: [
@@ -1938,6 +2120,10 @@ export class View {
       bar.append(addBtn);
     }
 
+    const searchWrap = DOM({
+      style: ['castle-hero-list-search-wrap', View.castleHeroSearch ? 'castle-hero-list-search-wrap-has-value' : null].filter(Boolean),
+    });
+
     const search = DOM({
       tag: 'input',
       style: 'castle-hero-list-search',
@@ -1947,28 +2133,51 @@ export class View {
         'input',
         (event) => {
           View.castleHeroSearch = String(event?.target?.value || '');
+          if (View.castleHeroSearch) {
+            searchWrap.classList.add('castle-hero-list-search-wrap-has-value');
+          } else {
+            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
+          }
           /* Не пересобирать toolbar: replaceChildren() снимает фокус с input */
           View.renderCastleHeroesFromCache({ refreshToolbar: false });
         },
       ],
     });
-    bar.append(search);
-
+    const clearSearchBtn = DOM(
+      {
+        tag: 'button',
+        type: 'button',
+        style: 'castle-hero-list-search-clear',
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!search.value) return;
+            search.value = '';
+            View.castleHeroSearch = '';
+            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
+            search.focus();
+            View.renderCastleHeroesFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      '×',
+    );
+    searchWrap.append(search, clearSearchBtn);
+    bar.append(searchWrap);
   }
 
   static buildCastleHeroListEditorCard(listId) {
     const mode = View.castleHeroListEditMode || '';
     const listName = View.getCastleHeroListName(listId);
-    const modeClass = mode === 'add'
-      ? 'castle-hero-list-editor-mode-add'
-      : mode === 'remove'
-        ? 'castle-hero-list-editor-mode-remove'
-        : 'castle-hero-list-editor-mode-idle';
-    const titleText = mode === 'add'
-      ? `Добавить выбранных героев в ${listName}`
-      : mode === 'remove'
-        ? `Удалить выбранных героев из ${listName}`
-        : listName;
+    const modeClass =
+      mode === 'add'
+        ? 'castle-hero-list-editor-mode-add'
+        : mode === 'remove'
+          ? 'castle-hero-list-editor-mode-remove'
+          : 'castle-hero-list-editor-mode-idle';
+    const titleText =
+      mode === 'add' ? `Добавить выбранных героев в ${listName}` : mode === 'remove' ? `Удалить выбранных героев из ${listName}` : listName;
     const totalHeroes = (View.castleHeroAll || []).length;
     let heroesInList = 0;
     for (const hero of View.castleHeroAll || []) {
@@ -1979,7 +2188,11 @@ export class View {
 
     const topPlus = DOM(
       {
-        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-add', canAddToList ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        style: [
+          'castle-hero-list-editor-sign',
+          'castle-hero-list-editor-sign-add',
+          canAddToList ? null : 'castle-hero-list-editor-sign-disabled',
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         event: [
           'click',
@@ -1996,7 +2209,11 @@ export class View {
     );
     const bottomMinus = DOM(
       {
-        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-remove', canRemoveFromList ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        style: [
+          'castle-hero-list-editor-sign',
+          'castle-hero-list-editor-sign-remove',
+          canRemoveFromList ? null : 'castle-hero-list-editor-sign-disabled',
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         event: [
           'click',
@@ -2105,7 +2322,8 @@ export class View {
       View.castleHeroPrevSelectedList = selectedList;
     }
     const editMode = selectedList > 0 ? View.castleHeroListEditMode : '';
-    const searchValue = String(View.castleHeroSearch || '').trim().toLowerCase();
+    const searchVariants = View.getLayoutAwareSearchVariants(View.castleHeroSearch);
+    const hasSearch = searchVariants.length > 0;
     const preload = new PreloadImages(View.castleBottom);
     const pinnedEditorRoot = View.castleHeroPinnedEditor;
     let renderedHeroCount = 0;
@@ -2121,13 +2339,20 @@ export class View {
     for (let item of View.castleHeroAll || []) {
       const localizedNameRaw = String(Lang.heroName(item.id, item.skin) || item.name || `Hero ${item.id}`);
       const localizedName = localizedNameRaw.replace(/<[^>]*>/g, '').trim();
-      const fallbackName = String(item?.name || '').replace(/<[^>]*>/g, '').trim();
+      const fallbackName = String(item?.name || '')
+        .replace(/<[^>]*>/g, '')
+        .trim();
       const customNames = getHeroSearchAliases(item.id)
-        .map((name) => String(name).replace(/<[^>]*>/g, '').trim())
+        .map((name) =>
+          String(name)
+            .replace(/<[^>]*>/g, '')
+            .trim(),
+        )
         .filter(Boolean)
         .join(' ');
       const filterHaystack = `${localizedName} ${fallbackName} ${customNames}`.toLowerCase();
-      if (searchValue && !filterHaystack.includes(searchValue)) {
+      const filterWords = View.splitSearchWords(filterHaystack);
+      if (hasSearch && !searchVariants.some((variant) => View.isFuzzySearchVariantMatch(filterHaystack, filterWords, variant))) {
         continue;
       }
 
@@ -2185,7 +2410,7 @@ export class View {
     }
 
     if (renderedHeroCount === 0) {
-      const emptyText = searchValue ? 'Ничего не найдено' : 'Список пуст';
+      const emptyText = hasSearch ? 'Ничего не найдено' : 'Список пуст';
       View.castleBottom.append(
         DOM(
           { style: ['castle-hero-item', 'castle-hero-list-empty-item'] },
@@ -2256,7 +2481,12 @@ export class View {
 
     const allBtn = DOM(
       {
-        style: ['castle-hero-list-btn', 'castle-hero-list-btn-all', 'castle-friend-list-btn-all', View.castleFriendSelectedList === 0 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        style: [
+          'castle-hero-list-btn',
+          'castle-hero-list-btn-all',
+          'castle-friend-list-btn-all',
+          View.castleFriendSelectedList === 0 ? 'castle-hero-list-btn-active' : null,
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         title: Lang.text('titlefriends'),
         event: [
@@ -2277,7 +2507,11 @@ export class View {
 
     const favBtn = DOM(
       {
-        style: ['castle-hero-list-btn', 'castle-friend-list-btn-fav', View.castleFriendSelectedList === 1 ? 'castle-hero-list-btn-active' : null].filter(Boolean),
+        style: [
+          'castle-hero-list-btn',
+          'castle-friend-list-btn-fav',
+          View.castleFriendSelectedList === 1 ? 'castle-hero-list-btn-active' : null,
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         event: [
           'click',
@@ -2294,6 +2528,10 @@ export class View {
     );
     bar.append(favBtn);
 
+    const searchWrap = DOM({
+      style: ['castle-hero-list-search-wrap', View.castleFriendSearch ? 'castle-hero-list-search-wrap-has-value' : null].filter(Boolean),
+    });
+
     const search = DOM({
       tag: 'input',
       style: 'castle-hero-list-search',
@@ -2303,11 +2541,37 @@ export class View {
         'input',
         (event) => {
           View.castleFriendSearch = String(event?.target?.value || '');
+          if (View.castleFriendSearch) {
+            searchWrap.classList.add('castle-hero-list-search-wrap-has-value');
+          } else {
+            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
+          }
           View.renderCastleFriendsFromCache({ refreshToolbar: false });
         },
       ],
     });
-    bar.append(search);
+    const clearSearchBtn = DOM(
+      {
+        tag: 'button',
+        type: 'button',
+        style: 'castle-hero-list-search-clear',
+        domaudio: domAudioPresets.defaultButton,
+        event: [
+          'click',
+          () => {
+            if (!search.value) return;
+            search.value = '';
+            View.castleFriendSearch = '';
+            searchWrap.classList.remove('castle-hero-list-search-wrap-has-value');
+            search.focus();
+            View.renderCastleFriendsFromCache({ refreshToolbar: false });
+          },
+        ],
+      },
+      '×',
+    );
+    searchWrap.append(search, clearSearchBtn);
+    bar.append(searchWrap);
   }
 
   static buildCastleFriendListEditorCard() {
@@ -2322,7 +2586,11 @@ export class View {
 
     const topPlus = DOM(
       {
-        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-add', canAdd ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        style: [
+          'castle-hero-list-editor-sign',
+          'castle-hero-list-editor-sign-add',
+          canAdd ? null : 'castle-hero-list-editor-sign-disabled',
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         event: [
           'click',
@@ -2339,7 +2607,11 @@ export class View {
     );
     const bottomMinus = DOM(
       {
-        style: ['castle-hero-list-editor-sign', 'castle-hero-list-editor-sign-remove', canRemove ? null : 'castle-hero-list-editor-sign-disabled'].filter(Boolean),
+        style: [
+          'castle-hero-list-editor-sign',
+          'castle-hero-list-editor-sign-remove',
+          canRemove ? null : 'castle-hero-list-editor-sign-disabled',
+        ].filter(Boolean),
         domaudio: domAudioPresets.defaultButton,
         event: [
           'click',
@@ -2409,11 +2681,12 @@ export class View {
       View.castleFriendClearConfirm ? Lang.text('confirmAction') : Lang.text('friendListClear'),
     );
 
-    const modeClass = mode === 'add'
-      ? 'castle-hero-list-editor-mode-add'
-      : mode === 'remove'
-        ? 'castle-hero-list-editor-mode-remove'
-        : 'castle-hero-list-editor-mode-idle';
+    const modeClass =
+      mode === 'add'
+        ? 'castle-hero-list-editor-mode-add'
+        : mode === 'remove'
+          ? 'castle-hero-list-editor-mode-remove'
+          : 'castle-hero-list-editor-mode-idle';
     const titleText = mode === 'add' ? 'Добавить друзей в список' : mode === 'remove' ? 'Удалить друзей из списка' : 'Избранные друзья';
 
     return DOM(
@@ -2434,7 +2707,8 @@ export class View {
 
     const selectedList = Number(View.castleFriendSelectedList) || 0;
     const editMode = selectedList > 0 ? View.castleFriendListEditMode : '';
-    const searchValue = String(View.castleFriendSearch || '').trim().toLowerCase();
+    const searchVariants = View.getLayoutAwareSearchVariants(View.castleFriendSearch);
+    const hasSearch = searchVariants.length > 0;
     const pinnedEditorRoot = View.castleHeroPinnedEditor;
     const preload = new PreloadImages(View.castleBottom);
 
@@ -2550,7 +2824,7 @@ export class View {
                 found.nickname,
               );
 
-              if (App.isAdmin() && ('blocked' in found)) {
+              if (App.isAdmin() && 'blocked' in found) {
                 template.addEventListener('contextmenu', (event) => {
                   event.preventDefault();
                   openAdminFoundUserModal();
@@ -2569,10 +2843,16 @@ export class View {
       },
       DOM(
         { style: 'castle-friend-item-middle' },
-        DOM({ style: 'castle-item-hero-name' }, DOM({ style: ['castle-hero-name', 'add-to-friend-text'] }, DOM({ tag: 'span' }, Lang.text('addFriend')))),
+        DOM(
+          { style: 'castle-item-hero-name' },
+          DOM({ style: ['castle-hero-name', 'add-to-friend-text'] }, DOM({ tag: 'span' }, Lang.text('addFriend'))),
+        ),
         DOM({ src: 'content/hero/addFriend.png', style: 'addToFriendIcon', tag: 'img' }),
         DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-        DOM({ style: 'castle-friend-item-bottom' }, DOM({ style: ['castle-friend-add-group', 'add-to-friend-button'] }, Lang.text('inviteToAFriend'))),
+        DOM(
+          { style: 'castle-friend-item-bottom' },
+          DOM({ style: ['castle-friend-add-group', 'add-to-friend-button'] }, Lang.text('inviteToAFriend')),
+        ),
       ),
     );
     buttonAdd.dataset.url = `content/hero/empty.png`;
@@ -2582,7 +2862,9 @@ export class View {
     for (let item of View.castleFriendAll || []) {
       const status = Number(item?.status);
       const nickname = String(item?.nickname || '');
-      if (searchValue && !nickname.toLowerCase().includes(searchValue)) continue;
+      const nicknameLower = nickname.toLowerCase();
+      const nicknameWords = View.splitSearchWords(nicknameLower);
+      if (hasSearch && !searchVariants.some((variant) => View.isFuzzySearchVariantMatch(nicknameLower, nicknameWords, variant))) continue;
       const inList = status === 1 && View.isCastleFriendInList(item, 1);
       if (selectedList > 0) {
         const inFavList = View.isCastleFriendInList(item, 1);
@@ -2599,12 +2881,7 @@ export class View {
       if (nickname.length > 10) heroName.firstChild.classList.add('castle-name-autoscroll');
       let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
       let bottom = DOM({ style: 'castle-friend-item-bottom' });
-      let friend = DOM(
-        { style: 'castle-friend-item' },
-        DOM({ style: ['castle-item-ornament', 'hover-brightness'] }),
-        heroNameBase,
-        bottom,
-      );
+      let friend = DOM({ style: 'castle-friend-item' }, DOM({ style: ['castle-item-ornament', 'hover-brightness'] }), heroNameBase, bottom);
 
       if (editMode && status === 1) {
         const selected = View.castleFriendEditSelection.has(Number(item.id));
@@ -2660,6 +2937,20 @@ export class View {
               },
               Lang.text('friendRemove'),
             );
+            let profileButton = DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'splash-content-button',
+                event: [
+                  'click',
+                  () => {
+                    Splash.hide();
+                    App.openStatsProfile({ id: item.id, login: item.nickname });
+                  },
+                ],
+              },
+              Lang.text('showStatistics'),
+            );
             let cancelButton = DOM(
               {
                 domaudio: domAudioPresets.closeButton,
@@ -2668,7 +2959,13 @@ export class View {
               },
               Lang.text('friendCancle'),
             );
-            body.append(modal, DOM({ id: 'friendRemoveText' }, Lang.text('friendRemoveText').replace('{nickname}', item.nickname)), removeButton, cancelButton);
+            body.append(
+              modal,
+              DOM({ id: 'friendRemoveText' }, String(item.nickname || '')),
+              profileButton,
+              removeButton,
+              cancelButton,
+            );
             Splash.show(body);
             return false;
           });
@@ -2679,10 +2976,13 @@ export class View {
               {
                 domaudio: domAudioPresets.smallButton,
                 style: 'castle-friend-confirm',
-                event: ['click', async () => {
-                  await App.api.request('friend', 'accept', { id: item.id });
-                  View.bodyCastleFriends();
-                }],
+                event: [
+                  'click',
+                  async () => {
+                    await App.api.request('friend', 'accept', { id: item.id });
+                    View.bodyCastleFriends();
+                  },
+                ],
               },
               Lang.text('friendAccept'),
             ),
@@ -2690,26 +2990,34 @@ export class View {
               {
                 domaudio: domAudioPresets.smallButton,
                 style: 'castle-friend-cancel',
-                event: ['click', async () => {
-                  await App.api.request('friend', 'remove', { id: item.id });
-                  View.bodyCastleFriends();
-                }],
+                event: [
+                  'click',
+                  async () => {
+                    await App.api.request('friend', 'remove', { id: item.id });
+                    View.bodyCastleFriends();
+                  },
+                ],
               },
               Lang.text('friendDecline'),
             ),
           );
         } else if (status == 3) {
-          friend.append(DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('friendAcceptWaiting'))));
+          friend.append(
+            DOM({ style: 'castle-friend-item-middle' }, DOM({ style: 'castle-friend-request' }, Lang.text('friendAcceptWaiting'))),
+          );
           friend.style.filter = 'grayscale(1)';
           bottom.append(
             DOM(
               {
                 domaudio: domAudioPresets.smallButton,
                 style: 'castle-friend-cancel',
-                event: ['click', async () => {
-                  await App.api.request('friend', 'remove', { id: item.id });
-                  View.bodyCastleFriends();
-                }],
+                event: [
+                  'click',
+                  async () => {
+                    await App.api.request('friend', 'remove', { id: item.id });
+                    View.bodyCastleFriends();
+                  },
+                ],
               },
               Lang.text('cancel'),
             ),
@@ -2761,9 +3069,7 @@ export class View {
     View.castleHeroListsBar?.classList?.remove('castle-hero-lists-bar-hidden');
     View.castleHeroPinnedEditor?.replaceChildren?.();
     View.loadCastleFriendSelectedList();
-    while (View.castleBottom.firstChild) {
-      View.castleBottom.firstChild.remove();
-    }
+    View.renderCastleFriendsFromCache();
 
     App.api.silent(
       (result) => {
@@ -3172,6 +3478,19 @@ export class View {
 
           MM.hero = request;
 
+          let bannedHeroesResponse = new Array();
+          try {
+            bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
+          } catch (error) {
+            bannedHeroesResponse = new Array();
+          }
+
+          const bannedHeroes = new Set(
+            (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
+              .map((id) => Number(id))
+              .filter((id) => Number.isFinite(id) && id > 0),
+          );
+
           request.push({ id: 0 });
 
           let bodyHero = DOM({ style: 'party-hero' });
@@ -3181,7 +3500,19 @@ export class View {
           for (let item of request) {
             let hero = DOM({ domaudio: domAudioPresets.smallButton });
 
+            const isBannedInMode = item.id && bannedHeroes.has(Number(item.id));
+            if (isBannedInMode) {
+              hero.style.filter = 'grayscale(100%)';
+              hero.style.opacity = '0.6';
+              hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
+            }
+
             hero.addEventListener('click', async () => {
+              if (isBannedInMode) {
+                App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
+                return;
+              }
+
               try {
                 await App.api.request(App.CURRENT_MM, 'heroParty', {
                   id: MM.partyId,
@@ -3321,6 +3652,7 @@ export class View {
       { id: 2, labelKey: 'gm3' },
       { id: 3, labelKey: 'gm4' },
     ];
+    const HERO_STATS_TAB_ID = 6;
 
     const heroId = hero == null || hero === '' ? 0 : Number(hero) || 0;
     let activeMode = mode == null || mode === '' ? 0 : Number(mode);
@@ -3330,15 +3662,21 @@ export class View {
     if (activeMode === 4 || activeMode === 5) {
       activeMode = 0;
     }
+    const isHeroStatsView = activeMode === HERO_STATS_TAB_ID;
+    if (!isHeroStatsView && activeMode > 3) {
+      activeMode = 0;
+    }
 
     let body = DOM({ style: 'main' });
 
     const [result] = await Promise.all([
-      App.api.request(App.CURRENT_MM, 'top', {
-        limit: 100,
-        hero: heroId,
-        mode: activeMode,
-      }),
+      isHeroStatsView
+        ? App.api.request(App.CURRENT_MM, 'topHeroStats')
+        : App.api.request(App.CURRENT_MM, 'top', {
+            limit: 100,
+            hero: heroId,
+            mode: activeMode,
+          }),
       (async () => {
         if (!MM.hero) {
           try {
@@ -3354,9 +3692,17 @@ export class View {
       throw 'Рейтинг отсутствует';
     }
 
-    const list = Array.isArray(result) ? result : [];
+    const list = isHeroStatsView ? [] : (Array.isArray(result) ? result : []);
+    const heroStatsPayload =
+      isHeroStatsView && result && typeof result === 'object' && !Array.isArray(result)
+        ? result
+        : { month: [], allTime: [] };
 
     const heroNameById = (id) => {
+      const localizedName = Lang.heroName(Number(id), 1);
+      if (localizedName && localizedName !== `hero_${Number(id)}_name`) {
+        return localizedName;
+      }
       const row = MM.hero && MM.hero.find((h) => Number(h.id) === Number(id));
       return row && row.name ? row.name : '';
     };
@@ -3365,14 +3711,8 @@ export class View {
       if (rankNum < 1 || rankNum > 3) {
         return [];
       }
-      const src =
-        rankNum === 1
-          ? 'content/icons/crown_5.png'
-          : rankNum === 2
-            ? 'content/icons/crown_3.png'
-            : 'content/icons/crown_2.png';
-      const style =
-        variant === 'podium' ? ['wtop-crown', 'wtop-crown--podium'] : ['wtop-crown', 'wtop-crown--row'];
+      const src = rankNum === 1 ? 'content/icons/crown_5.png' : rankNum === 2 ? 'content/icons/crown_3.png' : 'content/icons/crown_2.png';
+      const style = variant === 'podium' ? ['wtop-crown', 'wtop-crown--podium'] : ['wtop-crown', 'wtop-crown--row'];
       return [
         DOM({
           tag: 'img',
@@ -3422,12 +3762,7 @@ export class View {
       if (rankNum <= 3) {
         heroCellStyle.push('wtop-cell--hero-with-crown');
       }
-      const heroCell = DOM(
-        { style: heroCellStyle },
-        heroIcon,
-        heroNameEl,
-        ...makeCrownForRank(rankNum, 'row'),
-      );
+      const heroCell = DOM({ style: heroCellStyle }, heroIcon, heroNameEl, ...makeCrownForRank(rankNum, 'row'));
       const ratingCell = DOM({ style: ['wtop-cell', 'wtop-cell--rating'] }, String(player.rating));
       return DOM(
         {
@@ -3440,6 +3775,122 @@ export class View {
         heroCell,
         ratingCell,
       );
+    };
+
+    const heroStatsSortState = {
+      key: 'battles',
+      direction: 'desc',
+    };
+    let heroStatsPeriod = 'month';
+
+    const heroStatsColumns = [
+      { key: 'hero', labelKey: 'topColHero' },
+      { key: 'battles', labelKey: 'topColBattles' },
+      { key: 'wins', labelKey: 'topColWins' },
+      { key: 'losses', labelKey: 'topColLosses' },
+      { key: 'winrate', labelKey: 'topColWinrate' },
+    ];
+
+    const makeHeroStatsRow = (item) => {
+      const heroIcon = DOM({ style: 'wtop-cell-hero-icon' });
+      heroIcon.style.backgroundImage = `url(content/hero/${item.hero}/1.webp)`;
+      const heroCell = DOM(
+        { style: ['wtop-cell', 'wtop-cell--hero', 'wtop-cell--hero-stats-hero'] },
+        heroIcon,
+        DOM({ style: 'wtop-cell-hero-name' }, heroNameById(item.hero) || '—'),
+      );
+      const battlesCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.battles || 0));
+      const winsCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.wins || 0));
+      const lossesCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.losses || 0));
+      const winrateCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number', 'wtop-cell--hero-stat-winrate'] }, `${Number(item.winrate || 0).toFixed(2)}%`);
+      return DOM({ style: 'wtop-hero-stats-row' }, heroCell, battlesCell, winsCell, lossesCell, winrateCell);
+    };
+
+    const makeHeroStatsTable = (listScroll) => {
+      const rowsBody = DOM({ style: 'wtop-hero-stats-rows' });
+      const headerButtons = new Map();
+      const periodToggle = DOM({
+        tag: 'button',
+        type: 'button',
+        domaudio: domAudioPresets.defaultButton,
+        style: ['wtop-cell', 'wtop-hero-period-toggle'],
+      });
+      const headerHeroTitle = DOM({ style: ['wtop-cell', 'wtop-cell--hero', 'wtop-cell--hero-stats-hero', 'wtop-hero-title-cell'] });
+      const headerHeroLabel = DOM({ tag: 'span', style: 'wtop-hero-title-label' }, Lang.text('topColHero'));
+      const getCurrentHeroList = () => (heroStatsPeriod === 'allTime' ? heroStatsPayload.allTime || [] : heroStatsPayload.month || []);
+      const hasAnyData = (heroStatsPayload.month || []).length > 0 || (heroStatsPayload.allTime || []).length > 0;
+
+      const sortRows = () => {
+        const key = heroStatsSortState.key;
+        const dir = heroStatsSortState.direction === 'asc' ? 1 : -1;
+        const rows = [...getCurrentHeroList()];
+        rows.sort((a, b) => {
+          const av = Number(a[key]) || 0;
+          const bv = Number(b[key]) || 0;
+          if (av === bv) {
+            return (Number(a.hero) || 0) - (Number(b.hero) || 0);
+          }
+          return (av - bv) * dir;
+        });
+
+        rowsBody.innerHTML = '';
+        if (!rows.length) {
+          rowsBody.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
+        } else {
+          for (const item of rows) {
+            rowsBody.append(makeHeroStatsRow(item));
+          }
+        }
+
+        for (const [keyName, btn] of headerButtons) {
+          const arrow = heroStatsSortState.key === keyName ? (heroStatsSortState.direction === 'asc' ? ' ▲' : ' ▼') : '';
+          btn.textContent = `${Lang.text(heroStatsColumns.find((col) => col.key === keyName).labelKey)}${arrow}`;
+          btn.classList.toggle('is-active', heroStatsSortState.key === keyName);
+        }
+        headerHeroLabel.textContent = Lang.text('topColHero');
+        periodToggle.textContent = heroStatsPeriod === 'month' ? Lang.text('topPeriodMonth') : Lang.text('topPeriodAllTime');
+      };
+
+      if (!hasAnyData) {
+        listScroll.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
+        return;
+      }
+
+      const header = DOM({ style: 'wtop-hero-stats-header' });
+      for (const col of heroStatsColumns) {
+        if (col.key === 'hero') {
+          periodToggle.addEventListener('click', () => {
+            heroStatsPeriod = heroStatsPeriod === 'month' ? 'allTime' : 'month';
+            sortRows();
+          });
+          headerHeroTitle.append(DOM({ style: 'wtop-hero-title-split' }, headerHeroLabel, periodToggle));
+          header.append(headerHeroTitle);
+          continue;
+        }
+        const btn = DOM({
+          tag: 'button',
+          type: 'button',
+          style: ['wtop-cell', 'wtop-sortable-header'],
+          domaudio: domAudioPresets.defaultButton,
+          event: [
+            'click',
+            () => {
+              if (heroStatsSortState.key === col.key) {
+                heroStatsSortState.direction = heroStatsSortState.direction === 'desc' ? 'asc' : 'desc';
+              } else {
+                heroStatsSortState.key = col.key;
+                heroStatsSortState.direction = 'desc';
+              }
+              sortRows();
+            },
+          ],
+        });
+        headerButtons.set(col.key, btn);
+        header.append(btn);
+      }
+      listScroll.append(header);
+      listScroll.append(rowsBody);
+      sortRows();
     };
 
     const openHeroPicker = async () => {
@@ -3469,6 +3920,26 @@ export class View {
 
     const scrollClass = isSplah ? 'wtop-scroll' : 'top-scroll';
     const modeBar = DOM({ style: 'wtop-mode-bar' });
+    modeBar.append(
+      DOM({
+        domaudio: domAudioPresets.defaultButton,
+        style: ['wtop-mode-tab', isHeroStatsView ? 'is-active' : null].filter(Boolean),
+        tag: 'button',
+        type: 'button',
+        textContent: Lang.text('topHeroesTab'),
+        event: [
+          'click',
+          () => {
+            if (isHeroStatsView) return;
+            if (isSplah) {
+              Window.show('main', 'top', heroId, HERO_STATS_TAB_ID);
+            } else {
+              View.show('top', heroId, false, HERO_STATS_TAB_ID);
+            }
+          },
+        ],
+      }),
+    );
     for (const tab of TOP_MODE_TABS) {
       const isActive = tab.id === activeMode;
       const btn = DOM({
@@ -3498,17 +3969,14 @@ export class View {
     }
 
     const listScroll = DOM({ style: 'wtop-list-scroll' });
-    if (list.length === 0) {
+    if (!isHeroStatsView && list.length === 0) {
       listScroll.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
-    } else {
+    } else if (!isHeroStatsView) {
       listScroll.append(
         DOM(
           { style: 'wtop-table-header' },
           DOM({ style: ['wtop-cell', 'wtop-cell--place'] }, Lang.text('topColPlace')),
-          DOM(
-            { style: ['wtop-cell', 'wtop-cell--name'] },
-            DOM({ tag: 'span', style: 'wtop-cell-name-text' }, Lang.text('topColPlayer')),
-          ),
+          DOM({ style: ['wtop-cell', 'wtop-cell--name'] }, DOM({ tag: 'span', style: 'wtop-cell-name-text' }, Lang.text('topColPlayer'))),
           DOM({ style: ['wtop-cell', 'wtop-cell--hero'] }, Lang.text('topColHero')),
           DOM({ style: ['wtop-cell', 'wtop-cell--rating'] }, Lang.text('topColRating')),
         ),
@@ -3516,6 +3984,8 @@ export class View {
       for (let i = 0; i < list.length; i++) {
         listScroll.append(makeTableRow(list[i], i + 1));
       }
+    } else {
+      makeHeroStatsTable(listScroll);
     }
 
     const heroFilterImg = DOM({
@@ -3538,11 +4008,13 @@ export class View {
     );
     heroFilterBtn.setAttribute('aria-label', Lang.text('clickToViewHeroRating'));
 
-    const podiumRow = DOM({ style: 'wtop-podium-row' }, podium, heroFilterBtn);
-
     const listRow = DOM({ style: 'wtop-list-row' }, listScroll);
-
-    const top = DOM({ style: [scrollClass, 'top-layout'] }, modeBar, podiumRow, listRow);
+    const topChildren = [modeBar];
+    if (!isHeroStatsView) {
+      topChildren.push(DOM({ style: 'wtop-podium-row' }, podium, heroFilterBtn));
+    }
+    topChildren.push(listRow);
+    const top = DOM({ style: [scrollClass, 'top-layout'] }, ...topChildren);
 
     const helpBtn = DOM({
       id: 'wtop_help',
@@ -3801,12 +4273,22 @@ export class View {
 
   static async build(heroId, targetId = 0, isWindow = false) {
     const body = DOM({ style: 'build-horizontal' });
-
     requestAnimationFrame(() => Voice.updatePanelPosition());
 
     await Build.init(heroId, targetId, isWindow);
 
     body.append(
+      DOM({
+        id: 'wbuild_help',
+        domaudio: domAudioPresets.defaultButton,
+        style: 'help-button',
+        event: [
+          'click',
+          () => {
+            HelpSplash(Lang.text('build_help_content'));
+          },
+        ],
+      }),
       DOM({ style: 'build-left' }, Build.heroView),
       DOM(
         { style: 'build-center' },
@@ -3814,7 +4296,7 @@ export class View {
         DOM({ style: 'build-field-with-tabs' }, Build.listView, DOM({ style: 'build-field-container' }, Build.levelView, Build.fieldView)),
         DOM(
           { style: 'build-active-bar-container' },
-		  Build.activeBarKeybindingsView,
+          Build.activeBarKeybindingsView,
           Build.activeBarView,
           DOM({ style: 'build-active-bar-hint' }, Lang.text('smartcastDescription')),
         ),
@@ -3848,7 +4330,7 @@ export class View {
             style: 'close-image-style',
           }),
         ),
-      ); // Замените путь к изображению
+      );
     }
 
     return isWindow ? body : DOM({ id: 'viewbuild' }, body);

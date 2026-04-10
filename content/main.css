@@ -11,6 +11,7 @@
 
 :root {
   --cursor-pointer: url('img/cursor_button32x32.png') 0 0, pointer;
+  --cursor-default: url('img/cursor32x32.png') 0 0, default;
   --build-hl-h: 199;
   --build-hl-border-mm: 0.42mm;
 }
@@ -990,17 +991,10 @@ input::placeholder {
 
 .splash-help-img{
   display: block;
-  width: 100%;
+  width: 80%;
   height: auto;
-  
+  margin: 0 auto;
 }
-
-/* Модификаторы ДОЛЖНЫ содержать только отличия от базового стиля */
-.build-list-close {
-  /* Если нужны специфичные стили, иначе можно удалить этот класс */
-}
-
-
 
 .close-image-style {
   width: 5vh !important;
@@ -3624,6 +3618,8 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   flex-shrink: 0;
   padding: 0.874cqw 0.624cqw 1.498cqw;
   box-sizing: border-box;
+  position: relative;
+  left: -5.2cqw;
 }
 
 .wtop-mode-tab {
@@ -3634,7 +3630,7 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   color: rgba(255, 255, 255, 0.88);
   cursor: var(--cursor-pointer);
   font: inherit;
-  font-size: 2.87cqw;
+  font-size: 2.57cqw;
   text-shadow: rgba(0, 0, 0, 0.35) 0 0 9px;
 }
 
@@ -4002,6 +3998,40 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   box-shadow: none;
 }
 
+.wtop-hero-stats-header {
+  display: grid;
+  grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.8cqw;
+  width: 100%;
+  flex-shrink: 0;
+  margin-bottom: 0.7cqw;
+  box-sizing: border-box;
+}
+
+.wtop-hero-stats-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.8cqw;
+  align-items: stretch;
+  width: 100%;
+  margin-bottom: 0.7cqw;
+  box-sizing: border-box;
+}
+
+.wtop-sortable-header {
+  font: inherit;
+  cursor: var(--cursor-pointer);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 2.1cqw;
+  font-weight: 600;
+  background: rgba(0, 12, 20, 0.65);
+}
+
+.wtop-sortable-header.is-active {
+  border-color: rgba(255, 200, 120, 0.82);
+  color: rgba(255, 230, 200, 0.95);
+}
+
 .wtop-cell--name {
   justify-content: flex-start;
   text-align: left;
@@ -4022,6 +4052,45 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   justify-content: flex-start;
   gap: 0.9cqw;
   padding-left: 0.8cqw;
+}
+
+.wtop-cell--hero-stats-hero {
+  justify-content: flex-start;
+}
+
+.wtop-hero-title-cell {
+  padding-right: 0.6cqw;
+}
+
+.wtop-hero-title-split {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6cqw;
+}
+
+.wtop-hero-title-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wtop-hero-period-toggle {
+  min-height: 4.5cqw;
+  padding: 0.35cqw 0.9cqw;
+  border-radius: 0.6cqw;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 220, 180, 0.96);
+  font-size: 1.75cqw;
+  line-height: 1;
+  cursor: var(--cursor-pointer);
+  white-space: nowrap;
+}
+
+.wtop-hero-period-toggle:hover {
+  filter: brightness(1.2);
 }
 
 .wtop-cell-hero-icon {
@@ -4049,6 +4118,14 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 .wtop-cell--rating {
   font-weight: 600;
   color: rgba(255, 230, 200, 0.95);
+}
+
+.wtop-cell--hero-stat-number {
+  font-weight: 600;
+}
+
+.wtop-cell--hero-stat-winrate {
+  color: rgba(200, 255, 200, 0.95);
 }
 
 .wtop-empty-hint {
@@ -5649,6 +5726,181 @@ i-success {
   z-index: 9996;
 }
 
+/* Dedicated style hooks for detached voice window mode.
+   You can safely tweak these values later without touching JS. */
+.voice-window-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+  z-index: 1 !important;
+  --voice-monitor-scale: 1;
+  --voice-window-size-factor: 0.9;
+}
+
+.voice-window-mode,
+.voice-window-mode * {
+  cursor: var(--cursor-default);
+}
+
+.voice-window-mode .voice-info-panel-body-item-name,
+.voice-window-mode .voice-info-panel-body-item-mute,
+.voice-window-mode .voice-info-panel-close,
+.voice-window-mode button,
+.voice-window-mode [role='button'],
+.voice-window-mode a:any-link {
+  cursor: var(--cursor-pointer);
+}
+
+.voice-window-mode .voice-info-panel-close {
+  display: none !important;
+}
+
+.voice-window-mode .voice-info-panel-body {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: calc(26px * var(--voice-monitor-scale) * var(--voice-window-size-factor)) calc(22px * var(--voice-monitor-scale) * var(--voice-window-size-factor)) !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  border-width: 0 !important;
+  opacity: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable !important;
+}
+
+/* Full set of dedicated window-mode analog styles for voice UI.
+   Edit these rules to tune popup appearance independently. */
+.voice-window-mode .voice-info-panel-body-tutorial {
+  font-size: calc(14px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  font-family: 'DejaVuSans', sans-serif;
+  color: rgb(255, 232, 29, 1);
+  text-shadow: 2px 2px 4px black;
+  margin: calc(10px * var(--voice-monitor-scale) * var(--voice-window-size-factor)) 0 calc(8px * var(--voice-monitor-scale) * var(--voice-window-size-factor)) 0;
+  line-height: 1.25;
+}
+
+.voice-window-mode .voice-info-panel-body-item {
+  display: flex;
+  margin-bottom: calc(14px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  flex-flow: column nowrap;
+}
+
+.voice-window-mode .voice-info-panel-body-item-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  min-width: 0;
+  width: 100%;
+}
+
+.voice-window-mode .voice-info-panel-body-item-mute {
+  font-size: calc(28px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  line-height: 1;
+}
+
+.voice-window-mode .voice-info-panel-body-item-muted-by {
+  font-size: calc(22px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  line-height: 1;
+  color: #ff3b30;
+  text-shadow: 0 0 6px rgba(255, 59, 48, 0.65);
+  user-select: none;
+}
+
+.voice-window-mode .voice-info-panel-body-item-nostream {
+  animation: pulse 2s infinite;
+}
+
+.voice-window-mode .voice-info-panel-body-item-name {
+  font-size: calc(20px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  font-family: 'DejaVuSans', sans-serif;
+  font-weight: bold;
+  color: rgb(255, 232, 29, 1);
+  margin-bottom: calc(6px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 2px 2px 4px black;
+}
+
+.voice-window-mode .voice-info-panel-body-item-status {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+}
+
+.voice-window-mode .voice-info-panel-body-item-bar {
+  flex-grow: 1;
+  height: calc(18px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: calc(12px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 0.5em rgba(0, 0, 0, 0.3);
+}
+
+.voice-window-mode .voice-info-panel-body-item-bar-level {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #d946ef, #ec4899);
+  border-radius: calc(12px * var(--voice-monitor-scale) * var(--voice-window-size-factor));
+  width: 0%;
+  transition: width 0.1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.voice-window-mode .voice-info-panel-body-item-bar-level-muted {
+  background: transparent;
+}
+
+.voice-window-mode .voice-info-panel-body-item-bar-level-muted::before {
+  display: none;
+}
+
+.voice-window-mode .voice-info-panel-body-item-bar-level::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: volumeShine 2s infinite;
+}
+
+.voice-info-panel-close {
+  position: absolute;
+  top: -0.9cqh;
+  right: -0.9cqh;
+  width: 2.8vh;
+  height: 2.8vh;
+  min-width: 2.8vh;
+  min-height: 2.8vh;
+  background-image: url('content/icons/close-cropped.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: none;
+  opacity: 1;
+  display: block;
+  z-index: 9997;
+  transform: none !important;
+}
+
+.voice-info-panel-close:hover {
+  transform: scale(1.08) !important;
+}
+
 .left-offset-with-shift {
   position: absolute;
   left: 10vh;
@@ -5681,6 +5933,26 @@ i-success {
   display: flex;
   margin-bottom: 1vh;
   flex-flow: column nowrap;
+}
+
+.voice-info-panel-body-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4cqw;
+  min-width: 0;
+}
+
+.voice-info-panel-body-item-mute {
+  font-size: clamp(0.9em, 1.2vw, 1.6em);
+  line-height: 1;
+}
+
+.voice-info-panel-body-item-muted-by {
+  font-size: clamp(0.8em, 1.1vw, 1.4em);
+  line-height: 1;
+  color: #ff3b30;
+  text-shadow: 0 0 0.4em rgba(255, 59, 48, 0.65);
+  user-select: none;
 }
 
 .voice-info-panel-body-item-nostream {
@@ -5916,6 +6188,10 @@ body:has(#wcastle-call)::before {
   padding-top: 3cqh;
 }
 
+#wcastle-menu {
+  z-index: 2147483647 !important;
+}
+
 #wcastle-render-debug {
   bottom: 0;
 }
@@ -5983,6 +6259,14 @@ body:has(#wcastle-call)::before {
   padding: 1cqw 1cqw;
   margin: 1cqw 2cqw;
   position: relative;
+}
+
+.castle-menu-item-checkbox.is-disabled {
+  opacity: 0.45;
+}
+
+.castle-menu-item-checkbox.is-disabled label {
+  filter: grayscale(0.35);
 }
 
 .castle-menu-item-checkbox input[type='checkbox'] {
@@ -6487,6 +6771,15 @@ body:has(#wcastle-call)::before {
   min-width: auto;
   width: 2.1cqh;
   font-size: 1.9cqh;
+}
+
+.chat-source-icon-steam {
+  background-image: url('icons/steam2.webp');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  box-shadow: none;
 }
 
 @media (max-aspect-ratio: 1/1) {

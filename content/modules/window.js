@@ -36,6 +36,12 @@ export class Window {
     template.requestClose = () => {
       Window.close(category);
     };
+    if (category === 'main' && method === 'keybindings') {
+      const previousMethod = typeof value === 'string' ? value : 'settings';
+      template.requestClose = () => {
+        Window.show(category, previousMethod);
+      };
+    }
     let closeButton = DOM(
       {
         domaudio: domAudioPresets.closeButton,
@@ -1459,85 +1465,6 @@ const clanGuideSpan = DOM({
       DOM(
         { style: 'castle-menu-items' },
         DOM(
-          { style: 'castle-menu-item-checkbox' },
-          DOM(
-            {
-              tag: 'input',
-              domaudio: domAudioPresets.defaultSelect,
-              type: 'checkbox',
-              id: 'fullscreen-toggle',
-              checked: !Settings.settings.fullscreen,
-              event: [
-                'change',
-                (e) => {
-                  Settings.settings.fullscreen = !e.target.checked;
-                  Settings.ApplySettings({ render: false, audio: false });
-                },
-              ],
-            },
-            { checked: Settings.settings.fullscreen },
-          ),
-          DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode') + ' (F11)'),
-        ),
-        DOM(
-          { style: 'castle-menu-item-checkbox' },
-          DOM({
-            tag: 'input',
-            domaudio: domAudioPresets.defaultSelect,
-            type: 'checkbox',
-            id: 'render-toggle',
-            checked: Settings.settings.render,
-            event: [
-              'change',
-              (e) => {
-                Settings.settings.render = e.target.checked;
-                Settings.ApplySettings({ audio: false, window: false });
-              },
-            ],
-          }),
-          DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD')),
-        ),
-        DOM(
-          { style: 'castle-menu-item-checkbox' },
-          DOM(
-            {
-              tag: 'input',
-              domaudio: domAudioPresets.defaultSelect,
-              type: 'checkbox',
-              id: 'radmin-priority',
-              checked: Settings.settings.radminPriority,
-              event: [
-                'change',
-                (e) => {
-                  Settings.settings.radminPriority = e.target.checked;
-                },
-              ],
-            },
-            { checked: Settings.settings.radminPriority },
-          ),
-          DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority')),
-        ),
-        DOM(
-          { style: 'castle-menu-item-checkbox' },
-          DOM(
-            {
-              tag: 'input',
-              domaudio: domAudioPresets.defaultSelect,
-              type: 'checkbox',
-              id: 'novoice',
-              checked: Settings.settings.novoice,
-              event: [
-                'change',
-                (e) => {
-                  Settings.settings.novoice = e.target.checked;
-                },
-              ],
-            },
-            { checked: Settings.settings.novoice },
-          ),
-          DOM({ tag: 'label', for: 'novoice' }, Lang.text('voiceEnabled')),
-        ),
-        DOM(
           { style: 'castle-menu-label' },
           Lang.text('volume'),
           DOM({
@@ -1648,6 +1575,50 @@ const clanGuideSpan = DOM({
           ),
         ),
         DOM(
+          { style: 'castle-menu-label' },
+          Lang.text('voiceVolume'),
+          DOM({
+            tag: 'input',
+            domaudio: domAudioPresets.defaultButton,
+            type: 'range',
+            value: Math.round((Number(Settings.settings.voiceVolume) || 1) * 100),
+            min: '0',
+            max: '100',
+            step: '1',
+            style: 'castle-menu-slider',
+            event: [
+              'input',
+              (e) => {
+                Settings.settings.voiceVolume = parseFloat(e.target.value) / 100;
+                Voice.setVolumeLevel(Settings.settings.voiceVolume);
+                document.getElementById('voice-volume-percentage').textContent = `${Math.round(Settings.settings.voiceVolume * 100)}%`;
+                Window.updateSliderFill(e.target);
+              },
+            ],
+          }),
+          DOM(
+            {
+              tag: 'span',
+              id: 'voice-volume-percentage',
+              style: 'volume-percentage',
+            },
+            `${Math.round((Number(Settings.settings.voiceVolume) || 1) * 100)}%`,
+          ),
+        ),
+        DOM(
+          {
+            style: 'castle-menu-item-button',
+            domaudio: domAudioPresets.defaultButton,
+            event: [
+              'click',
+              () => {
+                Window.show('main', 'advancedSettings');
+              },
+            ],
+          },
+          Lang.text('advancedSettings'),
+        ),
+        DOM(
           {
             style: 'castle-menu-item-button',
             domaudio: domAudioPresets.defaultButton,
@@ -1672,7 +1643,7 @@ const clanGuideSpan = DOM({
             event: [
               'click',
               () => {
-                Window.show('main', 'keybindings');
+                Window.show('main', 'keybindings', 'settings');
               },
             ],
           },
@@ -1696,6 +1667,170 @@ const clanGuideSpan = DOM({
 				
 				DOM({ style: 'castle-menu-label-description' }, Lang.text('soundHelp'))
 				*/
+      ),
+    );
+  }
+
+  static async advancedSettings() {
+    const voiceInWindowUnavailableByWindows = NativeAPI.isLegacyWindowsForVoiceWindow?.() === true;
+    const voiceInWindowUnavailableByNwjs = NativeAPI.isLegacyNwjsForVoiceWindow?.() === true;
+    const voiceInWindowUnavailable = voiceInWindowUnavailableByWindows || voiceInWindowUnavailableByNwjs;
+    const voiceInWindowUnavailableTitle = voiceInWindowUnavailableByWindows
+      ? Lang.text('voiceInWindowRequiresWin11')
+      : voiceInWindowUnavailableByNwjs
+        ? Lang.text('voiceInWindowRequiresNwjs')
+        : '';
+    if (voiceInWindowUnavailable) {
+      Settings.settings.voiceInWindow = false;
+    }
+
+    return DOM(
+      { id: 'wcastle-menu' },
+      DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, Lang.text('advancedSettings'))),
+      DOM(
+        { style: 'castle-menu-items' },
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
+              id: 'fullscreen-toggle',
+              checked: !Settings.settings.fullscreen,
+              event: [
+                'change',
+                (e) => {
+                  Settings.settings.fullscreen = !e.target.checked;
+                  Settings.ApplySettings({ render: false, audio: false });
+                },
+              ],
+            },
+            { checked: Settings.settings.fullscreen },
+          ),
+          DOM({ tag: 'label', for: 'fullscreen-toggle' }, Lang.text('windowMode') + ' (F11)'),
+        ),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM({
+            tag: 'input',
+            domaudio: domAudioPresets.defaultSelect,
+            type: 'checkbox',
+            id: 'render-toggle',
+            checked: Settings.settings.render,
+            event: [
+              'change',
+              (e) => {
+                Settings.settings.render = e.target.checked;
+                Settings.ApplySettings({ audio: false, window: false });
+              },
+            ],
+          }),
+          DOM({ tag: 'label', for: 'render-toggle' }, Lang.text('threeD')),
+        ),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
+              id: 'radmin-priority',
+              checked: Settings.settings.radminPriority,
+              event: [
+                'change',
+                (e) => {
+                  Settings.settings.radminPriority = e.target.checked;
+                },
+              ],
+            },
+            { checked: Settings.settings.radminPriority },
+          ),
+          DOM({ tag: 'label', for: 'radmin-priority' }, Lang.text('radminPriority')),
+        ),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
+              id: 'novoice',
+              checked: Settings.settings.novoice,
+              event: [
+                'change',
+                (e) => {
+                  Settings.settings.novoice = e.target.checked;
+                },
+              ],
+            },
+            { checked: Settings.settings.novoice },
+          ),
+          DOM({ tag: 'label', for: 'novoice' }, Lang.text('voiceEnabled')),
+        ),
+        DOM(
+          {
+            style: voiceInWindowUnavailable ? ['castle-menu-item-checkbox', 'is-disabled'] : 'castle-menu-item-checkbox',
+            title: voiceInWindowUnavailableTitle,
+          },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
+              id: 'voice-in-window',
+              checked: !voiceInWindowUnavailable && Settings.settings.voiceInWindow !== false,
+              disabled: voiceInWindowUnavailable,
+              title: voiceInWindowUnavailableTitle,
+              event: [
+                'change',
+                (e) => {
+                  if (voiceInWindowUnavailable) {
+                    Settings.settings.voiceInWindow = false;
+                    e.target.checked = false;
+                    return;
+                  }
+                  Settings.settings.voiceInWindow = e.target.checked;
+                },
+              ],
+            },
+            { checked: !voiceInWindowUnavailable && Settings.settings.voiceInWindow !== false },
+          ),
+          DOM({ tag: 'label', for: 'voice-in-window', title: voiceInWindowUnavailableTitle }, Lang.text('voiceInWindow')),
+        ),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          DOM(
+            {
+              tag: 'input',
+              domaudio: domAudioPresets.defaultSelect,
+              type: 'checkbox',
+              id: 'voice-radio-mode',
+              checked: Settings.settings.voiceRadioMode,
+              event: [
+                'change',
+                (e) => {
+                  Settings.settings.voiceRadioMode = e.target.checked;
+                },
+              ],
+            },
+            { checked: Settings.settings.voiceRadioMode },
+          ),
+          DOM({ tag: 'label', for: 'voice-radio-mode' }, Lang.text('voiceRadioMode')),
+        ),
+        DOM(
+          {
+            domaudio: domAudioPresets.bigButton,
+            style: 'castle-menu-item-button',
+            event: [
+              'click',
+              () => {
+                Window.show('main', 'settings');
+              },
+            ],
+          },
+          Lang.text('back'),
+        ),
       ),
     );
   }
@@ -1954,10 +2089,96 @@ const clanGuideSpan = DOM({
       ),
     );
   }
+  
+  static async mmSearchSettings() {
+    let mmEnabled = true;
+    let mmtestEnabled = true;
+    
+    try {
+      const [mmState, mmtestState] = await Promise.all([
+        App.api.request('mm', 'getSearchAvailability'),
+        App.api.request('mmtest', 'getSearchAvailability'),
+      ]);
+      mmEnabled = Boolean(mmState?.enabled);
+      mmtestEnabled = Boolean(mmtestState?.enabled);
+    } catch (error) {
+      App.error(error);
+    }
+    
+    const updateFlag = async (target, checked, input) => {
+      try {
+        const response = await App.api.request(target, 'setSearchAvailability', { enabled: checked });
+        input.checked = Boolean(response?.enabled);
+      } catch (error) {
+        input.checked = !checked;
+        App.error(error);
+      }
+    };
+    
+    const mmToggle = DOM({
+      tag: 'input',
+      domaudio: domAudioPresets.defaultSelect,
+      type: 'checkbox',
+      id: 'mm-search-enabled',
+      checked: mmEnabled,
+      event: [
+        'change',
+        (e) => updateFlag('mm', e.target.checked, e.target),
+      ],
+    });
+    
+    const mmtestToggle = DOM({
+      tag: 'input',
+      domaudio: domAudioPresets.defaultSelect,
+      type: 'checkbox',
+      id: 'mmtest-search-enabled',
+      checked: mmtestEnabled,
+      event: [
+        'change',
+        (e) => updateFlag('mmtest', e.target.checked, e.target),
+      ],
+    });
+    
+    return DOM(
+      { id: 'wcastle-menu' },
+      DOM({ style: 'title-modal' }, DOM({ style: 'title-modal-text' }, 'Настройка поиска боя')),
+      DOM(
+        { style: 'castle-menu-items' },
+        DOM({ style: 'castle-menu-item-checkbox' }, mmToggle, DOM({ tag: 'label', for: 'mm-search-enabled' }, 'Включить поиск боя (MM)')),
+        DOM(
+          { style: 'castle-menu-item-checkbox' },
+          mmtestToggle,
+          DOM({ tag: 'label', for: 'mmtest-search-enabled' }, 'Включить поиск боя (MMTEST)'),
+        ),
+        DOM(
+          {
+            domaudio: domAudioPresets.bigButton,
+            style: 'castle-menu-item-button',
+            event: ['click', () => Window.show('main', 'adminPanel')],
+          },
+          Lang.text('back'),
+        ),
+      ),
+    );
+  }
+  
   static async adminPanel() {
     return DOM(
       { id: 'wcastle-menu' },
       DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, 'Админ Панель')),
+      DOM(
+        {
+          domaudio: domAudioPresets.bigButton,
+          style: 'castle-menu-item-button',
+          event: [
+            'click',
+            () => {
+              Window.show('main', 'mmSearchSettings');
+            },
+          ],
+        },
+        'Поиск боя',
+      ),
       DOM(
         {
           domaudio: domAudioPresets.bigButton,
@@ -2097,12 +2318,9 @@ const clanGuideSpan = DOM({
   }
 
   static async callWindow() {
-    console.log('callWindow вызван, данные:', Window.callData);
-
     const data = Window.callData;
 
     if (!data) {
-      console.warn('Нет данных для окна звонка');
       return DOM({ id: 'wcastle-call' });
     }
 
@@ -2112,7 +2330,6 @@ const clanGuideSpan = DOM({
     }
 
     const callTimeout = setTimeout(() => {
-      console.log('Таймаут 15 секунд, звонок автоматически отменяется');
       Sound.stop('ui-call');
 
       if (Window.windows['main'] && Window.windows['main'].id === 'wcastle-call') {
@@ -2143,7 +2360,7 @@ const clanGuideSpan = DOM({
               async () => {
                 Sound.stop('ui-call');
                 try {
-                  let voice = new Voice(data.id, '', data.name, true);
+                  let voice = new Voice(data.id, String(data?.key || ''), data.name, true);
                   await voice.accept(data.offer);
                   Window.callData = null;
                   Window.close('main');

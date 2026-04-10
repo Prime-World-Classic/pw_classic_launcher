@@ -14,6 +14,7 @@ import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { Castle } from './castle.js';
 import { Window } from './window.js';
+import { Settings } from './settings.js';
 
 export class Events {
   static Message(data) {
@@ -257,7 +258,30 @@ export class Events {
 
 
   static async VCall(data) {
-    if (data.isCaller) {
+    if (Settings.settings?.novoice) {
+      Sound.stop('ui-call');
+      Window.callData = null;
+      if (Window.windows?.main?.id === 'wcastle-call') {
+        Window.close('main');
+      }
+      return;
+    }
+    const callKey = String(data?.key || '');
+    if (MM.isInBattle && callKey === 'friend') {
+      return;
+    }
+    const activeMatchKey = String(MM.id || '');
+    if ((MM.isInTambur || MM.isInBattle) && (!activeMatchKey || callKey !== activeMatchKey)) {
+      return;
+    }
+    const existing = Voice.manager?.[Number(data?.id)];
+    if (existing?.peer && existing.peer.connectionState !== 'closed') {
+      // Cross-calls may arrive while we already have an active/pending connection.
+      // Ignore duplicate incoming invite for the same peer to prevent race-induced drops.
+      return;
+    }
+    const forceAutoAccept = Voice.consumeMergeAutoAccept(data?.id);
+    if (data.isCaller && Number(data?.reconnect || 0) !== 1 && !forceAutoAccept) {
       let playCallSoundLoop = () => {
         Sound.stop('ui-call');
         Sound.play(
@@ -279,7 +303,7 @@ export class Events {
       Window.show('main', 'callWindow');
 		
     } else {
-      let voice = new Voice(data.id, '', data.name);
+      let voice = new Voice(data.id, callKey, data.name);
 
       await voice.accept(data.offer);
     }
@@ -291,6 +315,21 @@ export class Events {
 
   static async VCandidate(data) {
     await Voice.candidate(data.id, data.candidate);
+  }
+
+  static async VDrop(data) {
+    await Voice.remoteDrop(data.id);
+  }
+  
+  static async VMuteState(data) {
+    Voice.setMutedByPeer(data?.id, Number(data?.muted || 0) === 1);
+  }
+
+  static async VFriendMerge(data) {
+    if (MM.isInTambur || MM.isInBattle) {
+      return;
+    }
+    await Voice.mergeFriendCalls(data?.users || []);
   }
 
   static VKick() {

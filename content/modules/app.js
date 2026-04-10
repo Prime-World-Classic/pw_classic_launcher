@@ -21,7 +21,7 @@ import { SessionPulse } from './sessionPulse.js';
 export class App {
   static APP_VERSION = '0';
 
-  static PW_VERSION = '2.14.3';
+  static PW_VERSION = '2.15.0';
 
   static CURRENT_MM = 'mmtest';
 
@@ -328,6 +328,10 @@ export class App {
     } else {
       window.open(url, url, 'popup');
     }
+  }
+
+  static onApiReconnected() {
+    Chat.syncPinnedMessagesWithBackend?.();
   }
 
   static async authorization(login, password) {
@@ -672,6 +676,57 @@ export class App {
     await App.storage.set({ id: 0, token: '', login: '' });
 
     View.show('authorization');
+  }
+
+  static openStatsProfile({ id = 0, login = '' } = {}) {
+    const onEsc = (e) => {
+      if (e.key === 'Escape') {
+        Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, { id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
+        Splash.hide();
+        document.removeEventListener('keydown', onEsc);
+      }
+    };
+    document.addEventListener('keydown', onEsc, { once: true });
+
+    const BASE = 'https://pw2.26rus-game.ru/stats/';
+    const targetId = Number(id) || 0;
+    const targetLogin = String(login || '').trim();
+    const ownId = Number(App?.storage?.data?.id) || 0;
+    const ownLogin = String(App?.storage?.data?.login || '').trim();
+
+    const qs = new URLSearchParams();
+    if (targetId > 0) qs.set('user_id', String(targetId));
+    else if (targetLogin) qs.set('login', targetLogin);
+    else if (ownId > 0) qs.set('user_id', String(ownId));
+    else if (ownLogin) qs.set('login', ownLogin);
+    else qs.set('user_id', '0');
+    qs.set('tab', 'info');
+    qs.set('q', '');
+    qs.set('_', Date.now().toString());
+
+    const src = `${BASE}?${qs.toString()}`;
+
+    Splash.show(
+      DOM(
+        {
+          domaudio: domAudioPresets.closeButton,
+          style: 'iframe-stats',
+          event: [
+            'click',
+            (e) => {
+              if (e.target === e.currentTarget) Splash.hide();
+            },
+          ],
+        },
+        DOM({
+          domaudio: domAudioPresets.closeButton,
+          style: 'iframe-stats-navbar',
+          event: ['click', () => Splash.hide()],
+        }),
+        DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' }),
+      ),
+      false,
+    );
   }
 
   static input(callback, object = new Object()) {
