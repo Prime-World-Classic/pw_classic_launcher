@@ -341,7 +341,7 @@ export const ru = {
     friendDecline: 'Отклонить',
     friendRemove: 'Удалить',
     friendCancle: 'Отказаться',
-    friendRemoveText: 'Удалить {nickname} из друзей?',
+    friendRemoveText: 'Друг - {nickname}',
     friendAcceptText: 'Приглашение отправлено игроку {nickname}',
     friendListClear: 'Очистить список',
     confirmAction: 'Вы уверены?',

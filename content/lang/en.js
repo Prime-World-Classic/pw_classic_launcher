@@ -335,7 +335,7 @@ export const en = {
     friendDecline: 'Decline',
     friendRemove: 'Remove',
     friendCancle: 'Cancle',
-    friendRemoveText: 'Remove {nickname} from friends?',
+    friendRemoveText: 'Friend - {nickname}',
     friendAcceptText: 'Invitation sent to {nickname}',
     friendNicknamePlaceholder: 'Nickname',
     friendAcceptWaiting: 'Waiting',

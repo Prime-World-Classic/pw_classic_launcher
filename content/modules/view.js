@@ -1226,50 +1226,7 @@ export class View {
       event: [
         'click',
         () => {
-          const onEsc = (e) => {
-            if (e.key === 'Escape') {
-              Sound.play(SOUNDS_LIBRARY.CLICK_CLOSE, { id: 'ui-close', volume: Castle.GetVolume(Castle.AUDIO_SOUNDS) });
-              Splash.hide();
-              document.removeEventListener('keydown', onEsc);
-            }
-          };
-          document.addEventListener('keydown', onEsc, { once: true });
-
-          const BASE = 'https://pw2.26rus-game.ru/stats/';
-          const id = Number(App?.storage?.data?.id) || 0;
-          const login = String(App?.storage?.data?.login || '').trim();
-
-          const qs = new URLSearchParams();
-          if (id > 0) qs.set('user_id', String(id));
-          else if (login) qs.set('login', login);
-          else qs.set('user_id', '0');
-          qs.set('tab', 'info');
-          qs.set('q', '');
-          qs.set('_', Date.now().toString());
-
-          const src = `${BASE}?${qs.toString()}`;
-
-          Splash.show(
-            DOM(
-              {
-                domaudio: domAudioPresets.closeButton,
-                style: 'iframe-stats',
-                event: [
-                  'click',
-                  (e) => {
-                    if (e.target === e.currentTarget) Splash.hide();
-                  },
-                ],
-              },
-              DOM({
-                domaudio: domAudioPresets.closeButton,
-                style: 'iframe-stats-navbar',
-                event: ['click', () => Splash.hide()],
-              }),
-              DOM({ tag: 'iframe', src, style: 'iframe-stats-frame' }),
-            ),
-            false,
-          );
+          App.openStatsProfile();
         },
       ],
     });
@@ -2980,6 +2937,20 @@ export class View {
               },
               Lang.text('friendRemove'),
             );
+            let profileButton = DOM(
+              {
+                domaudio: domAudioPresets.smallButton,
+                style: 'splash-content-button',
+                event: [
+                  'click',
+                  () => {
+                    Splash.hide();
+                    App.openStatsProfile({ id: item.id, login: item.nickname });
+                  },
+                ],
+              },
+              Lang.text('showStatistics'),
+            );
             let cancelButton = DOM(
               {
                 domaudio: domAudioPresets.closeButton,
@@ -2990,7 +2961,8 @@ export class View {
             );
             body.append(
               modal,
-              DOM({ id: 'friendRemoveText' }, Lang.text('friendRemoveText').replace('{nickname}', item.nickname)),
+              DOM({ id: 'friendRemoveText' }, String(item.nickname || '')),
+              profileButton,
               removeButton,
               cancelButton,
             );
