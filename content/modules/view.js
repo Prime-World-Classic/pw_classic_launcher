@@ -3680,6 +3680,7 @@ export class View {
       { id: 2, labelKey: 'gm3' },
       { id: 3, labelKey: 'gm4' },
     ];
+    const HERO_STATS_TAB_ID = 6;
 
     const heroId = hero == null || hero === '' ? 0 : Number(hero) || 0;
     let activeMode = mode == null || mode === '' ? 0 : Number(mode);
@@ -3689,15 +3690,21 @@ export class View {
     if (activeMode === 4 || activeMode === 5) {
       activeMode = 0;
     }
+    const isHeroStatsView = activeMode === HERO_STATS_TAB_ID;
+    if (!isHeroStatsView && activeMode > 3) {
+      activeMode = 0;
+    }
 
     let body = DOM({ style: 'main' });
 
     const [result] = await Promise.all([
-      App.api.request(App.CURRENT_MM, 'top', {
-        limit: 100,
-        hero: heroId,
-        mode: activeMode,
-      }),
+      isHeroStatsView
+        ? App.api.request(App.CURRENT_MM, 'topHeroStats')
+        : App.api.request(App.CURRENT_MM, 'top', {
+            limit: 100,
+            hero: heroId,
+            mode: activeMode,
+          }),
       (async () => {
         if (!MM.hero) {
           try {
@@ -3713,9 +3720,17 @@ export class View {
       throw 'Рейтинг отсутствует';
     }
 
-    const list = Array.isArray(result) ? result : [];
+    const list = isHeroStatsView ? [] : (Array.isArray(result) ? result : []);
+    const heroStatsPayload =
+      isHeroStatsView && result && typeof result === 'object' && !Array.isArray(result)
+        ? result
+        : { month: [], allTime: [] };
 
     const heroNameById = (id) => {
+      const localizedName = Lang.heroName(Number(id), 1);
+      if (localizedName && localizedName !== `hero_${Number(id)}_name`) {
+        return localizedName;
+      }
       const row = MM.hero && MM.hero.find((h) => Number(h.id) === Number(id));
       return row && row.name ? row.name : '';
     };
@@ -3790,6 +3805,122 @@ export class View {
       );
     };
 
+    const heroStatsSortState = {
+      key: 'battles',
+      direction: 'desc',
+    };
+    let heroStatsPeriod = 'month';
+
+    const heroStatsColumns = [
+      { key: 'hero', labelKey: 'topColHero' },
+      { key: 'battles', labelKey: 'topColBattles' },
+      { key: 'wins', labelKey: 'topColWins' },
+      { key: 'losses', labelKey: 'topColLosses' },
+      { key: 'winrate', labelKey: 'topColWinrate' },
+    ];
+
+    const makeHeroStatsRow = (item) => {
+      const heroIcon = DOM({ style: 'wtop-cell-hero-icon' });
+      heroIcon.style.backgroundImage = `url(content/hero/${item.hero}/1.webp)`;
+      const heroCell = DOM(
+        { style: ['wtop-cell', 'wtop-cell--hero', 'wtop-cell--hero-stats-hero'] },
+        heroIcon,
+        DOM({ style: 'wtop-cell-hero-name' }, heroNameById(item.hero) || '—'),
+      );
+      const battlesCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.battles || 0));
+      const winsCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.wins || 0));
+      const lossesCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.losses || 0));
+      const winrateCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number', 'wtop-cell--hero-stat-winrate'] }, `${Number(item.winrate || 0).toFixed(2)}%`);
+      return DOM({ style: 'wtop-hero-stats-row' }, heroCell, battlesCell, winsCell, lossesCell, winrateCell);
+    };
+
+    const makeHeroStatsTable = (listScroll) => {
+      const rowsBody = DOM({ style: 'wtop-hero-stats-rows' });
+      const headerButtons = new Map();
+      const periodToggle = DOM({
+        tag: 'button',
+        type: 'button',
+        domaudio: domAudioPresets.defaultButton,
+        style: ['wtop-cell', 'wtop-hero-period-toggle'],
+      });
+      const headerHeroTitle = DOM({ style: ['wtop-cell', 'wtop-cell--hero', 'wtop-cell--hero-stats-hero', 'wtop-hero-title-cell'] });
+      const headerHeroLabel = DOM({ tag: 'span', style: 'wtop-hero-title-label' }, Lang.text('topColHero'));
+      const getCurrentHeroList = () => (heroStatsPeriod === 'allTime' ? heroStatsPayload.allTime || [] : heroStatsPayload.month || []);
+      const hasAnyData = (heroStatsPayload.month || []).length > 0 || (heroStatsPayload.allTime || []).length > 0;
+
+      const sortRows = () => {
+        const key = heroStatsSortState.key;
+        const dir = heroStatsSortState.direction === 'asc' ? 1 : -1;
+        const rows = [...getCurrentHeroList()];
+        rows.sort((a, b) => {
+          const av = Number(a[key]) || 0;
+          const bv = Number(b[key]) || 0;
+          if (av === bv) {
+            return (Number(a.hero) || 0) - (Number(b.hero) || 0);
+          }
+          return (av - bv) * dir;
+        });
+
+        rowsBody.innerHTML = '';
+        if (!rows.length) {
+          rowsBody.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
+        } else {
+          for (const item of rows) {
+            rowsBody.append(makeHeroStatsRow(item));
+          }
+        }
+
+        for (const [keyName, btn] of headerButtons) {
+          const arrow = heroStatsSortState.key === keyName ? (heroStatsSortState.direction === 'asc' ? ' ▲' : ' ▼') : '';
+          btn.textContent = `${Lang.text(heroStatsColumns.find((col) => col.key === keyName).labelKey)}${arrow}`;
+          btn.classList.toggle('is-active', heroStatsSortState.key === keyName);
+        }
+        headerHeroLabel.textContent = Lang.text('topColHero');
+        periodToggle.textContent = heroStatsPeriod === 'month' ? Lang.text('topPeriodMonth') : Lang.text('topPeriodAllTime');
+      };
+
+      if (!hasAnyData) {
+        listScroll.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
+        return;
+      }
+
+      const header = DOM({ style: 'wtop-hero-stats-header' });
+      for (const col of heroStatsColumns) {
+        if (col.key === 'hero') {
+          periodToggle.addEventListener('click', () => {
+            heroStatsPeriod = heroStatsPeriod === 'month' ? 'allTime' : 'month';
+            sortRows();
+          });
+          headerHeroTitle.append(DOM({ style: 'wtop-hero-title-split' }, headerHeroLabel, periodToggle));
+          header.append(headerHeroTitle);
+          continue;
+        }
+        const btn = DOM({
+          tag: 'button',
+          type: 'button',
+          style: ['wtop-cell', 'wtop-sortable-header'],
+          domaudio: domAudioPresets.defaultButton,
+          event: [
+            'click',
+            () => {
+              if (heroStatsSortState.key === col.key) {
+                heroStatsSortState.direction = heroStatsSortState.direction === 'desc' ? 'asc' : 'desc';
+              } else {
+                heroStatsSortState.key = col.key;
+                heroStatsSortState.direction = 'desc';
+              }
+              sortRows();
+            },
+          ],
+        });
+        headerButtons.set(col.key, btn);
+        header.append(btn);
+      }
+      listScroll.append(header);
+      listScroll.append(rowsBody);
+      sortRows();
+    };
+
     const openHeroPicker = async () => {
       let request = await App.api.request('build', 'heroAll');
       request.push({ id: 0 });
@@ -3817,6 +3948,26 @@ export class View {
 
     const scrollClass = isSplah ? 'wtop-scroll' : 'top-scroll';
     const modeBar = DOM({ style: 'wtop-mode-bar' });
+    modeBar.append(
+      DOM({
+        domaudio: domAudioPresets.defaultButton,
+        style: ['wtop-mode-tab', isHeroStatsView ? 'is-active' : null].filter(Boolean),
+        tag: 'button',
+        type: 'button',
+        textContent: Lang.text('topHeroesTab'),
+        event: [
+          'click',
+          () => {
+            if (isHeroStatsView) return;
+            if (isSplah) {
+              Window.show('main', 'top', heroId, HERO_STATS_TAB_ID);
+            } else {
+              View.show('top', heroId, false, HERO_STATS_TAB_ID);
+            }
+          },
+        ],
+      }),
+    );
     for (const tab of TOP_MODE_TABS) {
       const isActive = tab.id === activeMode;
       const btn = DOM({
@@ -3846,9 +3997,9 @@ export class View {
     }
 
     const listScroll = DOM({ style: 'wtop-list-scroll' });
-    if (list.length === 0) {
+    if (!isHeroStatsView && list.length === 0) {
       listScroll.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
-    } else {
+    } else if (!isHeroStatsView) {
       listScroll.append(
         DOM(
           { style: 'wtop-table-header' },
@@ -3861,6 +4012,8 @@ export class View {
       for (let i = 0; i < list.length; i++) {
         listScroll.append(makeTableRow(list[i], i + 1));
       }
+    } else {
+      makeHeroStatsTable(listScroll);
     }
 
     const heroFilterImg = DOM({
@@ -3883,11 +4036,13 @@ export class View {
     );
     heroFilterBtn.setAttribute('aria-label', Lang.text('clickToViewHeroRating'));
 
-    const podiumRow = DOM({ style: 'wtop-podium-row' }, podium, heroFilterBtn);
-
     const listRow = DOM({ style: 'wtop-list-row' }, listScroll);
-
-    const top = DOM({ style: [scrollClass, 'top-layout'] }, modeBar, podiumRow, listRow);
+    const topChildren = [modeBar];
+    if (!isHeroStatsView) {
+      topChildren.push(DOM({ style: 'wtop-podium-row' }, podium, heroFilterBtn));
+    }
+    topChildren.push(listRow);
+    const top = DOM({ style: [scrollClass, 'top-layout'] }, ...topChildren);
 
     const helpBtn = DOM({
       id: 'wtop_help',

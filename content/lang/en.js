@@ -40,6 +40,7 @@ export const en = {
     volume: 'Volume',
     volumeMusic: 'Volume of music',
     volumeSound: 'Volume of sounds',
+    voiceVolume: 'Voice volume',
     back: 'Back',
     save: 'Save',
     soundHelp:
@@ -102,10 +103,17 @@ export const en = {
 
     //castleNavBar
     clickToViewHeroRating: 'Click to view rating by individual heroes',
+    topHeroesTab: 'Heroes',
     topColPlace: '#',
     topColPlayer: 'Nickname',
     topColHero: 'Hero',
     topColRating: 'Rating',
+    topColBattles: 'Battles',
+    topColWins: 'Wins',
+    topColLosses: 'Losses',
+    topColWinrate: 'Winrate',
+    topPeriodMonth: 'Month',
+    topPeriodAllTime: 'All Time',
     topEmpty: 'No data',
     gm1: 'Borderlands',
     gm2: 'Outpost',

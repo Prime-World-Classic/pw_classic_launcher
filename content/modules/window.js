@@ -990,6 +990,37 @@ export class Window {
           ),
         ),
         DOM(
+          { style: 'castle-menu-label' },
+          Lang.text('voiceVolume'),
+          DOM({
+            tag: 'input',
+            domaudio: domAudioPresets.defaultButton,
+            type: 'range',
+            value: Math.round((Number(Settings.settings.voiceVolume) || 1) * 100),
+            min: '0',
+            max: '100',
+            step: '1',
+            style: 'castle-menu-slider',
+            event: [
+              'input',
+              (e) => {
+                Settings.settings.voiceVolume = parseFloat(e.target.value) / 100;
+                Voice.setVolumeLevel(Settings.settings.voiceVolume);
+                document.getElementById('voice-volume-percentage').textContent = `${Math.round(Settings.settings.voiceVolume * 100)}%`;
+                Window.updateSliderFill(e.target);
+              },
+            ],
+          }),
+          DOM(
+            {
+              tag: 'span',
+              id: 'voice-volume-percentage',
+              style: 'volume-percentage',
+            },
+            `${Math.round((Number(Settings.settings.voiceVolume) || 1) * 100)}%`,
+          ),
+        ),
+        DOM(
           {
             style: 'castle-menu-item-button',
             domaudio: domAudioPresets.defaultButton,

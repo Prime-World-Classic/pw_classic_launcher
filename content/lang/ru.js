@@ -42,6 +42,7 @@ export const ru = {
     volume: 'Общая громкость',
     volumeMusic: 'Громкость музыки',
     volumeSound: 'Громкость звуков',
+    voiceVolume: 'Громкость войса',
     back: 'Назад',
     save: 'Сохранить',
     soundHelp:
@@ -104,10 +105,17 @@ export const ru = {
 
     //castleNavBar
     clickToViewHeroRating: 'Нажмите сюда, чтобы посмотреть рейтинг по отдельным героям',
+    topHeroesTab: 'Герои',
     topColPlace: 'Место',
     topColPlayer: 'Никнейм',
     topColHero: 'Герой',
     topColRating: 'Рейтинг',
+    topColBattles: 'Боев',
+    topColWins: 'Побед',
+    topColLosses: 'Поражений',
+    topColWinrate: 'Винрейт',
+    topPeriodMonth: 'Месяц',
+    topPeriodAllTime: 'За все время',
     topEmpty: 'Нет данных',
     gm1: 'Пограничье',
     gm2: 'Форпост',
