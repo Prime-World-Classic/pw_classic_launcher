@@ -63,6 +63,25 @@ const KEYBOARD_LAYOUT_EN_TO_RU = {
   '`': 'ё',
 };
 const KEYBOARD_LAYOUT_RU_TO_EN = Object.fromEntries(Object.entries(KEYBOARD_LAYOUT_EN_TO_RU).map(([enChar, ruChar]) => [ruChar, enChar]));
+const KEYBOARD_LAYOUT_GRID_ROWS = [
+  ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'],
+];
+const KEYBOARD_LAYOUT_POSITIONS = (() => {
+  const positions = new Map();
+  for (let rowIndex = 0; rowIndex < KEYBOARD_LAYOUT_GRID_ROWS.length; rowIndex++) {
+    const row = KEYBOARD_LAYOUT_GRID_ROWS[rowIndex];
+    for (let colIndex = 0; colIndex < row.length; colIndex++) {
+      const enChar = row[colIndex];
+      positions.set(enChar, [rowIndex, colIndex]);
+      const ruChar = KEYBOARD_LAYOUT_EN_TO_RU[enChar];
+      if (ruChar) positions.set(ruChar, [rowIndex, colIndex]);
+    }
+  }
+  return positions;
+})();
 
 export class View {
   static mmQueueMap = {};
@@ -136,6 +155,110 @@ export class View {
     variants.add(View.remapQueryByKeyboardLayout(normalized, KEYBOARD_LAYOUT_EN_TO_RU));
     variants.add(View.remapQueryByKeyboardLayout(normalized, KEYBOARD_LAYOUT_RU_TO_EN));
     return [...variants].filter(Boolean);
+  }
+
+  static splitSearchWords(value) {
+    return String(value || '')
+      .toLowerCase()
+      .split(/[^a-zа-яё0-9]+/i)
+      .filter(Boolean);
+  }
+
+  static hasSingleAdjacentTransposition(left, right) {
+    if (left.length !== right.length || left === right) return false;
+    let firstDiff = -1;
+    for (let i = 0; i < left.length; i++) {
+      if (left[i] !== right[i]) {
+        firstDiff = i;
+        break;
+      }
+    }
+    if (firstDiff < 0 || firstDiff >= left.length - 1) return false;
+    if (!(left[firstDiff] === right[firstDiff + 1] && left[firstDiff + 1] === right[firstDiff])) return false;
+    for (let i = firstDiff + 2; i < left.length; i++) {
+      if (left[i] !== right[i]) return false;
+    }
+    return true;
+  }
+
+  static hasEditDistanceAtMostOne(left, right) {
+    if (left === right) return true;
+    const lenDiff = Math.abs(left.length - right.length);
+    if (lenDiff > 1) return false;
+    let i = 0;
+    let j = 0;
+    let edits = 0;
+    while (i < left.length && j < right.length) {
+      if (left[i] === right[j]) {
+        i++;
+        j++;
+        continue;
+      }
+      edits++;
+      if (edits > 1) return false;
+      if (left.length > right.length) {
+        i++;
+      } else if (left.length < right.length) {
+        j++;
+      } else {
+        if (!View.isKeyboardNeighbor(left[i], right[j])) return false;
+        i++;
+        j++;
+      }
+    }
+    if (i < left.length || j < right.length) edits++;
+    return edits <= 1;
+  }
+
+  static toKeyboardLayoutKey(char) {
+    const normalizedChar = String(char || '').toLowerCase();
+    return KEYBOARD_LAYOUT_RU_TO_EN[normalizedChar] || normalizedChar;
+  }
+
+  static toKeyboardLayoutString(value) {
+    return String(value || '')
+      .split('')
+      .map((char) => View.toKeyboardLayoutKey(char))
+      .join('');
+  }
+
+  static isKeyboardNeighbor(leftChar, rightChar) {
+    if (leftChar === rightChar) return true;
+    const leftPosition = KEYBOARD_LAYOUT_POSITIONS.get(View.toKeyboardLayoutKey(leftChar));
+    const rightPosition = KEYBOARD_LAYOUT_POSITIONS.get(View.toKeyboardLayoutKey(rightChar));
+    if (!leftPosition || !rightPosition) return true;
+    return Math.abs(leftPosition[0] - rightPosition[0]) <= 1 && Math.abs(leftPosition[1] - rightPosition[1]) <= 1;
+  }
+
+  static isFuzzySearchVariantMatch(filterHaystack, filterWords, variant) {
+    if (!variant) return false;
+    if (filterHaystack.includes(variant)) return true;
+    const variantKey = View.toKeyboardLayoutString(variant);
+    if (variantKey && filterWords.some((word) => View.toKeyboardLayoutString(word).includes(variantKey))) return true;
+    if (variant.length < 3) return false;
+    for (const word of filterWords) {
+      if (word.includes(variant)) return true;
+      const prefix = word.slice(0, variant.length);
+      if (prefix && prefix !== word) {
+        if (View.hasSingleAdjacentTransposition(prefix, variant)) return true;
+        if (View.hasEditDistanceAtMostOne(prefix, variant)) return true;
+      }
+      if (Math.abs(word.length - variant.length) > 1) continue;
+      if (View.hasSingleAdjacentTransposition(word, variant)) return true;
+      if (View.hasEditDistanceAtMostOne(word, variant)) return true;
+
+      const wordKey = View.toKeyboardLayoutString(word);
+      const keyPrefix = wordKey.slice(0, variantKey.length);
+      if (keyPrefix && keyPrefix !== wordKey) {
+        if (View.hasSingleAdjacentTransposition(keyPrefix, variantKey)) return true;
+        if (View.hasEditDistanceAtMostOne(keyPrefix, variantKey)) return true;
+      }
+      if (Math.abs(wordKey.length - variantKey.length) <= 1) {
+        if (View.hasSingleAdjacentTransposition(wordKey, variantKey)) return true;
+        if (View.hasEditDistanceAtMostOne(wordKey, variantKey)) return true;
+      }
+    }
+    return false;
   }
 
   static setCastleOpenedBuildHero(heroId = 0) {
@@ -2271,7 +2394,8 @@ export class View {
         .filter(Boolean)
         .join(' ');
       const filterHaystack = `${localizedName} ${fallbackName} ${customNames}`.toLowerCase();
-      if (hasSearch && !searchVariants.some((variant) => filterHaystack.includes(variant))) {
+      const filterWords = View.splitSearchWords(filterHaystack);
+      if (hasSearch && !searchVariants.some((variant) => View.isFuzzySearchVariantMatch(filterHaystack, filterWords, variant))) {
         continue;
       }
 
@@ -2782,7 +2906,8 @@ export class View {
       const status = Number(item?.status);
       const nickname = String(item?.nickname || '');
       const nicknameLower = nickname.toLowerCase();
-      if (hasSearch && !searchVariants.some((variant) => nicknameLower.includes(variant))) continue;
+      const nicknameWords = View.splitSearchWords(nicknameLower);
+      if (hasSearch && !searchVariants.some((variant) => View.isFuzzySearchVariantMatch(nicknameLower, nicknameWords, variant))) continue;
       const inList = status === 1 && View.isCastleFriendInList(item, 1);
       if (selectedList > 0) {
         const inFavList = View.isCastleFriendInList(item, 1);
