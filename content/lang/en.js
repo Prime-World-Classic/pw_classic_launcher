@@ -28,6 +28,7 @@ export const en = {
     nicknameChange: 'Change your nickname',
     sideChange: 'Choose a Faction',
     preferences: 'Settings',
+    advancedSettings: 'Advanced settings',
     windowMode: 'Window mode',
     radminPriority: 'RadminVPN Priority',
     threeD: '3D',

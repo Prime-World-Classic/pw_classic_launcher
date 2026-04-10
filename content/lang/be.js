@@ -17,6 +17,7 @@ export const be = {
     library: 'Бібліятэка',
     menu: 'Мяню',
     preferences: 'Прылады',
+    advancedSettings: 'Дад. налады',
     windowMode: 'Аконны рэжым',
     radminPriority: 'Прыярытэт RadminVPN',
     threeD: '3D графіка',

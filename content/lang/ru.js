@@ -30,6 +30,7 @@ export const ru = {
     nicknameChange: 'Изменить никнейм',
     sideChange: 'Выбрать Фракцию',
     preferences: 'Настройки',
+    advancedSettings: 'Доп. настройки',
     windowMode: 'Оконный режим',
     radminPriority: 'Приоритет RadminVPN',
     threeD: '3D графика',
