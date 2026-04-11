@@ -3025,6 +3025,10 @@ export class View {
         }
       }
 
+      if (status == 1 && item.online && Number(item.mobile) == 1) {
+        friend.append(DOM({ style: 'castle-friend-mobile-emoji' }, '📱'));
+      }
+
       friend.dataset.url = `content/hero/friendLogo.png`;
       preload.add(friend);
     }

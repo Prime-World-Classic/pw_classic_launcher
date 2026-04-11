@@ -1637,6 +1637,12 @@ export class Build {
     return Build.combatModeLearnOrder.length;
   }
 
+  static getCombatStackProgressFactor() {
+    if (!Build.combatModeEnabled) return 1;
+    const level = Math.max(1, Number(Build.getCombatModeHeroLevel()) || 1);
+    return Math.max(0, Math.min(1, level / 36));
+  }
+
   static getCombatMainTalentSlotIndex() {
     for (let i = 0; i < (Build.installedTalents || []).length; i++) {
       const t = Build.installedTalents[i];
@@ -3289,6 +3295,9 @@ export class Build {
         let refineBonus = Build.getTalentRefineByRarity(talent.rarity);
         let refineMul = parseFloat(talent.statsRefine[key]);
         statValue += refineBonus * refineMul;
+      }
+      if (Build.combatModeEnabled && key.indexOf('stak') !== -1) {
+        statValue *= Build.getCombatStackProgressFactor();
       }
       add[stat] = statValue;
     }
