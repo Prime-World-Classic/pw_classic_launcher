@@ -332,6 +332,10 @@ export class Build {
 
     Build.descriptionView.style.display = 'none';
     Build._hoveredDescriptionTalentEl = null;
+    Build._libraryHoverSuppressed = false;
+    Build._libraryHoverSuppressTimer = 0;
+    Build._libraryPointerX = null;
+    Build._libraryPointerY = null;
 
     const bindCommandsToGet = [
       "cmd_action_bar_slot1",
@@ -410,6 +414,28 @@ export class Build {
     Build.talentsAndSetsView.append(buttonTalents, separator, buttonSets);
 
     const buildTalents = DOM({ style: 'build-talents' });
+    buildTalents.addEventListener(
+      'wheel',
+      () => {
+        Build.beginLibraryHoverSuppression();
+      },
+      { passive: true },
+    );
+    buildTalents.addEventListener(
+      'scroll',
+      () => {
+        Build.beginLibraryHoverSuppression();
+      },
+      { passive: true },
+    );
+    buildTalents.addEventListener(
+      'mousemove',
+      (e) => {
+        Build._libraryPointerX = e.clientX;
+        Build._libraryPointerY = e.clientY;
+      },
+      { passive: true },
+    );
 
     Build.inventoryView = document.createElement('div');
     Build.inventoryView.classList.add('build-talent-view');
@@ -728,6 +754,9 @@ export class Build {
     if (Settings.settings.buildStatFilterHighlightMode < 0 || Settings.settings.buildStatFilterHighlightMode > 2) {
       Settings.settings.buildStatFilterHighlightMode = 1;
     }
+    if (typeof Settings.settings.buildSetHoverOnTalent !== 'boolean') {
+      Settings.settings.buildSetHoverOnTalent = true;
+    }
     if (!Number.isFinite(Number(Settings.settings.buildHighlightHue))) {
       Settings.settings.buildHighlightHue = Build.BUILD_HIGHLIGHT_HUE_DEFAULT;
     }
@@ -799,6 +828,38 @@ export class Build {
 
   static isBuildRowHoverHighlightEnabled() {
     return !!Settings.settings?.buildRowHoverHighlight;
+  }
+
+  static isBuildSetHoverOnTalentEnabled() {
+    return Settings.settings?.buildSetHoverOnTalent !== false;
+  }
+
+  static beginLibraryHoverSuppression(timeoutMs = 80) {
+    Build._libraryHoverSuppressed = true;
+    try {
+      if (Build._libraryHoverSuppressTimer) clearTimeout(Build._libraryHoverSuppressTimer);
+    } catch {}
+    Build._libraryHoverSuppressTimer = setTimeout(() => {
+      Build._libraryHoverSuppressTimer = 0;
+      Build._libraryHoverSuppressed = false;
+      try {
+        const x = Number(Build._libraryPointerX);
+        const y = Number(Build._libraryPointerY);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        const below = document.elementFromPoint(x, y);
+        const hoveredTalent = below?.closest?.('.build-talents .build-talent-item');
+        if (!hoveredTalent) return;
+        hoveredTalent.dispatchEvent(
+          new MouseEvent('mouseover', {
+            bubbles: false,
+            cancelable: false,
+            view: window,
+            clientX: x,
+            clientY: y,
+          }),
+        );
+      } catch {}
+    }, timeoutMs);
   }
 
   static applyTalentViewLayoutFromSettings() {
@@ -984,6 +1045,37 @@ export class Build {
       statFiltDots.append(dot);
     }
 
+    const setHoverTalentLabel = DOM({ style: 'build-settings-row-label' }, Lang.text('buildSettingsSetHoverOnTalent'));
+    const setHoverTalentValue = DOM({ tag: 'span', style: 'build-settings-row-value' });
+    const setHoverTalentDots = DOM({ style: 'build-settings-mode-dots' });
+    const applySetHoverTalentValue = async (enabled) => {
+      Settings.settings.buildSetHoverOnTalent = enabled;
+      setHoverTalentValue.textContent = enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+      const activeIndex = enabled ? 1 : 0;
+      const items = setHoverTalentDots.querySelectorAll('.build-settings-mode-dot');
+      items.forEach((dot, idx) => dot.classList.toggle('build-settings-mode-dot-active', idx === activeIndex));
+      try {
+        await Settings.WriteSettings();
+      } catch {}
+    };
+    const setHoverTalentEnabledNow = Build.isBuildSetHoverOnTalentEnabled();
+    setHoverTalentValue.textContent = setHoverTalentEnabledNow ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff');
+    for (let i = 0; i < 2; i++) {
+      const enabled = i === 1;
+      const dotStyle = ['build-settings-mode-dot'];
+      if ((setHoverTalentEnabledNow && enabled) || (!setHoverTalentEnabledNow && !enabled)) {
+        dotStyle.push('build-settings-mode-dot-active');
+      }
+      const dot = DOM({
+        tag: 'button',
+        type: 'button',
+        style: dotStyle,
+        title: enabled ? Lang.text('buildSettingsOn') : Lang.text('buildSettingsOff'),
+        event: ['click', async () => applySetHoverTalentValue(enabled)],
+      });
+      setHoverTalentDots.append(dot);
+    }
+
     const hlBlock = DOM({ style: 'build-settings-hl-block' });
     const hlSliders = DOM({ style: 'build-settings-hl-sliders' });
     const hlHueLabel = DOM({ style: 'build-settings-hl-line-label' }, Lang.text('buildSettingsHighlightHue'));
@@ -1143,6 +1235,9 @@ export class Build {
       statFiltLabel,
       statFiltDots,
       statFiltValue,
+      setHoverTalentLabel,
+      setHoverTalentDots,
+      setHoverTalentValue,
       hlBlock,
     );
 
@@ -4531,11 +4626,54 @@ export class Build {
   static highlightSetTalents(talentIds) {
     Build.clearSetHighlights();
     const wanted = new Set((talentIds || []).map(String));
+    const visibleRect = Build.getLibraryVisibleScrollRect();
     Build.fieldView?.querySelectorAll('.build-talent-item').forEach((el) => {
       if (wanted.has(el.dataset.id)) el.classList.add('build-set-highlight');
     });
     Build.inventoryView?.querySelectorAll('.build-talents .build-talent-item').forEach((el) => {
-      if (wanted.has(el.dataset.id)) el.classList.add('build-set-highlight-lib');
+      if (wanted.has(el.dataset.id) && Build.isLibraryTalentVisibleByScroll(el, visibleRect)) el.classList.add('build-set-highlight-lib');
+    });
+    Build.refreshStatFilterHighlightCountDisplay();
+  }
+
+  static getLibraryVisibleScrollRect() {
+    const list = Build.inventoryView?.querySelector?.('.build-talents');
+    if (!list) return null;
+    const listRect = list.getBoundingClientRect?.();
+    return {
+      list,
+      listRect,
+      left: list.scrollLeft,
+      right: list.scrollLeft + list.clientWidth,
+      top: list.scrollTop,
+      bottom: list.scrollTop + list.clientHeight,
+    };
+  }
+
+  static isLibraryTalentVisibleByScroll(el, visibleRect) {
+    if (!el || !el.isConnected || !visibleRect?.list) return false;
+    if (!visibleRect.list.contains(el)) return false;
+    const elRect = el.getBoundingClientRect?.();
+    const listRect = visibleRect.listRect || visibleRect.list.getBoundingClientRect?.();
+    if (!elRect || !listRect) return false;
+    const left = elRect.left - listRect.left + visibleRect.list.scrollLeft;
+    const top = elRect.top - listRect.top + visibleRect.list.scrollTop;
+    const right = left + el.offsetWidth;
+    const bottom = top + el.offsetHeight;
+    return !(
+      right <= visibleRect.left ||
+      left >= visibleRect.right ||
+      bottom <= visibleRect.top ||
+      top >= visibleRect.bottom
+    );
+  }
+
+  static highlightSetTalentsInLibraryOnly(talentIds) {
+    Build.clearSetHighlights();
+    const wanted = new Set((talentIds || []).map(String));
+    const visibleRect = Build.getLibraryVisibleScrollRect();
+    Build.inventoryView?.querySelectorAll('.build-talents .build-talent-item').forEach((el) => {
+      if (wanted.has(el.dataset.id) && Build.isLibraryTalentVisibleByScroll(el, visibleRect)) el.classList.add('build-set-highlight-lib');
     });
     Build.refreshStatFilterHighlightCountDisplay();
   }
@@ -6458,6 +6596,7 @@ export class Build {
     if (Build._descriptionPinnedBySet) return;
     const activeTalentEl = Build._hoveredDescriptionTalentEl;
     if (!activeTalentEl || !activeTalentEl.isConnected) return;
+    if (Build._libraryHoverSuppressed && activeTalentEl.closest?.('.build-talents')) return;
     try {
       activeTalentEl.dispatchEvent(new MouseEvent('mouseover', { bubbles: false, cancelable: false, view: window }));
     } catch {}
@@ -6468,6 +6607,7 @@ export class Build {
       let positionElement = element.getBoundingClientRect();
       let data = Build.talents[element.dataset.id];
       const isInventoryTalent = !!element.closest?.('.build-talents');
+      if (isInventoryTalent && Build._libraryHoverSuppressed) return;
 
       if (!data) {
         console.log('Не найден талант в билде: ' + element.dataset.id);
@@ -6482,6 +6622,32 @@ export class Build {
 
       const nameKey = `${prefix}${absId}_name`;
       const descriptionKey = `${prefix}${absId}_description`;
+
+      let hasSetHover = !!Build._hoveredSetTalentIds;
+      if (!hasSetHover && Build.isBuildSetHoverOnTalentEnabled()) {
+        const wantedId = Math.abs(Number(data.id));
+        if (Number.isFinite(wantedId) && wantedId > 0) {
+          for (const set of TalentSets.list()) {
+            const ids = TalentSets.getTalentIds(set);
+            if (!Array.isArray(ids) || !ids.length) continue;
+            if (!ids.some((id) => Math.abs(Number(id)) === wantedId)) continue;
+            let installedSetTalentsCount = 0;
+            for (const id of ids) {
+              if (Build.isTalentInBuild(id)) installedSetTalentsCount++;
+            }
+            const hoveredTalentInstalledInBuild = Build.isTalentInBuild(data.id);
+            if (installedSetTalentsCount <= 1 && hoveredTalentInstalledInBuild) {
+              Build.highlightSetTalentsInLibraryOnly(ids);
+              hasSetHover = true;
+              break;
+            }
+            Build.highlightSetTalents(ids);
+            Build.previewSetTalentsInEmptySlots({ _manualOrder: ids, key: `hover_talent_set_${wantedId}` });
+            hasSetHover = true;
+            break;
+          }
+        }
+      }
 
       // Получаем переводы из системы Lang
       const name = Lang.text(nameKey);
@@ -6598,18 +6764,21 @@ export class Build {
         if (Build.isBuildRowHoverHighlightEnabled() && data.level > 0) {
           Build.highlightBuildRowByLevel(data.level);
         }
-        // Single talent preview in library should pick the left-most empty slot.
-        Build.previewSetTalentsInEmptySlots(
-          { _manualOrder: [data.id], key: `single_${data.id}` },
-          'left',
-          { previewClass: 'build-talent-empty-slot-preview' },
-        );
+        if (!hasSetHover) {
+          // Single talent preview in library should pick the left-most empty slot.
+          Build.previewSetTalentsInEmptySlots(
+            { _manualOrder: [data.id], key: `single_${data.id}` },
+            'left',
+            { previewClass: 'build-talent-empty-slot-preview' },
+          );
+        }
       }
     };
 
     let descEventEnd = () => {
       Build.descriptionView.style.display = 'none';
       Build.clearBuildRowHoverHighlight();
+      if (!Build._hoveredSetTalentIds) Build.clearSetHighlights();
       // Remove only slot previews (keeps set-highlight logic independent).
       if (element.closest?.('.build-talents')) Build.clearEmptySlotPreviews();
     };
@@ -6633,6 +6802,13 @@ export class Build {
   }
   static cleanup() {
     Build._hoveredDescriptionTalentEl = null;
+    Build._libraryHoverSuppressed = false;
+    try {
+      if (Build._libraryHoverSuppressTimer) clearTimeout(Build._libraryHoverSuppressTimer);
+    } catch {}
+    Build._libraryHoverSuppressTimer = 0;
+    Build._libraryPointerX = null;
+    Build._libraryPointerY = null;
     Build.clearBuildRowHoverHighlight();
     Build.toggleBuildSettingsPanel(false);
     try {

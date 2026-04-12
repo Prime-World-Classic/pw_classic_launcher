@@ -68,6 +68,7 @@ export const be = {
     topPeriodMonth: 'Месяц',
     topPeriodAllTime: 'За ўвесь час',
     topEmpty: 'Няма дадзеных',
+    buildSettingsSetHoverOnTalent: 'Падсветка сета пры навядзенні на талент',
     showStatistics: 'Паказаць статыстыку',
 
 
