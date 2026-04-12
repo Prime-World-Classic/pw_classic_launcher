@@ -20,6 +20,8 @@ import { getMainHeroTalentId } from './mainHeroTalent.js';
 
 export class Build {
   static loading = false;
+  static useOptimisticTalentApi = true;
+  static mutationQueue = Promise.resolve();
 
   /** HSL hue для подсветки сетов (как rgba(80,190,255)); толщина рамки в мм (макс. 1.5). */
   static BUILD_HIGHLIGHT_HUE_DEFAULT = 199;
@@ -726,6 +728,107 @@ export class Build {
       if (request?.active) Build.activeBar(request.active);
     } catch {}
     Build.syncCombatModeButtonState();
+  }
+  
+  static resolveTalentById(talentId) {
+    const key = `${Number(talentId)}`;
+    if (key in Build.talents) return Build.talents[key];
+    if (`${talentId}` in Build.talents) return Build.talents[`${talentId}`];
+    return null;
+  }
+  
+  static applyRollbackSnapshot(rollback) {
+    if (!rollback || !Array.isArray(rollback.body) || !Array.isArray(rollback.active)) {
+      return false;
+    }
+    if (rollback.body.length < 36 || rollback.active.length < 24) {
+      return false;
+    }
+    
+    const nextInstalled = new Array(36).fill(null);
+    for (let i = 0; i < 36; i++) {
+      const id = Number(rollback.body[i]) || 0;
+      if (!id) continue;
+      const data = Build.resolveTalentById(id);
+      if (!data) {
+        return false;
+      }
+      nextInstalled[i] = data;
+    }
+    
+    Build.installedTalents = nextInstalled;
+    Build.activeBarItems = rollback.active.slice(0, 24).map((item) => Number(item) || 0);
+    Build.rebuildFieldConflictFromInstalledTalents();
+    Build.syncFieldSlotsFromInstalledTalents();
+    Build.activeBar(Build.activeBarItems);
+    Build.sortInventory();
+    Build.updateHeroStats();
+    Build.syncCombatModeButtonState();
+    return true;
+  }
+  
+  static notifyTalentAnomaly(reason) {
+    const key = reason && `${reason}` ? `${reason}` : 'talentAnomalyUnknown';
+    const text = Lang.text(key);
+    App.notify(text && text !== key ? text : Lang.text('talentAnomalyUnknown'));
+  }
+  
+  static async handleOptimisticResponse(result) {
+    if (!result || typeof result !== 'object' || !('ok' in result)) {
+      return true;
+    }
+    if (result.ok) {
+      return true;
+    }
+    
+    const restored = Build.applyRollbackSnapshot(result.rollback);
+    Build.notifyTalentAnomaly(result.reason);
+    if (!restored) {
+      await Build.refreshBuildStateFromServer({ refreshInventory: true });
+    }
+    return false;
+  }
+  
+  static async sendBuildMutation({ optimisticMethod, legacyMethod, data }) {
+    const runLegacy = async () => {
+      if (!legacyMethod) return false;
+      let legacyData = data;
+      if (legacyMethod === 'swap' && data && !('id' in data) && 'buildId' in data) {
+        legacyData = { ...data, id: data.buildId };
+      }
+      await App.api.request('build', legacyMethod, legacyData);
+      return true;
+    };
+    
+    const runOptimistic = async () => {
+      if (!Build.useOptimisticTalentApi) {
+        return await runLegacy();
+      }
+      try {
+        const result = await App.api.request('build', optimisticMethod, data);
+        return await Build.handleOptimisticResponse(result);
+      } catch (error) {
+        return await runLegacy();
+      }
+    };
+    
+    Build.mutationQueue = Build.mutationQueue
+      .then(async () => {
+        try {
+          await runOptimistic();
+        } catch {}
+      })
+      .catch(() => {});
+    
+    return true;
+  }
+  
+  static async sendBuildMutationOrThrow(options) {
+    const ok = await Build.sendBuildMutation(options);
+    if (!ok) {
+      throw new Error('Talent action rejected by backend');
+    }
+    return true;
   }
 
   static ensureBuildSettingsDefaults() {
@@ -5014,7 +5117,7 @@ export class Build {
     });
   }
 
-  static async applySetToBuild(set) {
+  static applySetToBuild(set) {
     const setIds = TalentSets.getTalentIds(set);
     let ids = Build.sortSetTalentIdsByPriority(setIds);
     ids = Build.filterSetTalentIdsByMatchingStats(ids);
@@ -5036,30 +5139,36 @@ export class Build {
       if (emptyIndex == null) continue;
 
       try {
-        await App.api.request('build', 'set', {
-          buildId: Build.id,
-          talentId: data.id,
-          index: emptyIndex,
+        Build.sendBuildMutation({
+          optimisticMethod: 'optimisticSet',
+          legacyMethod: 'set',
+          data: {
+            buildId: Build.id,
+            talentId: data.id,
+            index: emptyIndex,
+          },
         });
 
         Build.installedTalents[emptyIndex] = data;
         simInstalled[emptyIndex] = data;
 
         if (data.active) {
-          try {
-            if (!Build.isFieldIndexAlreadyInActiveBar(emptyIndex)) {
-              const free = Build.findFirstFreeActiveBarIndex();
-              if (free !== -1) {
-                const position = Number(emptyIndex) + 1;
-                await App.api.request('build', 'setActive', {
+          if (!Build.isFieldIndexAlreadyInActiveBar(emptyIndex)) {
+            const free = Build.findFirstFreeActiveBarIndex();
+            if (free !== -1) {
+              const position = Number(emptyIndex) + 1;
+              Build.sendBuildMutation({
+                optimisticMethod: 'optimisticSetActive',
+                legacyMethod: 'setActive',
+                data: {
                   buildId: Build.id,
                   index: free,
                   position: position,
-                });
-                Build.activeBarItems[free] = position;
-              }
+                },
+              });
+              Build.activeBarItems[free] = position;
             }
-          } catch {}
+          }
         }
       } catch (e) {
       }
@@ -5238,27 +5347,42 @@ export class Build {
 
   static async removeSetFromBuild(set) {
     const ids = TalentSets.getTalentIds(set);
-    for (const id of ids) {
-      const setTalentIdNum = Number(id);
-      for (let index = 0; index < (Build.installedTalents || []).length; index++) {
-        const t = Build.installedTalents[index];
-        if (!t) continue;
-        const installedIdNum = Number(t.id);
-        if (Number.isFinite(setTalentIdNum) && Number.isFinite(installedIdNum)) {
-          if (installedIdNum !== setTalentIdNum) continue;
-        } else if (`${t.id}` !== `${id}`) {
-          continue;
-        }
-
-        try {
-          await Build.removeTalentFromActiveByFieldIndex(index);
-        } catch {}
-
-        try {
-          await App.api.request('build', 'setZero', { buildId: Build.id, index });
-          Build.installedTalents[index] = null;
-        } catch (e) {}
+    const idSet = new Set((ids || []).map((id) => `${Number(id)}`));
+    const removeIndices = [];
+    
+    for (let index = 0; index < (Build.installedTalents || []).length; index++) {
+      const t = Build.installedTalents[index];
+      if (!t) continue;
+      if (idSet.has(`${Number(t.id)}`)) {
+        removeIndices.push(index);
       }
+    }
+    
+    if (!removeIndices.length) {
+      Build.refreshLocalBuildUiAfterSet(ids, set);
+      return;
+    }
+    
+    const removePositions = new Set(removeIndices.map((index) => Number(index) + 1));
+    for (let i = 0; i < (Build.activeBarItems || []).length; i++) {
+      const activeItem = Number(Build.activeBarItems[i]) || 0;
+      if (!activeItem) continue;
+      if (!removePositions.has(Math.abs(activeItem))) continue;
+      Build.clearActiveSlotLocal(i);
+      Build.sendBuildMutation({
+        optimisticMethod: 'optimisticClearActive',
+        legacyMethod: 'setZeroActive',
+        data: { buildId: Build.id, index: i },
+      });
+    }
+    
+    for (const index of removeIndices) {
+      Build.installedTalents[index] = null;
+      Build.sendBuildMutation({
+        optimisticMethod: 'optimisticRemove',
+        legacyMethod: 'setZero',
+        data: { buildId: Build.id, index },
+      });
     }
 
     Build.refreshLocalBuildUiAfterSet(ids, set);
@@ -5357,7 +5481,7 @@ export class Build {
               Build.applySetInventoryOrder(set);
             }
             if (mode !== 3) {
-              await Build.applySetToBuild(set);
+              Build.applySetToBuild(set);
               Build.applySetInventoryOrder(set);
             } else {
               Build.applySetInventoryOrder(set);
@@ -5383,7 +5507,6 @@ export class Build {
             Build._forceShowTalentIds = mode === 1 ? new Set(ids.map(String)) : null;
             Build._forceShowOnlySetTalentIds = null;
             Build._forceShowOnlyTalentIds = null;
-            Build.applySetInventoryOrder(set);
             await Build.removeSetFromBuild(set);
             Build.refreshSetHoverState(set, item, ids);
           } finally {
@@ -5575,11 +5698,64 @@ export class Build {
     container.firstChild.remove();
 
     Build.activeBarItems[activeId] = 0;
-    await App.api.request('build', 'setZeroActive', {
+    await Build.sendBuildMutationOrThrow({
+      optimisticMethod: 'optimisticClearActive',
+      legacyMethod: 'setZeroActive',
+      data: {
       buildId: Build.id,
       index: activeId,
+      },
     });
   }
+  
+  static clearActiveSlotLocal(activeId) {
+    const index = Number(activeId);
+    if (!Number.isFinite(index) || index < 0) return;
+    const container = Build.activeBarView?.childNodes?.[index];
+    if (container) {
+      try {
+        container.classList.remove('smartcast');
+        container.dataset.active = 0;
+        container.title = Lang.text('titleSmartcastIsDisabled');
+      } catch {}
+      try {
+        container.firstChild?.remove?.();
+      } catch {}
+    }
+    if (Array.isArray(Build.activeBarItems) && index < Build.activeBarItems.length) {
+      Build.activeBarItems[index] = 0;
+    }
+  }
+  
+  static assignActiveSlotLocal(activeId, position) {
+    const index = Number(activeId);
+    const pos = Number(position);
+    if (!Number.isFinite(index) || index < 0) return;
+    if (!Number.isFinite(pos) || pos === 0) return;
+    
+    const absPos = Math.abs(pos);
+    for (let i = 0; i < (Build.activeBarItems || []).length; i++) {
+      if (i === index) continue;
+      const current = Number(Build.activeBarItems[i]) || 0;
+      if (!current) continue;
+      if (Math.abs(current) !== absPos) continue;
+      Build.clearActiveSlotLocal(i);
+    }
+    
+    if (Array.isArray(Build.activeBarItems) && index < Build.activeBarItems.length) {
+      Build.activeBarItems[index] = pos;
+    }
+    
+    const container = Build.activeBarView?.childNodes?.[index];
+    if (container) {
+      try {
+        if (container.firstChild) {
+          container.firstChild.remove();
+        }
+      } catch {}
+    }
+  }
+  
 
   static async requestSmartcast(element) {
     if (element.firstChild) {
@@ -5588,10 +5764,14 @@ export class Build {
         position = -position;
       }
 
-      await App.api.request('build', 'setActive', {
+      await Build.sendBuildMutationOrThrow({
+        optimisticMethod: 'optimisticSetActive',
+        legacyMethod: 'setActive',
+        data: {
         buildId: Build.id,
         index: element.dataset.index,
         position: position,
+        },
       });
     }
   }
@@ -6125,7 +6305,7 @@ export class Build {
         };
 
         let addToActive = async (index, position, datasetPosition, targetElem, clone, smartCast) => {
-          Build.activeBarItems[index] = position;
+          Build.assignActiveSlotLocal(index, position);
           targetElem.append(clone);
           clone.style.position = 'static';
           clone.style.zIndex = 1;
@@ -6145,10 +6325,14 @@ export class Build {
           }
 
           try {
-            await App.api.request('build', 'setActive', {
-              buildId: Build.id,
-              index: index,
-              position: position,
+            await Build.sendBuildMutationOrThrow({
+              optimisticMethod: 'optimisticSetActive',
+              legacyMethod: 'setActive',
+              data: {
+                buildId: Build.id,
+                index: index,
+                position: position,
+              },
             });
             if (smartCast) {
               try {
@@ -6212,7 +6396,7 @@ export class Build {
 
           if (elemBelow.className == 'build-talent-item' && elemBelow.parentElement.className == 'build-hero-grid-item') {
             elemBelow = elemBelow.parentElement;
-            performSwap = swapParentNode.dataset.position ? true : false;
+            performSwap = (swapParentNode?.dataset?.position !== undefined);
             performSwapFromLibrary = !performSwap;
           }
 
@@ -6251,6 +6435,8 @@ export class Build {
 
                   swapParentNode.append(elemBelow.firstChild);
                   elemBelow.append(element);
+                  // Active bar keeps clones, so force immediate redraw after field swap.
+                  Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
                 } else {
                   if (performSwapFromLibrary) {
                     swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
@@ -6278,7 +6464,7 @@ export class Build {
 
                 try {
                   let activeBarPosition = null;
-                  if (data.active && swapParentNode.dataset.position) {
+                  if (!performSwap && data.active && swapParentNode?.dataset?.position !== undefined) {
                     activeBarPosition = await editActive(
                       swapParentNode.dataset.position,
                       elemBelow.dataset.position,
@@ -6286,24 +6472,39 @@ export class Build {
                     );
                   }
                   if (performSwap) {
-                    let swappedTalent = Build.installedTalents[parseInt(swapParentNode.dataset.position)];
-
-                    if (swappedTalent.active) {
-                      await editActive(
-                        elemBelow.dataset.position,
-                        swapParentNode.dataset.position,
-                        swapParentNode.firstChild.cloneNode(true),
-                        activeBarPosition,
-                      );
+                    const oldPos = Number(swapParentNode.dataset.position);
+                    const newPos = Number(elemBelow.dataset.position);
+                    const movedTalent = swappingTal;
+                    const displacedTalent = Build.installedTalents[oldPos];
+                    if (movedTalent?.active && !displacedTalent?.active) {
+                      for (let i = 0; i < (Build.activeBarItems || []).length; i++) {
+                        const item = Number(Build.activeBarItems[i]) || 0;
+                        if (!item) continue;
+                        const sign = item < 0 ? -1 : 1;
+                        if (Math.abs(item) === oldPos + 1) {
+                          Build.activeBarItems[i] = sign * (newPos + 1);
+                        }
+                      }
+                      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+                    } else if (!movedTalent?.active && displacedTalent?.active) {
+                      for (let i = 0; i < (Build.activeBarItems || []).length; i++) {
+                        const item = Number(Build.activeBarItems[i]) || 0;
+                        if (!item) continue;
+                        const sign = item < 0 ? -1 : 1;
+                        if (Math.abs(item) === newPos + 1) {
+                          Build.activeBarItems[i] = sign * (oldPos + 1);
+                        }
+                      }
+                      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
                     }
-                    await App.api.request('build', 'setZero', {
-                      buildId: Build.id,
-                      index: swapParentNode.dataset.position,
-                    });
-                    await App.api.request('build', 'set', {
-                      buildId: Build.id,
-                      talentId: swappedTalent.id,
-                      index: swapParentNode.dataset.position,
+                    await Build.sendBuildMutationOrThrow({
+                      optimisticMethod: 'optimisticSwap',
+                      legacyMethod: 'swap',
+                      data: {
+                        buildId: Build.id,
+                        i1: Number(swapParentNode.dataset.position),
+                        i2: Number(elemBelow.dataset.position),
+                      },
                     });
 
                     Build.setStat(data, true, false);
@@ -6313,19 +6514,29 @@ export class Build {
                         await removeFromActive(elemBelow.dataset.position);
                       }
                       swapParentNode.firstChild.dataset.state = 1;
-                      await App.api.request('build', 'setZero', {
-                        buildId: Build.id,
-                        index: elemBelow.dataset.position,
+                      await Build.sendBuildMutationOrThrow({
+                        optimisticMethod: 'optimisticRemove',
+                        legacyMethod: 'setZero',
+                        data: {
+                          buildId: Build.id,
+                          index: elemBelow.dataset.position,
+                        },
                       });
                     }
                     Build.setStat(data, true);
                   }
 
-                  await App.api.request('build', 'set', {
-                    buildId: Build.id,
-                    talentId: data.id,
-                    index: elemBelow.dataset.position,
-                  });
+                  if (!performSwap) {
+                    await Build.sendBuildMutationOrThrow({
+                      optimisticMethod: 'optimisticSet',
+                      legacyMethod: 'set',
+                      data: {
+                        buildId: Build.id,
+                        talentId: data.id,
+                        index: elemBelow.dataset.position,
+                      },
+                    });
+                  }
 
                   if (data.active && prevState != element.dataset.state) {
                     let index = -1;
@@ -6424,13 +6635,17 @@ export class Build {
             targetElement.prepend(containedTalent);
 
             try {
-              if (data.active && oldParentNode.dataset.position) {
+              if (data.active && oldParentNode?.dataset?.position !== undefined) {
                 await removeFromActive(oldParentNode.dataset.position);
               }
 
-              await App.api.request('build', 'setZero', {
-                buildId: Build.id,
-                index: oldParentNode.dataset.position,
+              await Build.sendBuildMutationOrThrow({
+                optimisticMethod: 'optimisticRemove',
+                legacyMethod: 'setZero',
+                data: {
+                  buildId: Build.id,
+                  index: oldParentNode.dataset.position,
+                },
               });
 
               Build.installedTalents[parseInt(oldParentNode.dataset.position)] = null;
@@ -6488,21 +6703,77 @@ export class Build {
                   // moved to other position
                   let swapElemParent = element.parentNode;
                   let targetElem = isSwap ? elemBelow.parentNode : elemBelow;
-                  let swapPositionRaw = isSwap ? elemBelow.dataset.position : 0;
-                  let swapPosition = Number(swapPositionRaw) + 1;
-                  let swapSmartCast = Number(targetElem.dataset.active);
-
                   let clone = element.cloneNode(true);
-                  let swapClone = isSwap ? elemBelow.cloneNode(true) : null;
-                  await removeFromActive(positionRaw);
-                  if (swapClone) {
-                    await removeFromActive(swapPositionRaw);
-                  }
-
-                  await addToActive(index, position, positionRaw, targetElem, clone, smartCast);
-
-                  if (swapClone) {
-                    await addToActive(startingIndex, swapPosition, swapPositionRaw, swapElemParent, swapClone, swapSmartCast);
+                  if (isSwap) {
+                    const swapPositionRaw = elemBelow.dataset.position;
+                    const swapPosition = Number(swapPositionRaw) + 1;
+                    const swapSmartCast = Number(targetElem.dataset.active);
+                    const swapClone = elemBelow.cloneNode(true);
+                    const targetIndexNum = Number(index);
+                    const startingIndexNum = Number(startingIndex);
+                    const startPositionNum = Number(position);
+                    const swapPositionNum = Number(swapPosition);
+                    
+                    if (
+                      Number.isFinite(targetIndexNum) &&
+                      Number.isFinite(startingIndexNum) &&
+                      Number.isFinite(startPositionNum) &&
+                      Number.isFinite(swapPositionNum) &&
+                      startPositionNum > 0 &&
+                      swapPositionNum > 0
+                    ) {
+                      // Atomic local swap without intermediate removals to avoid transient empty/duplicate states.
+                      Build.clearActiveSlotLocal(startingIndexNum);
+                      Build.clearActiveSlotLocal(targetIndexNum);
+                      
+                      Build.assignActiveSlotLocal(targetIndexNum, startPositionNum);
+                      Build.assignActiveSlotLocal(startingIndexNum, swapPositionNum);
+                      
+                      clone.dataset.position = `${Number(positionRaw)}`;
+                      clone.dataset.state = 3;
+                      clone.style.opacity = 1;
+                      clone.style.zIndex = 1;
+                      clone.style.position = 'static';
+                      Build.move(clone, true);
+                      targetElem.append(clone);
+                      
+                      swapClone.dataset.position = `${Number(swapPositionRaw)}`;
+                      swapClone.dataset.state = 3;
+                      swapClone.style.opacity = 1;
+                      swapClone.style.zIndex = 1;
+                      swapClone.style.position = 'static';
+                      Build.move(swapClone, true);
+                      swapElemParent.append(swapClone);
+                      
+                      if (smartCast) await Build.enableSmartCast(targetElem, false);
+                      else await Build.disableSmartCast(targetElem, false);
+                      
+                      if (swapSmartCast) await Build.enableSmartCast(swapElemParent, false);
+                      else await Build.disableSmartCast(swapElemParent, false);
+                      
+                      Build.sendBuildMutation({
+                        optimisticMethod: 'optimisticSetActive',
+                        legacyMethod: 'setActive',
+                        data: {
+                          buildId: Build.id,
+                          index: targetIndexNum,
+                          position: startPositionNum,
+                        },
+                      });
+                      
+                      Build.sendBuildMutation({
+                        optimisticMethod: 'optimisticSetActive',
+                        legacyMethod: 'setActive',
+                        data: {
+                          buildId: Build.id,
+                          index: startingIndexNum,
+                          position: swapPositionNum,
+                        },
+                      });
+                    }
+                  } else {
+                    await removeFromActive(positionRaw);
+                    await addToActive(index, position, positionRaw, targetElem, clone, smartCast);
                   }
                 }
               } else {
@@ -6518,12 +6789,16 @@ export class Build {
                   await removeFromActive(elemBelow.dataset.position);
                 }
                 await removeFromActive(positionRaw);
-                await App.api.request('build', 'setActive', {
-                  buildId: Build.id,
-                  index: index,
-                  position: position,
+                await Build.sendBuildMutationOrThrow({
+                  optimisticMethod: 'optimisticSetActive',
+                  legacyMethod: 'setActive',
+                  data: {
+                    buildId: Build.id,
+                    index: index,
+                    position: position,
+                  },
                 });
-                Build.activeBarItems[index] = position;
+                Build.assignActiveSlotLocal(index, position);
 
                 Build.move(clone, true);
 
