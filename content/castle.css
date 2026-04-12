@@ -2346,6 +2346,10 @@ body {
   z-index: 140;
 }
 
+#wshop:hover {
+  z-index: 140;
+}
+
 .castle-chat:has(.chat.chat-has-pinned) {
   bottom: 17cqh;
 }
