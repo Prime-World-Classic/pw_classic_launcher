@@ -41,6 +41,7 @@ export class Build {
   static setSortButtonEl = null;
   static sortSetsInProgress = false;
   static sortSetsClassSide = 'left';
+  static sortSetsWasApplied = false;
   static combatModeEnabled = false;
   static combatModeLearnOrder = [];
   static combatModeLearnOrderBySlot = new Map();
@@ -337,6 +338,7 @@ export class Build {
 
     Build.descriptionView.style.display = 'none';
     Build._hoveredDescriptionTalentEl = null;
+    Build.sortSetsWasApplied = false;
     Build._libraryHoverSuppressed = false;
     Build._libraryHoverSuppressTimer = 0;
     Build._libraryPointerX = null;
@@ -1859,6 +1861,10 @@ export class Build {
           Build.syncSetSortButtonState();
           return;
         }
+        if (Build.sortSetsWasApplied) {
+          await Build.mirrorBuildOnlyWithSingleSync();
+          return;
+        }
         await Build.sortSetTalentsIntoColumns({ classEdgeSort: true });
       });
       const sortSetsBg = DOM({
@@ -1880,6 +1886,7 @@ export class Build {
     Build.combatModeButtonCountEl = null;
     Build.setSortButtonEl = null;
     Build.sortSetsInProgress = false;
+    Build.sortSetsWasApplied = false;
     Build.combatModeEnabled = false;
     Build.combatModeLearnOrder = [];
     Build.combatModeLearnOrderBySlot = new Map();
@@ -2130,6 +2137,36 @@ export class Build {
       }
     }
     return moved;
+  }
+
+  static async mirrorBuildOnlyWithSingleSync() {
+    if (Build.sortSetsInProgress || Build.combatModeEnabled) {
+      Build.syncSetSortButtonState();
+      return;
+    }
+    const initialBodySnapshot = (Build.installedTalents || []).map((t) => Number(t?.id) || 0);
+    const initialActiveSnapshot = (Build.activeBarItems || []).slice(0, 24).map((v) => Number(v) || 0);
+    Build.sortSetsInProgress = true;
+    Build._sortDeferBackendSync = true;
+    Build.syncSetSortButtonState();
+    try {
+      await Build.mirrorBuildRightToLeft();
+      Build.updateHeroStats();
+      Build.renderCombatOrderBadges();
+      Build.refreshActiveTalentDescription();
+      Build.refreshStatFilterHighlightCountDisplay();
+      Build.syncCombatModeButtonState();
+      await Build.syncSortResultToBackend(initialBodySnapshot, initialActiveSnapshot);
+    } catch {
+      try {
+        await Build.refreshBuildStateFromServer({ refreshInventory: true });
+      } catch {}
+      App.notify(Lang.text('sortSetsIntoColumnFailed'));
+    } finally {
+      Build._sortDeferBackendSync = false;
+      Build.sortSetsInProgress = false;
+      Build.syncSetSortButtonState();
+    }
   }
 
   static buildSwapPlanFromBodySnapshots(initialBody = [], finalBody = []) {
@@ -2790,6 +2827,7 @@ export class Build {
       Build.syncCombatModeButtonState();
       if (!skipBackendSync) {
         await Build.syncSortResultToBackend(initialBodySnapshot, initialActiveSnapshot);
+        Build.sortSetsWasApplied = true;
       }
 
       if (!skipBackendSync && swapCount > 0) {
