@@ -2193,7 +2193,6 @@ export class Build {
       try {
         await Build.refreshBuildStateFromServer({ refreshInventory: true });
       } catch {}
-      App.notify(Lang.text('sortSetsIntoColumnFailed'));
     } finally {
       Build._sortDeferBackendSync = false;
       Build.sortSetsInProgress = false;
@@ -2604,14 +2603,10 @@ export class Build {
         Build.sortSetsWasApplied = true;
       }
 
-      if (!skipBackendSync && swapCount > 0) {
-        App.notify(Lang.text('sortSetsIntoColumnDone').replace('{count}', String(swapCount)));
-      }
     } catch {
       try {
         await Build.refreshBuildStateFromServer({ refreshInventory: true });
       } catch {}
-      App.notify(Lang.text('sortSetsIntoColumnFailed'));
     } finally {
       Build._sortDeferBackendSync = false;
       Build.sortSetsInProgress = false;

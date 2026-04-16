@@ -1045,8 +1045,6 @@ export const en = {
     combatModeLevelCounterTitle: 'Hero level',
     sortSetsIntoColumnDisabledCombat: 'Set sorting is unavailable in combat mode',
     sortSetsIntoColumnInProgress: 'Sorting sets...',
-    sortSetsIntoColumnDone: 'Sets sorted. Moved: {count}',
-    sortSetsIntoColumnFailed: 'Failed to sort sets. Build state has been refreshed.',
     titleClickToViewHeroRating: 'Click here to select a hero and sort hall of fame players',
 
     // Постройки

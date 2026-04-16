@@ -1051,8 +1051,6 @@ export const ru = {
     combatModeLevelCounterTitle: 'Уровень героя',
     sortSetsIntoColumnDisabledCombat: 'Сортировка сетов недоступна в боевом режиме',
     sortSetsIntoColumnInProgress: 'Сортировка сетов...',
-    sortSetsIntoColumnDone: 'Сеты отсортированы. Перемещено: {count}',
-    sortSetsIntoColumnFailed: 'Не удалось отсортировать сеты. Состояние билда обновлено.',
     titleClickToViewHeroRating: 'Выберите героя, чтобы отсортировать игроков зала славы',
 
     // Постройки
