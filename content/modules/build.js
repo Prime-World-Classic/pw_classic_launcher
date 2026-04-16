@@ -602,6 +602,7 @@ export class Build {
     Build.inventoryView.append(talentsSection, setsSection);
     Build.attachAltResetHintBelowInventory();
     Build.installAltResetHandler();
+    Build.installHeroNavKeyboardHandler();
     Build.buildSettingsButton = Build.createBuildSettingsButton();
     Build.buildSettingsPanel = Build.createBuildSettingsPanel();
     Build.attachBuildSettingsToWbuild();
@@ -3733,11 +3734,13 @@ export class Build {
     return ids;
   }
 
-  static async switchHeroFromCastleBottomList(direction = 1) {
+  static async switchHeroFromCastleBottomList(direction = 1, waitForBuildWindowRender = true) {
     const ids = Build.getHeroIdsFromCastleBottomList();
     if (!ids.length) return;
     const dir = Number(direction) < 0 ? -1 : 1;
-    const currentHeroId = Number(Build.heroId);
+    const highlightedHeroId = Number(View.castleOpenedBuildHeroId);
+    const buildHeroId = Number(Build.heroId);
+    const currentHeroId = Number.isFinite(highlightedHeroId) && highlightedHeroId > 0 ? highlightedHeroId : buildHeroId;
     let index = ids.indexOf(currentHeroId);
     if (index < 0) index = 0;
     const nextHeroId = ids[(index + dir + ids.length) % ids.length];
@@ -3750,7 +3753,12 @@ export class Build {
 
     const isWindowBuild = Window.windows?.main?.id === 'wbuild';
     if (isWindowBuild) {
-      await Window.show('main', 'build', nextHeroId, 0, true);
+      const showPromise = Window.show('main', 'build', nextHeroId, 0, true);
+      if (waitForBuildWindowRender) {
+        await showPromise;
+      } else {
+        showPromise.catch(() => {});
+      }
       try {
         View.scrollCastleBottomToHero?.(nextHeroId);
       } catch {}
@@ -6902,6 +6910,148 @@ export class Build {
     } catch {}
   }
 
+  static installHeroNavKeyboardHandler() {
+    try {
+      if (Build._heroNavKeyboardHandler) {
+        window.removeEventListener('keydown', Build._heroNavKeyboardHandler, true);
+      }
+      if (Build._heroNavKeyboardUpHandler) {
+        window.removeEventListener('keyup', Build._heroNavKeyboardUpHandler, true);
+      }
+      if (Build._heroNavKeyboardBlurHandler) {
+        window.removeEventListener('blur', Build._heroNavKeyboardBlurHandler, true);
+      }
+    } catch {}
+
+    const HOLD_DELAY_MS = 800;
+    const REPEAT_INTERVAL_MS = 50;
+    const sleep = (ms) =>
+      new Promise((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    const syncStoppedHeroAfterRepeat = async () => {
+      const syncToken = (Number(Build._heroNavStopSyncToken) || 0) + 1;
+      Build._heroNavStopSyncToken = syncToken;
+      if (Window.windows?.main?.id !== 'wbuild') return;
+
+      // Non-awaited Window.show calls from hold-repeat can finish out of order.
+      // Re-assert the final highlighted hero a few times after key release.
+      await sleep(120);
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (Build._heroNavStopSyncToken !== syncToken) return;
+        if (Window.windows?.main?.id !== 'wbuild') return;
+        const wantedHeroId = Number(View.castleOpenedBuildHeroId);
+        if (!Number.isFinite(wantedHeroId) || wantedHeroId <= 0) return;
+
+        try {
+          await Window.show('main', 'build', wantedHeroId, 0, true);
+        } catch {}
+        if (Build._heroNavStopSyncToken !== syncToken) return;
+
+        if (Number(Build.heroId) === wantedHeroId) {
+          await sleep(140);
+          if (Build._heroNavStopSyncToken !== syncToken) return;
+          if (Number(Build.heroId) === wantedHeroId) return;
+        } else {
+          await sleep(120);
+        }
+      }
+    };
+    const stopHeroNavRepeat = (syncAfterStop = false) => {
+      const hadRepeat = !!Build._heroNavKeyboardRepeatTimer;
+      try {
+        if (Build._heroNavKeyboardHoldTimer) clearTimeout(Build._heroNavKeyboardHoldTimer);
+      } catch {}
+      try {
+        if (Build._heroNavKeyboardRepeatTimer) clearInterval(Build._heroNavKeyboardRepeatTimer);
+      } catch {}
+      Build._heroNavKeyboardHoldTimer = 0;
+      Build._heroNavKeyboardRepeatTimer = 0;
+      Build._heroNavHeldCode = '';
+      if (syncAfterStop && hadRepeat) {
+        void syncStoppedHeroAfterRepeat();
+      }
+    };
+    const getHeroNavCode = (e) => {
+      const code = String(e?.code || '');
+      if (code === 'KeyA' || code === 'KeyD') return code;
+      const key = String(e?.key || '').toLowerCase();
+      if (key === 'a') return 'KeyA';
+      if (key === 'd') return 'KeyD';
+      return '';
+    };
+    const canUseHeroNavHotkey = (e) => {
+      if (Window.windows?.main?.id !== 'wbuild') return false;
+      if (e?.ctrlKey || e?.metaKey || e?.altKey || e?.shiftKey) return false;
+      const activeEl = document.activeElement;
+      const activeTag = String(activeEl?.tagName || '').toUpperCase();
+      const isTypingTarget =
+        activeEl?.isContentEditable ||
+        activeTag === 'INPUT' ||
+        activeTag === 'TEXTAREA' ||
+        activeTag === 'SELECT';
+      if (isTypingTarget) return false;
+      return true;
+    };
+    const switchHeroSafe = async (dir, waitForRender = true) => {
+      if (waitForRender && Build._heroNavKeyboardBusy) return;
+      if (Window.windows?.main?.id !== 'wbuild') {
+        stopHeroNavRepeat(false);
+        return;
+      }
+      if (waitForRender) Build._heroNavKeyboardBusy = true;
+      try {
+        await Build.switchHeroFromCastleBottomList(dir, waitForRender);
+      } finally {
+        if (waitForRender) Build._heroNavKeyboardBusy = false;
+      }
+    };
+
+    Build._heroNavKeyboardHandler = async (e) => {
+      const navCode = getHeroNavCode(e);
+      if (!navCode || e?.repeat) return;
+      if (!canUseHeroNavHotkey(e)) {
+        stopHeroNavRepeat();
+        return;
+      }
+
+      const dir = navCode === 'KeyA' ? -1 : 1;
+      if (Build._heroNavHeldCode === navCode) {
+        e.preventDefault?.();
+        return;
+      }
+
+      stopHeroNavRepeat(false);
+      Build._heroNavHeldCode = navCode;
+      e.preventDefault?.();
+      await switchHeroSafe(dir);
+
+      Build._heroNavKeyboardHoldTimer = setTimeout(() => {
+        if (Build._heroNavHeldCode !== navCode) return;
+        Build._heroNavKeyboardRepeatTimer = setInterval(() => {
+          if (Build._heroNavHeldCode !== navCode) return;
+          void switchHeroSafe(dir, false);
+        }, REPEAT_INTERVAL_MS);
+      }, HOLD_DELAY_MS);
+    };
+    Build._heroNavKeyboardUpHandler = (e) => {
+      const navCode = getHeroNavCode(e);
+      if (!navCode) return;
+      if (Build._heroNavHeldCode === navCode) {
+        stopHeroNavRepeat(true);
+      }
+    };
+    Build._heroNavKeyboardBlurHandler = () => {
+      stopHeroNavRepeat(true);
+    };
+
+    try {
+      window.addEventListener('keydown', Build._heroNavKeyboardHandler, true);
+      window.addEventListener('keyup', Build._heroNavKeyboardUpHandler, true);
+      window.addEventListener('blur', Build._heroNavKeyboardBlurHandler, true);
+    } catch {}
+  }
+
   static cancelSortInventory() {
     Build.ruleSortInventory = new Object();
 
@@ -7970,6 +8120,29 @@ export class Build {
       if (Build._altResetHandler) window.removeEventListener('keydown', Build._altResetHandler, true);
     } catch {}
     Build._altResetHandler = null;
+    try {
+      if (Build._heroNavKeyboardHandler) window.removeEventListener('keydown', Build._heroNavKeyboardHandler, true);
+    } catch {}
+    try {
+      if (Build._heroNavKeyboardUpHandler) window.removeEventListener('keyup', Build._heroNavKeyboardUpHandler, true);
+    } catch {}
+    try {
+      if (Build._heroNavKeyboardBlurHandler) window.removeEventListener('blur', Build._heroNavKeyboardBlurHandler, true);
+    } catch {}
+    try {
+      if (Build._heroNavKeyboardHoldTimer) clearTimeout(Build._heroNavKeyboardHoldTimer);
+    } catch {}
+    try {
+      if (Build._heroNavKeyboardRepeatTimer) clearInterval(Build._heroNavKeyboardRepeatTimer);
+    } catch {}
+    Build._heroNavKeyboardHandler = null;
+    Build._heroNavKeyboardUpHandler = null;
+    Build._heroNavKeyboardBlurHandler = null;
+    Build._heroNavKeyboardHoldTimer = 0;
+    Build._heroNavKeyboardRepeatTimer = 0;
+    Build._heroNavHeldCode = '';
+    Build._heroNavStopSyncToken = (Number(Build._heroNavStopSyncToken) || 0) + 1;
+    Build._heroNavKeyboardBusy = false;
     try {
       Build.altResetHintView?.parentNode?.removeChild?.(Build.altResetHintView);
     } catch {}
