@@ -1768,7 +1768,7 @@ export class Window {
       return DOM({ id: 'wcastle-call' });
     }
 
-    let displayName = data.name;
+    let displayName = String(data?.name || data?.nickname || `id${Number(data?.id) || '?'}`);
     if (displayName.length > 13) {
       displayName = displayName.substring(0, 11) + '...';
     }

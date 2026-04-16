@@ -382,6 +382,7 @@ export const ru = {
     hotkeyDropCalls: '<strong>Ctrl+K</strong> - сбросить все звонки кроме друзей',
     hotkeyDropCallsSuffix: ' - сбросить все звонки кроме друзей',
     hotkeyVolumeControl: '<strong>Ctrl+↑/↓</strong> - повысить/понизить громкость',
+    voicePeerVolumeHint: 'Наведи на % и крути колёсико — громкость игрока',
 
     // Квесты
     qDays: 'д.',

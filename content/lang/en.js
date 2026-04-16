@@ -376,6 +376,7 @@ export const en = {
     hotkeyDropCalls: '<strong>Ctrl+K</strong> - drop all calls except friends',
     hotkeyDropCallsSuffix: ' - drop all calls except friends',
     hotkeyVolumeControl: '<strong>Ctrl+↑/↓</strong> - increase/decrease volume',
+    voicePeerVolumeHint: 'Hover % and scroll wheel to change player volume',
 
     // Квесты
     qDays: 'd.',
