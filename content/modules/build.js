@@ -44,6 +44,9 @@ export class Build {
   static sortSetsWasApplied = false;
   static libraryTalentClickCooldownMs = 50;
   static _lastLibraryTalentClickAt = 0;
+  static _postMoveRefreshRaf = 0;
+  static _postMoveRefreshNeedSort = false;
+  static animateHeroOnBuildChange = false;
   static combatModeEnabled = false;
   static combatModeLearnOrder = [];
   static combatModeLearnOrderBySlot = new Map();
@@ -4264,6 +4267,8 @@ export class Build {
     let speedBaseCandidate = -Infinity;
     let speedDeltaCandidate = 0;
     let speedNeedsAnimation = false;
+    const statKeysToAnimate = new Set();
+    const shouldAnimateHero = Build.animateHeroOnBuildChange === true;
 
     // Apply animation and change stats in Build.calculationStats
     for (let key2 in add) {
@@ -4294,12 +4299,7 @@ export class Build {
       }
 
       if (animation) {
-        Build.dataStats[animationKey].animate(
-          { transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] },
-          { duration: 250, fill: 'both', easing: 'ease-out' },
-        );
-
-        Build.heroImg.animate({ transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] }, { duration: 250, fill: 'both', easing: 'ease-out' });
+        statKeysToAnimate.add(animationKey);
       }
     }
 
@@ -4309,10 +4309,20 @@ export class Build {
       calcualteSpecialStats('speed', base + addSpeed);
 
       if (animation && speedNeedsAnimation && Build.dataStats['speed']) {
-        Build.dataStats['speed'].animate(
+        statKeysToAnimate.add('speed');
+      }
+    }
+
+    if (animation && statKeysToAnimate.size > 0) {
+      for (const statKey of statKeysToAnimate) {
+        const el = Build.dataStats?.[statKey];
+        if (!el?.animate) continue;
+        el.animate(
           { transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] },
           { duration: 250, fill: 'both', easing: 'ease-out' },
         );
+      }
+      if (shouldAnimateHero && Build.heroImg?.animate) {
         Build.heroImg.animate({ transform: ['scale(1)', 'scale(1.5)', 'scale(1)'] }, { duration: 250, fill: 'both', easing: 'ease-out' });
       }
     }
@@ -7548,13 +7558,7 @@ export class Build {
           await removeFromActive(element.dataset.position);
         }
 
-        try {
-          // Всегда пересчитать видимость (в т.ч. скрыть дубликаты «в билде + в библиотеке» без режима сета).
-          Build.sortInventory();
-        } catch {}
-
-        Build.updateHeroStats();
-        Build.syncCombatModeButtonState();
+        Build.schedulePostMoveUiRefresh({ needSort: true });
 
         fieldRow.style.background = '';
 
@@ -7564,19 +7568,22 @@ export class Build {
 
         // If cursor stays over a talent after click/drag-end,
         // restore tooltip/row-highlight without requiring mouse movement.
-        try {
-          const hovered = document.elementFromPoint(event.clientX, event.clientY);
-          const hoveredTalent = hovered?.closest?.('.build-talent-item');
-          if (hoveredTalent) {
-            hoveredTalent.dispatchEvent(
-              new MouseEvent('mouseover', {
-                bubbles: true,
-                clientX: event.clientX,
-                clientY: event.clientY,
-              }),
-            );
-          }
-        } catch {}
+        // Avoid expensive forced tooltip redraw on very frequent library clicks.
+        if (!(isInventoryTalent && isClick)) {
+          try {
+            const hovered = document.elementFromPoint(event.clientX, event.clientY);
+            const hoveredTalent = hovered?.closest?.('.build-talent-item');
+            if (hoveredTalent) {
+              hoveredTalent.dispatchEvent(
+                new MouseEvent('mouseover', {
+                  bubbles: true,
+                  clientX: event.clientX,
+                  clientY: event.clientY,
+                }),
+              );
+            }
+          } catch {}
+        }
       };
     };
 
@@ -7608,6 +7615,26 @@ export class Build {
     if (now - Build._lastLibraryTalentClickAt < cooldownMs) return false;
     Build._lastLibraryTalentClickAt = now;
     return true;
+  }
+
+  static schedulePostMoveUiRefresh({ needSort = true } = {}) {
+    if (needSort) Build._postMoveRefreshNeedSort = true;
+    if (Build._postMoveRefreshRaf) return;
+
+    Build._postMoveRefreshRaf = requestAnimationFrame(() => {
+      Build._postMoveRefreshRaf = 0;
+      const shouldSort = Build._postMoveRefreshNeedSort;
+      Build._postMoveRefreshNeedSort = false;
+      try {
+        if (shouldSort) Build.sortInventory();
+      } catch {}
+      try {
+        Build.updateHeroStats();
+      } catch {}
+      try {
+        Build.syncCombatModeButtonState();
+      } catch {}
+    });
   }
 
   static refreshActiveTalentDescription() {
