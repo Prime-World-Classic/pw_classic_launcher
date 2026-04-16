@@ -698,11 +698,13 @@ export class Voice {
       const dropKey = formatHotkey(Settings.settings?.voiceDropHotkey, 'Ctrl+K');
       const toggleKey = formatHotkey(Settings.settings?.voiceToggleHotkey, 'Ctrl+Z');
       if (Voice.mic.enabled) {
-        tutorial.innerHTML = `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}`;
+        tutorial.innerHTML = `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}<br>${Lang.text('hotkeyVolumeControl')}`;
       } else {
         const micLabel = String(Voice.rawMic?.label || Voice.mic?.label || 'microphone');
         tutorial.innerHTML =
           `<strong>${dropKey}</strong>${Lang.text('hotkeyDropCallsSuffix')}` +
+          '<br>' +
+          Lang.text('hotkeyVolumeControl') +
           '<br>────────────<br>' +
           `<strong>${toggleKey}</strong>${Lang.text('enableMicSuffix').replace('{Voice.mic.label}', micLabel)}`;
       }
@@ -1089,6 +1091,33 @@ export class Voice {
     }
 
     Voice.volumeLevel = volumeLevel;
+  }
+  
+  static volumeControl(increase = false) {
+    const current = Number.isFinite(Number(Settings.settings?.voiceVolume))
+      ? Number(Settings.settings.voiceVolume)
+      : Voice.volumeLevel;
+    const next = Math.max(0, Math.min(1, current + (increase ? 0.01 : -0.01)));
+    if (Math.abs(next - current) < 0.00001) {
+      return;
+    }
+    Settings.settings.voiceVolume = next;
+    Voice.setVolumeLevel(next);
+    const nextPercent = Math.round(next * 100);
+    if (nextPercent % 20 === 0) {
+      App.say(`${nextPercent}%`);
+    }
+    const slider = document.getElementById('voice-volume-slider');
+    if (slider) {
+      slider.value = String(nextPercent);
+      const max = Number(slider.max || 100);
+      const percentage = 2 + (nextPercent / Math.max(1, max)) * 98;
+      slider.style.setProperty('--fill-percentage', `${percentage}%`);
+    }
+    const percent = document.getElementById('voice-volume-percentage');
+    if (percent) {
+      percent.textContent = `${nextPercent}%`;
+    }
   }
 
   static updatePanelPosition() {

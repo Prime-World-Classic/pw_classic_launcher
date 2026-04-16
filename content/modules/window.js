@@ -996,6 +996,7 @@ export class Window {
             tag: 'input',
             domaudio: domAudioPresets.defaultButton,
             type: 'range',
+            id: 'voice-volume-slider',
             value: Math.round((Number(Settings.settings.voiceVolume) || 1) * 100),
             min: '0',
             max: '100',
