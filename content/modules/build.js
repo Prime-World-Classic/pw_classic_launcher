@@ -44,9 +44,13 @@ export class Build {
   static sortSetsWasApplied = false;
   static libraryTalentClickCooldownMs = 50;
   static _lastLibraryTalentClickAt = 0;
+  static inventorySetHoverDelayMs = 30;
+  static _inventorySetHoverTimer = 0;
+  static _inventorySetHoverTalentId = null;
   static _postMoveRefreshRaf = 0;
   static _postMoveRefreshNeedSort = false;
   static animateHeroOnBuildChange = false;
+  static _isDraggingTalent = false;
   static combatModeEnabled = false;
   static combatModeLearnOrder = [];
   static combatModeLearnOrderBySlot = new Map();
@@ -6935,7 +6939,17 @@ export class Build {
       }
 
       let moveStart = Date.now();
-      if (!Build._descriptionPinnedBySet) Build.descriptionView.style.display = 'none';
+      // Drag start should always dismiss talent/set description overlays.
+      // Fast cursor moves can skip mouseout and leave expensive hover-refresh logic active.
+      Build._isDraggingTalent = true;
+      Build._hoveredDescriptionTalentEl = null;
+      Build._descriptionPinnedBySet = false;
+      Build._hoveredSetTalentIds = null;
+      Build._hoveredSetAnchorEl = null;
+      if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+      Build.clearBuildRowHoverHighlight();
+      Build.clearSetHighlights();
+      Build.clearEmptySlotPreviews();
 
       if (!Build._hoveredSetTalentIds) Build.clearSetHighlights();
       try {
@@ -6985,6 +6999,19 @@ export class Build {
       };
 
       element.onmouseup = async (event) => {
+        Build._isDraggingTalent = false;
+        const finishDragVisualState = () => {
+          fieldRow.style.background = '';
+          element.style.position = 'static';
+          element.style.zIndex = 'auto';
+          element.style.left = '';
+          element.style.top = '';
+          element.style.transition = '';
+          element.style.willChange = '';
+          element.style.transformOrigin = '';
+          element.style.removeProperty('transform');
+        };
+
         // Возвращаем исходный размер
         element.style.setProperty('transform', 'scale(1)', 'important');
 
@@ -7040,6 +7067,31 @@ export class Build {
           Build.previewSetTalentsInEmptySlots({ _manualOrder: Build._hoveredSetTalentIds, key: 'hover_preview_move' });
         }
         else Build.clearSetHighlights();
+
+        // No-op case: talent was dragged inside library and released in library.
+        // Snap it back immediately, without waiting for heavy post-drop logic.
+        if (!fromActiveBar && element.dataset.state == 1 && isInventoryTarget) {
+          Build.schedulePostMoveUiRefresh({ needSort: false });
+          finishDragVisualState();
+          try {
+            const hovered = document.elementFromPoint(event.clientX, event.clientY);
+            const hoveredTalent = hovered?.closest?.('.build-talent-item');
+            if (hoveredTalent) {
+              requestAnimationFrame(() => {
+                try {
+                  hoveredTalent.dispatchEvent(
+                    new MouseEvent('mouseover', {
+                      bubbles: true,
+                      clientX: event.clientX,
+                      clientY: event.clientY,
+                    }),
+                  );
+                } catch {}
+              });
+            }
+          } catch {}
+          return;
+        }
 
         let removeFromActive = async (position, skipActiveId) => {
           for (let i = 0; i < Build.activeBarItems.length; i++) {
@@ -7560,11 +7612,7 @@ export class Build {
 
         Build.schedulePostMoveUiRefresh({ needSort: true });
 
-        fieldRow.style.background = '';
-
-        element.style.position = 'static';
-
-        element.style.zIndex = 'auto';
+        finishDragVisualState();
 
         // If cursor stays over a talent after click/drag-end,
         // restore tooltip/row-highlight without requiring mouse movement.
@@ -7637,6 +7685,79 @@ export class Build {
     });
   }
 
+  static scheduleLibraryDescriptionRender(renderFn) {
+    if (typeof renderFn !== 'function') return;
+    requestAnimationFrame(() => {
+      try {
+        renderFn();
+      } catch {}
+    });
+  }
+
+  static cancelPendingInventorySetHover() {
+    try {
+      if (Build._inventorySetHoverTimer) clearTimeout(Build._inventorySetHoverTimer);
+    } catch {}
+    Build._inventorySetHoverTimer = 0;
+    Build._inventorySetHoverTalentId = null;
+  }
+
+  static applySetHoverForLibraryTalent(talentData) {
+    let hasSetHover = !!Build._hoveredSetTalentIds;
+    const numericTalentId = Number(talentData?.id);
+    const canUseSetHoverForTalent = Number.isFinite(numericTalentId) && numericTalentId > 0;
+    if (!hasSetHover && canUseSetHoverForTalent && Build.isBuildSetHoverOnTalentEnabled()) {
+      const wantedId = numericTalentId;
+      for (const set of TalentSets.list()) {
+        const ids = TalentSets.getTalentIds(set);
+        if (!Array.isArray(ids) || !ids.length) continue;
+        if (!ids.some((id) => Number(id) === wantedId)) continue;
+        let installedSetTalentsCount = 0;
+        for (const id of ids) {
+          if (Build.isTalentInBuild(id)) installedSetTalentsCount++;
+        }
+        const hoveredTalentInstalledInBuild = Build.isTalentInBuild(talentData.id);
+        if (installedSetTalentsCount <= 1 && hoveredTalentInstalledInBuild) {
+          Build.highlightSetTalentsInLibraryOnly(ids);
+          hasSetHover = true;
+          break;
+        }
+        Build.highlightSetTalents(ids);
+        hasSetHover = true;
+        break;
+      }
+    }
+    return hasSetHover;
+  }
+
+  static scheduleInventorySetHoverEnhance(talentElement, talentData) {
+    Build.cancelPendingInventorySetHover();
+    const talentId = Number(talentData?.id);
+    Build._inventorySetHoverTalentId = Number.isFinite(talentId) ? talentId : null;
+    const waitMs = Math.max(0, Number(Build.inventorySetHoverDelayMs) || 0);
+    Build._inventorySetHoverTimer = setTimeout(() => {
+      Build._inventorySetHoverTimer = 0;
+      if (Build._isDraggingTalent) return;
+      if (Build._hoveredDescriptionTalentEl !== talentElement) return;
+      if (!talentElement?.isConnected) return;
+      if (Build._libraryHoverSuppressed) return;
+      const currentHoveredId = Number(Build._hoveredDescriptionTalentEl?.dataset?.id);
+      if (Number.isFinite(Build._inventorySetHoverTalentId) && currentHoveredId !== Build._inventorySetHoverTalentId) return;
+      const hasSetHover = Build.applySetHoverForLibraryTalent(talentData);
+      if (Build.isBuildRowHoverHighlightEnabled() && Number(talentData?.level) > 0) {
+        Build.highlightBuildRowByLevel(talentData.level);
+      }
+      if (!hasSetHover) {
+        Build.previewSetTalentsInEmptySlots(
+          { _manualOrder: [talentData.id], key: `single_${talentData.id}` },
+          'left',
+          { previewClass: 'build-talent-empty-slot-preview' },
+        );
+      }
+      Build._inventorySetHoverTalentId = null;
+    }, waitMs);
+  }
+
   static refreshActiveTalentDescription() {
     if (!Build.descriptionView) return;
     if (Build.descriptionView.style.display === 'none') return;
@@ -7651,6 +7772,10 @@ export class Build {
 
   static description(element) {
     let descEvent = () => {
+      if (Build._isDraggingTalent) {
+        if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+        return;
+      }
       let positionElement = element.getBoundingClientRect();
       let data = Build.talents[element.dataset.id];
       const isInventoryTalent = !!element.closest?.('.build-talents');
@@ -7671,30 +7796,12 @@ export class Build {
       const descriptionKey = `${prefix}${absId}_description`;
 
       let hasSetHover = !!Build._hoveredSetTalentIds;
-      const numericTalentId = Number(data.id);
-      const canUseSetHoverForTalent = Number.isFinite(numericTalentId) && numericTalentId > 0;
-      if (!hasSetHover && canUseSetHoverForTalent && Build.isBuildSetHoverOnTalentEnabled()) {
-        const wantedId = numericTalentId;
-        if (Number.isFinite(wantedId) && wantedId > 0) {
-          for (const set of TalentSets.list()) {
-            const ids = TalentSets.getTalentIds(set);
-            if (!Array.isArray(ids) || !ids.length) continue;
-            if (!ids.some((id) => Number(id) === wantedId)) continue;
-            let installedSetTalentsCount = 0;
-            for (const id of ids) {
-              if (Build.isTalentInBuild(id)) installedSetTalentsCount++;
-            }
-            const hoveredTalentInstalledInBuild = Build.isTalentInBuild(data.id);
-            if (installedSetTalentsCount <= 1 && hoveredTalentInstalledInBuild) {
-              Build.highlightSetTalentsInLibraryOnly(ids);
-              hasSetHover = true;
-              break;
-            }
-            Build.highlightSetTalents(ids);
-            hasSetHover = true;
-            break;
-          }
-        }
+      if (isInventoryTalent) {
+        // Library hover gets an extra delayed pass for expensive set highlighting.
+        // This avoids spikes during rapid cursor movement.
+        Build.scheduleInventorySetHoverEnhance(element, data);
+      } else {
+        hasSetHover = Build.applySetHoverForLibraryTalent(data);
       }
 
       // Получаем переводы из системы Lang
@@ -7809,21 +7916,14 @@ export class Build {
 
       // Preview: where this library talent would land in the build.
       if (isInventoryTalent) {
-        if (Build.isBuildRowHoverHighlightEnabled() && data.level > 0) {
-          Build.highlightBuildRowByLevel(data.level);
-        }
-        if (!hasSetHover) {
-          // Single talent preview in library should pick the left-most empty slot.
-          Build.previewSetTalentsInEmptySlots(
-            { _manualOrder: [data.id], key: `single_${data.id}` },
-            'left',
-            { previewClass: 'build-talent-empty-slot-preview' },
-          );
-        }
+        // Expensive library hover effects are delayed in scheduleInventorySetHoverEnhance().
+        // This keeps fast cursor movement smooth (same feel as hovering talents in build grid).
+        return;
       }
     };
 
     let descEventEnd = () => {
+      Build.cancelPendingInventorySetHover();
       Build.descriptionView.style.display = 'none';
       Build.clearBuildRowHoverHighlight();
       if (!Build._hoveredSetTalentIds) Build.clearSetHighlights();
@@ -7837,6 +7937,11 @@ export class Build {
 
     element.onmouseover = () => {
       Build._hoveredDescriptionTalentEl = element;
+      const isInventoryTalent = !!element.closest?.('.build-talents');
+      if (isInventoryTalent) {
+        Build.scheduleLibraryDescriptionRender(descEvent);
+        return;
+      }
       descEvent();
     };
     element.onmouseout = () => {
@@ -7849,12 +7954,14 @@ export class Build {
     };
   }
   static cleanup() {
+    Build._isDraggingTalent = false;
     Build._hoveredDescriptionTalentEl = null;
     Build._libraryHoverSuppressed = false;
     try {
       if (Build._libraryHoverSuppressTimer) clearTimeout(Build._libraryHoverSuppressTimer);
     } catch {}
     Build._libraryHoverSuppressTimer = 0;
+    Build.cancelPendingInventorySetHover();
     Build._libraryPointerX = null;
     Build._libraryPointerY = null;
     Build.clearBuildRowHoverHighlight();
