@@ -1136,7 +1136,7 @@ export class View {
     }
 
     const partySize = Math.max(1, players.length);
-    const maxInRow = partySize <= 4 ? partySize : Math.max(1, Math.ceil(partySize / 2));
+    const maxInRow = partySize <= 5 ? partySize : 5;
     lobby.style.setProperty('--castle-play-lobby-max-in-row', String(maxInRow));
     const rowCount = Math.max(1, Math.ceil(partySize / maxInRow));
     lobby.dataset.rows = String(rowCount);
