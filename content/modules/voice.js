@@ -7,6 +7,7 @@ import { Lang } from './lang.js';
 import { domAudioPresets } from './domAudioPresets.js';
 import { SOUNDS_LIBRARY } from './soundsLibrary.js';
 import { normalizeKey } from './keybindings/keybindings.input.js';
+import { MM } from './mm.js';
 
 export class Voice {
   static peerConnectionConfig = {
@@ -870,7 +871,11 @@ export class Voice {
         event: [
           'click',
           () => {
-            if (Voice.infoPanel?.classList?.contains('voice-window-mode')) {
+            if (
+              Voice.infoPanel?.classList?.contains('voice-window-mode') ||
+              MM.isInTambur ||
+              MM.isInBattle
+            ) {
               return;
             }
             Voice.drop(Number(id));
