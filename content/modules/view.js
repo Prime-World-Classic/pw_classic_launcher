@@ -1029,7 +1029,20 @@ export class View {
     return body;
   }
 
-  static async castlePlay() {
+  static async refreshCastlePlayOnly(partyData = null) {
+    const castleBody = document.getElementById('castle-body');
+    const activeCastleView = castleBody && View.active === castleBody;
+    const currentCastlePlay = activeCastleView ? castleBody.querySelector('.castle-play') : null;
+    if (!currentCastlePlay) {
+      await View.show('castle', partyData);
+      return;
+    }
+
+    const updatedCastlePlay = await View.castlePlay(partyData);
+    currentCastlePlay.replaceWith(updatedCastlePlay);
+  }
+
+  static async castlePlay(partyData = null) {
     const DEMO_PARTY_SIZE = 0;
     let body = DOM({ style: 'castle-play' });
 
@@ -1049,7 +1062,7 @@ export class View {
         */
     let lobby = DOM({ style: 'castle-play-lobby' });
 
-    let data = await App.api.request(App.CURRENT_MM, 'loadParty'),
+    let data = partyData || (await App.api.request(App.CURRENT_MM, 'loadParty')),
       players = new Array();
 
     MM.partyId = data.id;
@@ -1290,7 +1303,7 @@ export class View {
             id: MM.partyId,
           });
 
-          View.show('castle');
+          await View.refreshCastlePlayOnly();
         });
 
         if (player.nickname.length > 15) {
@@ -3803,7 +3816,7 @@ export class View {
                     id: MM.partyId,
                   });
 
-                  View.show('castle');
+                  await View.refreshCastlePlayOnly();
                 },
               ],
             },
