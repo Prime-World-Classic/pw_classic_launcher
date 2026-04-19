@@ -92,11 +92,13 @@ export class View {
   static castleOpenedBuildHeroId = 0;
   static CASTLE_HERO_LISTS_MAX = 8;
   static CASTLE_HERO_LIST_STORAGE_KEY = 'castleHeroSelectedList';
+  static CASTLE_HERO_LAST_ACTIVE_LIST_STORAGE_KEY = 'castleHeroLastActiveList';
   static CASTLE_HERO_LIST_NAMES_STORAGE_KEY = 'castleHeroListNames';
   static CASTLE_FRIEND_LISTS_MAX = 1;
   static CASTLE_FRIEND_LIST_STORAGE_KEY = 'castleFriendSelectedList';
   static castleHeroAll = [];
   static castleHeroSelectedList = 0;
+  static castleHeroLastActiveList = 0;
   static castleHeroSearch = '';
   static castleHeroPhantomList = 0;
   static castleHeroListEditMode = '';
@@ -112,6 +114,10 @@ export class View {
   static castleFriendListEditMode = '';
   static castleFriendEditSelection = new Set();
   static castleFriendClearConfirm = false;
+  static castleModeHeroAutoOpenHandler = null;
+  static castleHeroAutoOpenModes = new Set([1, 2, 5]);
+  static castleAramMode = 3;
+  static castlePartyHeroRequestInFlight = false;
 
   static getQueue(cssKey) {
     const map = {
@@ -130,6 +136,206 @@ export class View {
     View.hasFriendIncomingRequest = Boolean(value);
     View.updateFriendsMenuIncomingState();
   }
+  
+  static normalizeFriendPresenceState(item) {
+    const state = String(item?.presenceState || '').toLowerCase();
+    if (state === 'online' || state === 'queue' || state === 'tambour' || state === 'battle' || state === 'away' || state === 'offline') {
+      return state;
+    }
+    return Number(item?.online) === 1 ? 'online' : 'offline';
+  }
+  
+  static getFriendPresenceLabel(state) {
+    switch (String(state || 'offline')) {
+      case 'battle':
+        return Lang.text('friendStatusBattle');
+      case 'tambour':
+        return Lang.text('friendStatusTambour');
+      case 'queue':
+        return Lang.text('friendStatusQueue');
+      case 'away':
+        return Lang.text('friendStatusAway');
+      case 'online':
+        return Lang.text('friendStatusOnline');
+      default:
+        return Lang.text('friendStatusOffline');
+    }
+  }
+  
+  static isFriendGroupInviteEnabled(item) {
+    return View.normalizeFriendPresenceState(item) === 'online';
+  }
+  
+  static isFriendCallEnabled(item) {
+    const state = View.normalizeFriendPresenceState(item);
+    return state === 'online' || state === 'queue';
+  }
+  
+  static getFriendPresenceFilter(state) {
+    switch (String(state || 'offline')) {
+      case 'battle':
+        return 'sepia(1) hue-rotate(-40deg) saturate(1.45) brightness(0.95)';
+      case 'tambour':
+        return 'sepia(1) hue-rotate(-715deg) saturate(3.35) brightness(1.02)';
+      case 'queue':
+        return 'brightness(1.28)';
+      case 'away':
+        return 'sepia(1) hue-rotate(352deg) saturate(1.1) brightness(0.92)';
+      case 'offline':
+        return 'grayscale(0.8)';
+      default:
+        return '';
+    }
+  }
+  
+  static getFriendStatusSortWeight(item) {
+    const relationStatus = Number(item?.status || 0);
+    if (relationStatus === 2) {
+      return 0; // incoming requests
+    }
+    if (relationStatus === 3) {
+      return 8; // outgoing requests
+    }
+    if (relationStatus !== 1) {
+      return 9;
+    }
+    const presenceState = View.normalizeFriendPresenceState(item);
+    if (presenceState === 'online') {
+      return Number(item?.inParty) === 1 ? 2 : 1;
+    }
+    switch (presenceState) {
+      case 'queue':
+        return 3;
+      case 'tambour':
+        return 4;
+      case 'battle':
+        return 5;
+      case 'away':
+        return 6;
+      default:
+        return 7; // offline/unknown
+    }
+  }
+  
+  static getSortedCastleFriends() {
+    const source = Array.isArray(View.castleFriendAll) ? View.castleFriendAll : [];
+    return source
+      .map((item, index) => ({ item, index }))
+      .sort((a, b) => {
+        const weightDiff = View.getFriendStatusSortWeight(a.item) - View.getFriendStatusSortWeight(b.item);
+        if (weightDiff !== 0) {
+          return weightDiff;
+        }
+        return a.index - b.index;
+      })
+      .map((entry) => entry.item);
+  }
+  
+  static applyFriendPresenceUpdate(data) {
+    const friendId = Number(data?.id || 0);
+    if (!friendId) return;
+    let changed = false;
+    let changedItem = null;
+    for (const item of View.castleFriendAll || []) {
+      if (Number(item?.id) !== friendId) continue;
+      item.presenceState = String(data?.state || item?.presenceState || '');
+      if ('online' in (data || {})) item.online = Number(data.online) === 1 ? 1 : 0;
+      if ('mobile' in (data || {})) item.mobile = Number(data.mobile) === 1 ? 1 : 0;
+      if ('inParty' in (data || {})) item.inParty = Number(data.inParty) === 1 ? 1 : 0;
+      changed = true;
+      changedItem = item;
+      break;
+    }
+    if (changed && changedItem && View.castleActiveTab === 'friends') {
+      View.patchVisibleFriendCard(changedItem);
+      View.reorderVisibleFriendCards();
+    }
+  }
+  
+  static createFriendGroupAction(item) {
+    return async () => {
+      await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id, mode: CastleNAVBAR.mode });
+      App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
+    };
+  }
+  
+  static createFriendCallAction(item) {
+    return async () => {
+      try {
+        let voice = new Voice(item.id, 'friend', item.nickname, true);
+        await voice.call();
+      } catch (error) {
+        App.error(error);
+      }
+    };
+  }
+  
+  static patchVisibleFriendCard(item) {
+    if (!View.castleBottom) return;
+    const card = View.castleBottom.querySelector(`.castle-friend-item[data-friend-id="${Number(item?.id || 0)}"]`);
+    if (!card) return;
+    const status = Number(item?.status || 0);
+    if (status !== 1) return;
+    const bottom = card.querySelector('.castle-friend-item-bottom');
+    if (!bottom) return;
+    const buttons = bottom.querySelectorAll('.castle-friend-add-group');
+    if (buttons.length < 2) return;
+    const call = buttons[0];
+    const group = buttons[1];
+    const presenceState = View.normalizeFriendPresenceState(item);
+    const friendInParty = presenceState === 'online' && Number(item?.inParty) === 1;
+    const groupEnabled = View.isFriendGroupInviteEnabled(item);
+    const callEnabled = View.isFriendCallEnabled(item);
+    const groupText = friendInParty
+      ? Lang.text('friendInGroup')
+      : groupEnabled
+        ? Lang.text('inviteToAGroup')
+        : View.getFriendPresenceLabel(presenceState);
+    group.textContent = groupText;
+    const presenceFilter = View.getFriendPresenceFilter(presenceState);
+    group.style.filter = (!groupEnabled || friendInParty) ? (presenceFilter || 'grayscale(0.8)') : '';
+    call.style.filter = !callEnabled ? 'grayscale(0.8)' : '';
+    group.onclick = null;
+    call.onclick = null;
+    if (groupEnabled && !friendInParty) {
+      group.onclick = View.createFriendGroupAction(item);
+    }
+    if (callEnabled) {
+      call.onclick = View.createFriendCallAction(item);
+    }
+    const mobileEmoji = card.querySelector('.castle-friend-mobile-emoji');
+    const showMobile = status === 1 && View.normalizeFriendPresenceState(item) !== 'offline' && Number(item?.mobile) === 1;
+    if (showMobile && !mobileEmoji) {
+      card.append(DOM({ style: 'castle-friend-mobile-emoji' }, '📱'));
+    } else if (!showMobile && mobileEmoji) {
+      mobileEmoji.remove();
+    }
+  }
+  
+  static reorderVisibleFriendCards() {
+    if (!View.castleBottom) return;
+    const cards = Array.from(View.castleBottom.querySelectorAll('.castle-friend-item[data-friend-id]'));
+    if (cards.length < 2) return;
+    const orderIndex = new Map();
+    const all = Array.isArray(View.castleFriendAll) ? View.castleFriendAll : [];
+    for (let i = 0; i < all.length; i++) {
+      orderIndex.set(Number(all[i]?.id || 0), i);
+    }
+    cards.sort((a, b) => {
+      const aId = Number(a.dataset.friendId || 0);
+      const bId = Number(b.dataset.friendId || 0);
+      const aItem = all.find((x) => Number(x?.id || 0) === aId);
+      const bItem = all.find((x) => Number(x?.id || 0) === bId);
+      const weightDiff = View.getFriendStatusSortWeight(aItem) - View.getFriendStatusSortWeight(bItem);
+      if (weightDiff !== 0) {
+        return weightDiff;
+      }
+      return (orderIndex.get(aId) ?? 0) - (orderIndex.get(bId) ?? 0);
+    });
+    for (const card of cards) {
+      View.castleBottom.append(card);
+    }
+  }
 
   static updateFriendsMenuIncomingState() {
     if (!View.friendsMenuItem) {
@@ -137,6 +343,158 @@ export class View {
     }
 
     View.friendsMenuItem.classList.toggle('friends-menu-item-incoming', View.hasFriendIncomingRequest);
+  }
+
+  static isCastleModeRequireHeroSelection(mode) {
+    return View.castleHeroAutoOpenModes.has(Number(mode));
+  }
+
+  static async setCastlePartyHero(playerCard, heroId, fallbackRating = 1100) {
+    if (!playerCard || Number(playerCard?.dataset?.id) !== Number(App.storage?.data?.id)) {
+      return false;
+    }
+
+    if (View.castlePartyHeroRequestInFlight) {
+      return false;
+    }
+
+    View.castlePartyHeroRequestInFlight = true;
+    try {
+      await App.api.request(App.CURRENT_MM, 'heroParty', {
+        id: MM.partyId,
+        hero: heroId,
+      });
+    } catch (error) {
+      App.error(error);
+      return false;
+    } finally {
+      View.castlePartyHeroRequestInFlight = false;
+    }
+
+    const numericHeroId = Number(heroId) || 0;
+    let heroSkin = 1;
+    let heroRating = fallbackRating || 1100;
+
+    if (numericHeroId > 0) {
+      let heroes = MM.hero;
+      if (!Array.isArray(heroes) || !heroes.length) {
+        heroes = await App.api.request('build', 'heroAll');
+        MM.hero = heroes;
+      }
+
+      const selectedHero = Array.isArray(heroes) ? heroes.find((item) => Number(item?.id) === numericHeroId) : null;
+      if (selectedHero) {
+        heroSkin = Number(selectedHero.skin) > 0 ? Number(selectedHero.skin) : 1;
+        heroRating = Number(selectedHero.rating) || heroRating;
+      }
+    }
+
+    const newHeroImg = numericHeroId ? `url(content/hero/${numericHeroId}/${heroSkin}.webp)` : `url(content/hero/empty.webp)`;
+    playerCard.style.backgroundImage = `${newHeroImg}, url(content/hero/background.png)`;
+    playerCard.style.backgroundRepeat = 'no-repeat, no-repeat';
+    playerCard.style.backgroundPosition = 'center, center';
+    playerCard.style.backgroundSize = 'contain, contain';
+
+    const rankContainer = playerCard.querySelector('.rank');
+    Rank.updateRankContainer(rankContainer, parseInt(heroRating, 10));
+
+    MM.activeSelectHero = numericHeroId;
+    return true;
+  }
+
+  static async openCastlePartyHeroPicker(playerCard, fallbackRating = 1100, options = {}) {
+    const { notifyOnActiveSearch = true } = options;
+    if (!playerCard || Number(playerCard?.dataset?.id) !== Number(App.storage?.data?.id)) {
+      return;
+    }
+    if (MM.active) {
+      if (notifyOnActiveSearch) {
+        App.notify(Lang.text('youSearchFight'));
+      }
+      return;
+    }
+
+    let request = await App.api.request('build', 'heroAll');
+    MM.hero = request;
+
+    let bannedHeroesResponse = new Array();
+    try {
+      bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
+    } catch (error) {
+      bannedHeroesResponse = new Array();
+    }
+
+    const bannedHeroes = new Set(
+      (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0),
+    );
+
+    const heroList = [...request, { id: 0 }];
+    let bodyHero = DOM({ style: 'party-hero' });
+    let preload = new PreloadImages(bodyHero);
+
+    for (let heroData of heroList) {
+      let hero = DOM({ domaudio: domAudioPresets.smallButton });
+      const isBannedInMode = heroData.id && bannedHeroes.has(Number(heroData.id));
+      if (isBannedInMode) {
+        hero.style.filter = 'grayscale(100%)';
+        hero.style.opacity = '0.6';
+        hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
+      }
+
+      hero.addEventListener('click', async () => {
+        if (isBannedInMode) {
+          App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
+          return;
+        }
+
+        const selected = await View.setCastlePartyHero(playerCard, heroData.id, heroData.rating || fallbackRating || 1100);
+        if (selected) {
+          Splash.hide();
+        }
+      });
+
+      hero.dataset.url = heroData.id ? `content/hero/${heroData.id}/${heroData.skin ? heroData.skin : 1}.webp` : `content/hero/empty.webp`;
+      preload.add(hero);
+    }
+
+    Splash.show(bodyHero, false);
+  }
+
+  static bindCastleModeHeroAutoOpen() {
+    if (View.castleModeHeroAutoOpenHandler) {
+      window.removeEventListener('CastleModeChanged', View.castleModeHeroAutoOpenHandler);
+    }
+
+    View.castleModeHeroAutoOpenHandler = async (event) => {
+      const mode = Number(event?.detail?.mode);
+      const myCard = document.querySelector(`.castle-play-lobby-player[data-id="${App.storage.data.id}"]`);
+      if (!myCard) {
+        return;
+      }
+
+      if (mode === View.castleAramMode) {
+        if (Number(MM.activeSelectHero) !== 0) {
+          const selected = await View.setCastlePartyHero(myCard, 0, 1100);
+          if (selected && Splash.body && Splash.body.style.display == 'flex' && Splash.body.querySelector('.party-hero')) {
+            Splash.hide();
+          }
+        }
+        return;
+      }
+
+      if (!View.isCastleModeRequireHeroSelection(mode) || Number(MM.activeSelectHero) > 0) {
+        return;
+      }
+      if (Splash.body && Splash.body.style.display == 'flex' && Splash.body.querySelector('.party-hero')) {
+        return;
+      }
+
+      await View.openCastlePartyHeroPicker(myCard, 1100, { notifyOnActiveSearch: false });
+    };
+
+    window.addEventListener('CastleModeChanged', View.castleModeHeroAutoOpenHandler);
   }
 
   static remapQueryByKeyboardLayout(value, layoutMap) {
@@ -671,7 +1029,20 @@ export class View {
     return body;
   }
 
-  static async castlePlay() {
+  static async refreshCastlePlayOnly(partyData = null) {
+    const castleBody = document.getElementById('castle-body');
+    const activeCastleView = castleBody && View.active === castleBody;
+    const currentCastlePlay = activeCastleView ? castleBody.querySelector('.castle-play') : null;
+    if (!currentCastlePlay) {
+      await View.show('castle', partyData);
+      return;
+    }
+
+    const updatedCastlePlay = await View.castlePlay(partyData);
+    currentCastlePlay.replaceWith(updatedCastlePlay);
+  }
+
+  static async castlePlay(partyData = null) {
     const DEMO_PARTY_SIZE = 0;
     let body = DOM({ style: 'castle-play' });
 
@@ -691,10 +1062,14 @@ export class View {
         */
     let lobby = DOM({ style: 'castle-play-lobby' });
 
-    let data = await App.api.request(App.CURRENT_MM, 'loadParty'),
+    let data = partyData || (await App.api.request(App.CURRENT_MM, 'loadParty')),
       players = new Array();
 
     MM.partyId = data.id;
+    MM.partyMembersCount = Object.keys(data?.users || {}).length || 1;
+    if (data && ('mode' in data)) {
+      CastleNAVBAR.setMode(Number(data.mode) + 1, { syncParty: false });
+    }
 
     MM.activeSelectHero = data.users[App.storage.data.id].hero;
 
@@ -774,7 +1149,7 @@ export class View {
     }
 
     const partySize = Math.max(1, players.length);
-    const maxInRow = partySize <= 4 ? partySize : Math.max(1, Math.ceil(partySize / 2));
+    const maxInRow = partySize <= 5 ? partySize : 5;
     lobby.style.setProperty('--castle-play-lobby-max-in-row', String(maxInRow));
     const rowCount = Math.max(1, Math.ceil(partySize / maxInRow));
     lobby.dataset.rows = String(rowCount);
@@ -928,7 +1303,7 @@ export class View {
             id: MM.partyId,
           });
 
-          View.show('castle');
+          await View.refreshCastlePlayOnly();
         });
 
         if (player.nickname.length > 15) {
@@ -940,87 +1315,7 @@ export class View {
 
       item.addEventListener('click', async () => {
         if (item.dataset.id == App.storage.data.id) {
-          if (MM.active) {
-            App.notify(Lang.text('youSearchFight'));
-            return;
-          }
-
-          let request = await App.api.request('build', 'heroAll');
-
-          // request.sort((a, b) => b.rating - a.rating);
-
-          MM.hero = request;
-
-          let bannedHeroesResponse = new Array();
-          try {
-            bannedHeroesResponse = await App.api.request(App.CURRENT_MM, 'bannedHeroes', { mode: CastleNAVBAR.mode });
-          } catch (error) {
-            bannedHeroesResponse = new Array();
-          }
-
-          const bannedHeroes = new Set(
-            (Array.isArray(bannedHeroesResponse) ? bannedHeroesResponse : new Array())
-              .map((id) => Number(id))
-              .filter((id) => Number.isFinite(id) && id > 0),
-          );
-
-          request.push({ id: 0 });
-
-          let bodyHero = DOM({ style: 'party-hero' });
-
-          let preload = new PreloadImages(bodyHero);
-
-          for (let item2 of request) {
-            let hero = DOM({ domaudio: domAudioPresets.smallButton });
-
-            const isBannedInMode = item2.id && bannedHeroes.has(Number(item2.id));
-            if (isBannedInMode) {
-              hero.style.filter = 'grayscale(100%)';
-              hero.style.opacity = '0.6';
-              hero.title = Lang.text('thisHeroIsUnavailableInCurrentGameMode');
-            }
-
-            hero.addEventListener('click', async () => {
-              if (isBannedInMode) {
-                App.error(Lang.text('thisHeroIsUnavailableInCurrentGameMode'));
-                return;
-              }
-
-              try {
-                await App.api.request(App.CURRENT_MM, 'heroParty', {
-                  id: MM.partyId,
-                  hero: item2.id,
-                });
-              } catch (error) {
-                return App.error(error);
-              }
-
-              const newHeroImg = item2.id
-                ? `url(content/hero/${item2.id}/${item2.skin ? item2.skin : 1}.webp)`
-                : `url(content/hero/empty.webp)`;
-              item.style.backgroundImage = `${newHeroImg}, url(content/hero/background.png)`;
-              item.style.backgroundRepeat = 'no-repeat, no-repeat';
-              item.style.backgroundPosition = 'center, center';
-              item.style.backgroundSize = 'contain, contain';
-
-              const rankContainer = item.querySelector('.rank');
-              const heroRating = item2.rating || player.rating || 1100;
-              Rank.updateRankContainer(rankContainer, parseInt(heroRating, 10));
-
-              MM.activeSelectHero = item2.id;
-              Splash.hide();
-            });
-
-            if (item2.id) {
-              hero.dataset.url = `content/hero/${item2.id}/${item2.skin ? item2.skin : 1}.webp`;
-            } else {
-              hero.dataset.url = `content/hero/empty.webp`;
-            }
-
-            preload.add(hero);
-          }
-
-          Splash.show(bodyHero, false);
+          await View.openCastlePartyHeroPicker(item, player.rating);
         }
         /*
                 if( ( (item.dataset.id == 0) && ( (!MM.partyId ) || (MM.partyId == App.storage.data.id) ) ) ){
@@ -1053,7 +1348,7 @@ export class View {
                             
                             body.append(DOM({event:['click', async () => {
                                 
-                                await App.api.request(App.CURRENT_MM,'inviteParty',{id:item.id});
+                                await App.api.request(App.CURRENT_MM,'inviteParty',{id:item.id,mode:CastleNAVBAR.mode});
                                 
                                 App.notify(`Приглашение отправлено игроку ${item.nickname}`,1000);
                                 
@@ -1077,6 +1372,7 @@ export class View {
     }
 
     body.append(CastleNAVBAR.body, lobby);
+    View.bindCastleModeHeroAutoOpen();
 
     return body;
   }
@@ -1894,6 +2190,20 @@ export class View {
     } catch {}
   }
 
+  static persistCastleHeroLastActiveList() {
+    try {
+      localStorage.setItem(View.CASTLE_HERO_LAST_ACTIVE_LIST_STORAGE_KEY, String(View.castleHeroLastActiveList || 0));
+    } catch {}
+  }
+
+  static rememberCastleHeroLastActiveList(listId) {
+    const id = Number(listId) || 0;
+    if (id < 1 || id > View.CASTLE_HERO_LISTS_MAX) return;
+    if (View.castleHeroLastActiveList === id) return;
+    View.castleHeroLastActiveList = id;
+    View.persistCastleHeroLastActiveList();
+  }
+
   static loadCastleHeroSelectedList() {
     try {
       const value = Number(localStorage.getItem(View.CASTLE_HERO_LIST_STORAGE_KEY));
@@ -1901,6 +2211,37 @@ export class View {
         View.castleHeroSelectedList = value;
       }
     } catch {}
+    try {
+      const value = Number(localStorage.getItem(View.CASTLE_HERO_LAST_ACTIVE_LIST_STORAGE_KEY));
+      if (Number.isFinite(value) && value >= 1 && value <= View.CASTLE_HERO_LISTS_MAX) {
+        View.castleHeroLastActiveList = value;
+      } else {
+        View.castleHeroLastActiveList = 0;
+      }
+    } catch {}
+    if (View.castleHeroSelectedList > 0) {
+      View.rememberCastleHeroLastActiveList(View.castleHeroSelectedList);
+    }
+  }
+
+  static getCastleHeroTamburListId(heroes = []) {
+    const selectedListId = Number(View.castleHeroSelectedList) || 0;
+    if (selectedListId >= 1 && selectedListId <= View.CASTLE_HERO_LISTS_MAX) {
+      return selectedListId;
+    }
+
+    const fallbackListId = Number(View.castleHeroLastActiveList) || 0;
+    if (fallbackListId < 1 || fallbackListId > View.CASTLE_HERO_LISTS_MAX) {
+      return 0;
+    }
+
+    if (Array.isArray(heroes) && heroes.length) {
+      const mask = 1 << (fallbackListId - 1);
+      const hasHeroesInList = heroes.some((hero) => (View.getCastleHeroFavouriteMask(hero) & mask) !== 0);
+      if (!hasHeroesInList) return 0;
+    }
+
+    return fallbackListId;
   }
 
   static cleanupCastleHeroPhantomList() {
@@ -2080,6 +2421,7 @@ export class View {
                 View.cleanupCastleHeroPhantomList();
               }
               View.castleHeroSelectedList = i;
+              View.rememberCastleHeroLastActiveList(i);
               if (isPhantom && !View.castleHeroListEditMode) View.castleHeroListEditMode = 'add';
               View.castleHeroEditSelection = new Set();
               View.castleHeroDeleteConfirmListId = 0;
@@ -2859,7 +3201,8 @@ export class View {
     preload.add(buttonAdd);
     View.castleBottom.append(buttonAdd);
 
-    for (let item of View.castleFriendAll || []) {
+    const sortedFriends = View.getSortedCastleFriends();
+    for (let item of sortedFriends) {
       const status = Number(item?.status);
       const nickname = String(item?.nickname || '');
       const nicknameLower = nickname.toLowerCase();
@@ -2882,6 +3225,7 @@ export class View {
       let heroNameBase = DOM({ style: 'castle-item-hero-name' }, heroName);
       let bottom = DOM({ style: 'castle-friend-item-bottom' });
       let friend = DOM({ style: 'castle-friend-item' }, DOM({ style: ['castle-item-ornament', 'hover-brightness'] }), heroNameBase, bottom);
+      friend.dataset.friendId = String(Number(item?.id || 0));
 
       if (editMode && status === 1) {
         const selected = View.castleFriendEditSelection.has(Number(item.id));
@@ -2897,24 +3241,29 @@ export class View {
       } else {
         // Keep existing friend actions in non-edit mode (copied minimal core behavior).
         if (status == 1) {
-          let group = DOM({ style: 'castle-friend-add-group' }, item.online ? Lang.text('inviteToAGroup') : Lang.text('friendIsOffline'));
+          const presenceState = View.normalizeFriendPresenceState(item);
+          const friendInParty = presenceState === 'online' && Number(item?.inParty) === 1;
+          const groupEnabled = View.isFriendGroupInviteEnabled(item);
+          const callEnabled = View.isFriendCallEnabled(item);
+          const groupText = friendInParty
+            ? Lang.text('friendInGroup')
+            : groupEnabled
+              ? Lang.text('inviteToAGroup')
+              : View.getFriendPresenceLabel(presenceState);
+          let group = DOM({ style: 'castle-friend-add-group' }, groupText);
           let call = DOM({ style: 'castle-friend-add-group' }, Lang.text('callAFriend'));
-          if (!item.online) {
-            group.style.filter = 'grayscale(0.8)';
-            call.style.filter = 'grayscale(.8)';
-          } else {
-            group.onclick = async () => {
-              await App.api.request(App.CURRENT_MM, 'inviteParty', { id: item.id });
-              App.notify(Lang.text('friendAcceptText').replace('{nickname}', item.nickname));
-            };
-            call.onclick = async () => {
-              try {
-                let voice = new Voice(item.id, 'friend', item.nickname, true);
-                await voice.call();
-              } catch (error) {
-                App.error(error);
-              }
-            };
+          const presenceFilter = View.getFriendPresenceFilter(presenceState);
+          if (!groupEnabled || friendInParty) {
+            group.style.filter = presenceFilter || 'grayscale(0.8)';
+          }
+          if (!callEnabled) {
+            call.style.filter = 'grayscale(0.8)';
+          }
+          if (groupEnabled && !friendInParty) {
+            group.onclick = View.createFriendGroupAction(item);
+          }
+          if (callEnabled) {
+            call.onclick = View.createFriendCallAction(item);
           }
           friend.addEventListener('contextmenu', (event) => {
             event.preventDefault();
@@ -3023,6 +3372,10 @@ export class View {
             ),
           );
         }
+      }
+
+      if (status == 1 && View.normalizeFriendPresenceState(item) !== 'offline' && Number(item.mobile) == 1) {
+        friend.append(DOM({ style: 'castle-friend-mobile-emoji' }, '📱'));
       }
 
       friend.dataset.url = `content/hero/friendLogo.png`;
@@ -3330,6 +3683,10 @@ export class View {
     data = data ? data : await App.api.request(App.CURRENT_MM, 'loadParty');
 
     MM.partyId = data.id;
+    MM.partyMembersCount = Object.keys(data?.users || {}).length || 1;
+    if (data && ('mode' in data)) {
+      CastleNAVBAR.setMode(Number(data.mode) + 1, { syncParty: false });
+    }
 
     MM.activeSelectHero = data.users[App.storage.data.id].hero;
 
@@ -3459,7 +3816,7 @@ export class View {
                     id: MM.partyId,
                   });
 
-                  View.show('castle');
+                  await View.refreshCastlePlayOnly();
                 },
               ],
             },
@@ -3584,6 +3941,7 @@ export class View {
                       async () => {
                         await App.api.request(App.CURRENT_MM, 'inviteParty', {
                           id: item.id,
+                          mode: CastleNAVBAR.mode,
                         });
 
                         App.notify(`Приглашение отправлено игроку ${item.nickname}`, 1000);
@@ -3696,7 +4054,7 @@ export class View {
     const heroStatsPayload =
       isHeroStatsView && result && typeof result === 'object' && !Array.isArray(result)
         ? result
-        : { month: [], allTime: [] };
+        : { week: [], month: [], allTime: [] };
 
     const heroNameById = (id) => {
       const localizedName = Lang.heroName(Number(id), 1);
@@ -3781,7 +4139,8 @@ export class View {
       key: 'battles',
       direction: 'desc',
     };
-    let heroStatsPeriod = 'month';
+    const HERO_STATS_PERIODS = ['week', 'month', 'allTime'];
+    let heroStatsPeriod = 'week';
 
     const heroStatsColumns = [
       { key: 'hero', labelKey: 'topColHero' },
@@ -3790,8 +4149,63 @@ export class View {
       { key: 'losses', labelKey: 'topColLosses' },
       { key: 'winrate', labelKey: 'topColWinrate' },
     ];
+    const HERO_STATS_COLOR_RANGE = {
+      battles: { min: '#d46a6a', max: '#62d27a' },
+      wins: { min: '#d46a6a', max: '#62d27a' },
+      losses: { min: '#d46a6a', max: '#62d27a' },
+      winrate: { min: '#d46a6a', max: '#62d27a' },
+    };
+    const HERO_STATS_METRIC_KEYS = ['battles', 'wins', 'losses', 'winrate'];
 
-    const makeHeroStatsRow = (item) => {
+    const hexToRgb = (hexColor) => {
+      const hex = String(hexColor || '').replace('#', '');
+      if (hex.length !== 6) return { r: 255, g: 255, b: 255 };
+      return {
+        r: Number.parseInt(hex.slice(0, 2), 16),
+        g: Number.parseInt(hex.slice(2, 4), 16),
+        b: Number.parseInt(hex.slice(4, 6), 16),
+      };
+    };
+
+    const mixColor = (minColor, maxColor, ratio) => {
+      const clamped = Math.max(0, Math.min(1, ratio));
+      const minRgb = hexToRgb(minColor);
+      const maxRgb = hexToRgb(maxColor);
+      const r = Math.round(minRgb.r + (maxRgb.r - minRgb.r) * clamped);
+      const g = Math.round(minRgb.g + (maxRgb.g - minRgb.g) * clamped);
+      const b = Math.round(minRgb.b + (maxRgb.b - minRgb.b) * clamped);
+      return `rgb(${r}, ${g}, ${b})`;
+    };
+
+    const buildMetricRanges = (rows) => {
+      const ranges = {};
+      for (const key of HERO_STATS_METRIC_KEYS) {
+        let min = Infinity;
+        let max = -Infinity;
+        for (const item of rows) {
+          const value = Number(item[key]) || 0;
+          if (value < min) min = value;
+          if (value > max) max = value;
+        }
+        ranges[key] = {
+          min: Number.isFinite(min) ? min : 0,
+          max: Number.isFinite(max) ? max : 0,
+        };
+      }
+      return ranges;
+    };
+
+    const metricValueColor = (metricKey, value, metricRanges) => {
+      const range = metricRanges[metricKey];
+      if (!range) return '';
+      const min = Number(range.min) || 0;
+      const max = Number(range.max) || 0;
+      const ratio = max === min ? 0.5 : (value - min) / (max - min);
+      const palette = HERO_STATS_COLOR_RANGE[metricKey] || HERO_STATS_COLOR_RANGE.battles;
+      return mixColor(palette.min, palette.max, ratio);
+    };
+
+    const makeHeroStatsRow = (item, metricRanges) => {
       const heroIcon = DOM({ style: 'wtop-cell-hero-icon' });
       heroIcon.style.backgroundImage = `url(content/hero/${item.hero}/1.webp)`;
       const heroCell = DOM(
@@ -3803,6 +4217,10 @@ export class View {
       const winsCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.wins || 0));
       const lossesCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number'] }, String(item.losses || 0));
       const winrateCell = DOM({ style: ['wtop-cell', 'wtop-cell--hero-stat-number', 'wtop-cell--hero-stat-winrate'] }, `${Number(item.winrate || 0).toFixed(2)}%`);
+      battlesCell.style.color = metricValueColor('battles', Number(item.battles) || 0, metricRanges);
+      winsCell.style.color = metricValueColor('wins', Number(item.wins) || 0, metricRanges);
+      lossesCell.style.color = metricValueColor('losses', Number(item.losses) || 0, metricRanges);
+      winrateCell.style.color = metricValueColor('winrate', Number(item.winrate) || 0, metricRanges);
       return DOM({ style: 'wtop-hero-stats-row' }, heroCell, battlesCell, winsCell, lossesCell, winrateCell);
     };
 
@@ -3817,8 +4235,8 @@ export class View {
       });
       const headerHeroTitle = DOM({ style: ['wtop-cell', 'wtop-cell--hero', 'wtop-cell--hero-stats-hero', 'wtop-hero-title-cell'] });
       const headerHeroLabel = DOM({ tag: 'span', style: 'wtop-hero-title-label' }, Lang.text('topColHero'));
-      const getCurrentHeroList = () => (heroStatsPeriod === 'allTime' ? heroStatsPayload.allTime || [] : heroStatsPayload.month || []);
-      const hasAnyData = (heroStatsPayload.month || []).length > 0 || (heroStatsPayload.allTime || []).length > 0;
+      const getCurrentHeroList = () => heroStatsPayload[heroStatsPeriod] || [];
+      const hasAnyData = HERO_STATS_PERIODS.some((periodKey) => (heroStatsPayload[periodKey] || []).length > 0);
 
       const sortRows = () => {
         const key = heroStatsSortState.key;
@@ -3837,8 +4255,9 @@ export class View {
         if (!rows.length) {
           rowsBody.append(DOM({ style: 'wtop-empty-hint', textContent: Lang.text('topEmpty') }));
         } else {
+          const metricRanges = buildMetricRanges(rows);
           for (const item of rows) {
-            rowsBody.append(makeHeroStatsRow(item));
+            rowsBody.append(makeHeroStatsRow(item, metricRanges));
           }
         }
 
@@ -3848,7 +4267,13 @@ export class View {
           btn.classList.toggle('is-active', heroStatsSortState.key === keyName);
         }
         headerHeroLabel.textContent = Lang.text('topColHero');
-        periodToggle.textContent = heroStatsPeriod === 'month' ? Lang.text('topPeriodMonth') : Lang.text('topPeriodAllTime');
+        if (heroStatsPeriod === 'week') {
+          periodToggle.textContent = Lang.text('topPeriodWeek');
+        } else if (heroStatsPeriod === 'month') {
+          periodToggle.textContent = Lang.text('topPeriodMonth');
+        } else {
+          periodToggle.textContent = Lang.text('topPeriodAllTime');
+        }
       };
 
       if (!hasAnyData) {
@@ -3860,7 +4285,8 @@ export class View {
       for (const col of heroStatsColumns) {
         if (col.key === 'hero') {
           periodToggle.addEventListener('click', () => {
-            heroStatsPeriod = heroStatsPeriod === 'month' ? 'allTime' : 'month';
+            const currentIndex = HERO_STATS_PERIODS.indexOf(heroStatsPeriod);
+            heroStatsPeriod = HERO_STATS_PERIODS[(currentIndex + 1) % HERO_STATS_PERIODS.length];
             sortRows();
           });
           headerHeroTitle.append(DOM({ style: 'wtop-hero-title-split' }, headerHeroLabel, periodToggle));

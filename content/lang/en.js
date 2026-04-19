@@ -112,6 +112,7 @@ export const en = {
     topColWins: 'Wins',
     topColLosses: 'Losses',
     topColWinrate: 'Winrate',
+    topPeriodWeek: 'Week',
     topPeriodMonth: 'Month',
     topPeriodAllTime: 'All Time',
     topEmpty: 'No data',
@@ -268,6 +269,17 @@ export const en = {
     skins: 'Skins',
     classTalent: 'Class Talent',
     talentConflict: 'The selected talent conflicts with another talent in the build!!',
+    talentAnomalyUnknown: 'Talent action was rejected by backend. Build state has been restored.',
+    TALENT_ANOMALY_INVALID_SLOT: 'Invalid talent slot.',
+    TALENT_ANOMALY_INVALID_TALENT: 'Invalid talent.',
+    TALENT_ANOMALY_SLOT_OCCUPIED: 'Slot is already occupied by another talent.',
+    TALENT_ANOMALY_WRONG_LEVEL: 'This talent cannot be placed into this row.',
+    TALENT_ANOMALY_CONFLICT: 'Talent conflicts with already installed talents.',
+    TALENT_ANOMALY_INVALID_ACTIVE_SLOT: 'Invalid active bar slot.',
+    TALENT_ANOMALY_INVALID_ACTIVE_POSITION: 'Invalid active talent position.',
+    TALENT_ANOMALY_ACTIVE_POINTS_TO_EMPTY: 'Cannot assign an empty build slot to active bar.',
+    TALENT_ANOMALY_MISMATCH_CLIENT: 'This talent is not available for your client.',
+    TALENT_ANOMALY_UNKNOWN_ACTION: 'Unknown talent action.',
     smartcastDescription: 'Right-click a talent in this bar to enable/disable smartcast (use skill without confirmation)',
     stealBuild: 'Steal build?',
     overwriteBuild: 'Overwrite current build?',
@@ -293,6 +305,7 @@ export const en = {
     buildSettingsLmbMode3: 'Show set in Library',
     buildSettingsSetMatchOnly: 'Matching stats only (Sets)',
     buildSettingsStatFilterHighlight: 'Talent highlight (hover over a stat)',
+    buildSettingsSetHoverOnTalent: 'Set highlight on talent hover',
     buildSettingsStatFilterHighlightModeOff: 'Off',
     buildSettingsStatFilterHighlightModeHasStat: 'All matching talents',
     buildSettingsStatFilterHighlightModeAffectsTotal: 'Only talents that actually apply',
@@ -330,12 +343,19 @@ export const en = {
     callAFriend: 'Call',
     inviteToAGroup: 'Party',
     friendIsOffline: 'Offline',
+    friendStatusOnline: 'Online',
+    friendStatusBattle: 'In battle',
+    friendStatusQueue: 'Searching',
+    friendStatusTambour: 'In tambour',
+    friendStatusAway: 'Away',
+    friendStatusOffline: 'Offline',
     friendAccept: 'Accept',
     friendDecline: 'Decline',
     friendRemove: 'Remove',
     friendCancle: 'Cancle',
     friendRemoveText: 'Friend - {nickname}',
     friendAcceptText: 'Invitation sent to {nickname}',
+    friendInGroup: 'In party',
     friendNicknamePlaceholder: 'Nickname',
     friendAcceptWaiting: 'Waiting',
     friendListClear: 'Clear list',
@@ -361,6 +381,7 @@ export const en = {
     hotkeyDropCalls: '<strong>Ctrl+K</strong> - drop all calls except friends',
     hotkeyDropCallsSuffix: ' - drop all calls except friends',
     hotkeyVolumeControl: '<strong>Ctrl+↑/↓</strong> - increase/decrease volume',
+    voicePeerVolumeHint: 'Hover % and scroll wheel to change player volume',
 
     // Квесты
     qDays: 'd.',
@@ -1008,6 +1029,8 @@ export const en = {
     titleDuplicateTheCurrentBuild: 'Duplicate the current build',
     titleGenerateARandomBuild: 'Generate a random build',
     titleResetTalentsInThisBuild: 'Reset talents in this build',
+    titleSortSetsIntoColumn: 'Sort sets into columns',
+    sortSetsRmbMirrorBuild: 'RMB - Mirror build',
     titleActiveTalents: 'Active talents',
     titleTheRed: 'The red',
     titleTheOrange: 'The orange',
@@ -1026,6 +1049,8 @@ export const en = {
     combatModeName: 'Combat Mode',
     combatModeBuildNotComplete: 'Build is not complete',
     combatModeLevelCounterTitle: 'Hero level',
+    sortSetsIntoColumnDisabledCombat: 'Set sorting is unavailable in combat mode',
+    sortSetsIntoColumnInProgress: 'Sorting sets...',
     titleClickToViewHeroRating: 'Click here to select a hero and sort hall of fame players',
 
     // Постройки
@@ -2031,7 +2056,7 @@ export const en = {
       'Creates an area for <num>8</num> sec. where enemies take <mag>%s</mag> damage per sec.<br>\nRat Swarm turns enemy terrain neutral.',
     htalent_190_name: "Flute's Call <mana>180</mana> <CD>15</CD>",
     htalent_190_description:
-      'Forces an enemy hero to follow for <num>2.5</num> sec., or until <num>%s</num> damage is taken (based on Intellect), and enslaves enemy creatures.<br>\nCan control up to <num>4</num> creatures simultaneously.',
+      'Forces an enemy Hero to follow you for <num>2.5</num> seconds, or until <num>%s</num> damage (based on Intellect) is dealt, and forces enemy creatures to serve you.<br>Can control up to <num>4</num> creatures at the same time. Tamed creatures gain <num>%s</num> Agility and Cunning (based on Agility and Cunning).',
     htalent_191_name: 'Rat Disease',
     htalent_191_description:
       'The Rat Swarm talent additionally deals <mag>%s</mag> damage to enemies and reduces their highest of Strength or Intellect by <num>%s</num> (based on Strength) for <num>3</num> sec. Reduces enemy healing by <num>%s%</num> (based on Strength), up to <num>75%</num>.<br>Total damage <mag>%s</mag>',
@@ -2040,15 +2065,15 @@ export const en = {
     htalent_193_name: 'Rat Rogues <mana>220</mana> <CD>120</CD>',
     htalent_193_description:
       "Rats run towards enemy heroes, dealing <mag>%s</mag> damage to them, stealing <prime>11-81</prime> (based on your Hero's level), and reducing their Speed by <num>30%</num> for <num>3</num> sec. Can only be killed by auto-attacks.",
-    htalent_194_name: 'Charming Melody <mana>260</mana> <CD>150</CD>',
+    htalent_194_name: 'Charming Melody <mana>260</mana> <CD>110</CD>',
     htalent_194_description:
-      'The hero becomes immune to control for <num>1.5</num> sec. and forces nearby enemy heroes and their summoned creatures to freeze, while others obey for <num>15</num> sec.',
+      'The hero becomes immune to control for <num>1.5</num> sec. and forces nearby enemy heroes and their summoned creatures to freeze, while others obey for <num>15</num> sec. Deals <mag>%s</mag> damage to enemy Heroes (based on the higher of Strength or Intellect).',
     htalent_195_name: "Flute's Power",
     htalent_195_description:
-      "Creatures charmed by the flute receive Health and Energy regeneration like the hero's and <num>50%</num> of their Health.",
+      "Creatures charmed by the flute receive Health and Energy regeneration like the hero's and <num>%s%</num> of their Health.",
     htalent_196_name: 'Enchanting Music',
     htalent_196_description:
-      'After Charming Melody ends, nearby enemy heroes are slowed by <num>80%</num> and cannot use talents for <num>1.5</num> sec.',
+      'After Charming Melody ends, nearby enemy heroes are slowed by <num>80%</num> and cannot use talents for <num>1.8</num> sec.',
     htalent_197_name: 'Shredding Volley <mana>100</mana> <CD>10</CD>',
     htalent_197_description:
       "The hero draws the bow for <num>0.5</num> sec. and releases arrows in the specified direction, dealing <fiz>%s</fiz> (based on Intellect) and <mag>%s</mag> (based on Intellect) damage that can be <orange-d>Critical</orange-d> to all enemies in the path.<br><rz>When used from native terrain, the talent deals <num>1.3</num> times more damage.</rz><br> The talent's range is increased by <num>%s</num> (based on Intellect).",
@@ -2910,7 +2935,7 @@ export const en = {
       'When colliding with an enemy hero, a Supernova also causes damage to all enemies around - <num>2</num> times less.',
     htalent_504_name: 'An eye for an eye <CD>60</CD>',
     htalent_504_description:
-      'When a hero dies, he deals <mag>%s</mag> damage (from the highest of Strength and Intellect) to the nearest enemy hero (within a radius of 100) with the lowest Health.<br>The damage inflicted on the hero is reduced by <num>5%</num>.',
+      'When a hero dies, he deals <mag>%s</mag> damage (from the highest of Strength and Intellect) to the nearest enemy hero (within a radius of <num>%s</num>) with the lowest Health.<br>The damage inflicted on the hero is reduced by <num>5%</num>.',
     htalent_505_name: 'Revenge',
     htalent_505_description: 'If the enemy was not killed by the Tit-for-Tat talent, the hero is reborn after <num>10</num> seconds.',
     htalent_506_name: 'Destructive Fire',
@@ -3224,7 +3249,7 @@ export const en = {
     htalent_618_description: 'Talent Crossbow shot additionally stuns the target for <num>1</num> sec.',
     htalent_619_name: 'Lightning Reflexes <mana>100</mana> <CD>15</CD>',
     htalent_619_description:
-      'The hero accelerates by <num>60%</num> for <num>4</num> seconds. The recovery time of the Crossbow Shot talent is reduced by <num>50%</num> if the Heavy Crossbow talent is learned (on line 5) - the recovery time of the Crossbow Shot talent is reduced by <num>90%</num>.',
+      'The Hero gains a <num>60%</num> speed boost for <num>4</num> seconds. The cooldown of the Crossbow Shot talent is reduced by <num>50%</num>; if the Heavy Crossbow talent (on row 5) is learned, the cooldown of Crossbow Shot is reduced by <num>%s%</num>.',
     htalent_620_name: 'Disarming technique <mana>200</mana> <CD>60</CD>',
     htalent_620_description: 'For <num>3</num> seconds, disarms all enemies around and slows them down by <num>50%</num>.',
     htalent_621_name: 'Insubordination',
@@ -3275,7 +3300,7 @@ export const en = {
       'The Rat Invasion Talent deals additional <mag>%s</mag> damage to enemies and slows them down by <num>20%</num> For <num>3</num> seconds.',
     htalent_638_name: 'Flute Master',
     htalent_638_description:
-      'Talent The call of the flute at the end of the action stuns the enchanted hero for <num>0.5</num> sec. Flute-enchanted creatures gain <num>25%</num> Health is greater from the hero, and <num>%s</num> to the greatest of Stamina and Will (from the greatest of Stamina and Will of the hero).',
+      'Talent The call of the flute at the end of the action stuns the enchanted hero for <num>0.5</num> sec. Flute-enchanted creatures gain <num>%s%</num> Health is greater from the hero, and <num>%s</num> to the greatest of Stamina and Will (from the greatest of Stamina and Will of the hero).',
     htalent_639_name: 'Static charge',
     htalent_639_description:
       'The hero deals <mag>%s</mag> damage (from the greatest of Strength and Intellect) to the nearest enemy when using class talents that strike enemies with lightning.',
@@ -3315,7 +3340,7 @@ export const en = {
     htalent_651_description:
       'Stealing health from talent A determined attack from non-hero creatures increases by <num>2</num> times, and from heroes by <num>4</num> times.',
     htalent_652_name: 'Heavy Crossbow',
-    htalent_652_description: 'The area of damage to talent Crossbow shot becomes wider by <num>25%</num>.',
+    htalent_652_description: 'The impact area of the Crossbow Shot talent becomes <num>25%</num> wider.<br>The Lightning Reflexes talent reduces the cooldown of Crossbow Shot by <num>%s%</num>.',
     htalent_653_name: 'Rare, but accurate!',
     htalent_653_description:
       'A medium-range weapon with the following characteristics:<br>\n- There are 2 cartridges in the magazine.<br>\n- Attack speed <num>5</num> per second and does not depend on agility.<br>\n-After emptying the store, the hero reloads his weapon. The cooldown time depends on agility.<br>\n- Attacks cannot be critical.',
@@ -4984,7 +5009,7 @@ export const en = {
       'The cooldown of <tn>Pernicious Power</tn> is reduced by <num>30</num> sec. If the hero has no energy, increases health regeneration. <br> <br> <gray>Set</gray> <tn>"Pernicious passion"</tn>',
     talent_473_name: 'Pernicious Power<white> <CD>90</CD></white>',
     talent_473_description:
-      '<num>Attacking</num><br><br>Deals a total of <fiz>%s</fiz> damage (from the highest of Strength and Intellect) to the specified enemy hero.<br>Each kill made with this talent increases its damage by <fiz>%s</fiz> (from the highest of Strength and Intellect).<br> <br> <gray>Set</gray> <tn>"Pernicious passion"</tn><br><br><gray>- can be improved by <num>3</num> talents</gray>',
+      '<num>Attacking</num><br><br>Deals a total of <fiz>%s</fiz> damage (from the highest of Strength and Intellect) to the specified enemy hero.<br>Each kill made with this talent (no more than <num>10</num>) increases its damage by <fiz>%s</fiz> (from the highest of Strength and Intellect).<br> <br> <gray>Set</gray> <tn>"Pernicious passion"</tn><br><br><gray>- can be improved by <num>3</num> talents</gray>',
     talent_474_name: 'A Pernicious Ploy',
     talent_474_description:
       'Increases talent penetration by <num>0.8%</num> for each kill made with <tn>Pernicious Power</tn>.<br> <br> <gray>Set</gray> <tn>"Pernicious passion"</tn>',
@@ -5317,16 +5342,16 @@ export const en = {
       'Talent <orange-d>Forest symbol</orange-d> additionally deals <mag>%s</mag> damage. The damage is distributed evenly across the set targets affected by the class ability.<br> <br> <gray>Set</gray> <orange-d>"Forest symbol"</orange-d>',
     talent_584_name: 'The Order of Victory',
     talent_584_description:
-      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.5</num> seconds</gray>.',
     talent_585_name: 'Order of Courage',
     talent_585_description:
-      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.5</num> seconds</gray>.',
     talent_586_name: 'Order of Courage',
     talent_586_description:
-      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.5</num> seconds</gray>.',
     talent_587_name: 'The Order of Nobility',
     talent_587_description:
-      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.7</num> seconds</gray>.',
+      '<gray>Set</gray> <tn>"Experienced Warrior"</tn> <br> <br> <orange-l>1 talent</orange-l> <br> <gray>The Hero\'s attack deals <fiz>%s</fiz> bonus damage to enemy soldiers (based on the higher of Strength or Intellect)</gray> <br> <orange-l>2 talents</orange-l> <br> <gray>Once every <num>15</num> seconds, the attack deals <mag>%s</mag> bonus damage (based on the higher of Strength or Intellect) to an enemy Hero or tower</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Reduces the cooldown of the empowered attack by <num>5</num> seconds. The empowered attack slows the enemy Hero by <num>90%</num> for <num>0.5</num> seconds</gray>.',
     talent_588_name: 'Stronghold of Life',
     talent_588_description:
       '<gray>Set</gray> <orange-d>"Impenetrable bulwark"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <num>+6</num> <gray>to the greatest of Stamina and Will</gray> <br> <orange-l>3 talents</orange-l> <br> <gray>Hero\'s damage is reduced by <num>10%</num></gray>',
@@ -5863,9 +5888,9 @@ export const en = {
     talent_767_name: 'Energy Spinner',
     talent_767_description:
       'the Hero\'s energy increases every minute by <yellow>11.1</yellow>. The maximum total increase is <yellow>%s</yellow><br> <br> <gray>set</gray> <orange-d>"Spinners of Heroes"</orange-d> <br> <br> <orange-l>2 talents</orange-l> <br> <gray>each <num>4</num> sec. gives <prime>+1</prime></gray><br><hr><gray>Compatibility</gray><br>Cannot be equipped together with <amethyst>"Prime Influx"</amethyst>.',
-    talent_768_name: 'Sea Symbol<white> <CD>7</CD></white>',
+    talent_768_name: 'Sea Symbol<white> <CD>10</CD></white>',
     talent_768_description:
-      'An ally who received a buff from the class ability for <num>3</num> sec will gain <num>%s</num> Health per second from the highest of your hero\'s Strength and Intellect. Triggers on each hero no more than once every <num>7</num> sec.  <br> <br> <gray>Set</gray> <tn>"Sea Symbol"</tn><br><br><gray>- can be improved by <num>3</num> talents</gray>',
+      'An ally who received a buff from the class ability for <num>3</num> sec will gain <num>%s</num> Health per second from the highest of your hero\'s Strength and Intellect. Triggers on each hero no more than once every <num>10</num> sec. Each learned talent from the set increases the base healing by <num>%s%</num> <br> <br> <gray>Set</gray> <tn>"Sea Symbol"</tn><br><br><gray>- can be improved by <num>4</num> talents</gray>',
     talent_769_name: 'Sea Aspiration',
     talent_769_description:
       'The hero\'s Base Speed increases by <num>%s</num>. Of passive speed increases, the highest applies. Vision radius increases by <num>4.2</num>.<br> While the Sea Symbol effect is active, the target\'s speed increases by <num>%s</num> (from the highest of Strength and Intellect of the set owner).  <br> <br> <gray>Set</gray> <tn>"Sea Symbol"</tn>',
