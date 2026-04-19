@@ -38,6 +38,11 @@ export class MM {
   static active = false;
 
   static targetPlayerAnimate = false;
+  static targetPlayerRing = false;
+  static comparePlayerAnimate = false;
+  static comparePlayerRing = false;
+  static minimizeButton = false;
+  static isMinimized = false;
 
   static activeSelectHero = 0;
   
@@ -121,6 +126,26 @@ export class MM {
         }
       }
     });
+
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key !== 'Escape') {
+          return;
+        }
+
+        if (!MM.isInTambur || !MM.minimizeButton || MM.minimizeButton.classList.contains('is-hidden')) {
+          return;
+        }
+
+        MM.isMinimized = !MM.isMinimized;
+        MM.view.classList.toggle('mm-minimized', MM.isMinimized);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      },
+      true,
+    );
   }
 
   static soundEvent() {
@@ -142,6 +167,8 @@ export class MM {
     }
 
     MM.view.append(content);
+    MM.view.classList.remove('mm-minimized');
+    MM.isMinimized = false;
 
     MM.view.style.display = 'flex';
   }
@@ -165,6 +192,8 @@ export class MM {
     }
     
     MM.skipVoiceRestoreOnClose = false;
+    MM.isMinimized = false;
+    MM.minimizeButton = false;
 
     MM.view.style.display = 'none';
 
@@ -551,6 +580,9 @@ export class MM {
                 heroId: MM.targetHeroId,
                 banHeroId: MM.targetBanHeroId,
               });
+              if (MM.minimizeButton) {
+                MM.minimizeButton.classList.remove('is-hidden');
+              }
             } catch (error) {
               MM.lobbyConfirm.innerText = error;
 
@@ -562,6 +594,24 @@ export class MM {
         ],
       },
       Lang.text('ready2'),
+    );
+
+    MM.minimizeButton = DOM(
+      {
+        style: ['mm-lobby-window-action', 'mm-lobby-window-action-minimize', 'is-hidden'],
+        domaudio: domAudioPresets.smallButton,
+        event: [
+          'click',
+          () => {
+            MM.isMinimized = !MM.isMinimized;
+            MM.view.classList.toggle('mm-minimized', MM.isMinimized);
+            if (MM.minimizeButton) {
+              MM.minimizeButton.innerText = MM.isMinimized ? 'Развернуть' : 'Свернуть';
+            }
+          },
+        ],
+      },
+      'Свернуть',
     );
 
     MM.lobbyConfirm.style.opacity = 0;
@@ -594,12 +644,18 @@ export class MM {
       player.dataset.skin = 1;
 
       let hero = DOM({ style: 'mm-lobby-header-team-player-hero' });
+      let ring = DOM({ style: 'mm-lobby-header-team-player-ring' });
+      let compareRing = DOM({ style: 'mm-lobby-header-team-player-ring-compare' });
+      const isAllyPlayer = data.users[App.storage.data.id].team == data.users[key].team;
+
+      ring.classList.add(isAllyPlayer ? 'is-ally' : 'is-enemy');
+      compareRing.classList.add(isAllyPlayer ? 'is-ally' : 'is-enemy');
 
       let name = DOM({ style: 'mm-lobby-header-team-player-name' }, `${data.users[key].nickname}`);
 
       let rank = Rank.createRankNode(data.users[key].rating);
 
-      hero.append(rank, DOM({ style: 'mm-frame' }));
+      hero.append(rank, DOM({ style: 'mm-frame' }), ring, compareRing);
 
       if ('commander' in data.users[key]) {
         name.setAttribute('style', 'color:rgba(255,215,0,0.9)');
@@ -622,10 +678,17 @@ export class MM {
       player.append(hero, name);
 
       if (key == data.target) {
-        MM.lobbyPlayerAnimate = player.animate(
-          { transform: ['scale(1)', 'scale(0.8)', 'scale(1.1)', 'scale(1)'] },
-          { duration: 2000, iterations: Infinity, easing: 'ease-in-out' },
-        );
+        hero.classList.add('is-pulsing');
+        ring.style.opacity = '1';
+        MM.targetPlayerRing = ring;
+        MM.lobbyPlayerAnimate = ring.animate({ transform: ['rotate(0deg)', 'rotate(360deg)'] }, { duration: 1800, iterations: Infinity, easing: 'linear' });
+      }
+
+      if (key == data.compareTarget) {
+        hero.classList.add('is-pulsing');
+        compareRing.style.opacity = '1';
+        MM.comparePlayerRing = compareRing;
+        MM.comparePlayerAnimate = compareRing.animate({ transform: ['rotate(0deg)', 'rotate(360deg)'] }, { duration: 2000, iterations: Infinity, easing: 'linear' });
       }
 
       if (data.users[App.storage.data.id].team == data.users[key].team) {
@@ -810,7 +873,13 @@ export class MM {
     });
 
     let body = DOM(
-      { style: 'mm-lobby' },
+      { style: 'mm-lobby-shell' },
+      DOM({ style: 'mm-lobby-backdrop' }),
+      DOM(
+        { style: 'mm-lobby-window' },
+        DOM({ style: 'mm-lobby-window-topbar' }, MM.minimizeButton),
+        DOM(
+          { style: 'mm-lobby' },
       DOM({ style: 'mm-lobby-header' }, leftTeam, info, rightTeam),
       DOM(
         { style: 'mm-lobby-middle' },
@@ -822,6 +891,8 @@ export class MM {
         ),
         lobbyBuild,
         MM.lobbyHeroes,
+      ),
+        ),
       ),
     );
 
@@ -897,7 +968,7 @@ export class MM {
 
     let container = DOM({ tag: 'div' }, MM.renderBody);
 
-    container.setAttribute('style', 'width:37cqh;height:37cqh');
+    container.setAttribute('style', 'width:30cqh;height:30cqh');
 
     for (let number of [1, 2, 3, 4, 5, 6]) {
       let item = DOM({
@@ -940,6 +1011,17 @@ export class MM {
 
     if (!data.noAnimate && MM.lobbyPlayerAnimate) {
       MM.lobbyPlayerAnimate.cancel();
+      MM.lobbyPlayerAnimate = false;
+    }
+
+    if (!data.noAnimate && MM.targetPlayerRing) {
+      const oldHero = MM.targetPlayerRing.parentElement;
+      if (oldHero) {
+        oldHero.classList.remove('is-pulsing');
+      }
+      MM.targetPlayerRing.style.opacity = '0';
+      MM.targetPlayerRing.style.transform = 'rotate(0deg)';
+      MM.targetPlayerRing = false;
     }
 
     if (!data.noTimer) {
@@ -985,10 +1067,17 @@ export class MM {
       let findPlayer = document.getElementById(`PLAYER${data.target}`);
 
       if (findPlayer) {
-        MM.lobbyPlayerAnimate = findPlayer.animate(
-          { transform: ['scale(1)', 'scale(0.8)', 'scale(1.2)', 'scale(1)'] },
-          { duration: 500, iterations: Infinity, easing: 'ease-in-out' },
-        );
+        const ring = findPlayer.querySelector('.mm-lobby-header-team-player-ring');
+        const hero = findPlayer.querySelector('.mm-lobby-header-team-player-hero');
+
+        if (ring) {
+          if (hero) {
+            hero.classList.add('is-pulsing');
+          }
+          ring.style.opacity = '1';
+          MM.targetPlayerRing = ring;
+          MM.lobbyPlayerAnimate = ring.animate({ transform: ['rotate(0deg)', 'rotate(360deg)'] }, { duration: 1800, iterations: Infinity, easing: 'linear' });
+        }
       }
     }
 
@@ -1034,6 +1123,10 @@ export class MM {
       MM.lobbyConfirm.style.opacity = 1;
     } else {
       MM.lobbyConfirm.style.opacity = 0;
+    }
+
+    if (Number(data.userId) === Number(App.storage.data.id) && MM.minimizeButton) {
+      MM.minimizeButton.classList.remove('is-hidden');
     }
   }
   
@@ -1198,3 +1291,4 @@ export class MM {
     item.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }
 }
+

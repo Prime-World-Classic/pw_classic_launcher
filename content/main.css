@@ -2992,9 +2992,89 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 	animation: ready 8s linear infinite;*/
 }
 
+.mm {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+}
+
+.mm-lobby-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mm-lobby-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(6, 10, 16, 0.38), rgba(6, 10, 16, 0.62)),
+    url('img/bg.jpg') center/112% auto no-repeat;
+}
+
+.mm-lobby-window {
+  position: relative;
+  width: min(96vw, 162cqw);
+  height: min(92vh, 94cqh);
+  display: flex;
+  flex-flow: column nowrap;
+  border-radius: 1.2cqw;
+  overflow: hidden;
+  background: rgba(10, 17, 24, 0.72);
+  border: 0.08cqw solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1.2cqh 3.5cqh rgba(0, 0, 0, 0.45),
+    0 0 2.2cqw rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(0.35cqw);
+  z-index: 1;
+}
+
+.mm-lobby-window-topbar {
+  display: none;
+}
+
+.mm-lobby-window-action {
+  min-width: 8.5cqw;
+  padding: 0.45cqh 0.9cqw;
+  border-radius: 999px;
+  background: rgba(20, 54, 60, 0.9);
+  border: 0.08cqw solid rgba(96, 231, 255, 0.35);
+  color: rgba(231, 248, 255, 0.95);
+  font: 0.85cqw / 1 'DejaVuSans', sans-serif;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mm-lobby-window-action.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mm.mm-minimized {
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 1.6cqw;
+}
+
+.mm.mm-minimized .mm-lobby-window {
+  width: min(26vw, 44cqw);
+  height: 7.6cqh;
+}
+
+.mm.mm-minimized .mm-lobby {
+  display: none;
+}
+
 .mm-lobby {
-  width: 100cqw;
-  height: 100cqh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-flow: column nowrap;
 }
@@ -3002,45 +3082,54 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 .mm-lobby-header {
   display: flex;
   flex-flow: row nowrap;
-  width: 100cqw;
-  height: 30cqh;
+  width: 100%;
+  height: 19cqh;
   justify-content: space-around;
   align-items: center;
-  /*padding:3cqh 1cqw;*/
+  padding: 1.5cqh 0.7cqw 1.25cqh;
+  background: url('img/bodytop_bc.png') center/100% 100% no-repeat;
 }
 
 .mm-lobby-middle {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-  width: 100cqw;
-  height: 70cqh;
-  /*padding:3cqh 1cqw;*/
+  align-items: stretch;
+  gap: 0.8cqw;
+  padding: 2cqh 0.9cqw 1cqh;
+  background: url('img/bodybot_bc.jpg') center/103% 108% no-repeat;
+  width: 100%;
+  height: 85cqh;
 }
 
 .mm-lobby-middle-chat {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   width: 33.33cqw;
-  height: 70cqh;
+  height: 100%;
+  padding: 0.1cqh 0.15cqw 0.3cqh;
+  gap: 1.2cqh;
 }
 
 .mm-lobby-middle-chat-map {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 45cqh;
+  min-height: 30cqh;
+  margin-top: 4.2cqh;
+  margin-bottom: 0;
+  flex: 0 0 auto;
 }
 
 .mm-lobby-middle-chat-body {
-  height: 20cqh;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: none;
   overflow-y: scroll;
-  border-radius: 0 1cqw 0 0;
-  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+  border-radius: 0;
+  padding: 0.35cqh 0;
+  background: transparent;
 }
 
 .mm-lobby-middle-chat-body-item {
@@ -3061,11 +3150,15 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 }
 
 .mm-lobby-middle-chat-button {
+  flex: 0 0 auto;
+  display: block;
+  align-self: center;
   height: 5cqh;
+  margin-top: 0;
   width: 94%;
   padding: 0 3%;
   font: 1.3cqw / 1 'DejaVuSans', sans-serif;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 0 0 3px 3px;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -3073,10 +3166,12 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
 .mm-lobby-middle-build {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 33.33cqw;
-  height: 70cqh;
+  height: 100%;
+  padding: 0 0.2cqw 0.25cqh;
+  transform: translateY(-2.3cqh);
 }
 
 .mm-player-ban {
@@ -3116,7 +3211,8 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   flex-flow: row wrap;
   align-items: center;
   width: 33.33cqw;
-  height: 70cqh;
+  height: 100%;
+  padding: 0.15cqh 0.2cqw 0.25cqh;
   overflow-y: scroll;
 }
 
@@ -3196,8 +3292,93 @@ button.build-action-item.btn-hover.color-1 .btn-duplicate {
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
+  overflow: visible;
   box-shadow: 0 0 2cqw rgba(0, 0, 0, 0.5);
   container-type: size;
+}
+
+.mm-lobby-header-team-player-hero.is-pulsing {
+  animation: mmHeroPulse 2.1s infinite ease-in-out;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+
+.mm-lobby-header-team-player-ring,
+.mm-lobby-header-team-player-ring-compare {
+  position: absolute;
+  border-radius: 250%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  --ring-main: rgba(255, 214, 92, 1);
+  --ring-soft: rgba(255, 214, 92, 0.6);
+  --ring-glow: rgba(255, 214, 92, 0.58);
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg 24deg,
+      rgba(255, 255, 255, 0) 24deg,
+      var(--ring-soft) 38deg 92deg,
+      var(--ring-main) 104deg 130deg,
+      rgba(255, 255, 255, 0) 142deg,
+      transparent 142deg 204deg,
+      rgba(255, 255, 255, 0) 204deg,
+      var(--ring-soft) 218deg 272deg,
+      var(--ring-main) 284deg 310deg,
+      rgba(255, 255, 255, 0) 322deg,
+      transparent 322deg 360deg
+    );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6.9cqw), #000 calc(100% - 0.86cqw));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 6.9cqw), #000 calc(100% - 0.86cqw));
+}
+
+.mm-lobby-header-team-player-ring {
+  inset: -1.05cqw;
+  box-shadow:
+    0 0 1.2cqw var(--ring-glow),
+    0 0 2.2cqw var(--ring-glow);
+  z-index: 3;
+}
+
+.mm-lobby-header-team-player-ring-compare {
+  inset: -1.28cqw;
+  box-shadow:
+    0 0 0.65cqw var(--ring-glow),
+    0 0 1.25cqw var(--ring-glow);
+  filter: saturate(1.08) brightness(1.06);
+  z-index: 2;
+}
+
+.mm-lobby-header-team-player-ring.is-enemy,
+.mm-lobby-header-team-player-ring-compare.is-enemy {
+  --ring-main: rgba(255, 72, 72, 1);
+  --ring-soft: rgba(255, 72, 72, 0.58);
+  --ring-glow: rgba(255, 72, 72, 0.58);
+}
+
+.mm-lobby-header-team-player-ring.is-ally,
+.mm-lobby-header-team-player-ring-compare.is-ally {
+  --ring-main: rgba(255, 214, 92, 1);
+  --ring-soft: rgba(255, 214, 92, 0.6);
+  --ring-glow: rgba(255, 214, 92, 0.58);
+}
+
+@keyframes mmHeroPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 
 .mm-frame {
@@ -7057,3 +7238,4 @@ body:has(#wcastle-call)::before {
     width: auto;
   }
 }
+
