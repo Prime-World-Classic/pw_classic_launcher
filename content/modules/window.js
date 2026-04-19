@@ -195,10 +195,7 @@ export class Window {
     return DOM({ id: 'wgame' }, view);
   }
     static async clans() {
-     const userRole = "lider";
-    //const userRole = "coLider";
-    // const userRole = "member";
-    // const userRole = "noClan";
+     
   
     const clanRolesList = {
       Lider: {
@@ -214,8 +211,9 @@ export class Window {
         label: Lang.text("clanMember")
       }
     };
-  
+
     const clanData = {
+      userRole:  "lider",
       clanStatistics: {
           clanName: "ClanName",
           clanTag: "clanTag",
@@ -246,7 +244,7 @@ export class Window {
         { clanName: "ClanName3", icon: "content/clanImages/UnknowClanFlag.png", points: "122223" }
       ]
     };
-  
+  const userRole = clanData.userRole
     const SETTINGS_ICON = "content/clanImages/main123.png";
   
     const memberRows = clanData.clanMembers.map(row => {
