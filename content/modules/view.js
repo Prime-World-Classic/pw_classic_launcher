@@ -956,7 +956,7 @@ export class View {
     return body;
   }
 
-  static async castle() {
+  static async castle(castleArg = null) {
     document.body.classList.add('noselect');
 
     Shop.retrieveLastUpdate();
@@ -989,8 +989,18 @@ export class View {
       App.error(error);
     }
 
+    let partyData = null;
+    let castleOptions = {};
+    if (castleArg && typeof castleArg === 'object') {
+      if ('users' in castleArg || 'mode' in castleArg || 'id' in castleArg) {
+        partyData = castleArg;
+      } else {
+        castleOptions = castleArg;
+      }
+    }
+
     try {
-      let castlePlay = await View.castlePlay();
+      let castlePlay = await View.castlePlay(partyData, castleOptions);
 
       body.append(castlePlay);
     } catch (error) {
@@ -1042,7 +1052,7 @@ export class View {
     currentCastlePlay.replaceWith(updatedCastlePlay);
   }
 
-  static async castlePlay(partyData = null) {
+  static async castlePlay(partyData = null, options = {}) {
     const DEMO_PARTY_SIZE = 0;
     let body = DOM({ style: 'castle-play' });
 
@@ -1067,7 +1077,7 @@ export class View {
 
     MM.partyId = data.id;
     MM.partyMembersCount = Object.keys(data?.users || {}).length || 1;
-    if (data && ('mode' in data)) {
+    if (data && ('mode' in data) && !options?.preserveMode) {
       CastleNAVBAR.setMode(Number(data.mode) + 1, { syncParty: false });
     }
 
