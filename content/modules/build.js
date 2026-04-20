@@ -7354,7 +7354,7 @@ export class Build {
           }
         };
 
-        let addToActive = async (index, position, datasetPosition, targetElem, clone, smartCast) => {
+        let addToActive = async (index, position, datasetPosition, targetElem, clone, smartCast, deferRequest = false) => {
           Build.assignActiveSlotLocal(index, position);
           targetElem.append(clone);
           clone.style.position = 'static';
@@ -7374,29 +7374,31 @@ export class Build {
             } catch {}
           }
 
-          try {
-            await Build.sendBuildMutationOrThrow({
-              optimisticMethod: 'optimisticSetActive',
-              legacyMethod: 'setActive',
-              data: {
-                buildId: Build.id,
-                index: index,
-                position: position,
-              },
-            });
-            if (smartCast) {
+          if (!deferRequest) {
+            try {
+              await Build.sendBuildMutationOrThrow({
+                optimisticMethod: 'optimisticSetActive',
+                legacyMethod: 'setActive',
+                data: {
+                  buildId: Build.id,
+                  index: index,
+                  position: position,
+                },
+              });
+              if (smartCast) {
+                try {
+                  await Build.requestSmartcast(targetElem);
+                } catch {}
+              }
+            } catch {
               try {
-                await Build.requestSmartcast(targetElem);
+                await Build.refreshBuildStateFromServer({ refreshInventory: true });
               } catch {}
             }
-          } catch {
-            try {
-              await Build.refreshBuildStateFromServer({ refreshInventory: true });
-            } catch {}
           }
         };
 
-        let editActive = async (position, newPosition, clone, skipActiveId) => {
+        let editActive = async (position, newPosition, clone, skipActiveId, deferRequest = false) => {
           if (position == newPosition) {
             clone.remove();
             return null;
@@ -7425,9 +7427,9 @@ export class Build {
 
           await removeFromActive(position, skipActiveId);
 
-          await addToActive(activeBarPosition, activePosition, newPosition, container, clone, isSmartCast);
+          await addToActive(activeBarPosition, activePosition, newPosition, container, clone, isSmartCast, deferRequest);
 
-          return activeBarPosition;
+          return { index: Number(activeBarPosition), smartCast: Number(isSmartCast) };
         };
 
         if (isFieldTarget && !fromActiveBar) {
@@ -7513,12 +7515,14 @@ export class Build {
                 }
 
                 try {
-                  let activeBarPosition = null;
+                  let activeBarMove = null;
                   if (!performSwap && data.active && swapParentNode?.dataset?.position !== undefined) {
-                    activeBarPosition = await editActive(
+                    activeBarMove = await editActive(
                       swapParentNode.dataset.position,
                       elemBelow.dataset.position,
                       element.cloneNode(true),
+                      undefined,
+                      true,
                     );
                   }
                   if (performSwap) {
@@ -7586,6 +7590,27 @@ export class Build {
                         index: elemBelow.dataset.position,
                       },
                     });
+
+                    if (activeBarMove && Number.isFinite(activeBarMove.index) && activeBarMove.index >= 0) {
+                      const nextPosition = Number(elemBelow.dataset.position) + 1;
+                      await Build.sendBuildMutationOrThrow({
+                        optimisticMethod: 'optimisticSetActive',
+                        legacyMethod: 'setActive',
+                        data: {
+                          buildId: Build.id,
+                          index: activeBarMove.index,
+                          position: nextPosition,
+                        },
+                      });
+                      if (Number(activeBarMove.smartCast)) {
+                        const targetContainer = Build.activeBarView?.childNodes?.[activeBarMove.index];
+                        if (targetContainer) {
+                          try {
+                            await Build.requestSmartcast(targetContainer);
+                          } catch {}
+                        }
+                      }
+                    }
                   }
 
                   if (data.active && prevState != element.dataset.state) {
