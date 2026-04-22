@@ -242,6 +242,7 @@ export class View {
       if ('online' in (data || {})) item.online = Number(data.online) === 1 ? 1 : 0;
       if ('mobile' in (data || {})) item.mobile = Number(data.mobile) === 1 ? 1 : 0;
       if ('inParty' in (data || {})) item.inParty = Number(data.inParty) === 1 ? 1 : 0;
+      if ('mode' in (data || {})) item.mode = Number(data.mode);
       changed = true;
       changedItem = item;
       break;
@@ -291,10 +292,20 @@ export class View {
       : groupEnabled
         ? Lang.text('inviteToAGroup')
         : View.getFriendPresenceLabel(presenceState);
+    const modeId = Number(item?.mode);
+    const canShowModeOnHover =
+      !groupEnabled &&
+      !friendInParty &&
+      Number.isFinite(modeId) &&
+      modeId >= 0 &&
+      (presenceState === 'battle' || presenceState === 'queue' || presenceState === 'tambour');
+    const modeText = canShowModeOnHover ? Lang.text(`gm${modeId + 1}`) : '';
     group.textContent = groupText;
     const presenceFilter = View.getFriendPresenceFilter(presenceState);
     group.style.filter = (!groupEnabled || friendInParty) ? (presenceFilter || 'grayscale(0.8)') : '';
     call.style.filter = !callEnabled ? 'grayscale(0.8)' : '';
+    group.onmouseenter = null;
+    group.onmouseleave = null;
     group.onclick = null;
     call.onclick = null;
     if (groupEnabled && !friendInParty) {
@@ -302,6 +313,14 @@ export class View {
     }
     if (callEnabled) {
       call.onclick = View.createFriendCallAction(item);
+    }
+    if (canShowModeOnHover) {
+      group.onmouseenter = () => {
+        group.textContent = modeText;
+      };
+      group.onmouseleave = () => {
+        group.textContent = groupText;
+      };
     }
     const mobileEmoji = card.querySelector('.castle-friend-mobile-emoji');
     const showMobile = status === 1 && View.normalizeFriendPresenceState(item) !== 'offline' && Number(item?.mobile) === 1;
@@ -3260,6 +3279,14 @@ export class View {
             : groupEnabled
               ? Lang.text('inviteToAGroup')
               : View.getFriendPresenceLabel(presenceState);
+          const modeId = Number(item?.mode);
+          const canShowModeOnHover =
+            !groupEnabled &&
+            !friendInParty &&
+            Number.isFinite(modeId) &&
+            modeId >= 0 &&
+            (presenceState === 'battle' || presenceState === 'queue' || presenceState === 'tambour');
+          const modeText = canShowModeOnHover ? Lang.text(`gm${modeId + 1}`) : '';
           let group = DOM({ style: 'castle-friend-add-group' }, groupText);
           let call = DOM({ style: 'castle-friend-add-group' }, Lang.text('callAFriend'));
           const presenceFilter = View.getFriendPresenceFilter(presenceState);
@@ -3274,6 +3301,14 @@ export class View {
           }
           if (callEnabled) {
             call.onclick = View.createFriendCallAction(item);
+          }
+          if (canShowModeOnHover) {
+            group.onmouseenter = () => {
+              group.textContent = modeText;
+            };
+            group.onmouseleave = () => {
+              group.textContent = groupText;
+            };
           }
           friend.addEventListener('contextmenu', (event) => {
             event.preventDefault();
