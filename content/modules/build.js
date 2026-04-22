@@ -4085,7 +4085,7 @@ export class Build {
     return normalized;
   }
 
-  static getSetTalentCooldownDeltaSeconds(targetTalentId, installedTalents = Build.installedTalents) {
+  static getSetTalentCooldownDeltaSeconds(targetTalentId, installedTalents = Build.getEffectiveInstalledTalents()) {
     const target = Math.abs(Number(targetTalentId));
     if (!Number.isFinite(target) || target <= 0) return 0;
 
