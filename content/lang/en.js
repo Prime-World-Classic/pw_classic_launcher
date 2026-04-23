@@ -5918,6 +5918,6 @@ export const en = {
       'Increases harpoon range and flight speed by <num>50%</num>. <br> <br> <gray>Set</gray> <tn>"Boarding Harpoon"</tn>',
     talent_777_name: 'Boarding Supremacy',
     talent_777_description:
-      'Reduces the Boarding Harpoon talent cooldown by <num>20</num> sec. Stuns not only the main target but all enemies around it within radius <num>5</num>. After the stun, targets are additionally slowed by <num>50%</num> for <num>2</num> sec. <br> <br> <gray>Set</gray> <tn>"Boarding Harpoon"</tn>',
+      'Reduces the Boarding Harpoon talent cooldown by <num>20</num> sec. Stuns not only the main target but all enemies around it within radius <num>5</num>. After the stun, targets are additionally slowed by <num>50%</num> for <num>2</num> seconds <br> <br> <gray>Set</gray> <tn>"Boarding Harpoon"</tn>',
   },
 };
