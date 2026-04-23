@@ -2058,7 +2058,7 @@ export const en = {
       'Creates an area for <num>8</num> sec. where enemies take <mag>%s</mag> damage per sec.<br>\nRat Swarm turns enemy terrain neutral.',
     htalent_190_name: "Flute's Call <mana>180</mana> <CD>15</CD>",
     htalent_190_description:
-      'Forces an enemy Hero to follow you for <num>2.5</num> seconds, or until <num>%s</num> damage (based on Intellect) is dealt, and forces enemy creatures to serve you.<br>Can control up to <num>4</num> creatures at the same time. Tamed creatures gain <num>%s</num> Agility and Cunning (based on Agility and Cunning).',
+      'Forces an enemy Hero to follow you for <num>2.5</num> seconds, or until <num>%s</num> damage (based on Intellect) is dealt, and forces enemy creatures to serve you.<br>Can control up to <num>4</num> creatures at the same time.',
     htalent_191_name: 'Rat Disease',
     htalent_191_description:
       'The Rat Swarm talent additionally deals <mag>%s</mag> damage to enemies and reduces their highest of Strength or Intellect by <num>%s</num> (based on Strength) for <num>3</num> sec. Reduces enemy healing by <num>%s%</num> (based on Strength), up to <num>75%</num>.<br>Total damage <mag>%s</mag>',
@@ -2828,7 +2828,7 @@ export const en = {
       "The Rainbow Jump talent increases the hero's Stamina and Will by <num>%s</num> (from Intellect) for <num>5</num> seconds.",
     htalent_464_name: 'Master of Training',
     htalent_464_description:
-      'Flute-enchanted creatures deal additional <num>%s</num> <red-d>physical damage</red-d> (from the greatest Strength and Intellect).',
+      'Flute-enchanted creatures deal additional <fiz>%s</fiz> damage (from the greatest Strength and Intellect).',
     htalent_465_name: 'Master of the Forest <mana>50</mana> <CD>15</CD>',
     htalent_465_description:
       'With the help of talent, the Call of the flute forces an additional Goblin to serve itself. Once every <num>15</num> seconds, you can order a Goblin to use an ability that stuns enemies around for <num>1</num> second.',
