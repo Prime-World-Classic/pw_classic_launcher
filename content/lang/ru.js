@@ -20,6 +20,8 @@ export const ru = {
     titleHelper: 'Поддержка',
     titlePhone: 'Телефон',
     titleSteamClient: 'Steam Клиент',
+    titleStarsGlory:
+      '«Звёзды Славы» — 1 звезда = MVP 100%\n(ценный/лучший игрок из 10 игроков за матч)\nбез единой смерти.',
     ready: 'Готов!',
     ready2: 'Подтвердить выбор героя',
     cancel: 'Отменить',

@@ -19,6 +19,8 @@ export const en = {
     titleHelper: 'Helper',
     titlePhone: 'Phone',
     titleSteamClient: 'Steam Client',
+    titleStarsGlory:
+      '"Stars of Glory" — 1 star = MVP 100%\n(best/most valuable player among 10 players in a match)\nwith zero deaths.',
     ready: 'Ready!',
     ready2: "Confirm the hero's choice",
     library: 'Library',
