@@ -198,22 +198,22 @@ export class Window {
      
   
     const clanRolesList = {
-      Lider: {
+      1: {
         icon: "content/clanImages/main1234567899123.png",
         label: Lang.text("clanLeader")
       },
-      Colider: {
+      2: {
         icon: "content/clanImages/main12345678991234.png",
         label: Lang.text("clanDeputy")
       },
-      Member: {
+      3: {
         icon: "content/clanImages/main123456789912.png",
         label: Lang.text("clanMember")
       }
     };
 
     const clanData = {
-      userRole:  "lider",
+      userRole:  1,
       clanStatistics: {
           clanName: "ClanName",
           clanTag: "clanTag",
@@ -224,9 +224,9 @@ export class Window {
           clanGerb: 'content/clanImages/GuildB.png',
       },
       clanMembers: [
-        { name: "Игрок1", role: "Lider", state: "В замке", dailyPoints: "125", totalPoints: "4210" },
-        { name: "Игрок2", role: "Colider", state: "В замке", dailyPoints: "125", totalPoints: "4210" },
-        { name: "Игрок3", role: "Member", state: "В замке", dailyPoints: "125", totalPoints: "4210" }
+        { name: "Игрок1", role: 1, state: "В замке", dailyPoints: "125", totalPoints: "4210" },
+        { name: "Игрок2", role: 2, state: "В замке", dailyPoints: "125", totalPoints: "4210" },
+        { name: "Игрок3", role: 3, state: "В замке", dailyPoints: "125", totalPoints: "4210" }
       ],
       clanQuests: [
         { questsName: "Охотник", questsTask: "Убить 100 чуди в режиме пограничье", questsAward: "10" },
@@ -248,7 +248,7 @@ export class Window {
     const SETTINGS_ICON = "content/clanImages/main123.png";
   
     const memberRows = clanData.clanMembers.map(row => {
-      const roleData = clanRolesList[row.role] || clanRolesList.Member;
+      const roleData = clanRolesList[row.role] || clanRolesList[3];
       const showPlayerInfo = (e) => {
   e.stopPropagation();
 
@@ -277,7 +277,7 @@ export class Window {
   closeButton.style.backgroundImage = "url(content/icons/close-cropped.svg)";
 
   const renderStatusButton = () => {
-    if (userRole === 'lider' && row.role === 'Colider') {
+    if (userRole === 1 && row.role === 2) {
       return DOM({ 
         style: "clanMembersButton", 
         tag: "button",
@@ -287,7 +287,7 @@ export class Window {
         }]
       }, Lang.text('clanStatusToMemberButton'));
     }
-    if (userRole === 'lider' && row.role === 'Member') {
+    if (userRole === 1 && row.role === 3) {
       return DOM({ 
         style: "clanMembersButton", 
         tag: "button",
@@ -297,7 +297,7 @@ export class Window {
         }]
       }, Lang.text('clanStatusToColiderButton'));
     }
-    if (userRole === 'coLider' && row.role === 'Member') {
+    if (userRole === 2 && row.role === 3) {
       return DOM({ 
         style: "clanMembersButton", 
         tag: "button",
@@ -313,12 +313,12 @@ export class Window {
   const statusButton = renderStatusButton();
 
   const renderButtonsList = () => {
-    if (userRole === 'lider' && row.role === 'Lider') {
+    if (userRole === 1 && row.role === 1) {
       return DOM({ style: "buttonsMembersMenuList" },
-        DOM({ style: "clanMembersText" }, Lang.text('youAreLeaderText'))
+        DOM({ style: "clanMembersText", id: 'youAreLeaderText'}, Lang.text('youAreLeaderText'))
       );
     }
-    if (userRole == 'lider') {
+    if (userRole === 1) {
       return DOM({style: "buttonsMembersMenuList"},
         DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
         DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
@@ -326,7 +326,7 @@ export class Window {
         DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('kickFromClanButton'))
       );
     }
-    if (userRole == 'coLider') {
+    if (userRole === 2) {
       return DOM({style: "buttonsMembersMenuList"},
         DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInFriendsButton')),
         DOM({ style: "clanMembersButton", tag: "button" }, Lang.text('addInPartyButton')),
@@ -343,7 +343,7 @@ export class Window {
     DOM({ style: "splash-title" }, 
       DOM({style: 'title-modal'}, DOM({style: 'title-modal-text'}, Lang.text('clanActionModal'))),
       DOM({style: "splashClanMemberMenu"},
-        DOM({}, Lang.text("settingsSplashLabel") + '"' + row.name + '"'),
+        DOM({style: 'splashClanTextMenu'}, Lang.text("settingsSplashLabel") + '"' + row.name + '"'),
         renderButtonsList()
       )
     ),
@@ -531,7 +531,7 @@ export class Window {
     );
   
     const tab3 = DOM({ style: "tab-content", id: "tab3" },
-  userRole == "lider" || userRole == "coLider"
+  userRole === 1 || userRole === 2
   ? DOM({ style: "applications-main-wrapper" },
       DOM({ style: "wrap-add-witch-nickname" }, 
         DOM({ 
@@ -599,7 +599,7 @@ export class Window {
             { style: "settings-third-section" },
             DOM({ style: "history-wrapper" }, DOM({ style: "settings-history-top-lane" }, Lang.text("clanJournal")), DOM({ style: "history-board" }))
           ),
-          userRole == "lider"
+          userRole === 1
             ? DOM({ style: "settings-fourth-section" },
                 DOM({ style: "rename-clan-button", tag: "button" }, Lang.text("clanChangeName")),
                 DOM({ style: "rename-clan-button", tag: "button" }, Lang.text("clanChangeGerb")),
@@ -751,7 +751,7 @@ const clanGuideSpan = DOM({
   
     return DOM(
   { style: 'clan-wapper', id: 'clan-wapper' },
-  userRole !== "noClan"
+  userRole !== 0
     ? DOM(
         { style: 'main__clan__wrapper' },
         DOM(
