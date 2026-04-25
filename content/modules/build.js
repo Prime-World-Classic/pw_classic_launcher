@@ -49,6 +49,7 @@ export class Build {
   static _inventorySetHoverTalentId = null;
   static _postMoveRefreshRaf = 0;
   static _postMoveRefreshNeedSort = false;
+  static _regroupInventoryBySetsOnNextSort = false;
   static animateHeroOnBuildChange = false;
   static _isDraggingTalent = false;
   static combatModeEnabled = false;
@@ -4926,6 +4927,7 @@ export class Build {
       container.replaceChildren();
     }
     Build._inventoryDefaultOrder = new Map();
+    Build._regroupInventoryBySetsOnNextSort = true;
 
     const requestedBuildId = Build.id;
     Build.loading = true;
@@ -7143,7 +7145,10 @@ export class Build {
     for (let itemContainer of Build.inventoryView.querySelectorAll('.build-talent-item-container')) {
       Build.applySorting(itemContainer);
     }
-    Build.groupInventoryTalentsBySets();
+    if (Build._regroupInventoryBySetsOnNextSort) {
+      Build.groupInventoryTalentsBySets();
+      Build._regroupInventoryBySetsOnNextSort = false;
+    }
   }
 
   /** Группировать видимые таланты одного сета в библиотеке (в порядке sets.list.js). */
@@ -7363,8 +7368,8 @@ export class Build {
       if (Build.descriptionView) Build.descriptionView.style.display = 'none';
     } catch {}
     try {
+      Build._regroupInventoryBySetsOnNextSort = true;
       Build.sortInventory();
-      Build.reorderInventoryByDefaultOrder();
     } catch {}
   }
 
@@ -7687,6 +7692,8 @@ export class Build {
             }
           }
         }
+
+        let postMoveNeedSort = true;
 
         if (Build._hoveredSetTalentIds) {
           Build.highlightSetTalents(Build._hoveredSetTalentIds);
@@ -8079,9 +8086,9 @@ export class Build {
             let containedTalent = DOM({ style: 'build-talent-item-container' }, element);
             Build.attachDefaultOrderDatasetToInventoryContainer(containedTalent);
 
-            Build.applySorting(containedTalent);
-
             targetElement.prepend(containedTalent);
+            // Возврат из билда в библиотеку должен оставаться "в первый слот" до следующей явной сортировки.
+            postMoveNeedSort = false;
 
             try {
               if (data.active && oldParentNode?.dataset?.position !== undefined) {
@@ -8098,6 +8105,7 @@ export class Build {
               });
 
               Build.installedTalents[parseInt(oldParentNode.dataset.position)] = null;
+              Build.applySorting(containedTalent);
 
               Build.setStat(data, true);
 
@@ -8261,7 +8269,7 @@ export class Build {
           await removeFromActive(element.dataset.position);
         }
 
-        Build.schedulePostMoveUiRefresh({ needSort: true });
+        Build.schedulePostMoveUiRefresh({ needSort: postMoveNeedSort });
 
         finishDragVisualState();
 
@@ -8280,6 +8288,12 @@ export class Build {
                   clientY: event.clientY,
                 }),
               );
+            } else {
+              if (Build.descriptionView) Build.descriptionView.style.display = 'none';
+              Build._hoveredDescriptionTalentEl = null;
+              Build.clearBuildRowHoverHighlight();
+              Build.clearEmptySlotPreviews();
+              if (!Build._hoveredSetTalentIds) Build.clearSetHighlights();
             }
           } catch {}
         }
