@@ -7143,6 +7143,93 @@ export class Build {
     for (let itemContainer of Build.inventoryView.querySelectorAll('.build-talent-item-container')) {
       Build.applySorting(itemContainer);
     }
+    Build.groupInventoryTalentsBySets();
+  }
+
+  /** Группировать видимые таланты одного сета в библиотеке (в порядке sets.list.js). */
+  static groupInventoryTalentsBySets() {
+    const list = Build.inventoryView?.querySelector('.build-talents');
+    if (!list) return;
+
+    const containers = Array.from(list.querySelectorAll('.build-talent-item-container'));
+    if (containers.length < 2) return;
+
+    // TalentSets.list() возвращает reverse() для UI списка; для группировки берём порядок как в sets.list.js.
+    const sets = TalentSets.list().slice().reverse();
+    const setMetaByTalentId = new Map();
+    for (const set of sets) {
+      const setKey = `${set?.key || ''}`;
+      const ids = TalentSets.getTalentIds(set);
+      for (let index = 0; index < ids.length; index++) {
+        const key = `${Number(ids[index])}`;
+        if (!Number.isFinite(Number(key))) continue;
+        if (setMetaByTalentId.has(key)) continue;
+        setMetaByTalentId.set(key, { setKey, orderInSet: index });
+      }
+    }
+
+    const visibleContainersBySet = new Map();
+    const getTalentIdKey = (container) => {
+      const idRaw = container?.querySelector?.('.build-talent-item')?.dataset?.id;
+      const idNum = Number(idRaw);
+      if (!Number.isFinite(idNum)) return null;
+      return `${idNum}`;
+    };
+
+    for (const container of containers) {
+      if (container?.style?.display === 'none') continue;
+      const idKey = getTalentIdKey(container);
+      if (!idKey) continue;
+      const meta = setMetaByTalentId.get(idKey);
+      if (!meta) continue;
+      if (!visibleContainersBySet.has(meta.setKey)) {
+        visibleContainersBySet.set(meta.setKey, new Map());
+      }
+      const byOrder = visibleContainersBySet.get(meta.setKey);
+      if (!byOrder.has(meta.orderInSet)) {
+        byOrder.set(meta.orderInSet, []);
+      }
+      byOrder.get(meta.orderInSet).push(container);
+    }
+
+    const consumed = new Set();
+    const ordered = [];
+    for (const container of containers) {
+      if (consumed.has(container)) continue;
+
+      const idKey = getTalentIdKey(container);
+      const meta = idKey ? setMetaByTalentId.get(idKey) : null;
+      const visible = container?.style?.display !== 'none';
+      const groupMap = visible && meta ? visibleContainersBySet.get(meta.setKey) : null;
+
+      if (!groupMap || groupMap.size <= 1) {
+        ordered.push(container);
+        consumed.add(container);
+        continue;
+      }
+
+      const groupOrders = Array.from(groupMap.keys()).sort((a, b) => a - b);
+      for (const order of groupOrders) {
+        const groupContainers = groupMap.get(order) || [];
+        for (const groupedContainer of groupContainers) {
+          if (consumed.has(groupedContainer)) continue;
+          ordered.push(groupedContainer);
+          consumed.add(groupedContainer);
+        }
+      }
+    }
+
+    for (const container of containers) {
+      if (consumed.has(container)) continue;
+      ordered.push(container);
+      consumed.add(container);
+    }
+
+    for (const container of ordered) {
+      try {
+        list.appendChild(container);
+      } catch {}
+    }
   }
 
   static refreshLocalBuildUiAfterSet(ids, set = null) {
