@@ -36,6 +36,12 @@ export class Chat {
   static editCursor = -1;
   
   static editDraftBeforeCursor = '';
+  
+  static arrowNavLastKey = '';
+  
+  static arrowNavLastAt = 0;
+  
+  static lastEnterSendAt = 0;
 
   static initView() {
     let scrollBtn = DOM(
@@ -116,10 +122,17 @@ export class Chat {
       if (!App.isEnterKey(event)) return;
       
       event.preventDefault();
+      event.stopPropagation();
+      const now = Date.now();
+      if (now - Number(Chat.lastEnterSendAt || 0) < 150) {
+        return;
+      }
+      Chat.lastEnterSendAt = now;
       await Chat.sendMessage();
     };
 
     input.addEventListener('keydown', handleInputKeys);
+    input.addEventListener('keyup', handleInputKeys);
 
     input.addEventListener('input', () => {
       if (!Chat.input.firstChild.value) {
@@ -323,6 +336,15 @@ export class Chat {
     if (!event || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
       return false;
     }
+    const now = Date.now();
+    if (Chat.arrowNavLastKey === event.key && (now - Chat.arrowNavLastAt) < 120) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return true;
+    }
+    Chat.arrowNavLastKey = event.key;
+    Chat.arrowNavLastAt = now;
     if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
       return false;
     }
@@ -339,6 +361,8 @@ export class Chat {
         return false;
       }
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
       if (Chat.editCursor < 0) {
         Chat.editDraftBeforeCursor = input.value;
       }
@@ -349,6 +373,8 @@ export class Chat {
     if (Chat.editCursor < 0) {
       if (Number(Chat.to || 0) > 0) {
         event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
         const inputValue = String(input.value || '');
         const replyPrefix = Chat.getReplyPrefix();
         if (replyPrefix && inputValue.startsWith(replyPrefix)) {
@@ -362,6 +388,8 @@ export class Chat {
       return false;
     }
     event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
     if (Chat.editCursor <= 0) {
       Chat.resetEditCursor(true);
       return true;
@@ -970,9 +998,21 @@ export class Chat {
       }
       const messageKey = Chat.getMessageIdentityKey(clone);
       if (messageKey) {
-        Chat.messages = Chat.messages.filter((msg) => Chat.getMessageIdentityKey(msg) !== messageKey);
+        const existingIndex = Chat.messages.findIndex((msg) => Chat.getMessageIdentityKey(msg) === messageKey);
+        if (existingIndex >= 0) {
+          const previous = Chat.messages[existingIndex] || {};
+          // Keep original position in history, update payload in place.
+          Chat.messages[existingIndex] = {
+            ...previous,
+            ...clone,
+            _ts: previous?._ts ?? clone._ts,
+          };
+        } else {
+          Chat.messages.unshift(clone);
+        }
+      } else {
+        Chat.messages.unshift(clone);
       }
-      Chat.messages.unshift(clone);
       if (Chat.messages.length > Chat.MAX_HISTORY) {
         Chat.messages.length = Chat.MAX_HISTORY;
       }
