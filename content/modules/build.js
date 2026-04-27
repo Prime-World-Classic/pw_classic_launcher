@@ -22,6 +22,8 @@ export class Build {
   static loading = false;
   static useOptimisticTalentApi = true;
   static mutationQueue = Promise.resolve();
+  static _activeBarRenderScheduled = false;
+  static _activeBarRenderData = null;
 
   /** HSL hue для подсветки сетов (как rgba(80,190,255)); толщина рамки в мм (макс. 1.5). */
   static BUILD_HIGHLIGHT_HUE_DEFAULT = 199;
@@ -779,7 +781,7 @@ export class Build {
     Build.activeBarItems = rollback.active.slice(0, 24).map((item) => Number(item) || 0);
     Build.rebuildFieldConflictFromInstalledTalents();
     Build.syncFieldSlotsFromInstalledTalents();
-    Build.activeBar(Build.activeBarItems);
+    Build.scheduleActiveBarRender(Build.activeBarItems);
     Build.sortInventory();
     Build.updateHeroStats();
     Build.syncCombatModeButtonState();
@@ -848,6 +850,18 @@ export class Build {
       throw new Error('Talent action rejected by backend');
     }
     return true;
+  }
+  
+  static scheduleActiveBarRender(data = null) {
+    const source = Array.isArray(data) ? data : Build.activeBarItems;
+    Build._activeBarRenderData = Array.isArray(source) ? source.slice(0, 24).map((item) => Number(item) || 0) : new Array(24).fill(0);
+    if (Build._activeBarRenderScheduled) return;
+    Build._activeBarRenderScheduled = true;
+    requestAnimationFrame(() => {
+      Build._activeBarRenderScheduled = false;
+      const nextData = Array.isArray(Build._activeBarRenderData) ? Build._activeBarRenderData : new Array(24).fill(0);
+      Build.activeBar(nextData);
+    });
   }
 
   static ensureBuildSettingsDefaults() {
@@ -2172,7 +2186,7 @@ export class Build {
           }
         }
       }
-      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+      Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
     } catch {}
 
     if (!Build._sortDeferBackendSync) {
@@ -2306,7 +2320,7 @@ export class Build {
             else if (ref.talentRef && rightNow === ref.talentRef) nextPos = rightSlot + 1;
             Build.activeBarItems[ref.i] = ref.sign * nextPos;
           }
-          Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+          Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
         } catch {}
         moved++;
       }
@@ -6900,6 +6914,10 @@ export class Build {
       if (element.dataset.active == 1) {
         position = -position;
       }
+      const activeIndex = Number(element.dataset.index);
+      if (Number.isFinite(activeIndex) && Array.isArray(Build.activeBarItems) && activeIndex >= 0 && activeIndex < Build.activeBarItems.length) {
+        Build.activeBarItems[activeIndex] = position;
+      }
 
       await Build.sendBuildMutationOrThrow({
         optimisticMethod: 'optimisticSetActive',
@@ -6933,8 +6951,6 @@ export class Build {
 
   static activeBar(data) {
     Build.activeBarItems = data;
-
-    console.log('activeBar', data);
 
     try {
       Build.activeBarView?.replaceChildren();
@@ -7250,7 +7266,7 @@ export class Build {
     try {
       Build.rebuildFieldConflictFromInstalledTalents();
       Build.syncFieldSlotsFromInstalledTalents();
-      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+      Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
       Build.ensureTalentIdsPresentInInventory(ids);
       Build.sortInventory();
       if (set) Build.applySetInventoryOrder(set);
@@ -7869,7 +7885,7 @@ export class Build {
                   swapParentNode.append(elemBelow.firstChild);
                   elemBelow.append(element);
                   // Active bar keeps clones, so force immediate redraw after field swap.
-                  Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+                  Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
                 } else {
                   if (performSwapFromLibrary) {
                     swappingTal = Build.installedTalents[parseInt(elemBelow.dataset.position)];
@@ -7920,7 +7936,7 @@ export class Build {
                           Build.activeBarItems[i] = sign * (newPos + 1);
                         }
                       }
-                      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+                      Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
                     } else if (!movedTalent?.active && displacedTalent?.active) {
                       for (let i = 0; i < (Build.activeBarItems || []).length; i++) {
                         const item = Number(Build.activeBarItems[i]) || 0;
@@ -7930,7 +7946,7 @@ export class Build {
                           Build.activeBarItems[i] = sign * (oldPos + 1);
                         }
                       }
-                      Build.activeBar(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
+                      Build.scheduleActiveBarRender(Array.isArray(Build.activeBarItems) ? Build.activeBarItems : new Array(24).fill(0));
                     }
                     await Build.sendBuildMutationOrThrow({
                       optimisticMethod: 'optimisticSwap',
